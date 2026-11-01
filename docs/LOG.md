@@ -175,3 +175,4 @@
 - 2026-11-01 astra: Rest shipped as an optional route (4f2676b). Fable: invitation capture equals the authored record, sound.wav byte-equal to the Node rebuild, manual capture rebuilt; roadmap M8 shipped; proposal 017 status.
 - 2026-11-01 astra: Rest Listen back (worker-sampled picture, deferred PCM replay). Fable review approve; restRecordPictureFrames sequential sampler landed.
 - 2026-11-01 astra: Rest Listen back shipped (3481f0c), replay browser checks passed, captures byte-identical. Fable: restMovieSource for the film; roadmap updated; agreed priority: finish Rest keeping, then exploration and first-use polish.
+- 2026-11-01 astra: Rest film (plan worker, exporter with held-contact rings, deferred PCM in controls, producer strengths with coefficients). Fable: first Rest film VERIFIED at the full level; review approve.

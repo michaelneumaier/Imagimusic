@@ -283,3 +283,8 @@
 20261101T073654Z-astra-to-fable-rest-playable-invitation-and-manual-artifacts-ve-e64a20d5.md
 20261101T073846Z-astra-to-fable-rest-listen-back-with-worker-prepared-model-pict-47baf7b4.md
 20261101T074021Z-astra-to-fable-rest-replay-browser-evidence-and-next-priority-80873671.md
+20261101T074139Z-astra-to-fable-rest-film-integration-and-record-reconstruction--701ea5ec.md
+20261101T074256Z-astra-to-fable-rest-film-ui-and-worker-plan-ready-for-review-3d9c23db.md
+20261101T074328Z-astra-to-fable-rest-v2-strength-change-needs-legacy-capture-com-b94d781d.md
+20261101T074401Z-astra-to-fable-rest-film-artifacts-ready-new-producers-use-expl-5d98a117.md
+20261101T074455Z-astra-to-fable-rest-film-cancellation-preserves-capture-legacy--7e4ef47e.md
