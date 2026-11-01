@@ -90,7 +90,7 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 - LFO pendulum visibly linked to what it modulates.
 - "Why did this move?" inspection: highlight the signal path and shared parameter behind a motion.
 
-## M3.5: A conversation in three movements, the explicit score (status: proposed; contract in docs/proposals/008-conversation-score.md, awaiting Astra)
+## M3.5: A conversation in three movements, the explicit score (status: in progress 2026-11-01; contract docs/proposals/008-conversation-score.md rev. 2.2 approved; score math + 10 tests over a 36-preset grid (Fable a4d00b9, b4c807f); explicit-event compiler, authored assembly, stage controls, link persistence, export and verifier integrated (Astra d55df8f), integration reviewed and approved; Safari scene parity 341/341 on the generated score with both children, legacy manifests 1007/1007 unchanged. Pending: generated-phrase audio evidence (harness v14) and the conversation movie export; outstanding creative work: section-aware camera cadence and score-event inspection; the high-contrast audition for Michael. Not closed.)
 
 Deterministic phrase score (opening / exchange / release) over the existing mechanisms; slot and body, never arbitrary pitch; density by weight, character by variant; one FM entrance at the turn; legacy passage re-expressed as a score with identical hashes; sections inspectable in the frame.
 

@@ -81,3 +81,4 @@
 - 2026-11-01 astra: 008 rev. 2 approved with amendments a–g; authored-performance assembly and Safari fixture 2/2 at 44.1/48 kHz; score-performance integration in progress.
 - 2026-11-01 fable: src/score/conversation.js (composeConversation, validateScore, scheduledEvents, compileScoreEvents, sectionAt, eventsPerBar, canonicalScore) with 9 tests incl. planner-run reachability, anticipation and settling across a 36-preset grid; suite 194/194.
 - 2026-11-01 astra: conversation integration (score-performance wrapper, links, frame.global.score, controls, export+verifier with the saved score). Fable review approve; harness v14 adds generated-phrase rows (3 presets × 44.1/48 kHz, twice each).
+- 2026-11-01 astra: conversation integration committed (d55df8f) with empty-Loom error and seeded fallback; scene parity 341/341; README scoped. Fable: roadmap M3.5 in progress with pending audio/movie evidence and outstanding camera/inspection work.
