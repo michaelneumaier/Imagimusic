@@ -46,12 +46,14 @@ test('dense passage: stolen garden voices keep the outlive stop (retire cannot r
   assert.ok(asLive.scheduled.filter(s => s.voice.fadeAt !== undefined).every(s => s.voice.nodes.every(n => n.stopTime === s.voice.end)));
 });
 
-test('renderPerformanceAudio passes the passage duration as renderEnd for outlive-render', async () => {
+test('renderPerformanceAudio defaults to outlive-render with the passage duration as renderEnd; as-live stays an explicit control', async () => {
   const performance = createPerformance(DEFAULT_PATCH);
   let seen = null;
   class Spy extends FakeOffline { async startRendering() { seen = this.nodes.filter(n => n.kind === 'osc').map(n => n.stopTime); return super.startRendering(); } }
-  await renderPerformanceAudio(performance, 8000, { OfflineContext: Spy, sourceLifetime: 'outlive-render' });
+  await renderPerformanceAudio(performance, 8000, { OfflineContext: Spy });
   assert.ok(seen.length > 0 && seen.every(t => t === performance.duration + 1));
+  await renderPerformanceAudio(performance, 8000, { OfflineContext: Spy, sourceLifetime: 'as-live' });
+  assert.ok(seen.every(t => t < performance.duration));
 });
 
 test('compareRenders reports identity, max/rms difference, rounding units, and 16-bit PCM equality', () => {

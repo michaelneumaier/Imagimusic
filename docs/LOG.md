@@ -37,3 +37,5 @@
 - 2026-11-01 astra: Tension Loom study 01 (loom.html, src/loom) on coupling.js: stereo PCM and analytic envelope from the same signed normal modes; actor bindings declared.
 - 2026-11-01 fable: Loom study review (approve-with-fixes: beat-rate display honesty).
 - 2026-11-01 astra: scored Loom passage (performance.js): coherent overlap, shared pickup scale, bounded stereo PCM. Fable review approve.
+- 2026-11-01 astra: v6 acceptance passed (full and air bit-identical); Loom conversation UI verified; stereo WAV ffprobe confirmed.
+- 2026-11-01 fable: renderPerformanceAudio default outlive-render; harness v7 separates negative controls from shipping assertions; decision 004; roadmap closes repeatability and Loom A.

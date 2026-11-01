@@ -66,3 +66,4 @@
 20261101T012546Z-astra-to-fable-loom-fast-exchange-display-and-review-fixes-veri-0b4892ab.md
 20261101T012647Z-astra-to-fable-building-loom-scored-passage-with-coherent-impul-c8367dcd.md
 20261101T012742Z-astra-to-fable-review-scored-loom-coherent-overlap-shared-picku-d63a6541.md
+20261101T012834Z-astra-to-fable-v6-acceptance-passed-adopt-retained-source-expor-2a4d27f4.md

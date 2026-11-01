@@ -11,7 +11,11 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 6;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 7;   // bump on every change to the experiments so reports are comparable
+// From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
+// passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
+// expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
+const AS_LIVE = { sourceLifetime: 'as-live' };
 const environment = { harnessVersion: HARNESS_VERSION, userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
 let passage = null;
 
@@ -30,14 +34,15 @@ await check('Passage renders finite, bounded, audible audio with a silent tail',
 // identical, the cause is main-thread disconnect timing; if only variants with the compressor differ, it is the
 // compressor's state handling; if a single family differs on its own, it is that engine.
 const variants = [
-  ['full (default: keepNodes)', {}],
-  ['full, keepNodes:false (live-style disconnects)', { keepNodes: false }],
-  ['full, no compressor', { compressor: false }],
-  ['full, no compressor, keepNodes:false', { compressor: false, keepNodes: false }],
-  ['garden only', { families: ['garden'] }],
-  ['tine only', { families: ['tine'] }],
-  ['choir only', { families: ['bellows'] }],
-  ['garden only, no compressor', { families: ['garden'], compressor: false }],
+  ['negative control: as-live full', { ...AS_LIVE }],
+  ['negative control: as-live full, keepNodes:false (live-style disconnects)', { ...AS_LIVE, keepNodes: false }],
+  ['negative control: as-live full, no compressor', { ...AS_LIVE, compressor: false }],
+  ['negative control: as-live full, no compressor, keepNodes:false', { ...AS_LIVE, compressor: false, keepNodes: false }],
+  ['negative control: as-live garden only', { ...AS_LIVE, families: ['garden'] }],
+  ['negative control: as-live tine only', { ...AS_LIVE, families: ['tine'] }],
+  ['negative control: as-live choir only', { ...AS_LIVE, families: ['bellows'] }],
+  ['negative control: as-live garden only, no compressor', { ...AS_LIVE, families: ['garden'], compressor: false }],
+  ['shipping default: full passage', {}],
 ];
 const matrix = {};
 await check('Repeatability matrix: same seed rendered twice per variant (report, never relaxed thresholds)', async () => {
@@ -56,9 +61,9 @@ await check('Summation-order experiments: lone strike vs two simultaneous strike
   const mk = voices => ({ ...base, events: voices.map(voice => ({ family: 'garden', voice })), duration: first.end + 0.05, snapshots: { garden: { voices, dampers: [] } } });
   const lone = mk([first]), pair = mk([first, { ...first, id: 'g1b', slot: 1 }]);
   const trio = mk([first, { ...first, id: 'g1b', slot: 1 }, { ...first, id: 'g1c', slot: 2 }]);
-  const run = async p => { const a = await renderPerformanceAudio(p, 48000, { compressor: false }), b = await renderPerformanceAudio(p, 48000, { compressor: false }); return compareRenders(a, b, 48000); };
+  const run = async p => { const a = await renderPerformanceAudio(p, 48000, { ...AS_LIVE, compressor: false }), b = await renderPerformanceAudio(p, 48000, { ...AS_LIVE, compressor: false }); return compareRenders(a, b, 48000); };
   const out = { loneStrike: await run(lone), twoSimultaneous: await run(pair), threeSimultaneous: await run(trio) };
-  matrix['lone strike, no compressor'] = out.loneStrike; matrix['two simultaneous strikes, no compressor'] = out.twoSimultaneous; matrix['three simultaneous strikes, no compressor'] = out.threeSimultaneous;
+  matrix['negative control: as-live lone strike, no compressor'] = out.loneStrike; matrix['negative control: as-live two simultaneous strikes, no compressor'] = out.twoSimultaneous; matrix['negative control: as-live three simultaneous strikes, no compressor'] = out.threeSimultaneous;
   return out;
 });
 // Engine floor and per-source experiments. A single OscillatorNode → GainNode → destination has exactly one input at
@@ -71,9 +76,9 @@ await check('Engine floor: one oscillator alone, two oscillators summed, choir b
       return (await ctx.startRendering()).getChannelData(0); };
     return compareRenders(await run(), await run(), 48000);
   };
-  const source = async kind => { const patch = structuredClone(DEFAULT_PATCH); patch.bellows.source = kind; const a = await render(patch, { families: ['bellows'] }), b = await render(patch, { families: ['bellows'] }); return compareRenders(a, b, 48000); };
+  const source = async kind => { const patch = structuredClone(DEFAULT_PATCH); patch.bellows.source = kind; const a = await render(patch, { ...AS_LIVE, families: ['bellows'] }), b = await render(patch, { ...AS_LIVE, families: ['bellows'] }); return compareRenders(a, b, 48000); };
   const out = { oneOscillator: await osc(1), twoOscillatorsSummed: await osc(2), fiveOscillatorsSummed: await osc(5), choirOnlyAir: await source('air'), choirOnlyReed: await source('reed'), choirOnlySaw: await source('saw') };
-  Object.assign(matrix, { 'engine: one oscillator': out.oneOscillator, 'engine: two oscillators summed': out.twoOscillatorsSummed, 'engine: five oscillators summed': out.fiveOscillatorsSummed, 'choir only, air': out.choirOnlyAir, 'choir only, reed': out.choirOnlyReed, 'choir only, saw': out.choirOnlySaw });
+  Object.assign(matrix, { 'negative control: engine one oscillator': out.oneOscillator, 'negative control: engine two oscillators summed': out.twoOscillatorsSummed, 'negative control: engine five oscillators summed': out.fiveOscillatorsSummed, 'negative control: as-live choir only, air': out.choirOnlyAir, 'negative control: as-live choir only, reed': out.choirOnlyReed, 'negative control: as-live choir only, saw': out.choirOnlySaw });
   return out;
 });
 // Fixed-topology control. Render the first seconds of the garden one voice per OfflineAudioContext (every node has a
@@ -83,16 +88,16 @@ await check('Engine floor: one oscillator alone, two oscillators summed, choir b
 // the single-graph render can be compared against (expect float32 rounding-order differences only, if that is all).
 await check('Fixed-topology control: per-voice renders summed in JS, twice, vs the single graph', async () => {
   const base = createPerformance(DEFAULT_PATCH, 48000), span = 6, voices = base.snapshots.garden.voices.filter(v => v.noteOn < span);
-  const one = async voice => { const p = { ...base, events: [{ family: 'garden', voice }], duration: span, snapshots: { garden: { voices: [voice], dampers: [] } } }; return renderPerformanceAudio(p, 48000, { compressor: false }); };
+  const one = async voice => { const p = { ...base, events: [{ family: 'garden', voice }], duration: span, snapshots: { garden: { voices: [voice], dampers: [] } } }; return renderPerformanceAudio(p, 48000, { ...AS_LIVE, compressor: false }); };
   const sumAll = async () => { const acc = new Float64Array(Math.ceil(span * 48000)); let perVoiceIdentical = true; let worst = 0;
     for (const voice of voices) { const a = await one(voice), b = await one(voice); const c = compareRenders(a, b, 48000); if (!c.identical) { perVoiceIdentical = false; worst = Math.max(worst, c.maxDiff); } for (let i = 0; i < acc.length; i++) acc[i] += a[i]; }
     return { sum: Float32Array.from(acc), perVoiceIdentical, worstPerVoiceDiff: worst }; };
   const first = await sumAll(), second = await sumAll();
   const graph = { ...base, events: voices.map(voice => ({ family: 'garden', voice })), duration: span, snapshots: { garden: { voices, dampers: [] } } };
-  const g1 = await renderPerformanceAudio(graph, 48000, { compressor: false }), g2 = await renderPerformanceAudio(graph, 48000, { compressor: false });
+  const g1 = await renderPerformanceAudio(graph, 48000, { ...AS_LIVE, compressor: false }), g2 = await renderPerformanceAudio(graph, 48000, { ...AS_LIVE, compressor: false });
   const out = { voices: voices.length, seconds: span, perVoiceRendersIdentical: first.perVoiceIdentical && second.perVoiceIdentical, worstPerVoiceDiff: Math.max(first.worstPerVoiceDiff, second.worstPerVoiceDiff),
     jsSumRunToRun: compareRenders(first.sum, second.sum, 48000), singleGraphRunToRun: compareRenders(g1, g2, 48000), jsSumVsSingleGraph: compareRenders(first.sum, g1, 48000) };
-  matrix['control: per-voice JS sum run-to-run'] = out.jsSumRunToRun; matrix['control: single graph (same voices) run-to-run'] = out.singleGraphRunToRun; matrix['control: JS sum vs single graph'] = out.jsSumVsSingleGraph;
+  matrix['negative control: as-live per-voice JS sum run-to-run'] = out.jsSumRunToRun; matrix['negative control: as-live single graph (same voices) run-to-run'] = out.singleGraphRunToRun; matrix['negative control: as-live JS sum vs single graph'] = out.jsSumVsSingleGraph;
   return out;
 });
 // Source-finish experiments (v4). Observation from v3: every 6 s control was identical, and the lone strike's
@@ -106,15 +111,15 @@ await check('Source-finish experiments: stopped vs never-stopped over 12 s; firs
   const mk = (voices, duration, patch = base.patch) => ({ ...base, patch, events: voices.map(voice => ({ family: 'garden', voice })), duration, snapshots: { garden: { voices, dampers: [] } } });
   const twice = async (p, options) => compareRenders(await renderPerformanceAudio(p, 48000, options), await renderPerformanceAudio(p, 48000, options), 48000);
   const OUT = { sourceLifetime: 'outlive-render' };
-  const loneStopped = await twice(mk([first], span12), { compressor: false });
+  const loneStopped = await twice(mk([first], span12), { ...AS_LIVE, compressor: false });
   const loneNever = await twice(mk([first], span12), { compressor: false, ...OUT });
-  const gardenStopped = await twice(mk(garden12, span12), { compressor: false });
+  const gardenStopped = await twice(mk(garden12, span12), { ...AS_LIVE, compressor: false });
   const gardenNever = await twice(mk(garden12, span12), { compressor: false, ...OUT });
   const damped = createPerformance({ ...DEFAULT_PATCH, damping: 1 }, 48000), dFirst = damped.snapshots.garden.voices[0];
   const dp = { ...damped, events: [{ family: 'garden', voice: dFirst }], duration: 6, snapshots: { garden: { voices: [dFirst], dampers: [] } } };
-  const earlyFinish = await twice(dp, { compressor: false }), earlyNever = await twice(dp, { compressor: false, ...OUT });
+  const earlyFinish = await twice(dp, { ...AS_LIVE, compressor: false }), earlyNever = await twice(dp, { compressor: false, ...OUT });
   const out = { firstModeStopsAt: first.noteOn + Math.min(...first.modes.map(m => m.decay * 9)), loneStopped12s: loneStopped, loneNeverStopped12s: loneNever, gardenStopped12s: gardenStopped, gardenNeverStopped12s: gardenNever, dampedFirstModeStopsAt: dFirst.noteOn + Math.min(...dFirst.modes.map(m => m.decay * 9)), dampedLoneStopped6s: earlyFinish, dampedLoneNeverStopped6s: earlyNever };
-  Object.assign(matrix, { 'finish: lone strike 12 s, stopped': loneStopped, 'finish: lone strike 12 s, never stopped': loneNever, 'finish: garden 12 s, stopped': gardenStopped, 'finish: garden 12 s, never stopped': gardenNever, 'finish: damped lone strike 6 s, stopped': earlyFinish, 'finish: damped lone strike 6 s, never stopped': earlyNever });
+  Object.assign(matrix, { 'negative control: as-live lone strike 12 s': loneStopped, 'finish: lone strike 12 s, outlive-render': loneNever, 'negative control: as-live garden 12 s': gardenStopped, 'finish: garden 12 s, outlive-render': gardenNever, 'negative control: as-live damped lone strike 6 s': earlyFinish, 'finish: damped lone strike 6 s, outlive-render': earlyNever });
   return out;
 });
 // v5: the candidate lifecycle on the full passage, compressor and air included. 'outlive-render' stops every source
@@ -127,10 +132,10 @@ await check('Candidate lifecycle: full passage with sources outliving the render
   const full = await twiceFull(DEFAULT_PATCH, outlive);
   const air = structuredClone(DEFAULT_PATCH); air.bellows.source = 'air';
   const fullAir = await twiceFull(air, outlive);
-  const asLive = await render(DEFAULT_PATCH), candidate = await render(DEFAULT_PATCH, outlive), candidateAir = await render(air, outlive);
+  const asLive = await render(DEFAULT_PATCH, AS_LIVE), candidate = await render(DEFAULT_PATCH, outlive), candidateAir = await render(air, outlive);
   const passage = createPerformance(DEFAULT_PATCH, 48000);
   const out = { fullOutlive: full, fullAirOutlive: fullAir, asLiveVsOutlive: compareRenders(asLive, candidate, 48000), candidateStats: stats(candidate), candidateAirStats: stats(candidateAir), candidateSeconds: candidate.length / 48000, passageDuration: passage.duration };
-  Object.assign(matrix, { 'lifecycle: full passage, outlive-render': full, 'lifecycle: full passage air, outlive-render': fullAir, 'lifecycle: as-live vs outlive-render (same seed)': out.asLiveVsOutlive });
+  Object.assign(matrix, { 'lifecycle: full passage, outlive-render': full, 'lifecycle: full passage air, outlive-render': fullAir, 'negative control: as-live vs outlive-render (same seed)': out.asLiveVsOutlive });
   return out;
 });
 // v6 assertions on the candidate (added once v5 reported maxDiff 0 for both rows). These must hold before the
@@ -151,13 +156,13 @@ await check('Candidate lifecycle assertions: full and air bit-identical, bounded
   }
   return { full: s, air: sa };
 });
-await check('WAV resolution: every variant identical after 16-bit quantization (WAV path only; AAC takes float32 and is lossy)', async () => {
-  const failing = Object.entries(matrix).filter(([, r]) => !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);
+await check('WAV resolution: every SHIPPING row identical after 16-bit quantization (negative controls reported, not asserted)', async () => {
+  const failing = Object.entries(matrix).filter(([k, r]) => !k.startsWith('negative control') && !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);
   assert(failing.length === 0, failing.join('; '));
   return Object.fromEntries(Object.entries(matrix).map(([k, r]) => [k, { identical: r.identical, maxUlps32: r.maxUlps32, quietMaxDiff: r.quietMaxDiff, pcm16Differing: r.pcm16Differing }]));
 });
-await check('Default full render is bit-identical across two runs', async () => {
-  const r = matrix['full (default: keepNodes)']; assert(r, 'matrix did not run');
+await check('Shipping default: full passage is bit-identical across two runs', async () => {
+  const r = matrix['shipping default: full passage']; assert(r, 'matrix did not run');
   assert(r.identical, `max diff ${r.maxDiff} at ${r.atSeconds}s`); return r;
 });
 await check('Different seed produces different audio', async () => {

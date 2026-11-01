@@ -94,7 +94,13 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
   return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
 }
 
-export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes, sourceLifetime } = {}) {
+// Default lifecycle for renders is 'outlive-render' (decision 004, 2026-11-01): verified bit-identical repeated
+// renders of the full passage and the air choir on Safari 26.6.2 at 48 kHz, seed 731 (harness v6). 'as-live' stays
+// available as an explicit diagnostic control. buildPerformanceGraph keeps 'as-live' as its own default because it
+// has no render end to outlive unless told.
+export const DEFAULT_RENDER_LIFETIME = 'outlive-render';
+
+export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes, sourceLifetime = DEFAULT_RENDER_LIFETIME } = {}) {
   if (typeof OfflineContext !== 'function') throw new Error('OfflineAudioContext is not available in this environment; render in a browser (tests/stage-render-browser.html).');
   if (!Number.isFinite(sampleRate) || sampleRate <= 0) throw new Error('sampleRate must be positive.');
   if (!performance || !Number.isFinite(performance.duration) || performance.duration <= 0) throw new Error('performance.duration must be positive.');
@@ -105,7 +111,7 @@ export async function renderPerformanceAudio(performance, sampleRate = 48000, { 
   if (families !== undefined) options.families = families;
   if (compressor !== undefined) options.compressor = compressor;
   if (keepNodes !== undefined) options.keepNodes = keepNodes;
-  if (sourceLifetime !== undefined) { options.sourceLifetime = sourceLifetime; options.renderEnd = performance.duration; }
+  options.sourceLifetime = sourceLifetime; options.renderEnd = performance.duration;
   const graph = buildPerformanceGraph(context, performance, options);
   // Hold a strong reference to every scheduled node until rendering resolves. A finished source with no JS
   // reference may be garbage-collected by the engine at a collector-dependent moment, and whether a silent,
