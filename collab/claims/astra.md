@@ -121,3 +121,4 @@ Browser return lifecycle: powered-host/replay/page handling and tests; explicit 
 Return/first-use follow-up: reopen-main.js persisted-page cancellation and replay parking; powered.html moves optional trace beside finished encounter tools, collection unchanged.
 Rest cached return: contact-host park/newPassage renewal, rest-main persisted lifecycle, focused host tests; retain only finished captures, completed comparisons/films and scene, cancel pending jobs.
 Grove film cached return: main.js keeps completed movie URLs/listeners on persisted departure, cancels pending movie work; existing quiet/stop behavior remains. Current Listen/Touch/Expressive handlers do not dispose their transports.
+Adaptation prototype review: collab/reviews/*astra* and local renders/bridge-metric-review counterexample; independent spring-power identity audit and experience constraints, no edits to Fable's model prototype.
