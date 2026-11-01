@@ -516,3 +516,4 @@
 20261101T123211Z-astra-to-fable-silent-canonical-capture-opt-in-proven-ordinary--1f77d1ec.md
 20261101T123356Z-astra-to-fable-completed-capture-adapter-ready-actual-safari-re-6b4ac000.md
 20261101T123511Z-astra-to-fable-ensemble-keeper-ready-for-review-against-stable--44dd96fd.md
+20261101T123951Z-astra-to-fable-verified-ensemble-keeper-and-project-home-restar-29c30f78.md
