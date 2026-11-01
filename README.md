@@ -18,7 +18,7 @@ Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passag
 
 ## Tension Loom study
 
-Open [Tension Loom](http://127.0.0.1:8080/loom.html). Strike either body or use **Play conversation** for eight alternating strikes with overlapping vibrations. Coupling changes both normal modes; zero coupling leaves the unstruck body silent. Detuning changes the exchange. Each stereo channel picks up one body's displacement, with a shared pickup scale for the scored passage. **Save stereo WAV** saves the full selected strike or conversation.
+Open [Tension Loom](http://127.0.0.1:8080/loom.html). Strike either body or use **Play conversation** for eight alternating strikes with overlapping vibrations. Coupling changes both normal modes; zero coupling leaves the unstruck body silent. Detuning changes the exchange. Each stereo channel picks up one body's displacement, with a shared pickup scale for the scored passage. **Save stereo WAV** saves the full selected strike or conversation. **Silent study** scrubs the selected response without sound; Quiet returns the bodies to rest. Its seven declared scene bindings drive the same reusable bodies at every timestamp.
 
 The model is two coupled masses and springs, not an acoustic radiation solver. The picture shows displacement envelopes, switching to a labeled mean level above an 8 Hz mode split. A strike has a maximum 20-second tail with a quarter-second end fade. Changes to controls settle playback and take effect on the next performance. The scored renderer and arbitrary-time frame preserve interference between strikes; stage integration and movie export for this family remain future work.
 
