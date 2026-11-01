@@ -12,8 +12,10 @@ assert.equal(study.kind,FORCED_STUDY_KIND);assert.equal(study.version,FORCED_STU
 const recipe=createGroveRestRecipe(study.grove,study.voice,{sampleRate:sr,zones:study.zones,strengths:Object.fromEntries(study.strengths.map(s=>[s.name,s.c]))});
 assert.equal(study.outputGain,recipe.outputGain);assert.deepEqual(study.pickupVectors,recipe.pickupVectors);
 const forced=Math.round(d.forceSeconds*sr),total=forced+Math.round(d.ringSeconds*sr),factor=Math.max(...recipe.energyFactors),direction=recipe.strikeVectors[d.position][d.body],norm=Math.hypot(...direction);
+assert.equal(d.u,recipe.positions[d.position]);assert.equal(d.forcedFrames,forced);assert.equal(d.ringFrames,total-forced);assert.equal(d.budget.admissionCeiling,recipe.admissionCeiling);
 assert.equal(report.frames,total);assert.equal(report.forcedFrames,forced);assert.equal(report.releaseFrame,forced);
 assert.deepEqual(report.markers.forceActive,[0,forced/sr]);assert.deepEqual(report.markers.released,[forced/sr,total/sr]);
+assert.deepEqual(report.markers.contactSeconds,[0,total/sr]);
 assert.deepEqual(study.intervals.driverSeconds,[0,forced/sr]);assert.deepEqual(study.intervals.contactSeconds,[0,total/sr]);
 const near=(a,b,name)=>{assert.ok(Number.isFinite(a)&&Number.isFinite(b),`${name}: finite`);assert.ok(Math.abs(a-b)<=1e-10*Math.max(Math.abs(a),Math.abs(b),1e-12),`${name}: ${a} != ${b}`);};
 near(factor,d.budget.energyFactorMax,'energy factor');near(norm,d.budget.directionNorm,'force direction norm');
@@ -37,7 +39,8 @@ for(let j=0;j<report.cases.length;j++){
   if(previous>=forced/sr)assert.ok(E<=previousEnergy*(1+1e-9)+1e-18,'passive energy after driver release');previous=time;previousEnergy=E;
  }
  assert.deepEqual(trace,fresh.trace,'saved trace equals rebuilt state trace');
- near(c.observedPeak,fresh.observedPeak,'observed sample peak');assert.ok(c.observedPeak<=predicted+1e-10,'observed peak within predicted bound');
+ for(const key of ['observedPeak','rmsForced','rmsRing','maxEnergy','outputAtRelease'])near(c[key],fresh[key],key);
+ assert.ok(c.observedPeak<=predicted+1e-10,'observed peak within predicted bound');
  const wav=readFileSync(join(dirname(resolve(path)),c.file)),rebuiltWav=Buffer.from(stereoWav(fresh.pcm));assert.equal(sha(wav),c.wavSha256);assert.deepEqual(wav,rebuiltWav,'saved WAV equals fresh study render');
  assert.deepEqual(c.pcmSha256,fresh.pcm.channels.map(ch=>sha(new Uint8Array(ch.buffer,ch.byteOffset,ch.byteLength))));
  evidence.push({id:c.id,frames:fresh.pcm.channels[0].length,tracePoints:trace.times.length,wavSha256:sha(wav),observedPeak:c.observedPeak});

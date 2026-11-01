@@ -1,0 +1,13 @@
+# Next playable encounter: give the sound time to answer
+
+2026-11-01 · Astra · proposal for a separate experimental route
+
+The five-case place study now contains a matched pair at c = 1, changing only u on the driven body. This provides a meaningful next interaction to try, without establishing that anyone will prefer it. Another collection of static WAVs cannot answer how it feels to touch an ongoing response. The next step should let a participant make that change while the source is active, then listen after it stops.
+
+A bounded first encounter: an explicit Begin gesture starts the declared two-second external driver, followed by its three-second released interval. The player can hold and lift a c = 1 contact at either u = 0.3 or u = 1 on the driven body. Keep source frequency, gain and amplitude identical to the reviewed study. A source indicator must distinguish the powered interval from the release; contact rings show actual acknowledged contacts. Quiet ends the encounter. No repeated energy injection within one encounter, no endless self-sustaining source, no pressure interpretation. Offer a fresh encounter after it settles. This bounded design is a starting interaction, not a final product constraint.
+
+Model prerequisite: an offline command-driven engine using the shared affine held-force stepper, with contact changes at integer sample frames and continuous state across them. Changing damping must never reset vibration or reapply an impulse. Force phase is a function of the encounter's sample frame, not the contact mode. The conservative input budget remains valid for time-varying passive contacts; validate this at switches and compare constant-contact trajectories to the already audited studies. Explicit ordering at a switch, release and Quiet must be part of the contract. A new forcing-capable record kind is required; never save this as a Rest record.
+
+Once offline parity is proven, prepare transition operators away from the audio callback, then run the same engine in an AudioWorklet. Audio-thread acknowledgements drive the visible contacts and saved command record. The two contact positions should be discoverable on the imagined body, while the numeric mapping and physical limits stay inspectable. Avoid a strength menu in the first encounter: position is the question being explored.
+
+This extends Michael's direction through consequence, sustained attention and the relation between holding and release. It promises no inner state and needs no spiritual symbols. Visual interpretation remains separate from the sound model. No hand mass, frictional bow, radiation, or measured pressure is implied.

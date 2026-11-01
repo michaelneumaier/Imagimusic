@@ -139,3 +139,5 @@ After Quiet in Rest, **Carry the gesture** lets you explicitly choose another cu
 On Grove and Rest, film previews and Listen back take turns; Quiet stops either. Save film files before starting another passage or changing Grove (or Voice on Grove): those actions clear the local preview and its download links.
 
 Grove and Rest keep replay, saving and film controls out of the first encounter. After Quiet finishes a nonempty passage, those actions appear below the body pads; Rest also reveals its alternate-Grove comparison. Beginning another passage hides them again.
+
+Offline powered-body evaluation artifacts, when rendered locally: [source and contact](http://127.0.0.1:8080/renders/forced-study/) and [Where you touch](http://127.0.0.1:8080/renders/place-study/). The latter includes a matched-coefficient position pair, original reference contacts, exact source timing and model measurement plots. These are audition studies, not live controls or claims of perceived quality. Reproduction: `collab/notes/astra-place-audition.md`.
