@@ -105,3 +105,5 @@ The link carries the complete score and preserves it through either instrument s
 The inspector also names active authored events, their section and beat, and anchor/weight status. A verified local movie is available at `renders/conservatory-conversation-731.mp4`, with its canonical score manifest alongside it.
 
 For the conversation, **Follow the score** now opens wide, follows the exchange more closely, and pulls back during the release. Camera motion is analytic and seekable; it changes framing only. The saved movie above is the earlier manual wide-shot baseline.
+
+Open [the listening room](audition.html) to compare the verified seeded study and conversation recordings. Starting one pauses the other; the conversation offers fixed-wide and cadence-follow camera versions. This local page uses the ignored movie artifacts in `renders/`; regenerate the scoped plots with `node tools/audition-report.mjs`. The cadence-follow movie is `renders/conservatory-conversation-follow-731.mp4` with its matching manifest.
