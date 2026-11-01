@@ -101,10 +101,36 @@ const inflight = new Set();
 /** Number of renders currently holding their graph alive (diagnostic). */
 export function inflightRenders() { return inflight.size; }
 
-/** Compare two renders: max and RMS difference, where the largest difference sits, and whether they are identical. */
+/** Size of one float32 rounding step at magnitude x (the unit in the last place). */
+export function ulp32(x) {
+  const m = Math.abs(x);
+  if (m === 0) return 2 ** -149;
+  return 2 ** (Math.floor(Math.log2(m)) - 23);
+}
+
+/**
+ * Compare two renders. Besides max/RMS difference and where the largest difference sits, report the difference in
+ * float32 rounding units at that sample (summation-order noise shows up as a few units) and whether the two renders
+ * are identical after 16-bit PCM quantization (the format every export actually ships), with the count of samples
+ * that differ by one 16-bit step.
+ */
 export function compareRenders(a, b, sampleRate = 48000) {
   const n = Math.min(a.length, b.length);
-  let max = 0, at = -1, sum = 0;
-  for (let i = 0; i < n; i++) { const d = Math.abs(a[i] - b[i]); sum += d * d; if (d > max) { max = d; at = i; } }
-  return { identical: max === 0 && a.length === b.length, maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate, lengths: [a.length, b.length] };
+  let max = 0, at = -1, sum = 0, maxUlps = 0, pcmDiffering = 0, pcmMaxStep = 0;
+  for (let i = 0; i < n; i++) {
+    const d = Math.abs(a[i] - b[i]); sum += d * d;
+    if (d > max) { max = d; at = i; }
+    if (d > 0) {
+      const u = d / ulp32(Math.max(Math.abs(a[i]), Math.abs(b[i]))); if (u > maxUlps) maxUlps = u;
+      const pa = Math.round(Math.max(-1, Math.min(1, a[i])) * 32767), pb = Math.round(Math.max(-1, Math.min(1, b[i])) * 32767);
+      if (pa !== pb) { pcmDiffering++; pcmMaxStep = Math.max(pcmMaxStep, Math.abs(pa - pb)); }
+    }
+  }
+  return {
+    identical: max === 0 && a.length === b.length,
+    maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate,
+    maxUlps32: maxUlps,
+    pcm16Identical: pcmDiffering === 0 && a.length === b.length, pcm16Differing: pcmDiffering, pcm16MaxStep: pcmMaxStep,
+    lengths: [a.length, b.length],
+  };
 }

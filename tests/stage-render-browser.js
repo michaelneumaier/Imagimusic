@@ -45,6 +45,25 @@ await check('Repeatability matrix: same seed rendered twice per variant (report,
   }
   return { ...matrix, ...environment };
 });
+// Summation-order experiments. Hypothesis: the engine sums a node's inputs in an order that can vary between runs,
+// and float32 addition is not associative, so renders differ by a rounding unit wherever several voices overlap.
+// Prediction: a lone garden strike (one input everywhere) is bit-identical; two simultaneous strikes into the same
+// master (two inputs summed) can differ by one float32 unit; neither differs after 16-bit PCM quantization.
+await check('Summation-order experiments: lone strike vs two simultaneous strikes', async () => {
+  const base = createPerformance(DEFAULT_PATCH, 48000), first = base.snapshots.garden.voices[0];
+  const mk = voices => ({ ...base, events: voices.map(voice => ({ family: 'garden', voice })), duration: first.end + 0.05, snapshots: { garden: { voices, dampers: [] } } });
+  const lone = mk([first]), pair = mk([first, { ...first, id: 'g1b', slot: 1 }]);
+  const trio = mk([first, { ...first, id: 'g1b', slot: 1 }, { ...first, id: 'g1c', slot: 2 }]);
+  const run = async p => { const a = await renderPerformanceAudio(p, 48000, { compressor: false }), b = await renderPerformanceAudio(p, 48000, { compressor: false }); return compareRenders(a, b, 48000); };
+  const out = { loneStrike: await run(lone), twoSimultaneous: await run(pair), threeSimultaneous: await run(trio) };
+  matrix['lone strike, no compressor'] = out.loneStrike; matrix['two simultaneous strikes, no compressor'] = out.twoSimultaneous; matrix['three simultaneous strikes, no compressor'] = out.threeSimultaneous;
+  return out;
+});
+await check('All variants are identical after 16-bit PCM quantization (the shipped format)', async () => {
+  const failing = Object.entries(matrix).filter(([, r]) => !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);
+  assert(failing.length === 0, failing.join('; '));
+  return Object.fromEntries(Object.entries(matrix).map(([k, r]) => [k, { maxUlps32: r.maxUlps32, pcm16Differing: r.pcm16Differing }]));
+});
 await check('Default full render is bit-identical across two runs', async () => {
   const r = matrix['full (default: keepNodes)']; assert(r, 'matrix did not run');
   assert(r.identical, `max diff ${r.maxDiff} at ${r.atSeconds}s`); return r;

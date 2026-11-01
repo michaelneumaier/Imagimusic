@@ -26,3 +26,5 @@
 - 2026-11-01 fable: trace manifest; decision 003 (export dependency); render-audio diagnostic options (families, compressor bypass, keepNodes default offline) + repeatability matrix harness; explainBinding resolves projected fields; export/inspector review.
 - 2026-11-01 astra: lab 2D canvases migrated to StateFrame via src/snapshots.js (slice A, in review).
 - 2026-11-01 fable: lab migration review (approve); proposal 005 wording corrected (envelope dips); slice A marked review.
+- 2026-11-01 astra: lab migration committed 3a46cc3 (slice A done); pinned-graph matrix: residual drift at float32 rounding-unit level, choir identical.
+- 2026-11-01 fable: compareRenders gains rounding-unit and 16-bit PCM metrics; summation-order experiments in harness; roadmap: slice A done, voice track planning-only.

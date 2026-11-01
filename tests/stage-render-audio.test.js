@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DEFAULT_PATCH } from '../src/model.js';
 import { MAX_VOICES } from '../src/audio.js';
 import { createPerformance } from '../src/stage/performance.js';
-import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRenders, inflightRenders, MASTER_GAIN, FAMILIES } from '../src/stage/render-audio.js';
+import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRenders, ulp32, inflightRenders, MASTER_GAIN, FAMILIES } from '../src/stage/render-audio.js';
 
 test('diagnostic options isolate families, bypass the compressor, and keep nodes connected offline', () => {
   const performance = createPerformance(DEFAULT_PATCH);
@@ -22,12 +22,30 @@ test('diagnostic options isolate families, bypass the compressor, and keep nodes
   assert.throws(() => buildPerformanceGraph(new Context(), performance, { families: ['piano'] }), /unknown family/);
 });
 
-test('compareRenders reports identity, max/rms difference and the location of the largest difference', () => {
+test('compareRenders reports identity, max/rms difference, rounding units, and 16-bit PCM equality', () => {
   const a = new Float32Array([0, 0.5, -0.25, 0.1]), b = new Float32Array([0, 0.5, -0.25, 0.1]);
-  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, lengths: [4, 4] });
+  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, maxUlps32: 0, pcm16Identical: true, pcm16Differing: 0, pcm16MaxStep: 0, lengths: [4, 4] });
   const c = new Float32Array([0, 0.5, -0.2, 0.1]), r = compareRenders(a, c, 4);
   assert.equal(r.identical, false); assert.ok(Math.abs(r.maxDiff - 0.05) < 1e-7); assert.equal(r.atSample, 2); assert.equal(r.atSeconds, 0.5);
+  assert.equal(r.pcm16Identical, false); assert.equal(r.pcm16Differing, 1); assert.ok(r.pcm16MaxStep > 1000);
   assert.equal(compareRenders(a, new Float32Array(3), 4).identical, false);
+  // One float32 rounding step at 0.2 is invisible to 16-bit PCM and reads as exactly one unit.
+  const d = new Float32Array([0.2]), e = new Float32Array([0.2]); e[0] = Math.fround(0.2 + ulp32(0.2));
+  const one = compareRenders(d, e, 1);
+  assert.equal(one.identical, false); assert.ok(Math.abs(one.maxUlps32 - 1) < 1e-6); assert.equal(one.pcm16Identical, true);
+  assert.equal(ulp32(0.19), 2 ** -26); assert.equal(ulp32(0.5), 2 ** -24); assert.equal(ulp32(0), 2 ** -149);
+});
+
+test('reference experiments: a lone strike has one input per node, two simultaneous strikes share a summing node', () => {
+  const base = createPerformance(DEFAULT_PATCH), first = base.snapshots.garden.voices[0];
+  const lone = { ...base, events: [{ family: 'garden', voice: first }], duration: 5, snapshots: { garden: { voices: [first], dampers: [] } } };
+  const ctx1 = new Context(); buildPerformanceGraph(ctx1, lone);
+  assert.equal(ctx1.nodes.filter(n => n.kind === 'panner').length, 1);
+  const second = { ...first, id: 'g1b', slot: 1 };
+  const pair = { ...lone, events: [{ family: 'garden', voice: first }, { family: 'garden', voice: second }], snapshots: { garden: { voices: [first, second], dampers: [] } } };
+  const ctx2 = new Context(); const { master } = buildPerformanceGraph(ctx2, pair);
+  assert.equal(ctx2.nodes.filter(n => n.kind === 'panner').length, 2);
+  assert.equal(ctx2.nodes.filter(n => n.kind === 'panner' && n.connections.includes(master)).length, 2);
 });
 
 class Parameter {

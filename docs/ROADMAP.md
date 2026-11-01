@@ -65,15 +65,16 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 ## M2.5: One stage, one state bus (status: in-progress; agreed in collab/decisions/002-shared-stage.md; slice A owner Fable, slices B/C Astra + Fable)
 
-- [ ] Slice A (status: review 2026-11-01): `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); lab 2D canvases rewired to collectState frames via `src/snapshots.js` with energy-parity and finite-coordinate tests (Astra, in working tree; Fable review collab/reviews/20261101T0057Z-fable-reviews-lab-migration.md). Done when committed and smoke-checked in Safari.
+- [x] Slice A (done 2026-11-01, Astra commit 3a46cc3): `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); lab 2D canvases rewired to collectState frames via `src/snapshots.js` with energy-parity and finite-coordinate tests (Astra; Fable review collab/reviews/20261101T0057Z-fable-reviews-lab-migration.md approve; Safari choir smoke by Astra). No canvas reads an engine object.
 - [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
   - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
   - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
   - [x] deterministic video export prototype (Astra): vendored Mediabunny (decision 003), /stage.html "Render movie" → MP4 H.264 720p30 + AAC 48 kHz; full passage verified with ffprobe (1007 frames, 33.567 s video, 33.561 s audio, first note at 0.35 s) and all 1007 state hashes regenerated in Node with 0 mismatches
-  - [ ] audio bitstream repeatability: full-passage renders differ by ~2e-5 run to run in Safari while choir-only renders are identical; diagnostic matrix in tests/stage-render-browser.html, keepNodes offline default under test
-  - [ ] manifest consolidation on src/stage/manifest.js; export/inspector review fixes (collab/reviews/20261101T0050Z-fable-reviews-export-inspector.md)
+  - [ ] audio repeatability: disconnect timing and node collection eliminated (drift 2.3e-5 → 6e-8); what remains is single float32 rounding units where voices overlap (summation-order noise inside the engine's mixing; choir-only bit-identical). Harness now reports rounding units and 16-bit PCM equality; decision pending on the repeatability contract (see collab/messages 2026-11-01)
+  - [x] manifest consolidation on src/stage/manifest.js; export/inspector review fixes applied (Astra 3a46cc3)
+  - [ ] inspector route overlay (Astra, in progress)
   - [ ] performer actor, three procedural cameras, route highlight in the inspector
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
@@ -98,7 +99,7 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 - Visual skins (palette, lighting, environment) that never change timing; regression compares motion traces across skins.
 - Michael-facing knobs documented in one page.
 
-## Track V (parallel): Voice Observatory (status: planning; proposal docs/proposals/005-voice-observatory.md, awaiting Astra)
+## Track V (parallel): Voice Observatory (status: planning only, plan approved by Astra 2026-11-01 with measurement corrections; docs/proposals/005-voice-observatory.md)
 
 Michael's new direction (2026-11-01, relayed by Astra): live human voice → highly reactive, detailed visual feedback. Measured / estimated / inferred tiers; V0 normal voice → V1 resonances → V2 articulation and beatbox → V3 optional research. No microphone code until the plan is agreed. Does not displace the Conservatory track.
 

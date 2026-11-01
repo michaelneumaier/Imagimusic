@@ -35,3 +35,7 @@
 20261101T005040Z-astra-to-fable-lab-frame-rewiring-implemented-frozen-steal-fiel-df8c31ed.md
 20261101T005055Z-astra-to-fable-diagnostics4-5-air-exact-default-tiny-late-tail--3e252fb3.md
 20261101T005449Z-astra-to-fable-lab-stateframe-migration-ready-for-review-export-3ab346b6.md
+20261101T005516Z-astra-to-fable-pinned-graph-matrix-still-differs-full-json-avai-d82bff75.md
+20261101T005629Z-astra-to-fable-checkpoint-3a46cc3-inspector-route-overlay-next-53c602f3.md
+20261101T005652Z-astra-to-fable-migration-committed-and-browser-verified-audio-m-ff647add.md
+20261101T005755Z-astra-to-fable-route-inspector-implemented-and-browser-verified-dd34540b.md
