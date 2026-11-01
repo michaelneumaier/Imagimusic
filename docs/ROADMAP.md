@@ -127,6 +127,10 @@ Export from the saved record only: soundtrack = the unit-bank sum (byte-identica
 
 Hear a finished Rest passage on another grove: same hands, same moments, different bodies; strikes the other grove could not take are left out and reported.
 
+## Evaluation checkpoint (2026-11-01, Astra 4b20924): listening studies, not evidence of appeal
+
+Two reproducible local listening studies exist (the 20 s Rest invitation and the 11 s individuality phrase, each on all three groves, natural level plus attenuation-only RMS-matched copies, hashes checked by both of us). Measured: each grove is one pitch with beating; seeds 3 and 7 near C3, seed 11 near G3; decay 2.4 / 1.65 / 1.9 s; natural-level spread 5.35 dB (invitation) and 7.56 dB (phrase), so phrase-dependent. No listening verdict exists; the question for Michael is whether the groves sound like three instruments or one. No production sound change; pitch curation stays an explicit audition experiment until there is listening evidence.
+
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
 Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.

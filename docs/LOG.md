@@ -194,3 +194,4 @@
 - 2026-11-01 astra: listening-study renderer and artifact (natural plus attenuation-only RMS-matched). Fable review approve; the individuality phrase rendered with it; proposal 019 addendum on monitoring level (about 30 dB below full scale; any remedy must be an explicit recorded listening level, decided after listening).
 - 2026-11-01 fable: describeIndividuality corrected after Astra's blocker: free-ring and held-contact cases measured separately, ratios named as relative displacement amplitudes, not energy shares; proposal 019 wording fixed.
 - 2026-11-01 astra: individuality correction approved; independent phrase render agrees (7.56 dB spread). Fable: seconds validated in describeIndividuality; 019 notes the spread depends on the phrase.
+- 2026-11-01 astra: listening studies committed (4b20924). Fable: logged as an evaluation checkpoint, not evidence of appeal; next: one concrete first-minute distraction.
