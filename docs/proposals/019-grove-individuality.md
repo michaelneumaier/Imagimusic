@@ -4,13 +4,13 @@
 
 ## What measurably differs (same voice, same gesture: one strike on body 0 at the middle)
 
-| seed | fundamentals (Hz) | low modes (Hz) | beat rates (Hz) | low-mode decay τ | neighbours' share at 1–2 s | layout x | ring above −40 dB |
+| seed | fundamentals (Hz) | low modes (Hz) | beat rates (Hz) | low-mode decay τ | free-ring pickup motion of bodies 1, 2 relative to body 0 at 1–2 s | layout x | ring above −40 dB |
 |---|---|---|---|---|---|---|---|
 | 3 | 130.8 / 128.3 / 130.7 | 128.7 / 131.2 / 132.2 | 1.0–3.5 | 2.4 s | 0.20 and 0.96 (triangle, strong 0–2 bridge) | 0, −0.65, 0.65 | 11.1 s |
 | 7 | 130.8 / 132.0 / 130.2 | 130.7 / 131.1 / 133.3 | 0.4–2.6 | 1.65 s | 0.26 and 0.66 (chain, strong 1–2 bridge) | −0.8, 0, 0.8 | 7.6 s |
 | 11 | 196.0 / 196.8 / 196.3 | 196.4 / 198.6 / 201.4 | 2.2–5.0 | 1.9 s | 0.91 and 0.85 (triangle, three similar bridges) | 0, −0.65, 0.65 | 8.6 s |
 
-Two facts stand out. Every grove tunes its three bodies within about 3 Hz of one another, so each grove is **one pitch with beating**, and seeds 3 and 7 share that pitch (near C3) while seed 11 sits a fifth above (near G3). What distinguishes the groves is therefore not melody but **decay** (2.4 vs 1.65 vs 1.9 s), **what the bridges carry** (seed 3 sends a strike on body 0 almost entirely to body 2 and hardly to body 1; seed 11 sends it to both), the **beating rate**, and the **stereo layout** (seed 7 puts the struck body hard left; the triangles put it in the centre).
+Two facts stand out. Every grove tunes its three bodies within about 3 Hz of one another, so each grove is **one pitch with beating**, and seeds 3 and 7 share that pitch (near C3) while seed 11 sits a fifth above (near G3). What distinguishes the groves is therefore not melody but **decay** (2.4 vs 1.65 vs 1.9 s), **what the bridges carry** (in the free ring 1–2 s after a strike on body 0, the pickup motion of body 2 is 0.96 of body 0's on seed 3 while body 1's is 0.20; on seed 11 both are near 0.9: these are relative displacement amplitudes at the pickups, not energy shares, and can exceed 1), the **beating rate**, and the **stereo layout** (seed 7 puts the struck body hard left; the triangles put it in the centre). `describeIndividuality` also measures the held case separately (a firm hand on body 0 at the tip from 0.5 s) as each shell's motion relative to its own free ring; the caption for the hand moment uses that, not the free-ring ratio.
 
 ## The phrase (landed: `composeIndividualityPhrase(recipe)`, about 11 s at 60 BPM)
 

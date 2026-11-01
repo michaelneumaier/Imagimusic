@@ -348,20 +348,34 @@ export function composeIndividualityPhrase(recipe, { tempo = 60 } = {}) {
   return { version: 1, tempo, seconds: ended.frame / sr + REST_QUIET_FADE_SECONDS, moments: [{ id: 'ring', beats: [0, 3] }, { id: 'hand', beats: [3, 7] }, { id: 'turn', beats: [7, 11] }, { id: 'quiet', beats: [11, 11] }], record };
 }
 
-/** Measured facts behind a grove's individuality, computed from the recipe and one engine pass; phrased as what may be heard. */
+/** Measured facts behind a grove's individuality. All ratios are low-band displacement RMS at each body's pickup over the stated window,
+ *  relative amplitudes, not energy shares (they can exceed 1). Two gestures are measured: a free single strike on body 0 at the middle,
+ *  and the same strike with a firm hand on body 0 at the bridge tip from 0.5 s. Phrased as what may be heard, never promised. */
 export function describeIndividuality(recipe, { seconds = 2 } = {}) {
   const g = recipe.grove, v = recipe.visual, sr = recipe.sampleRate, low = v.lowBand.map(r => v.omegaD[r] / (2 * Math.PI)), decay = v.lowBand.map(r => 1 / v.gammas[r]);
   const beats = []; for (let i = 0; i < low.length; i++) for (let j = i + 1; j < low.length; j++) beats.push(Math.abs(low[i] - low[j]));
-  // The neighbours' share of motion at the pickup, 1..2 s after a single strike on body 0 at the middle, relative to the struck shell.
-  const engine = createRestEngine(recipe); engine.strike(1, 0, 1); const energy = new Array(recipe.bodies).fill(0);
-  for (let i = 0; i < seconds * sr; i++) { if (i >= (seconds - 1) * sr) { const x = engine.state; for (let b = 0; b < recipe.bodies; b++) { let s = 0; for (const r of v.lowBand) { let q = 0; for (let k = 0; k < recipe.n; k++) q += v.modeVectors[r][k] * x[k]; s += v.pickupByMode[r][b] * q; } energy[b] += s * s; } } engine.step(); }
-  const share = energy.map(e => Math.sqrt(e / energy[0]));
+  const firm = recipe.strengths.findIndex(st => st.name === 'firm'), tip = recipe.zones.length - 1;
+  const lowBandRms = (withHand) => {
+    const engine = createRestEngine(recipe); engine.strike(1, 0, 1); const energy = new Array(recipe.bodies).fill(0);
+    for (let i = 0; i < seconds * sr; i++) {
+      if (withHand && i === Math.floor(0.5 * sr)) engine.setContacts(contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => (b === 0 ? { zone: tip, strength: firm } : null))));
+      if (i >= (seconds - 1) * sr) { const x = engine.state; for (let b = 0; b < recipe.bodies; b++) { let s2 = 0; for (const r of v.lowBand) { let q = 0; for (let k = 0; k < recipe.n; k++) q += v.modeVectors[r][k] * x[k]; s2 += v.pickupByMode[r][b] * q; } energy[b] += s2 * s2; } }
+      engine.step();
+    }
+    return energy.map(e => Math.sqrt(e / sr));
+  };
+  const free = lowBandRms(false), held = firm >= 0 ? lowBandRms(true) : null;
+  const freeShare = free.map(a => a / free[0]), underHand = held ? held.map((a, b) => a / free[b]) : null;
   const pans = g.layout.map(l => l.x);
-  const facts = { seed: g.seed, lowModesHz: low.map(f => +f.toFixed(1)), beatRatesHz: beats.map(b => +b.toFixed(2)), lowDecaySeconds: +decay[0].toFixed(2), neighbourShare: share.slice(1).map(s => +s.toFixed(2)), layoutX: pans.map(x => +x.toFixed(2)), bridges: g.bridges.map(e => ({ a: e.a, b: e.b, coupling: +e.coupling.toFixed(3) })) };
+  const facts = { seed: g.seed, lowModesHz: low.map(f => +f.toFixed(1)), beatRatesHz: beats.map(b => +b.toFixed(2)), lowDecaySeconds: +decay[0].toFixed(2),
+    window: `${seconds - 1}..${seconds} s after a strike on body 0 at the middle`, measure: 'low-band displacement RMS at each pickup; relative amplitude, not an energy share',
+    freeRingShare: freeShare.slice(1).map(x => +x.toFixed(2)), underFirmHandOnStruck: underHand ? underHand.map(x => +x.toFixed(2)) : null, layoutX: pans.map(x => +x.toFixed(2)), bridges: g.bridges.map(e => ({ a: e.a, b: e.b, coupling: +e.coupling.toFixed(3) })) };
+  const pct = x => Math.round(x * 100) + ' %';
   const mayHear = [
     `the ring may beat about ${Math.min(...beats).toFixed(1)}–${Math.max(...beats).toFixed(1)} times a second (low modes ${low.map(f => f.toFixed(0)).join(', ')} Hz)`,
     `the ring may fade with a time constant near ${decay[0].toFixed(1)} s`,
-    `with a hand on the struck shell, the others may keep ${share.slice(1).map(s => Math.round(s * 100) + ' %').join(' and ')} of its motion at the pickup`,
+    `in the free ring, the other shells' motion at their pickups may be ${freeShare.slice(1).map(pct).join(' and ')} of the struck shell's, ${seconds - 1}..${seconds} s after the strike (relative amplitude, not energy)`,
+    underHand ? `with a firm hand on the struck shell from 0.5 s, the struck shell may keep ${pct(underHand[0])} and the others ${underHand.slice(1).map(pct).join(' and ')} of their free-ring motion in the same window` : 'no firm strength in this recipe',
     `the three shells may sit at ${pans.map(x => x < -0.2 ? 'left' : x > 0.2 ? 'right' : 'centre').join(', ')} in the stereo field`,
   ];
   return { facts, mayHear };
