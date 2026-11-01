@@ -89,6 +89,9 @@ $('fm-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,
 $('seek').max=performance.duration;
 $('seek').oninput=()=>{stop();study.seek(Number($('seek').value));};
 function updateCameraMode(){const manual=$('direction').value==='manual';if(world)world.controls.enabled=manual;$('camera-hint').textContent=manual?'DRAG TO ORBIT · SCROLL TO EXPLORE':'SCORE CAMERA · SCRUB TO EXPLORE';}
+// Browser form restoration may run after module initialization. The saved link
+// remains authoritative when the page is shown, including back/forward restore.
+window.addEventListener('pageshow',()=>{try{$('direction').value=readCameraSearch(location.search);}catch{$('direction').value='manual';}updateCameraMode();});
 $('view').onchange=()=>{ $('direction').value='manual';history.replaceState(null,'',cameraURL(location.href,'manual'));updateCameraMode();if(world)world.view($('view').value);};
 $('direction').onchange=()=>{history.replaceState(null,'',cameraURL(location.href,$('direction').value));updateCameraMode();};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
