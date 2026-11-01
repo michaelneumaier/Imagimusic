@@ -92,9 +92,17 @@ within the first 2.5 s (so the caption will say both, truthfully).
   as today; camera still; nothing drawn that the model does not report.
 - Captions in plain words: "The second body is never touched; the bridge
   moves it." "Listen for the other body to swell." "Still."
-- Export: a touch session is a list of (time, body, velocity) strikes,
-  which is already a Loom score; "Keep what you played" renders it through
-  `createLoomPerformance` and the verifier, so a session is reproducible.
+- Export (as built, 013b): a touch session is a record of (frame, body,
+  velocity) strikes plus the recorded end fade; "Keep what you played" sums
+  the **same cached unit impulse buffers** the live transport scheduled, at
+  the captured frames, with the session's fixed output gain, and saves the
+  WAV beside the JSON record. This is deliberately **not** the whole-score
+  `createLoomPerformance` path, whose conservative peak normalization would
+  let a later gesture change earlier sound; reproducibility is the record
+  plus the unit bank (an independent Node re-render from the JSON is
+  byte-identical, Astra's evidence). The stage movie exporter and manifest
+  verifier are not wired for touch sessions; if they are later, the
+  manifest must carry the touch record and the fixed gain, not a score.
 
 ## Model / presentation distinction
 
@@ -114,8 +122,9 @@ does and leaves the rest to the player.
    F/J and pointer, still camera, the swell cue, Still, bridge switch, a
    local recording list (Astra), reusing listen/transport patterns and the
    live Loom audio.
-3. 013c "Keep what you played" through the existing Loom performance and
-   verifier; a harness row for a recorded session (Astra, Fable fixture).
+3. 013c "Keep what you played" as the unit-bank sum of the touch record
+   (Astra, built); a harness row comparing live-graph vs offline sum for a
+   recorded session, and mobile checks (Astra); movie export later, if at all.
 4. Audition with the question list: did the answer feel anticipated? did
    waiting feel like part of it? did you want to touch again?
 

@@ -119,3 +119,4 @@
 - 2026-11-01 astra: exact duplicate automation compaction (long pair 16 s → 3.47 s; compact vs dense exact / 5.6e-9); 013a approved with contract corrections (answerPeak as swell, conservative stillness bound, cautious meeting semantics). Fable: compaction review approve.
 - 2026-11-01 fable: 013a src/score/call-answer.js (answerPeak as a swell, conservative stillnessBound, cautious per-body meeting) with 3 tests; proposal 013 rev. 2 with measured swells; roadmap M5.6 in progress.
 - 2026-11-01 astra: touch session core (fixed common gain, cached unit buffers, sample-frame strikes, headroom admission, recorded quiet fade, offline summation from the same impulses). Fable review approve.
+- 2026-11-01 astra: Touch. Listen. Answer. page and live transport (sample-aligned strikes, fixed-gain bus, recorded Quiet, WAV + JSON; Node re-render from JSON byte-identical). Fable review approve; proposal 013 export wording updated to the unit-bank record.

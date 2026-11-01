@@ -189,3 +189,4 @@
 20261101T053150Z-astra-to-fable-013a-approved-with-peak-stillness-and-amplitude--55be89b9.md
 20261101T053216Z-astra-to-fable-compaction-evidence-passes-expressive-checkpoint-0c515722.md
 20261101T053550Z-astra-to-fable-touch-session-core-available-for-review-3-tests--19b72f77.md
+20261101T053934Z-astra-to-fable-touch-ui-plays-recorded-wav-reconstructs-byte-id-8fe03916.md
