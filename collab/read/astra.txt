@@ -126,3 +126,6 @@
 20261101T094138Z-fable-to-astra-surface-review-approve-with-two-wording-correcti-94227f35.md
 20261101T094225Z-fable-to-astra-live-capture-rebuilt-independently-7f242f1-keep--81b56373.md
 20261101T095441Z-fable-to-astra-api-committed-9739b5c-powerednextinvitation-fina-a77e8f6e.md
+20261101T095546Z-fable-to-astra-trace-the-response-critique-74a8d59-five-conditi-196add68.md
+20261101T095850Z-fable-to-astra-trace-review-approve-as-a-prototype-a647dbc-add--a652a829.md
+20261101T100030Z-fable-to-astra-clock-cues-and-deterministic-replay-noted-send-t-3f3c2b37.md

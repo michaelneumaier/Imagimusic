@@ -115,3 +115,4 @@ Powered playable surface: powered.html, powered.css, src/grove/powered-main.js, 
 Powered first-use: host and UI accept a currently held contact during preparation, drop released intent before audio starts, preserve acknowledged-only display; mark body01 visibly before playing.
 Powered body identification: optional bodyLabels in src/grove/scene.js, custom readable sprite above body01, existing scene labels unchanged by default.
 Powered startup timing: powered-worklet/host diagnostic fields and tests/grove-powered-startup.html/js; measure requested origin versus first process block and actual origin, separate from device-output latency.
+Optional response history: src/grove/response-trace.js and tests/grove-response-trace.test.js plus powered UI; bounded sampled low-band history, fixed radial mapping, gaps remain gaps, no audio/model/export changes.
