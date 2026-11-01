@@ -1,5 +1,6 @@
 import * as T from '../../vendor/three/build/three.module.js';
 import {groveAnatomy} from './anatomy.js';
+import {groveStrikeMarkers} from './strike-markers.js';
 const colors=[0xa4d0b8,0xd8b5d8,0x9fc7dc,0xe0c18f,0xbebee1];
 const metal=()=>new T.MeshStandardMaterial({color:0xbfa67d,metalness:.72,roughness:.3});
 function add(parent,geometry,material,position=[0,0,0]){const mesh=new T.Mesh(geometry,material);mesh.position.fromArray(position);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;}
@@ -29,20 +30,23 @@ export function createGroveScene(grove,{vectors=[]}={}){
   const labelCanvas=document.createElement('canvas');labelCanvas.width=128;labelCanvas.height=64;const ink=labelCanvas.getContext('2d');ink.font='28px monospace';ink.fillStyle='#d8d5cf';ink.textAlign='center';ink.fillText(String(i+1).padStart(2,'0'),64,42);const labelTexture=new T.CanvasTexture(labelCanvas),label=new T.Sprite(new T.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false}));label.position.set(spec.position[0],.45,spec.position[2]);label.scale.set(.65,.325,1);root.add(label);
   const halo=add(root,new T.TorusGeometry(.6,.009,6,64),new T.MeshBasicMaterial({color:colors[i%colors.length],transparent:true,opacity:.15}),[spec.position[0],.025,spec.position[2]]);halo.rotation.x=Math.PI/2;
   const gesture=add(anchor,new T.TorusGeometry(.65,.012,8,64),new T.MeshBasicMaterial({color:0xf2e3ff,transparent:true,opacity:0,depthWrite:false}));gesture.rotation.x=Math.PI/2;
-  return {anchor,form,shell,core,bands,halo,gesture,labelTexture,spec};
+  const strike=add(anchor,new T.TorusGeometry(.65,.016,8,64),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false}));strike.rotation.x=Math.PI/2;strike.visible=false;
+  return {anchor,form,shell,core,bands,halo,gesture,strike,labelTexture,spec};
  });
  const bridges=anatomy.bridges.filter(b=>b.visible).map(spec=>{
-  const a=anatomy.bodies[spec.a].position,b=anatomy.bodies[spec.b].position;
-  const curve=tube(root,[a,[(a[0]*2+b[0])/3,1.25,(a[2]*2+b[2])/3],[(a[0]+b[0]*2)/3,1.25,(a[2]+b[2]*2)/3],b],spec.radius,brass);
+  const a=anatomy.bodies[spec.a].attachment,b=anatomy.bodies[spec.b].attachment,sag=Math.min(a[1],b[1])-.35;
+  const curve=tube(root,[a,[(a[0]*2+b[0])/3,sag,(a[2]*2+b[2])/3],[(a[0]+b[0]*2)/3,sag,(a[2]+b[2]*2)/3],b],spec.radius,brass);
   return {curve,spec};
  });
  return {root,bodies,bridges,anatomy,dispose(){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});bodies.forEach(b=>b.labelTexture.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
 }
 /** Amplified response envelopes animate shell width and light, never edge flow. */
-export function applyGroveScene(scene,{envelope=[]}={},holds=[],positions=[]){
+export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[]){
+ const markers=groveStrikeMarkers(strikes,scene.bodies.length);
  for(const [i,body] of scene.bodies.entries()){
   const level=Math.max(0,envelope[i]??0),pulse=Math.min(.2,level*.6);
   const held=holds[i]??0;body.gesture.position.y=positions[i]===undefined?0:(.5-positions[i])*2.6*body.spec.scale[1];body.gesture.visible=held>0;body.gesture.material.opacity=held>0?.35+.5*held:0;body.gesture.scale.setScalar(1+.35*held);
+  const marker=markers[i];body.strike.visible=!!marker;body.strike.material.opacity=marker?.opacity??0;body.strike.position.y=marker?(0.5-marker.u)*2.6*body.spec.scale[1]:0;body.strike.scale.setScalar(marker?.scale??1);
   body.form.scale.set(body.spec.scale[0]*(1+pulse),body.spec.scale[1],body.spec.scale[2]*(1+pulse));
   body.shell.material.emissiveIntensity=.025+Math.min(.7,level*2);body.core.material.emissiveIntensity=.1+Math.min(1.2,level*3);body.halo.material.opacity=.15+Math.min(.65,level*2);
  }

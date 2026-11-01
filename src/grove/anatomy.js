@@ -10,6 +10,7 @@ export function groveAnatomy(grove){
   // Multiplying all three scales gives radius³: tuning changes aspect, not volume.
   return {id:body.id??i,position:[point.x*3,2.1,point.z*3],scale:[radius/Math.sqrt(aspect),radius*aspect,radius/Math.sqrt(aspect)],radius,aspect,hz:body.hz,mass:body.mass};
  });
+ for(const body of bodies)body.attachment=[body.position[0],body.position[1]-1.3*body.scale[1],body.position[2]];
  const bridges=grove.bridges.map(edge=>{
   if(!Number.isInteger(edge.a)||!Number.isInteger(edge.b)||!bodies[edge.a]||!bodies[edge.b]||edge.a===edge.b||!Number.isFinite(edge.coupling)||edge.coupling<0||edge.coupling>.04)throw new Error('Invalid grove bridge');
   return {a:edge.a,b:edge.b,coupling:edge.coupling,radius:.012+.04*Math.sqrt(edge.coupling/.04),visible:edge.coupling>0};

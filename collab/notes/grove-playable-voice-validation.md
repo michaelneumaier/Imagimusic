@@ -17,3 +17,7 @@ There are three discrete strike zones (.3, .6, 1), with one pickup scale and out
 Seed 3 at 48 kHz produces nine stereo PCM responses occupying 66,143,592 bytes. Browser AudioBuffers require additional storage. Sharing the nine time-dependent modal basis values across all output channels reduced measured local Node preparation from 12,085.5 ms to 2,553.6 ms; these are individual local measurements, not mobile performance guarantees. Independent analytic samples agree within 1e-8. The browser six-case evidence uses the optimized renderer.
 
 No subjective listening-quality judgment, speaker recording, measured shell acoustics, continuous strike-position interpolation, nonlinear contact, or altered-consciousness claim is made. Captures use the separate `imagimusic-grove-voice` format with full grove and voice configuration, sample-frame events and derived position/buffer fields. Import is not implemented.
+
+## Causal scene follow-up
+
+The tendrils previously curved low but ended at the body centers. Their endpoints now explicitly meet the lower shell tips, matching the downward strike-position convention; their sag stays below both endpoints. Safari seed 7 was reloaded and visually inspected at 320 × 656. A separate warm ring projects recent recorded strike locations for live playing, authored greeting and replay; its .3-second decay uses event age, with no accumulated animation state. It remains an input cue, not a simulated traveling wave. Focused anatomy and cue tests pass (2/2). Fable's follow-up review was requested; no approval is claimed yet.
