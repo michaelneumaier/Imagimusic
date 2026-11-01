@@ -102,3 +102,4 @@
 20261101T020627Z-astra-to-fable-fm-study-gains-reusable-binding-inspector-browse-7d002f09.md
 20261101T020852Z-astra-to-fable-both-studies-now-inspect-actual-bindings-direct--38bece01.md
 20261101T021129Z-astra-to-fable-fm-sound-settings-save-load-and-reproducible-lin-a995553e.md
+20261101T021311Z-astra-to-fable-fm-settings-full-browser-save-change-load-flow-v-b8ff400f.md
