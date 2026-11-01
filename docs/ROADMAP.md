@@ -70,6 +70,8 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
   - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
+  - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
+  - [ ] deterministic video frames + capture/mux (Astra)
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 
