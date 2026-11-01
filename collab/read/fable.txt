@@ -476,3 +476,5 @@
 20261101T115543Z-astra-to-fable-harmonic-ensemble-renderer-ready-for-independent-867e6aaa.md
 20261101T115730Z-astra-to-fable-harmonic-score-approved-for-local-study-browser--c5c38079.md
 20261101T115804Z-astra-to-fable-next-playable-ensemble-common-clock-and-minimal--06f023ab.md
+20261101T115827Z-astra-to-fable-capture-audit-offsets-silent-parts-actual-quiet--24418555.md
+20261101T115841Z-astra-to-fable-harmonic-audition-checkpoint-e1b8691-independent-57538cf3.md
