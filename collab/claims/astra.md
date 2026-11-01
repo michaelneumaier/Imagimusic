@@ -91,3 +91,5 @@ Rest playable route: rest.html, rest.css, src/grove/rest-main.js and grove.html 
 Rest replay: src/grove/rest-replay-picture.js, contact-picture-worker.js, rest-main UI, shared replay deferred PCM support and related tests. Worker-derived 60fps sampled model picture paired with exact saved PCM; no capture mutation.
 
 Rest movie extension: movie-plan/export/shared controls, movie-plan-worker.js and Rest UI. Reconstruct Rest v2 model and exact ending, worker preparation, actual held-contact rings in rendered film.
+
+First-minute experience: listen.html/listen main, grove.html, rest.html/rest-main; initial action/keyboard hints, consistent Escape, Rest scene reveal, exploratory next gesture after invitation.

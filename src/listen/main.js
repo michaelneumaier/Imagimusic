@@ -35,13 +35,14 @@ function choose(id){
  const url=new URL(location.href);url.searchParams.set('study',id);history.replaceState(null,'',url);
  $('explore').href=compositionPageURL(location.href,'loom.html',{version:1,loom:{enabled:true,settings:selected.settings}});
  $('model-detail').textContent=`This passage holds the connection fixed: ${selected.settings.frequency} Hz base tuning, ${selected.settings.detune} cents detuning, coupling ${selected.settings.coupling}, loss ${selected.settings.loss}/s. Changes between studies affect the actual sound model. Camera movement changes framing only.`;
- status(`${selected.title}. Press Listen when you’re ready.`);
+ status(`${selected.title}. Press Listen. Headphones reveal the stereo space; Escape brings Quiet.`);
 }
 $('listen').onclick=async()=>{
  if(['playing','preparing'].includes(transport.state)){transport.stop();return;}
  try{await transport.play({settings:selected.settings,score:selected.score,body:null});if(transport.state==='playing'&&world)$('world').parentElement.scrollIntoView({block:'start',behavior:reduced.matches?'auto':'smooth'});}catch(error){status(error.message,true);}
 };
 $('quiet').onclick=()=>transport.stop();
+window.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();transport.stop();}});
 $('seek').oninput=()=>transport.seek(Number($('seek').value));
 $('save').onclick=()=>{
  const pcm=transport.pcm;if(!pcm)return;

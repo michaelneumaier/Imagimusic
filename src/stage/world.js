@@ -9,7 +9,7 @@ import {createSurfaceLighting} from './surface-lighting.js';
 /** Scene construction only. Musical motion is applied through frame bindings. */
 export function createWorld(canvas, fixedSize = null) {
   const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:!!fixedSize});
-  renderer.setPixelRatio(fixedSize ? 1 : Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.setPixelRatio(fixedSize ? 1 : Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
   const scene=new T.Scene();scene.background=new T.Color(0x101c20);scene.fog=new T.FogExp2(0x101c20,.026);
   const surfaceLighting=createSurfaceLighting(renderer);scene.environment=surfaceLighting.environment;scene.environmentIntensity=.65;
