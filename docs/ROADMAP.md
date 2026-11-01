@@ -147,6 +147,10 @@ renders/forced-study/ holds, for each curated grove, three WAVs of one identical
 
 A saved Rest gesture file (Keep the gestures) can be opened again on a separate local page: bounded intake before any matrix construction, exact rebuild through recipeForRecord, validateRestAdmission and renderRestRecord in a worker, the sampled model picture, explicit Listen only, the previous passage kept through failure or cancel; downloaded WAV byte-equal to the Node reconstruction (sha256 cf41570d…). Play → keep → reopen → listen is closed for Rest passages; no import of force studies, no network.
 
+## Evaluation artifact (2026-11-01, Astra 142c4e8): the place audition
+
+renders/place-study/ holds, for groves 3 and 11, five WAVs of one identical powered source and gain under five contact states: free; a hand on the driven body at u = 0.3 with c = 1; the same c = 1 at u = 1 (the matched-coefficient contrast); a hand on the bridged neighbour at u = 1 with c = 4; the firm reference at the tip. Reports declare which comparisons hold place or coefficient constant; both pass the strengthened auditor; plots and a narrow-screen page with explicit playback. Scope: measurement and audition only, for these tested cases; no listening verdict, no production change. Next: a bounded playable powered encounter (Astra's note), model prerequisite a command-driven forcing engine with parity to these studies.
+
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
 Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.

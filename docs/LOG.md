@@ -215,3 +215,4 @@
 - 2026-11-01 astra: saved Rest passage reopening shipped (ab87a55), WAV byte-equal to the Node rebuild. Fable: roadmap entry; place audition next (Astra).
 - 2026-11-01 fable: place study gains the matched-coefficient case (driven tip, c = 1) and declares which comparisons hold what constant; inherited wording replaced; both reports re-audited.
 - 2026-11-01 astra: five-case presenter adaptation (labels from actual contacts, matched contrasts stated, references preserved). Fable review approve.
+- 2026-11-01 astra: place audition committed (142c4e8). Fable: logged as an evaluation artifact, no verdict.
