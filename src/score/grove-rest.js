@@ -268,7 +268,7 @@ export function restInvitationSettledLine(invitation) {
 export const REST_EXPLORATION_STEPS = Object.freeze(['ring', 'here', 'lift', 'neighbor', 'done']);
 export function restExplorationPrompt(step, body, neighbor) {
   const b = `body ${body + 1}`, n = `body ${neighbor + 1}`;
-  return { ring: `Strike ${b} once and let it ring.`, here: `Strike ${b} again, and while it rings rest a hand on it.`, lift: 'Lift the hand when you want to hear what remains.',
+  return { ring: `Strike ${b} once and let it ring.`, here: `Let this ring. When you are ready, strike ${b} again and rest a hand on it while it rings.`, lift: 'Lift the hand when you want to hear what remains.',
     neighbor: `Strike ${b} once more, and this time rest the hand on ${n} instead.`, done: 'That is the whole gesture: strike, rest here, lift, rest on the neighbour. Play on, or choose Quiet.' }[step];
 }
 export function createRestExploration(recipe, { body = 0 } = {}) {
@@ -380,4 +380,36 @@ export function describeIndividuality(recipe, { seconds = 2 } = {}) {
     `the three shells may sit at ${pans.map(x => x < -0.2 ? 'left' : x > 0.2 ? 'right' : 'centre').join(', ')} in the stereo field`,
   ];
   return { facts, mayHear };
+}
+
+// ---- the second gesture (proposal 020): a neighbour strike timed against the first ring's beat ----
+// Fact: the two lowest coupled modes of every curated grove lie a few hertz apart, so a single strike beats slowly. A second strike on
+// the bridged neighbour adds to or subtracts from that beat depending on when it lands. Measured here, never promised.
+export function composeSecondStrikeRecord(recipe, delaySeconds, { body = 0, velocity = 0.6, ring = 4 } = {}) {
+  const g = recipe.grove, bridge = g.bridges.find(e => e.a === body || e.b === body); if (!bridge) throw new Error('the body needs a bridge.');
+  const neighbor = bridge.a === body ? bridge.b : bridge.a, sr = recipe.sampleRate;
+  if (!(Number.isFinite(delaySeconds) && delaySeconds > 0 && delaySeconds < ring)) throw new Error('delay must be within the ring.');
+  const events = [{ frame: 0, order: 0, body, position: 1, velocity }, { frame: Math.round(delaySeconds * sr), order: 1, body: neighbor, position: 1, velocity }];
+  const ended = { frame: Math.round((delaySeconds + ring) * sr), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
+  const record = { version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })), events, contacts: [], ended };
+  validateRestAdmission(record, recipe);
+  return { record, neighbor };
+}
+
+/** Sweep the neighbour strike across one beat period and measure the struck shell's low-band motion 1 s later (relative amplitude, dB). */
+export function measureSecondStrike(recipe, { body = 0, steps = 12, velocity = 0.6, after = 1, window = 1 } = {}) {
+  if (!Number.isInteger(steps) || steps < 2 || steps > 96) throw new Error('steps must be an integer in 2..96.');
+  const v = recipe.visual, sr = recipe.sampleRate, g = recipe.grove, bridge = g.bridges.find(e => e.a === body || e.b === body); if (!bridge) throw new Error('the body needs a bridge.');
+  const neighbor = bridge.a === body ? bridge.b : bridge.a, low = v.lowBand.map(r => v.omegaD[r] / (2 * Math.PI)).sort((a, b) => a - b), beatPeriod = 1 / Math.max(0.05, low[1] - low[0]);
+  const rms = (strikes, from, to) => { const e = createRestEngine(recipe); let acc = 0; for (let i = 0; i < to * sr; i++) { for (const k of strikes) if (k.frame === i) e.strike(k.position, k.body, k.velocity); if (i >= from * sr) { const x = e.state; let s = 0; for (const r of v.lowBand) { let q = 0; for (let k = 0; k < recipe.n; k++) q += v.modeVectors[r][k] * x[k]; s += v.pickupByMode[r][body] * q; } acc += s * s; } e.step(); } return Math.sqrt(acc / ((to - from) * sr)); };
+  const first = { frame: 0, position: 1, body, velocity }, start = 0.3;
+  const points = [];
+  for (let k = 0; k <= steps; k++) {
+    const delay = start + k * beatPeriod / steps, second = { frame: Math.round(delay * sr), position: 1, body: neighbor, velocity };
+    const from = delay + after, to = from + window, base = rms([first], from, to), both = rms([first, second], from, to);
+    points.push({ delay: +delay.toFixed(3), dB: +(20 * Math.log10(both / base)).toFixed(2) });
+  }
+  const best = points.reduce((a, p) => (p.dB > a.dB ? p : a)), worst = points.reduce((a, p) => (p.dB < a.dB ? p : a));
+  return { body, neighbor, beatPeriodSeconds: +beatPeriod.toFixed(3), lowModesHz: low.map(f => +f.toFixed(1)), points, best, worst, rangeDb: +(best.dB - worst.dB).toFixed(2),
+    measure: `low-band displacement RMS of body ${body + 1} at its pickup over ${window} s starting ${after} s after the neighbour strike, relative to the single strike over the same window; a measurement, not a listening claim` };
 }

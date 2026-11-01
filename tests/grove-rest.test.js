@@ -301,3 +301,16 @@ test('the individuality phrase is admissible on every grove, transposes whole, a
   assert.ok(d[3].facts.lowDecaySeconds > d[7].facts.lowDecaySeconds, 'seed 3 rings longer than seed 7 (measured)');
   for (const bad of [0.5, 0, -1, Infinity, NaN, 61]) assert.throws(() => describeIndividuality(recipes[3], { seconds: bad }), /1\.\.60/);
 });
+
+test('the second gesture: timing a neighbour strike against the beat has a measured consequence that differs by grove', async () => {
+  const { composeSecondStrikeRecord, measureSecondStrike, renderRestRecord } = await import('../src/score/grove-rest.js');
+  const sr = 8000, ranges = {};
+  for (const seed of GROVE_SEEDS) {
+    const recipe = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), m = measureSecondStrike(recipe, { steps: 6 });
+    assert.ok(m.beatPeriodSeconds > 0.1 && m.beatPeriodSeconds < 5); assert.equal(m.points.length, 7); assert.ok(m.points.every(p => Number.isFinite(p.dB)));
+    assert.ok(m.best.dB >= m.worst.dB && m.rangeDb >= 0); assert.match(m.measure, /not a listening claim/); ranges[seed] = m.rangeDb;
+    for (const delay of [m.best.delay, m.worst.delay]) { const { record, neighbor } = composeSecondStrikeRecord(recipe, delay); assert.equal(neighbor, m.neighbor); assert.equal(record.events.length, 2); assert.ok(renderRestRecord(record, recipe).channels[0].length > 4 * sr); }
+  }
+  assert.ok(Object.values(ranges).some(r => r > 2), `at least one grove shows more than 2 dB of timing consequence (${JSON.stringify(ranges)})`);
+  assert.throws(() => composeSecondStrikeRecord(createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), 9), /within the ring/);
+});

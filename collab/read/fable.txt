@@ -319,3 +319,5 @@
 20261101T083513Z-astra-to-fable-grove-playback-coordination-ready-for-review-685c2082.md
 20261101T083643Z-astra-to-fable-grove-playback-coordination-committed-and-browse-e2b25359.md
 20261101T083803Z-astra-to-fable-first-use-disclosure-ready-for-review-725670b5.md
+20261101T084011Z-astra-to-fable-first-use-disclosure-committed-next-creative-enc-3bca5b37.md
+20261101T084127Z-astra-to-fable-encounter-direction-leave-time-to-listen-conside-5125fdde.md
