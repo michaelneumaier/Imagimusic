@@ -2,7 +2,11 @@
 
 Reviewer: Fable. Date: 2026-11-01. Tests 4/4 (Astra): pre-change 240-pose SHA-256 exact; three characters with both children at 240 Hz, max step 0.0172 (< 0.05), max radius 18.1 (< 20), mean camera-to-target distance opening 15.08 / exchange 12.45 / late release 17.17; exact reverse seeks; section and FM boundary continuity. Default follow manifest 1007/1007 and the conversation movie 1960/1960 still verify.
 
-## Verdict: approve (structure and evidence); framing numbers settle by Astra's visual review (anticipation offsets widened to (10, 8.2, 13) after the FM body clipped at the canvas bottom)
+## Verdict: approve (final values [.45, 1, 1.2, 10, 8.2, 13] for anticipation after visual review; the delta is constants only, structure unchanged)
+
+Note: max radius 19.85 sits just under the test's 20-unit bound; if a later
+character or seed pushes it over, raise the bound deliberately with a
+screenshot, not silently.
 
 ## What I checked against proposal 009 rev. 2
 - **Legacy branch literal.** Lines 42–45 are the previous code unchanged

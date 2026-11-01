@@ -8,7 +8,15 @@ passages (no `score`) must produce the identical pose they do today.*
 
 | Cadence | Feel | Attention lead (s) | Gesture width (s) | Ensemble prior | Offset from target (x, y, z) |
 | --- | --- | --- | --- | --- | --- |
-| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 0.9 | (10, h = 8.2, 13); was (8.5, 7.2, 11) until visual review found the FM body clipped at the canvas bottom |
+| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 1.2 | (10, h = 8.2, 13) |
+
+Final values after Astra's visual review 2026-11-01: the initial design
+(prior 0.9, offset (8.5, 7.2, 11)) clipped the FM body at the canvas bottom
+during the opening; the shot was widened and the prior raised to 1.2 so
+the ensemble center holds as the shot widens. Measured at 240 Hz over
+three characters with both children: max step 0.0172, max radius 19.85
+(bound 20), mean camera-to-target distance opening 17.72 / exchange 12.48
+/ late release 17.17.
 | answer (exchange) | today's follow: leans to each attack, settles to the ensemble | 0.18 | 0.7 | 0.25 | (7, h = 6.1, 9) |
 | settling (release) | a slow pull-back to the whole stage as excitations thin | 0.10 | 1.2 | 1.0 → 2.0 with section progress | (7, h = 6.1, 9) → (10, h = 7.6, 13) with section progress |
 
