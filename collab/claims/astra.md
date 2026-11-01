@@ -164,3 +164,7 @@ Ensemble encounter design: collab/notes/astra-three-groves-encounter.md; concret
 
 Ensemble reopening: ensemble-reopen.html, src/grove/ensemble-import.js, ensemble-import-worker.js, ensemble-reopen-main.js, tests/grove-ensemble-import.test.js. Bounded local saved-record reader, explicit playback, cancellable worker.
 Reader discovery: project-catalog.js and reopen.html cross-link; collab/notes/astra-ensemble-reader.md evidence.
+
+Experimental ensemble host: src/grove/ensemble-host.js, ensemble-prepare-worker.js, ensemble-render-worker.js, tests/grove-ensemble-host.test.js. Shared context, acknowledged live capture, lifecycle and worker keeping; not a performance clearance.
+
+Experimental playing surface: ensemble.html, ensemble.css, src/grove/ensemble-main.js.
