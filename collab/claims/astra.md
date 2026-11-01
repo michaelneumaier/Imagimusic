@@ -79,3 +79,5 @@ Optional Grove voice integration: src/grove/** and shared impulse transport/sess
 Grove movie export: src/grove/movie-plan.js, export.js, world fixed-size option; tests/grove-movie-plan.test.js and grove-export-smoke harness. Frozen capture/model timeline plus supplied saved stereo PCM, independent local render world; no capture-schema changes.
 
 Rest worklet scheduling: src/grove/contact-events.js and tests/grove-contact-events.test.js; integer sample-frame application acknowledgements, stable event order, bounded per-passage identities. Fable owns contact model/record renderer; no live route change before shared-stepper equivalence.
+
+Rest shared-engine worklet: src/grove/contact-worklet.js and contact-prepare-worker.js; tests/grove-contact-audio.html/js. Imports Fable's src/rest/engine.js; per-body contact composition, actual applied acknowledgements and fatal stop. Offline browser equivalence only until admission and capture v2 integration are validated.
