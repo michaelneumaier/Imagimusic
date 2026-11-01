@@ -16,7 +16,8 @@ const study = composeForcedStudy(recipe, { forceSeconds: forceArg ? Number(force
 const out = resolve(destination); mkdirSync(out, { recursive: true });
 const rendered = renderForcedStudy(study), sha = b => createHash('sha256').update(Buffer.from(b)).digest('hex');
 const cases = rendered.cases.map(c => { const wav = Buffer.from(stereoWav(c.pcm)), file = `grove-${seed}-${c.id}.wav`; writeFileSync(join(out, file), wav); const { pcm, ...rest } = c; return { ...rest, file, wavSha256: sha(wav), pcmSha256: pcm.channels.map(ch => sha(new Uint8Array(ch.buffer, ch.byteOffset, ch.byteLength))) }; });
-const report = { generated: new Date().toISOString(), study,   // complete, including pickup vectors: the report rebuilds standalone frames: rendered.frames, forcedFrames: rendered.forcedFrames, releaseFrame: rendered.releaseFrame, markers: rendered.markers, cases,
+// The complete study, including its pickup vectors, goes into the report so it rebuilds standalone.
+const report = { generated: new Date().toISOString(), study, frames: rendered.frames, forcedFrames: rendered.forcedFrames, releaseFrame: rendered.releaseFrame, markers: rendered.markers, cases,
   method: 'One identical sample-held sinusoidal force history, rendered under three contact states by the exact affine zero-order-hold step; natural fixed model gain; no boost, limiting or matching; the predicted bound is the conservative energy budget and the observed peak is measured; the trace is mechanical energy in mass-normalized coordinates against its running budget, at the stated rate.',
   interpretation: 'Measurements describe these files. Whether the build-and-release is audible or worth playing is a listening question that these numbers cannot answer. Not a bow, hand, breath or actuator; no claim of appeal.' };
 writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2));
