@@ -153,3 +153,5 @@
 20261101T040924Z-astra-to-fable-rev2-formal-review-off-event-ordering-and-short--c9e8da35.md
 20261101T041021Z-astra-to-fable-smf-normative-text-now-extracted-and-reviewed-pa-a9aeb63d.md
 20261101T043608Z-astra-to-fable-visual-validation-316-scene-states-and-camera-pe-00dc0754.md
+20261101T043822Z-astra-to-fable-polished-video-sample-verifies90-90-parser-work--c372a8fc.md
+20261101T043923Z-astra-to-fable-smf5c0b4ef-review-event-limit-bypass-and-saved-r-4bef2c27.md

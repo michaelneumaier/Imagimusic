@@ -1,11 +1,12 @@
-# Proposal 010 (rev. 2): MIDI import onto the explicit-score contract (M4, planning)
+# Proposal 010 (rev. 3): MIDI import onto the explicit-score contract (M4)
 
-*Fable, 2026-11-01. Rev. 2 applies Astra's review (seven points) and
-settles the function signatures. Planning only; the parser is the first
-isolated slice after this revision is confirmed, and it begins by reading
-the SMF 1.0 specification and the control-change table from midi.org
-(running status, meta and SysEx rules, CC64 thresholds), not a summary.
-Direction, ownership and bounds were approved in the first review.*
+*Fable, 2026-11-01. Rev. 3: the parser (M4a) is implemented in
+`src/midi/smf.js` against the RP-001 text Astra retrieved (rules cite PDF
+pages); this revision records the parser as built and applies Astra's
+rev. 2 review (`collab/reviews/20261101T0412Z-astra-reviews-midi-import-rev2.md`)
+to the mapping contract, which is still planning. MIDI 2.0 expression is a
+separate layer (proposal 011); this NoteList is a MIDI 1.0 input adapter,
+not the universal performance representation.*
 
 ## What it is
 
@@ -32,16 +33,25 @@ only where the plan says.
 
 ## Parser policies (`parseSMF`)
 
-- **Accepted:** header chunk `MThd` with format 0 or 1, metrical division
-  (bit 15 clear, PPQ 1–32767). **Rejected with a named error:** format 2,
-  SMPTE division (bit 15 set), VLQ longer than 4 bytes, chunk length past
-  end of file, track without End of Track, a data byte where a status byte
-  is required and no running status is active, file over 256 KiB, more
-  than 4096 notes or 65536 events. Unknown chunk types are skipped (per
-  spec) and counted.
-- **Running status** persists for channel messages (0x80–0xEF); meta
-  (0xFF) and SysEx (0xF0/0xF7) do not carry it and, per spec, cancel it.
-  SysEx payloads are skipped by their length and counted.
+- **Accepted:** header chunk `MThd` with format 0 or 1 and a length of 6
+  or more (p7: honor a longer header, skip the extension), metrical
+  division (bit 15 clear, PPQ 1–32767). **Rejected with a named error:**
+  format 2, SMPTE division (bit 15 set, p6), VLQ longer than four bytes
+  (p4: largest 0x0FFFFFFF), chunk length past end of file (p5), track
+  without End of Track or with data after it (p10–11), a data byte with no
+  running status in effect (p8), a meta type ≥ 128 (p9), a known meta
+  shorter than its defined length, a time-signature denominator above 2^7
+  (our bound, not the format's), system bytes other than F0/F7/FF, file
+  over 256 KiB, more than 4096 notes or 65536 events. Unknown chunk types
+  are skipped and counted (p5: "expect alien chunks").
+- **Running status** persists for channel messages (0x80–0xEF) across
+  delta-times; the first event of a track must carry status (p8); meta
+  and SysEx events cancel it (p9). SysEx is length-framed: F0 (complete or
+  first packet) and F7 (continuation or escape) are skipped by length and
+  counted; a packet is not required to end in F7 (p9).
+- **Known meta longer than defined** (p9): the whole length is consumed,
+  the defined prefix interpreted, the extension ignored. Time signature
+  keeps all four fields (nn, dd, cc, bb), so nothing is dropped.
 - **Events** are merged across tracks and ordered by `tick`, then track
   index, then file order; each gets a stable `eventOrder`. Notes get
   `noteId` = eventOrder of their note-on.
@@ -52,12 +62,13 @@ only where the plan says.
   `danglingOn`); a note whose off tick equals its on tick is kept with
   `offTick = onTick` (warning `zeroGate`; compile gives it the minimum
   gate, see below).
-- **Tempo and time signature** from any track are merged by tick (format 1
-  files should keep them in track 0; others are accepted). Two tempo
-  events at the same tick: the later in merge order wins and a
-  `tempoConflict` warning names both. Default 500000 µs per quarter when
-  no tempo event precedes tick 0. Tempo 1–16777215 µs, numerator 1–255,
-  denominator a power of two ≤ 128.
+- **Tempo and time signature** from any track are merged by tick (p7:
+  format 1 should keep them in the first track; accepting other tracks is
+  a tolerance policy). Two tempo events at the same tick: the later in
+  merge order wins and a `tempoConflict` warning names both. Default
+  500000 µs per quarter (120 BPM, p7) when no tempo event precedes. Tempo
+  1–16777215 µs (24-bit, p11); time signature nn 0–255, dd ≤ 7 (bound),
+  cc and bb kept.
 - **Controllers:** CC64 (sustain) events are kept in order with their
   value (`≤ 63` off, `≥ 64` on, per the control-change table). Every other
   message kind is counted in `ignored` by kind (other CC by number,
@@ -66,20 +77,32 @@ only where the plan says.
 - Seconds are computed from ticks through the tempo map and stored
   **only as derived values**; `validateNoteList` recomputes them and
   rejects a mismatch, so saved seconds can never override ticks.
+- **Note-off identity:** every note records `offEventOrder` (the merge
+  order of the event that closed it: a Note Off, a retriggering Note On,
+  or End of Track), so same-tick CC64 / Note Off order is recoverable
+  from the saved data (Astra's rev. 2 review).
+- **Pairing scope policy:** pairing and pedal state are **track-local**
+  (keyed by track, channel, pitch). This differs from a merged single-port
+  receiver, where two tracks on one channel would share state; the
+  mapping report labels it. MIDI Channel Prefix meta-events are counted,
+  not applied, and imply no device routing.
+- **Retrigger is lossy:** closing an earlier same-pitch note at a new
+  Note On recovers no exact gate; the warning says so and the report
+  never calls such a note faithful in gate, only exact in pitch.
 
 ## Data (strict keys everywhere; all numbers finite and in range)
 
 ```js
 NoteList = {
-  version: 1, format: 0 | 1, ppq, endTick, durationSeconds,
+  version: 1, name, format: 0 | 1, ppq, trackCount, endTick, durationSeconds,
   tempoMap: [{ tick, usPerQuarter, eventOrder }],
-  timeSignatures: [{ tick, numerator, denominator, eventOrder }],
+  timeSignatures: [{ tick, numerator, denominator, clocksPerClick, thirtySecondsPerQuarter, eventOrder }],
   tracks: [{ index, name /* ≤ 120 chars */, channels: [int] }],
-  notes: [{ noteId, track, channel, pitch, velocity, onTick, offTick, onSeconds, offSeconds }],   // sorted by onTick, eventOrder
+  notes: [{ noteId, track, channel, pitch, velocity, onTick, offTick, offEventOrder, onSeconds, offSeconds }],   // sorted by onTick, noteId
   sustain: [{ eventOrder, tick, seconds, track, channel, value }],                                // CC64 only, ordered
-  markers: [{ tick, seconds, text /* ≤ 120 chars */ }],
+  markers: [{ tick, seconds, text /* ≤ 120 chars */, eventOrder }],
   warnings: [{ kind: 'retrigger'|'unmatchedOff'|'danglingOn'|'zeroGate'|'tempoConflict', eventOrder, detail }],
-  ignored: { controllers: { [number]: count }, programChange, pitchBend, channelAftertouch, polyAftertouch, sysEx, unknownMeta, unknownChunks },
+  ignored: { controllers: { [number]: count }, programChange, pitchBend, channelAftertouch, polyAftertouch, sysEx, meta: { [type]: count }, unknownMeta, unknownChunks, channelPrefix },
 }
 MappingPlan = {
   version: 1,
@@ -110,14 +133,28 @@ ImportedScore = { version: 1, source: { name, bytes, sha256 }, notes: NoteList, 
   `afterWindow`; notes before the window are `excluded`, `beforeWindow`.
 - Bellows gates crossing `end` are clipped to `end` (warning
   `gateClipped`); the passage's hold is `end − start + lead + tailSeconds`.
-- Sustain state at `start` is taken from the last CC64 at or before
-  `start` (so a pedal pressed before the window applies, warning
-  `pedalHeldAtStart`); a pedal never released extends gates to `end`,
-  clipped (warning `pedalNeverReleased`). With the pedal on, a bellows
-  note's gate ends at the later of its note-off and the next pedal-off.
-- Zero gates and gates shorter than 50 ms on bellows are compiled with a
-  50 ms minimum (warning `minimumGate`), since the compiler requires
-  `noteOff > time`.
+- **Pedal rule (bellows, when enabled):** pedal state is read **at the
+  note's off event** in merged event order (same tick: the earlier
+  `eventOrder` happened first). If the pedal is down at that moment, the
+  gate ends at the next pedal-up after the off event (or at `end`,
+  clipped, warning `pedalNeverReleased`); if it is up, the gate ends at
+  the off event. A pedal pressed after a note has ended never resurrects
+  it; a pedal released while the key is still held never shortens the
+  key gate. Pedal state at `start` is the last CC64 at or before `start`
+  (warning `pedalHeldAtStart` when down). Astra's examples (key 0–2 s):
+  down 1 / up 3 → 3; down 0, up 1, down 1.5, up 3 → 3; down 0, up 1 → 2;
+  key 0–1 with down 1.5 / up 3 → 1; down 1, never released, window end 4
+  → 4 with warning.
+- **Gates:** the compiler requires only a positive gate, so positive short
+  gates are preserved exactly (onset 0.990 / off 0.995 stays 5 ms). A
+  zero-length gate is compiled as **one sample** at the compile sample
+  rate (warning `zeroGateOneSample`), capped by the remaining window; if
+  no positive gate fits (onset at `end`), the note is `dropped` with
+  reason `noRepresentableGate`. Nothing is extended past `end` or 120 s.
+- **Endpoint cap validated before compiling:** `lead` (0–5 s) and
+  `tailSeconds` (0–30 s) are validated independently, and `lead + (end −
+  start)` must be ≤ 120 s. The natural release tail may extend past a
+  gate end; the window bounds authored gates, never the decay.
 
 ## Report
 
@@ -125,8 +162,8 @@ ImportedScore = { version: 1, source: { name, bytes, sha256 }, notes: NoteList, 
 MappingReport = {
   counts: { exact, mapped, timingOnly, dropped, unassigned, excluded, total },   // total === notes.length
   rows: [{ noteId, track, channel, pitch, family, class, from: { pitch, hz }, to: { slot | body | hz | 'tine fundamental' | 'fm entrance' }, cents, reason }],
-  warnings: [{ kind, noteId | eventOrder, detail }],         // gateIgnored, stolen, retrigger, unmatchedOff, danglingOn, zeroGate,
-                                                             // tempoConflict, gateClipped, pedalHeldAtStart, pedalNeverReleased, minimumGate, controllersIgnored
+  warnings: [{ kind, noteId | eventOrder, detail }],         // gateIgnored, stolen, retrigger, unmatchedOff, danglingOn, zeroGate, zeroGateOneSample,
+                                                             // tempoConflict, gateClipped, pedalHeldAtStart, pedalNeverReleased, controllersIgnored, trackLocalPedal
   planner: { garden: { unplanned }, tine: { unplanned } },   // from the real planner on the compiled events; shown, never a refusal
   children: { loom: boolean, fm: boolean },                  // whether the plan produced any Loom strikes / an FM entrance
 }
@@ -158,9 +195,19 @@ wrapper passes the composition with any child that has no events
 the manifest, and never falls back to the legacy pattern. A file has no
 reason to need an FM entrance; `fmTime: null` with FM disabled is normal.
 
+## Status
+
+- M4a parser: **built** (`src/midi/smf.js`, `tests/midi-smf.test.js`: the
+  RP-001 example file, running status and cancellation, format 1 tempo
+  map with conflict, pairing warnings, sustain/ignored accounting with
+  alien chunks and long known meta, sixteen named rejections, validator
+  tamper tests, canonical stability).
+- M4b mapping/compile/report: planning, this contract, awaiting Astra's
+  confirmation of rev. 3.
+
 ## Ownership and order
 
-- Fable: `src/midi/smf.js` (parser), `src/midi/mapping.js`
+- Fable: `src/midi/smf.js` (parser, built), `src/midi/mapping.js`
   (`validateNoteList`, `validateMappingPlan`, `canonicalImportedScore`,
   `compileImportedScore`), tests with hand-built SMF bytes covering both
   formats, running status, SysEx and meta cancelling it, tempo changes and

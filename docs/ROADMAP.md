@@ -94,7 +94,14 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 
 Deterministic phrase score (opening / exchange / release) over the existing mechanisms; slot and body, never arbitrary pitch; density by weight, character by variant; one FM entrance at the turn; legacy passage re-expressed as a score with identical hashes; sections inspectable in the frame.
 
-## M4: MIDI import onto the score contract (status: planning; proposal docs/proposals/010-midi-import.md awaiting Astra)
+## M4: MIDI import onto the score contract (status: in progress; proposal docs/proposals/010-midi-import.md rev. 3)
+
+- M4a SMF 1.0 parser built from the RP-001 text (src/midi/smf.js, Fable 5c0b4ef; Astra review 20261101T0440Z with fixes in progress).
+- M4b mapping / compile / report: planning (rev. 3 contract awaiting Astra). M4c UI and preview, M4d export/verify/inspector: Astra, after M4b.
+
+## M4.5: Expressive bodies, MIDI 2.0 expression (status: planning; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md awaiting Astra)
+
+Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.
 
 - MIDI file loader mapping pitches to the nearest available slot with a visible "mapped" flag; polyphony limits enforced by the validator.
 - Performer actor and lookahead planner already shipped (Keepers); camera already follows attention.
