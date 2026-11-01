@@ -328,3 +328,41 @@ export function transposeRestRecord(record, source, target) {
   const note = !dropped.length ? 'every gesture carried over.' : kept_ === 0 ? `no strike carried over: all ${total} were too loud for this grove at those moments; only the rests remain. This is not the same passage.` : `${dropped.length} of ${total} strikes were too loud for this grove at those moments and were left out; the rests and the other ${kept_} strikes carried over.`;
   return { record: out, dropped, kept: kept_, total, complete: dropped.length === 0, note };
 }
+
+// ---- the individuality phrase (proposal 019): one short gesture that exposes what measurably differs between groves ----
+// Four moments: a single strike and its ring (beating and decay); the same strike with a firm hand on the struck shell (what the
+// bridges carry); the three shells in turn (the stereo layout); Quiet. The same record transposed to the other groves is the
+// listening comparison; what "may be heard" is derived from measured facts below, never promised.
+export function composeIndividualityPhrase(recipe, { tempo = 60 } = {}) {
+  if (!Number.isInteger(tempo) || tempo < 40 || tempo > 160) throw new Error('tempo must be an integer in 40..160.');
+  const sr = recipe.sampleRate, beat = b => Math.round(b * 60 / tempo * sr), firm = recipe.strengths.findIndex(s => s.name === 'firm'), middle = 1;
+  if (firm < 0 || recipe.zones.length < 3 || recipe.positions.length < 3) throw new Error('the phrase is written for three positions, three zones and a firm strength.');
+  const events = [], contacts = []; let order = 0;
+  const strike = (b, body) => events.push({ frame: beat(b), order: order++, body, position: middle, velocity: 0.6 });
+  strike(0, 0);                                                                          // ring: 3 s alone
+  strike(3, 0); contacts.push({ body: 0, zone: 2, strength: firm, start: beat(3.5), end: beat(6), order: order++ });   // the hand: what the bridges carry
+  strike(7, 0); strike(7.4, 1); strike(7.8, 2);                                          // the layout: three shells in turn
+  const ended = { frame: beat(11), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
+  const record = { version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })), events, contacts, ended };
+  validateRestAdmission(record, recipe);
+  return { version: 1, tempo, seconds: ended.frame / sr + REST_QUIET_FADE_SECONDS, moments: [{ id: 'ring', beats: [0, 3] }, { id: 'hand', beats: [3, 7] }, { id: 'turn', beats: [7, 11] }, { id: 'quiet', beats: [11, 11] }], record };
+}
+
+/** Measured facts behind a grove's individuality, computed from the recipe and one engine pass; phrased as what may be heard. */
+export function describeIndividuality(recipe, { seconds = 2 } = {}) {
+  const g = recipe.grove, v = recipe.visual, sr = recipe.sampleRate, low = v.lowBand.map(r => v.omegaD[r] / (2 * Math.PI)), decay = v.lowBand.map(r => 1 / v.gammas[r]);
+  const beats = []; for (let i = 0; i < low.length; i++) for (let j = i + 1; j < low.length; j++) beats.push(Math.abs(low[i] - low[j]));
+  // The neighbours' share of motion at the pickup, 1..2 s after a single strike on body 0 at the middle, relative to the struck shell.
+  const engine = createRestEngine(recipe); engine.strike(1, 0, 1); const energy = new Array(recipe.bodies).fill(0);
+  for (let i = 0; i < seconds * sr; i++) { if (i >= (seconds - 1) * sr) { const x = engine.state; for (let b = 0; b < recipe.bodies; b++) { let s = 0; for (const r of v.lowBand) { let q = 0; for (let k = 0; k < recipe.n; k++) q += v.modeVectors[r][k] * x[k]; s += v.pickupByMode[r][b] * q; } energy[b] += s * s; } } engine.step(); }
+  const share = energy.map(e => Math.sqrt(e / energy[0]));
+  const pans = g.layout.map(l => l.x);
+  const facts = { seed: g.seed, lowModesHz: low.map(f => +f.toFixed(1)), beatRatesHz: beats.map(b => +b.toFixed(2)), lowDecaySeconds: +decay[0].toFixed(2), neighbourShare: share.slice(1).map(s => +s.toFixed(2)), layoutX: pans.map(x => +x.toFixed(2)), bridges: g.bridges.map(e => ({ a: e.a, b: e.b, coupling: +e.coupling.toFixed(3) })) };
+  const mayHear = [
+    `the ring may beat about ${Math.min(...beats).toFixed(1)}–${Math.max(...beats).toFixed(1)} times a second (low modes ${low.map(f => f.toFixed(0)).join(', ')} Hz)`,
+    `the ring may fade with a time constant near ${decay[0].toFixed(1)} s`,
+    `with a hand on the struck shell, the others may keep ${share.slice(1).map(s => Math.round(s * 100) + ' %').join(' and ')} of its motion at the pickup`,
+    `the three shells may sit at ${pans.map(x => x < -0.2 ? 'left' : x > 0.2 ? 'right' : 'centre').join(', ')} in the stereo field`,
+  ];
+  return { facts, mayHear };
+}

@@ -288,3 +288,15 @@ test('the same gestures on another grove: identical vocabulary required, source 
   if (admissible) { const all = transposeRestRecord(forty, s11, a); if (all.kept === 0) { assert.match(all.note, /no strike carried over.*not the same passage/); assert.equal(all.record.events.length, 0); assert.deepEqual(all.record.contacts, forty.contacts); } }
 });
 
+
+test('the individuality phrase is admissible on every grove, transposes whole, and its facts are measured not promised', async () => {
+  const { composeIndividualityPhrase, describeIndividuality, transposeRestRecord, renderRestRecord } = await import('../src/score/grove-rest.js');
+  const sr = 8000, recipes = Object.fromEntries(GROVE_SEEDS.map(seed => [seed, createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr })]));
+  const phrase = composeIndividualityPhrase(recipes[3]);
+  assert.ok(phrase.seconds > 10 && phrase.seconds < 12); assert.equal(phrase.record.events.length, 5); assert.equal(phrase.record.contacts.length, 1);
+  for (const seed of [7, 11]) { const t = transposeRestRecord(phrase.record, recipes[3], recipes[seed]); assert.ok(t.complete, `seed ${seed}: every gesture carried over`); assert.equal(renderRestRecord(t.record, recipes[seed]).channels[0].length, renderRestRecord(phrase.record, recipes[3]).channels[0].length); }
+  const d = Object.fromEntries(GROVE_SEEDS.map(seed => [seed, describeIndividuality(recipes[seed])]));
+  for (const seed of GROVE_SEEDS) { const f = d[seed].facts; assert.equal(f.lowModesHz.length, 3); assert.ok(f.beatRatesHz.every(b => b >= 0 && b < 10)); assert.ok(f.lowDecaySeconds > 0.5 && f.lowDecaySeconds < 5); assert.ok(f.neighbourShare.every(s => s >= 0 && s < 2)); assert.equal(d[seed].mayHear.length, 4); assert.ok(d[seed].mayHear.every(line => /may /.test(line)), 'nothing promised'); }
+  assert.ok(d[11].facts.lowModesHz[0] > 180 && d[3].facts.lowModesHz[0] < 140, 'seed 11 sits a fifth above seeds 3 and 7 (measured)');
+  assert.ok(d[3].facts.lowDecaySeconds > d[7].facts.lowDecaySeconds, 'seed 3 rings longer than seed 7 (measured)');
+});

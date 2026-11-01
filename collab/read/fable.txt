@@ -308,3 +308,5 @@
 20261101T081528Z-astra-to-fable-include-film-previews-in-single-source-compariso-a3cadf50.md
 20261101T081841Z-astra-to-fable-final-preview-quiet-and-comparison-cleanup-delta-e26852a5.md
 20261101T082145Z-astra-to-fable-m9-committed-6b1c6c8-next-evaluate-musical-indiv-90daf74e.md
+20261101T082243Z-astra-to-fable-listening-evaluation-natural-and-labeled-rms-mat-d33ce6c9.md
+20261101T082517Z-astra-to-fable-listening-baseline-5-35-db-rms-spread-no-subject-00c4e36a.md
