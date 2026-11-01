@@ -1,5 +1,6 @@
 import {composeGrove} from '../src/score/grove.js';
 import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
+import {groveMovieAudioEvidence} from '../src/grove/movie-audio.js';
 import {createRestCapture} from '../src/grove/contact-capture.js';
 import {renderRestRecord} from '../src/score/grove-rest.js';
 import {renderRestPassage} from '../src/rest/engine.js';
@@ -60,7 +61,8 @@ try{
   if(maxDifference!==0||finished.frame!==576||finished.ended.frame!==512||finished.ended.fadeFrames!==64||acks.length!==5||acks.slice(3).some(a=>a.accepted||a.reason!=='ended'))throw new Error('Quiet fade, contact release or terminal event handling differs');
   const record=capture.snapshot(),replay=renderRestRecord(record,recipe).channels;let captureDifference=0;for(let ch=0;ch<2;ch++)for(let i=0;i<replay[ch].length;i++)captureDifference=Math.max(captureDifference,Math.abs(replay[ch][i]-buffer.getChannelData(ch)[i+capture.originFrame]));
   if(capture.originFrame!==64||replay[0].length!==512||captureDifference!==0)throw new Error('Saved Rest record differs from actual audio');
-  report.results.push({seed:7,sampleRate,frames,case:'sample-exact Quiet, acknowledged v2 capture and replay',maxDifference,captureDifference,originFrame:capture.originFrame,record,finished,acknowledgements:acks});
+  const heard={sampleRate,channels:[0,1].map(ch=>buffer.getChannelData(ch).slice(capture.originFrame,finished.frame))},evidence=await groveMovieAudioEvidence(heard,'rest-capture.wav');
+  report.results.push({sourcePcm:evidence.audio.sourcePcm,seed:7,sampleRate,frames,case:'sample-exact Quiet, acknowledged v2 capture and replay',maxDifference,captureDifference,originFrame:capture.originFrame,record,finished,acknowledgements:acks});
  }
  report.passed=true;$('status').textContent='5/5 shared-engine AudioWorklet checks passed.';
 }catch(error){report.passed=false;report.error=error.message;$('status').textContent='FAILED · '+error.message;}

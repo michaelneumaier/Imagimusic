@@ -83,3 +83,5 @@ Rest worklet scheduling: src/grove/contact-events.js and tests/grove-contact-eve
 Rest shared-engine worklet: src/grove/contact-worklet.js and contact-prepare-worker.js; tests/grove-contact-audio.html/js. Imports Fable's src/rest/engine.js; per-body contact composition, actual applied acknowledgements and fatal stop. Offline browser equivalence only until admission and capture v2 integration are validated.
 
 Rest capture adapter: src/grove/contact-capture.js and tests/grove-contact-capture.test.js; translate complete audio-thread acknowledgement streams into Fable's validated v2 record, with browser replay equivalence.
+
+Rest live host: src/grove/contact-host.js, contact-job.js, contact-render-worker.js, worklet state snapshots and tests/grove-contact-host.test.js. Context/worker lifecycle, acknowledged picture/capture, offline saved audio, then UI integration.

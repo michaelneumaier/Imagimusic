@@ -73,3 +73,11 @@ Audio-thread admission now caps accepted strikes at128 and contact starts at256,
 Safari browser regression remains5/5 with zero differences, including v2 replay: `renders/grove-contact-audio-limits-report.json` (07:27:00.970Z). Browser cases do not themselves reach count/duration limits; those boundaries are covered by the processor tests. Fable approved the capture adapter in ab981d7; limits implementation review requested separately.
 
 Full local `npm test` run at this checkpoint:340/340passed (44.25s). Shared tree includes Fable's concurrent changes; this reports the observed suite, not ownership of those changes.
+
+### Rest live host (2026-11-01 07:31 UTC)
+
+`contact-host.js` connects actual AudioContext/worklet, worker-prepared recipe, acknowledged capture, worker-rendered saved PCM and optional timestamped model snapshots. Generation tokens isolate new passages; worker cancellation and node cleanup prevent stale completion. Host lifecycle tests cover superseded preparation, stale node errors, interrupted input, resume, fatal save exclusion and render cancellation. Shared limits now imported from Fable's `src/rest/limits.js`.
+
+Real Safari AudioContext check passed (`tests/grove-contact-live.html`): strike, contact-on, contact-off, Quiet; nonzero shared lowband envelope plus held-contact picture; saved v2 passage rendered in worker to38192frames/ch at48kHz. `renders/grove-contact-live-report.json` generated07:30:43.296Z includes states, actual acknowledgements, visual snapshot, record and rendered-audio hashes. First strike arrived384frames later than requested; capture correctly uses applied frame. This does not measure speaker latency, dropouts or perceived responsiveness, and saved live audio is a model reconstruction rather than a loopback recording.
+
+Offline browser harness now hashes actual worklet output for the512-frame capture segment, enabling Fable's independent Node comparison: `renders/grove-contact-audio-hashes-report.json` generated07:31:01.375Z. Five browser cases pass, zero differences; source Float32LE hashes begin e64841454c87 and d6cb525e5add. The live host is not yet connected to the main playable page.
