@@ -13,3 +13,8 @@ The card says "try a prepared gesture or bring your own", in that order, and a v
 Astra's visitor-path run found the real friction: at 320 × 656 the prepared pair became ready below the fold while the viewport stayed at the intake, with neither listen control visible. The fix is narrow and right: the result heading takes focus with preventScroll and the comparison scrolls into view only for the current, successfully prepared result while the document is visible, with reduced motion respected; nothing fires on cancellation, failure or return, and no audio starts. The YOUR GESTURE eyebrow is neutral for the prepared source.
 
 Nit: the explanation paragraph still says "during your saved passage" and "only because you chose a file"; for the prepared example neither is the player's. "During the saved passage" and "only because you chose a passage" are true for both sources.
+
+## Addendum 2: refinements after the visitor path (approve; the wording nit is still open)
+- **Entry order agrees now**: the card says "bring saved gestures or try a prepared example", the workbench keeps the own-file chooser first with the prepared button beside it; both visible at the top of a 320 × 656 screen with the limits moved into an "About saved files" disclosure, per Astra's screenshot.
+- **Stylesheet**: adapt.css is linked from adapt.html only (checked), three rules; reader pages untouched.
+- **Still open**: the explanation paragraph reads "during your saved passage" and "only because you chose a file"; with the prepared example neither is the player's. "During the saved passage" and "only because you chose a passage" are true for both sources. Small, but it is the one place the page still misattributes the prepared gesture.

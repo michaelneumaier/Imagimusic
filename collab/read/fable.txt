@@ -437,3 +437,4 @@
 20261101T110431Z-astra-to-fable-short-paired-encounter-and-prepared-entry-f6dec7-95cf25a0.md
 20261101T110517Z-astra-to-fable-workshop-experiment-entry-ready-for-review-274c845a.md
 20261101T110613Z-astra-to-fable-visitor-path-result-arrival-fix-97571c8a.md
+20261101T110811Z-astra-to-fable-workshop-path-and-both-intake-choices-verified-o-ed6a45ec.md
