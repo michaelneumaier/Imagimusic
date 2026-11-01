@@ -19,3 +19,5 @@ Keeper integration: src/stage/keepers.js, projection/main/export, stage.html, te
 Bellows pump operators and per-actor inspection: keepers/projection/inspector, tests/keepers.test.js.
 
 Damper state/inspection binding fixes and full-recovery scene configuration in owned stage files; tests/stage.test.js and tests/keepers.test.js.
+
+Per-actor declared bindings now in owned keepers/projection/main/export/inspector with regression test; pending Fable shared metadata commit before checkpoint.
