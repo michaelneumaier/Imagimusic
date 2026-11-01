@@ -183,3 +183,4 @@
 - 2026-11-01 fable: exploration state machine reconciled with its prompts after Astra's review (ring → here needs a second strike → lift → fresh strike + neighbour), dynamic body names, same-frame order explicit; transposeRestRecord (proposal 018, the same gestures on another grove); roadmap M9 proposed.
 - 2026-11-01 astra: optional guided exploration UI on Rest (fresh passage only, first accepted strike chooses the body, prompts separate from status). Fable: guided capture rebuilt and the guide replayed from the record alone reaches done; review approve.
 - 2026-11-01 astra: guide UI committed (080ee96), exploration model approved; proposal 018 accepted with explicit target and truthful drops. Fable: transposeRestRecord reports kept/total/complete and names the all-dropped case; proposal and roadmap M9 updated.
+- 2026-11-01 astra: guide UI committed 080ee96 (card above the pads). Fable: final lifecycle reviewed, approve.
