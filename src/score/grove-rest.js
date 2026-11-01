@@ -5,6 +5,7 @@
 import { createGroveVoice, voiceSystem, grovePans, DEFAULT_VOICE_CONFIG } from './grove-voice.js';
 import { stateStepper, strikeImpulse, contactDamping } from '../coupling.js';
 import { REST_RECIPE_VERSION, contactStateKey, createRestEngine, renderRestPassage, visualFromState } from '../rest/engine.js';
+import { REST_MAX_EVENTS, REST_MAX_CONTACTS, REST_MAX_SECONDS, REST_QUIET_FADE_SECONDS } from '../rest/limits.js';
 
 /** Two rest strengths, viscous coefficients in N·s/m per unit shape, stated as choices, not measurements of any hand. */
 export const REST_STRENGTHS = Object.freeze({ light: 12, firm: 60 });
@@ -63,7 +64,8 @@ export { contactDamping };
 // ---- capture v2: a Rest record, its validation, canonical form and exact renderer ----
 // Events carry the frame they were actually applied at and the actual application order (acknowledged by the audio clock,
 // never the requested time); contacts are half-open frame intervals per body that never overlap on one body.
-export const REST_RECORD_KIND = 'imagimusic-grove-rest', REST_RECORD_VERSION = 2, REST_MAX_EVENTS = 128, REST_MAX_CONTACTS = 256, REST_MAX_SECONDS = 120;
+export const REST_RECORD_KIND = 'imagimusic-grove-rest', REST_RECORD_VERSION = 2;
+export { REST_MAX_EVENTS, REST_MAX_CONTACTS, REST_MAX_SECONDS, REST_QUIET_FADE_SECONDS } from '../rest/limits.js';
 const keysExactly = (o, keys, name) => { if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error(`${name} must be an object.`); const extra = Object.keys(o).filter(k => !keys.includes(k)), missing = keys.filter(k => !(k in o)); if (extra.length || missing.length) throw new Error(`${name}: unexpected keys ${JSON.stringify(extra)}, missing ${JSON.stringify(missing)}.`); };
 /** Key-sorted JSON so that comparisons do not depend on key order (a canonical record round-trips through its own JSON). */
 const stable = v => JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, x[k]])) : x);
@@ -170,10 +172,10 @@ export function composeRestInvitation(recipe, { tempo = 72 } = {}) {
     strike(4, 0, middle, 0.6), rest(5, 0, tip, firm), lift(8, 0),    // rest on it: the ring dies under the hand
     strike(10, 0, middle, 0.6), rest(11, other, tip, firm), lift(14, other),   // rest on the neighbour: the bridge carries the change
     strike(16, 0, middle, 0.5), strike(16, other, middle, 0.5), strike(16, third, middle, 0.5), rest(17.5, 0, middle, light), lift(20, 0),   // all three, a light hand
-    { id: id(), kind: 'quiet', frame: beat(24), fadeFrames: Math.round(0.025 * sr) },
+    { id: id(), kind: 'quiet', frame: beat(24), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) },
   ];
   const sections = [{ id: 'ring', beats: [0, 4] }, { id: 'rest', beats: [4, 10] }, { id: 'across', beats: [10, 16] }, { id: 'together', beats: [16, 24] }, { id: 'quiet', beats: [24, 24] }];
-  const seconds = commands.at(-1).frame / sr + 0.025;
+  const seconds = commands.at(-1).frame / sr + REST_QUIET_FADE_SECONDS;
   if (seconds < REST_INVITATION_BOUNDS.minSeconds || seconds > REST_INVITATION_BOUNDS.maxSeconds) throw new Error(`invitation lasts ${seconds.toFixed(1)} s; bound is ${REST_INVITATION_BOUNDS.minSeconds}..${REST_INVITATION_BOUNDS.maxSeconds} s.`);
   return { version: 1, tempo, seconds, neighbor: other, third, sections, commands };
 }
