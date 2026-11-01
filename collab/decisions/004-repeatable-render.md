@@ -64,6 +64,21 @@ loss 0.8 (peak 0.1949), uncoupled 80 Hz / loss 0.2 (peak 0.1922)
 (`renders/loom-render-report-20261101T015618.json`). The verified set is
 exactly these; other arrangements are expected but not claimed.
 
+## Scope extension (2026-11-01, featured FM tensioner, composition v2)
+
+With the single featured FM tone attached (entrance at beat 8, PCM from the
+model at the context's rate, buffer padded past the render under the
+outlive policy counted from its start offset), harness v11 on Safari 26.6.2
+/ 48 kHz / seed 731: FM alone and FM with the Loom duet each rendered twice,
+bit-identical float32 (1,609,893 samples), peaks 0.1941 / 0.2077, RMS
+0.0304 / 0.0340, tails below 3e-6
+(`renders/stage-render-report-v11-731-20261101T023310.json`). The combined
+movie `renders/conservatory-fm-loom-731.mp4` verifies 1007/1007 with the
+saved v2 composition. The verified set is exactly these two arrangements with
+the default FM settings; the isolated before/after contribution check (v13
+focused) is a separate, still-open diagnostic; other FM settings are expected
+but not claimed.
+
 ## Consequences
 
 - `docs/ROADMAP.md`: the repeatability item closes with this evidence.
