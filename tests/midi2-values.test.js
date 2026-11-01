@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {velocity16ToUnit,controller32ToUnit,pitch725ToHcu,pitch79ToHcu,hcuToHz,perNoteBendToHcu} from '../src/midi2/values.js';
+import {velocity16ToUnit,controller32ToUnit,pitch725ToHcu,pitch79ToHcu,hcuToHz,perNoteBendToHcu,channelBendSensitivityToHcu,sustain32IsOn} from '../src/midi2/values.js';
 
 test('native MIDI2 resolution survives values that a 7-bit path would collapse',()=>{
   const a=0x81234567,b=a+1;
@@ -41,4 +41,23 @@ test('invalid wire values fail rather than wrap, clamp or coerce',()=>{
   for(const value of [-1,128,Infinity,NaN,'69'])assert.throws(()=>hcuToHz(value),RangeError);
   assert.throws(()=>perNoteBendToHcu(-1,0),RangeError);
   assert.throws(()=>perNoteBendToHcu(0,2**32),RangeError);
+});
+
+test('channel bend range decodes semitones and cents rather than Q7.25',()=>{
+ const encoded=2*2**25+50*2**18;
+ assert.equal(channelBendSensitivityToHcu(encoded),2.5);
+ assert.equal(channelBendSensitivityToHcu(encoded+2**18-1),2.5,'reserved low bits ignored');
+ assert.notEqual(pitch725ToHcu(encoded),2.5,'per-note format is different');
+ assert.equal(channelBendSensitivityToHcu(127*2**25+99*2**18),127.99);
+ assert.equal(channelBendSensitivityToHcu(0),0);
+ for(const cents of [100,127])assert.throws(()=>channelBendSensitivityToHcu(cents*2**18),RangeError);
+ for(const value of [-1,2**32,NaN,'0'])assert.throws(()=>channelBendSensitivityToHcu(value),RangeError);
+});
+
+test('32-bit sustain switches at the exact midpoint without rounding',()=>{
+ for(const [value,expected] of [[0,false],[0x7fffffff,false],[0x80000000,true],[0xffffffff,true]]){
+  assert.equal(sustain32IsOn(value),expected);
+  assert.equal(sustain32IsOn(value),Math.floor(value/2**25)>=64);
+ }
+ for(const value of [-1,.5,NaN,Infinity,'1',2**32])assert.throws(()=>sustain32IsOn(value),RangeError);
 });

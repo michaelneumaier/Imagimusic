@@ -36,3 +36,5 @@ and pitch parameters, making it a useful first adapter. Its current scheduler
 still consumes the existing dynamics model. The FM study's closed-form phase
 assumes a fixed carrier and ratio, so continuous expression would require a
 new phase solution or integration method. No dynamic FM support is implied.
+
+Follow-up: read section7.4.7.1 (p54) and D.1.4 (p96) in the same primary document. Added `channelBendSensitivityToHcu`: RPN0/0 takes top7bits as HCUs and next7 as cents, ignoring the bottom18; our receiver rejects cents100–127 rather than inventing a meaning. Example raw `(2*2^25)+(50*2^18)` means2.50HCUs, not the Q7.25 value2.390625. Added `sustain32IsOn`: MIDI1 CC64 threshold64 combined with the default downscaling rule (discard25lowbits) yields the exact uint32 midpoint0x80000000. This is the supported switch interpretation, not continuous half-pedaling. Six numeric tests now pass, including both threshold neighbors, ignored lowbits and signed-boundary values.

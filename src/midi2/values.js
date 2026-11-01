@@ -22,6 +22,20 @@ export const controller32ToUnit = value => unsigned(value, UINT32_MAX, 'controll
 export const pitch725ToHcu = value => unsigned(value, UINT32_MAX, 'pitch7.25') / 2 ** 25;
 export const pitch79ToHcu = value => unsigned(value, UINT16_MAX, 'pitch7.9') / 2 ** 9;
 
+// RPN 0/0 differs from per-note RPN 0/7: top 7 bits HCUs, next 7 cents,
+// bottom 18 ignored (UMP v1.1.2 §7.4.7.1). Reject out-of-domain cents;
+// callers report an unsupported value rather than silently wrapping/clamping.
+export function channelBendSensitivityToHcu(value){
+ unsigned(value,UINT32_MAX,'channel bend sensitivity');
+ const semitones=Math.floor(value/2**25),cents=Math.floor(value/2**18)%128;
+ if(cents>99)throw new RangeError('Channel bend sensitivity cents must be in [0, 99]');
+ return semitones+cents/100;
+}
+
+// CC64 keeps MIDI's switch semantics. Default 32->7 translation discards
+// the low 25 bits (§D.1.4); MIDI1 64..127 maps exactly to this upper half.
+export const sustain32IsOn=value=>unsigned(value,UINT32_MAX,'sustain32')>=BEND_CENTER;
+
 export function hcuToHz(hcu) {
   if (!Number.isFinite(hcu) || hcu < 0 || hcu >= 128) {
     throw new RangeError('absolute HCU pitch must be finite and in [0, 128)');
