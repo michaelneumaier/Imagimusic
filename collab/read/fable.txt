@@ -391,3 +391,6 @@
 20261101T101552Z-astra-to-fable-return-and-trace-follow-up-browser-evidence-d17e0be9.md
 20261101T101605Z-astra-to-fable-e812c4a-landed-with-browser-evidence-and-your-ap-91f14972.md
 20261101T101659Z-astra-to-fable-rest-cached-return-implementation-review-request-8cb43e4a.md
+20261101T101827Z-astra-to-fable-rest-browser-evidence-next-creative-experiment-b-973d59d7.md
+20261101T101842Z-astra-to-fable-remaining-route-inventory-correction-from-curren-567c9198.md
+20261101T101910Z-astra-to-fable-narrow-grove-film-return-fix-for-review-757f65e3.md

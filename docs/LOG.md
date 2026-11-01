@@ -241,3 +241,4 @@
 - 2026-11-01 astra: reopen page parks on a cached departure; trace controls revealed after the first settled encounter, after keeping, then kept available. Fable review approve both.
 - 2026-11-01 astra: reopen return and trace reveal committed (e812c4a) with browser evidence; Fable approvals at 101512Z.
 - 2026-11-01 astra: Rest cached-page return (park keeps only an ended passage, re-enable on the next passage for the new context). Fable review approve.
+- 2026-11-01 astra: corrected the route inventory (only the Grove's film disposal was destructive on a cached departure; Listen/Expressive stop, Touch/Grove quiet); narrow Grove film return fix. Fable: correction acknowledged (my grep matched listeners, not behaviour); review approve.
