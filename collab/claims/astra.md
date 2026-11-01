@@ -155,3 +155,4 @@ Catalog restart resilience: tools/prepare-project-home.mjs; existing project-cat
 
 Project home return path: index.html brand destination and accessible label only.
 Reproducible preliminary benchmark: tools/measure-ensemble-engine-cost.mjs, Node-only evidence with explicit excluded browser overhead.
+Notebook readability: src/project-notebook.js, project.html/project.css and project-catalog.js dialog integration; conservative structural formatting plus exact raw-source disclosure.

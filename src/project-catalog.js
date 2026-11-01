@@ -1,3 +1,4 @@
+import {renderNotebook} from './project-notebook.js';
 const entries=[
  ['Start here','welcome.html','Encounters','Playable','Three gentle doors into the project: listen, play, and rest a hand.'],
  ['Listen','listen.html','Encounters','Playable','Follow a sound between connected bodies in a short guided encounter.'],
@@ -47,12 +48,13 @@ function render(){
 }
 search.addEventListener('input',render);category.addEventListener('change',render);render();
 const notebook=document.getElementById('notebook'),title=document.getElementById('document-title'),status=document.getElementById('document-status'),source=document.getElementById('document-source'),text=document.getElementById('document-text');
+const reading=document.getElementById('document-reading'),raw=document.getElementById('document-raw');
 let revision=0,request;
 document.getElementById('close-doc').onclick=()=>notebook.close();
 notebook.addEventListener('close',()=>{revision++;request?.abort();});
 for(const button of document.querySelectorAll('[data-doc]'))button.addEventListener('click',async()=>{
- const own=++revision;request?.abort();request=new AbortController();title.textContent=button.childNodes[0].textContent.replace('↗','').trim();source.href=button.dataset.doc;text.textContent='';status.textContent='Loading the source notebook…';notebook.showModal();
- try{const response=await fetch(button.dataset.doc,{signal:request.signal});if(!response.ok)throw new Error('This document is unavailable ('+response.status+').');const body=await response.text();if(own!==revision)return;text.textContent=body;status.textContent='Working source · Markdown shown as plain text. Historical entries describe their own checkpoint, not necessarily the current state.';}
+ const own=++revision;request?.abort();request=new AbortController();title.textContent=button.childNodes[0].textContent.replace('↗','').trim();source.href=button.dataset.doc;text.textContent='';reading.replaceChildren();raw.open=false;status.textContent='Loading the source notebook…';notebook.showModal();
+ try{const response=await fetch(button.dataset.doc,{signal:request.signal});if(!response.ok)throw new Error('This document is unavailable ('+response.status+').');const body=await response.text();if(own!==revision)return;text.textContent=body;renderNotebook(reading,body);status.textContent='Reading layout · Exact source below. Historical notes may describe earlier versions.';}
  catch(error){if(own===revision&&error.name!=='AbortError')status.textContent=error.message+' Use the source link or try again.';}
 });
 
