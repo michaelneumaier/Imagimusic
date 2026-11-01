@@ -8,21 +8,27 @@ export function makeLoom(settings=DEFAULT_LOOM,body=0){
  const system=coupledPair({m1:mass,m2:mass,f1:p.frequency,f2:p.frequency*2**(p.detune/1200),kc:p.coupling*mass*w*w,gamma:p.loss});
  const impulse=body===0?[.01,0]:[0,.01],response=strikeResponse(system,impulse);
  const modes=[0,1].map(i=>pickupModes(system,impulse,i,{level:.19}));
- const duration=Math.min(20,8/p.loss),fade=.025;
+ const duration=Math.min(20,8/p.loss),fade=.25;
  return {settings:p,body,system,modes,response,duration,fade};
 }
 export function loomLevel(study,t){return t<0||t>=study.duration?0:Math.min(1,(study.duration-t)/study.fade);}
 /** Analytic modal amplitude envelope, without sampling the carrier phase into visible sway. */
 export function loomEnvelope(study,t){
  const level=loomLevel(study,t),base=study.system.normalFreqsHz[0];
- return study.modes.map(modes=>{let re=0,im=0;for(const m of modes){const angle=2*Math.PI*(m.frequency-base)*t+m.phase;re+=m.amplitude*Math.cos(angle);im+=m.amplitude*Math.sin(angle);}return level*Math.exp(-study.settings.loss*Math.max(0,t))*Math.hypot(re,im);});
+ return study.modes.map(modes=>{let re=0,im=0;for(const m of modes){const angle=2*Math.PI*(m.frequency-base)*t+m.phase;const amplitude=m.amplitude*Math.exp(-Math.max(0,t)/m.decay);re+=amplitude*Math.cos(angle);im+=amplitude*Math.sin(angle);}return level*Math.hypot(re,im);});
+}
+export const MAX_VISIBLE_BEAT_HZ=8;
+export function loomVisualEnvelope(study,t){
+ const averaged=study.system.normalFreqsHz[1]-study.system.normalFreqsHz[0]>MAX_VISIBLE_BEAT_HZ;
+ const values=averaged?study.modes.map(modes=>loomLevel(study,t)*Math.sqrt(modes.reduce((sum,m)=>sum+(m.amplitude*Math.exp(-Math.max(0,t)/m.decay))**2,0))):loomEnvelope(study,t);
+ return {values,averaged};
 }
 export function renderLoom(study,sampleRate=48000){
  if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>192000)throw new Error('Unsupported sample rate');
  const length=Math.ceil(study.duration*sampleRate),channels=[new Float32Array(length),new Float32Array(length)];
  for(let i=0;i<length;i++){
-  const t=i/sampleRate,gain=.45*loomLevel(study,t)*Math.exp(-study.settings.loss*t);
-  for(let body=0;body<2;body++)for(const mode of study.modes[body])channels[body][i]+=gain*mode.amplitude*Math.sin(2*Math.PI*mode.frequency*t+mode.phase);
+  const t=i/sampleRate,gain=.45*loomLevel(study,t);
+  for(let body=0;body<2;body++)for(const mode of study.modes[body])channels[body][i]+=gain*Math.exp(-t/mode.decay)*mode.amplitude*Math.sin(2*Math.PI*mode.frequency*t+mode.phase);
  }
  return {channels,sampleRate};
 }

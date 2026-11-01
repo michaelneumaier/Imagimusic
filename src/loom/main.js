@@ -1,7 +1,7 @@
 import * as T from '../../vendor/three/build/three.module.js';
 import {createWorld} from '../stage/world.js';
 import {mesh} from '../stage/bodies.js';
-import {DEFAULT_LOOM,makeLoom,loomEnvelope,renderLoom,stereoWav} from './model.js';
+import {DEFAULT_LOOM,makeLoom,loomVisualEnvelope,renderLoom,stereoWav} from './model.js';
 const $=id=>document.getElementById(id);
 let settings={...DEFAULT_LOOM},study=makeLoom(settings),context,source,gain,origin=0,playing=false,pcm=null,request=0;
 const world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
@@ -36,11 +36,11 @@ for(const key of ['coupling','detune','loss'])$(key).oninput=()=>{quiet();settin
 $('save').onclick=()=>{if(!pcm)return;const url=URL.createObjectURL(new Blob([stereoWav(pcm)],{type:'audio/wav'})),a=document.createElement('a');a.href=url;a.download=`imagimusic-loom-${study.body===0?'left':'right'}.wav`;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)quiet();});
 function draw(){
- const t=playing?Math.max(0,context.currentTime-origin):0,envelopes=playing?loomEnvelope(study,t):[0,0];
+ const t=playing?Math.max(0,context.currentTime-origin):0,visual=loomVisualEnvelope(study,t),envelopes=playing?visual.values:[0,0];
  bodies.forEach(({body,striker},i)=>{body.scale.x=.8+envelopes[i]*3;body.material.emissiveIntensity=envelopes[i]*5;striker.position.y=playing&&i===study.body?2.65-Math.max(0,1-t/.12)*.4:2.7;});
  bridge.material.opacity=settings.coupling===0?.08:.25+Math.min(.7,envelopes.reduce((a,b)=>a+b,0)*2);
  $('state').textContent=playing?`STRIKE ${study.body===0?'LEFT':'RIGHT'} · ${t.toFixed(2)} s`:'READY · STRIKE EITHER BODY';
- $('readout').textContent=`Normal modes ${study.system.normalFreqsHz.map(f=>f.toFixed(2)).join(' / ')} Hz · Coupling spring ${study.system.kc.toFixed(1)} N/m`;
+ $('readout').textContent=`Normal modes ${study.system.normalFreqsHz.map(f=>f.toFixed(2)).join(' / ')} Hz · Coupling spring ${study.system.kc.toFixed(1)} N/m${visual.averaged?' · Exchange too fast to draw; mean level shown (mode split > 8 Hz)':''}`;
  world.render();requestAnimationFrame(draw);
 }
 draw();

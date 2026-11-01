@@ -6,7 +6,7 @@ class Parameter {
   setValueCurveAtTime(curve, time, duration) { this.curve = curve; this.duration = duration; }
   exponentialRampToValueAtTime(value, time) { this.target = { value, time }; }
   cancelScheduledValues() {}
-  setValueAtTime(value, time) { this.value = value; }
+  setValueAtTime(value, time) { this.value = value; this.set = { value, time }; }
   linearRampToValueAtTime(value, time) { this.target = { value, time }; }
 }
 class Node {
@@ -91,4 +91,19 @@ test('a damper can cancel a future strike and its ended callbacks release the gr
   voice.nodes.forEach(node => node.onended());
   assert.ok(voice.gain.disconnected);
   assert.ok(voice.nodes.every(node => node.disconnected));
+});
+
+
+test('modal gains become exactly silent at the original source cutoff', async () => {
+  globalThis.AudioContext = Context;
+  const engine = new InstrumentAudio(); await engine.enable();
+  const voice = engine.strike(0, DEFAULT_PATCH);
+  const gains = engine.context.gains.filter(node => node.gain.curve);
+  assert.equal(gains.length, voice.nodes.length);
+  gains.forEach((node, i) => {
+    assert.equal(node.gain.set.value, 0);
+    assert.equal(node.gain.set.time, voice.nodes[i].stopTime);
+    assert.equal(node.gain.target.time, node.gain.set.time);
+    assert.ok(node.gain.target.value > 0);
+  });
 });

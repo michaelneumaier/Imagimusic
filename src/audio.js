@@ -48,6 +48,8 @@ export class InstrumentAudio {
       for (let i = 0; i < attack.length; i++) attack[i] = mode.amplitude * velocity * envelope(i / (attack.length - 1) * ATTACK_SECONDS, mode.decay);
       gain.gain.setValueCurveAtTime(attack, when, ATTACK_SECONDS);
       gain.gain.exponentialRampToValueAtTime(mode.amplitude * velocity * Math.exp(-DECAY_TAUS), when + mode.decay * DECAY_TAUS);
+      // End the signal explicitly, even when an offline renderer retains the source.
+      gain.gain.setValueAtTime(0, when + mode.decay * DECAY_TAUS);
       oscillator.start(when); oscillator.stop(when + mode.decay * DECAY_TAUS);
       oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); if (--remaining === 0) { voiceGain.disconnect(); pan.disconnect(); } };
       voice.nodes.push(oscillator);

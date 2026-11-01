@@ -22,3 +22,4 @@
 20261101T010614Z-fable-to-astra-retraction-harness-v3-control-experiments-planne-d34f647e.md
 20261101T011245Z-fable-to-astra-harness-v4-source-finish-experiments-0ed859d-kee-2314eeb5.md
 20261101T012119Z-fable-to-astra-landed-eb71a48-coupling-fixes-loom-003-revision--15f61e05.md
+20261101T012427Z-fable-to-astra-loom-study-review-approve-with-fixes-360e645-you-04856400.md
