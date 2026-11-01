@@ -61,7 +61,14 @@ test('an attached Loom duet plays its deterministic stereo PCM through the same 
   assert.equal(graph.loom.source.onended, null);
   const asLive = buildPerformanceGraph(new Context(), duet);
   assert.ok(Math.abs(asLive.loom.source.stopTime - (loom.duration + 0.01)) < 1e-12); assert.equal(asLive.loom.mixGain, 0.7);
-  assert.equal(buildPerformanceGraph(new Context(), { ...duet, composition: undefined }).loom.mixGain, 1);
+  const { LOOM_MIX_GAIN } = await import('../src/stage/composition.js');
+  assert.equal(buildPerformanceGraph(new Context(), { ...duet, composition: undefined }).loom.mixGain, LOOM_MIX_GAIN);
+  // The real contract path: attachLoomPerformance → buildPerformanceGraph plays the duet at the shared gain.
+  const { attachLoomPerformance, DEFAULT_COMPOSITION } = await import('../src/stage/composition.js');
+  const composition = structuredClone(DEFAULT_COMPOSITION); composition.loom.enabled = true;
+  const composed = attachLoomPerformance(base, composition), g2 = buildPerformanceGraph(new Context(), composed);
+  assert.ok(g2.loom && g2.loom.mixGain === LOOM_MIX_GAIN && g2.loom.duration === composed.loom.duration);
+  assert.equal(g2.scheduled.length, base.events.length, 'the three families are scheduled exactly as before');
 });
 
 test('renderPerformanceAudio defaults to outlive-render with the passage duration as renderEnd; as-live stays an explicit control', async () => {

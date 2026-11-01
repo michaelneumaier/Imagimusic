@@ -46,3 +46,4 @@
 - 2026-11-01 fable: src/stage/equivalence.js: planned score == synthesized engine voices on the bus (explicit id/order/nanosecond-timeline normalization), identical over 1007 frames in node; tests/stage-engine-parity.html for the real-engine browser run.
 - 2026-11-01 astra: Loom scene adapter reviewed approve; ensemble composition contract proposed (composition v1, performance.loom).
 - 2026-11-01 fable: render-audio attachLoomSource: optional duet PCM through the shared master/compressor, native 2ch→mono downmix, outlive stop policy; 143/143.
+- 2026-11-01 astra: composition v1 (attachLoomPerformance), live Loom adapter (loom-audio.js). Fable: offline adapter shares LOOM_MIX_GAIN; review approve-with-fixes (composed exports need composition in manifest/verifier).

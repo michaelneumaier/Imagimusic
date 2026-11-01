@@ -16,6 +16,7 @@ import { InstrumentAudio } from '../audio.js';
 import { createBellowsGraph, applyBellowsSchedule } from '../bellows-audio.js';
 import { voiceDynamics } from '../dynamics.js';
 import { renderLoomPerformance } from '../loom/performance.js';
+import { LOOM_MIX_GAIN } from './composition.js';
 
 // Optional Loom duet (Astra's composition contract, 2026-11-01). When `performance.loom` is attached, its
 // deterministic stereo PCM (renderLoomPerformance at the context's sample rate, the same function the live page's
@@ -30,7 +31,7 @@ export function attachLoomSource(context, master, performance, { stopAt = null, 
   const buffer = context.createBuffer(2, length, context.sampleRate);
   pcm.channels.forEach((samples, c) => buffer.copyToChannel(samples, c));
   const source = context.createBufferSource(); source.buffer = buffer;
-  const gain = context.createGain(); gain.gain.value = mixGain ?? loom.mixGain ?? performance.composition?.loomMixGain ?? 1;
+  const gain = context.createGain(); gain.gain.value = mixGain ?? loom.mixGain ?? performance.composition?.loomMixGain ?? LOOM_MIX_GAIN;   // same constant the live adapter uses
   source.connect(gain).connect(master);
   source.start(0);
   source.stop(stopAt ?? loom.duration + 0.01);
