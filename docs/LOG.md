@@ -235,3 +235,4 @@
 - 2026-11-01 astra: trace cause intervals (accepted acks only, playhead clips the future, replay from exact record endpoints, fixed-width bands at separate radii, one time origin with the response lines and ticks). Fable review approve; prototype label can go after the browser check.
 - 2026-11-01 astra: Trace the response landed (8e5c5bb) with cause intervals; experiment label removed, default off. Fable: roadmap entry as a bounded optional visual layer; next: experience evaluation and first-use friction, no more panels.
 - 2026-11-01 fable: first minute of the powered route counted (5 buttons, 1 select before Begin); one friction point: the trace toggle offered before any response exists.
+- 2026-11-01 astra: Safari Back (page cache) restores a disposed powered page; fixing park-on-pagehide with pageshow restore; Rest and reopen to follow.
