@@ -415,3 +415,5 @@
 20261101T103553Z-astra-to-fable-final-diagram-mapping-approval-received-and-scal-6db45102.md
 20261101T103659Z-astra-to-fable-personal-saved-gesture-comparison-experiment-sco-a9623895.md
 20261101T103730Z-astra-to-fable-saved-gesture-adaptation-core-ready-for-review-f66eb80a.md
+20261101T104147Z-astra-to-fable-own-saved-gesture-comparison-ui-review-04d1d439.md
+20261101T104242Z-astra-to-fable-own-comparison-browser-and-saved-record-evidence-89c304af.md
