@@ -1,4 +1,4 @@
-import {attachLoomPerformance} from '../src/stage/composition.js';
+import {attachComposition} from '../src/stage/composition.js';
 import {readCompositionSearch} from '../src/stage/composition-link.js';
 import {DEFAULT_PATCH} from '../src/model.js';
 import {createPerformance} from '../src/stage/performance.js';
@@ -21,7 +21,7 @@ $('run').onclick=async()=>{
  try{
   context=new AudioContext();await context.resume();
   const composition=readCompositionSearch(location.search);
-  const passage=attachLoomPerformance(createPerformance(DEFAULT_PATCH,context.sampleRate),composition),frames=createStageFrames(passage);
+  const passage=attachComposition(createPerformance(DEFAULT_PATCH,context.sampleRate),composition),frames=createStageFrames(passage);
   const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]},captured=[];
   liveWorld=createWorld($('live'),{width:480,height:270});
   const origin=context.currentTime,clock=new WallClock(()=>context.currentTime-origin);
@@ -35,10 +35,10 @@ $('run').onclick=async()=>{
   });
   if(captured.length<5)throw new Error('Insufficient live frames; rerun with this tab visible');
   // Probe discrete transitions across the complete passage without waiting for wall time.
-  const boundaries=[0,passage.duration,...passage.events.flatMap(e=>[Math.max(0,e.voice.noteOn-.001),e.voice.noteOn,e.voice.noteOn+.001,e.voice.end]),...(passage.loom?.events??[]).flatMap(e=>[e.time-.18,e.time-.001,e.time,e.time+.001,e.time+.28,e.end])].sort((a,b)=>a-b);
+  const boundaries=[0,passage.duration,...(passage.fm?[passage.fm.time-.001,passage.fm.time,passage.fm.time+.001,passage.fm.time+.125,passage.fm.time+3,passage.fm.duration-.026,passage.fm.duration-.001,passage.fm.duration,passage.fm.duration+.001]:[]),...passage.events.flatMap(e=>[Math.max(0,e.voice.noteOn-.001),e.voice.noteOn,e.voice.noteOn+.001,e.voice.end]),...(passage.loom?.events??[]).flatMap(e=>[e.time-.18,e.time-.001,e.time,e.time+.001,e.time+.28,e.end])].sort((a,b)=>a-b);
   for(const t of boundaries){const frame=frames.sample(t,camera);applyStage(frame,frames.bindings,liveWorld);captured.push({t,state:traceHash(frame),pose:poseHash(liveWorld)});}
   offlineWorld=createWorld($('offline'),{width:480,height:270});
-  const replay=createStageFrames(attachLoomPerformance(createPerformance(structuredClone(DEFAULT_PATCH),context.sampleRate),structuredClone(composition)));
+  const replay=createStageFrames(attachComposition(createPerformance(structuredClone(DEFAULT_PATCH),context.sampleRate),structuredClone(composition)));
   for(const row of [...captured].reverse()){
    const frame=replay.sample(row.t,camera);applyStage(frame,replay.bindings,offlineWorld);
    if(traceHash(frame)!==row.state||poseHash(offlineWorld)!==row.pose)throw new Error(`Scene mismatch at ${row.t}s`);

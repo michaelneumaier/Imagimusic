@@ -17,3 +17,16 @@ test('creative Loom settings round-trip in a link and preserve independent instr
 test('invalid link settings fail explicitly instead of silently changing the sound',()=>{
  for(const value of ['{','null','{"frequency":-1}','{"coupling":0.5}'])assert.throws(()=>readCompositionSearch('?loom=1&loomSettings='+encodeURIComponent(value)));
 });
+
+test('FM links preserve complete sound settings and independent enable flags with Loom',async()=>{
+ const {DEFAULT_TENSIONER}=await import('../src/fm.js');
+ const composition={version:2,loom:{...DEFAULT_COMPOSITION.loom,enabled:true},fm:{enabled:true,settings:{...DEFAULT_TENSIONER,ratio:.01,phase0:.7,level:.12}}};
+ const url=new URL(compositionURL('http://localhost/stage.html?instrument=lab#stage',composition));
+ assert.deepEqual(readCompositionSearch(url.search),composition);
+ assert.equal(url.searchParams.get('instrument'),'lab');assert.equal(url.hash,'#stage');
+ composition.fm.enabled=false;
+ assert.deepEqual(readCompositionSearch(new URL(compositionURL(url,composition)).search),composition);
+ const old=new URL(compositionURL(url,DEFAULT_COMPOSITION));assert.deepEqual(readCompositionSearch(old.search),DEFAULT_COMPOSITION);
+ assert.equal(readCompositionSearch('?fmEnabled=1').fm.enabled,true);
+ assert.throws(()=>readCompositionSearch('?fmEnabled=1&fm=oops'));
+});

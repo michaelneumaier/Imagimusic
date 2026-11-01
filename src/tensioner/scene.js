@@ -23,13 +23,13 @@ export function createTensionerScene(){
  const disc=mesh(new T.CircleGeometry(.61,64),new T.MeshBasicMaterial({color:0x83cabb,transparent:true,opacity:.2,side:T.DoubleSide,depthWrite:false}),wheel,[0,0,.08]);
  const rod=mesh(new T.CylinderGeometry(.035,.035,1,12),metal,root);
  const scene={root,anchor,carriage,carrier,halo,wheel,arm,pin,disc,rod};
- updateLinks(scene);return scene;
+ updateTensionerLinks(scene);return scene;
 }
 function connect(object,a,b){
  const delta=b.clone().sub(a);object.position.copy(a).add(b).multiplyScalar(.5);
  object.scale.y=delta.length();object.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());
 }
-function updateLinks(scene){
+export function updateTensionerLinks(scene){
  const left=new T.Vector3(-2.4,.8,0),right=new T.Vector3(scene.carriage.position.x,.8,0);
  connect(scene.carrier,left,right);connect(scene.halo,left,right);
  // A control link, not a rigid mechanical constraint or a force simulation.
@@ -51,14 +51,15 @@ export function tensionerSceneFrame(state,{active=true}={}){
  const sounding=active&&state.amplitude>0,slow=sounding&&Number.isFinite(state.modulatorPhase01);
  return {stage:{tensioner:{pull:sounding?state.tension01:0,bandwidth:sounding?state.bandwidthEstimateHz:0,amplitude:sounding?state.amplitude:0,angle:slow?state.modulatorPhase01*Math.PI*2:0,slow,fast:sounding&&!slow}}};
 }
+export function setTensionerParameter(scene,target,param,value){
+ if(param==='pull')scene.carriage.position.x=value;
+ else if(param==='width'){scene.halo.scale.x=value;scene.halo.scale.z=value;}
+ else if(param==='glow')scene.halo.material.emissiveIntensity=value;
+ else if(param==='angle')scene.arm.rotation.z=value;
+ else if(param==='slow')scene.arm.visible=value;
+ else if(param==='fast')scene.disc.visible=value;
+}
 export function applyTensionerScene(frame,scene){
- const applied=applyBindings(frame,TENSIONER_BINDINGS,(target,param,value)=>{
-  if(param==='pull')scene.carriage.position.x=value;
-  else if(param==='width'){scene.halo.scale.x=value;scene.halo.scale.z=value;}
-  else if(param==='glow')scene.halo.material.emissiveIntensity=value;
-  else if(param==='angle')scene.arm.rotation.z=value;
-  else if(param==='slow')scene.arm.visible=value;
-  else if(param==='fast')scene.disc.visible=value;
- });
- updateLinks(scene);return applied;
+ const applied=applyBindings(frame,TENSIONER_BINDINGS,(target,param,value)=>setTensionerParameter(scene,target,param,value));
+ updateTensionerLinks(scene);return applied;
 }

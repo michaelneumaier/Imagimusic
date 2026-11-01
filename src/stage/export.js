@@ -1,4 +1,4 @@
-import { attachLoomPerformance, DEFAULT_COMPOSITION } from './composition.js';
+import { attachComposition, DEFAULT_COMPOSITION } from './composition.js';
 import { createStageFrames } from './frame.js';
 import { createTraceManifest } from './manifest.js';
 import { Output, Mp4OutputFormat, BufferTarget, CanvasSource, AudioBufferSource, Quality, canEncodeVideo, canEncodeAudio } from '../../vendor/mediabunny/mediabunny.mjs';
@@ -15,7 +15,7 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
   const width=1280,height=720,fps=30,sampleRate=48000;
   if(!await canEncodeVideo('avc',{width,height,frameRate:fps}) || !await canEncodeAudio('aac',{sampleRate,numberOfChannels:1}))
     throw new Error('This browser cannot encode H.264/AAC video. Use a browser with both WebCodecs encoders.');
-  const passage=attachLoomPerformance(createPerformance(patch,sampleRate),composition),duration=Math.min(passage.duration,durationLimit);
+  const passage=attachComposition(createPerformance(patch,sampleRate),composition),duration=Math.min(passage.duration,durationLimit);
   const clock=new FrameClock({fps}),times=clock.times(duration),frames=createStageFrames(passage),bindings=frames.bindings;
   const project=frame=>frames.project(frame,cameraPose);
   let stopped=false;

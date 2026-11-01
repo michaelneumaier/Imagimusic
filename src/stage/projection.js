@@ -1,3 +1,4 @@
+import {setTensionerParameter,updateTensionerLinks} from '../tensioner/scene.js';
 import {setLoomParameter} from '../loom/scene.js';
 import { createKeeperProjection,keeperBindings,applyKeeper,pumpOperators } from './keepers.js';
 import { CAMERA_BINDING } from './director.js';
@@ -53,7 +54,9 @@ export function stageBindings({camera=false,performers=false,performance}={}){
 }
 export function applyStage(frame,bindings,world){
   if(world.loom)world.loom.root.visible=!!frame.stage?.loom;
-  return applyBindings(frame,bindings,(target,param,value)=>{
+  if(world.fm)world.fm.root.visible=!!frame.stage?.tensioner;
+  const applied=applyBindings(frame,bindings,(target,param,value)=>{
+    if(target.startsWith('fm/')){setTensionerParameter(world.fm,target,param,value);return;}
     if(target.startsWith('loom/')){world.loom.root.visible=true;setLoomParameter(world.loom,target,param,value);return;}
     if(target.startsWith('performer/')){applyKeeper(world,value);return;}
     if(target==='camera'){world.camera.position.fromArray(value.position);world.controls.target.fromArray(value.target);world.camera.lookAt(world.controls.target);return;}
@@ -87,4 +90,6 @@ export function applyStage(frame,bindings,world){
       if(param==='position')body.striker.position.x=.2+value*body.beam.scale.x;
     }
   });
+  if(world.fm)updateTensionerLinks(world.fm);
+  return applied;
 }

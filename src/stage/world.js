@@ -1,5 +1,6 @@
+import {createTensionerScene} from '../tensioner/scene.js';
 import {createLoomScene} from '../loom/scene.js';
-import { stagePosition,LOOM_STAGE_PLACEMENT } from './layout.js';
+import { stagePosition,LOOM_STAGE_PLACEMENT,FM_STAGE_PLACEMENT } from './layout.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import { gardenBody, choirBody, tineBody, mesh, palette } from './bodies.js';
@@ -23,6 +24,7 @@ export function createWorld(canvas, fixedSize = null) {
   const tine=tineBody();tine.root.position.set(...stagePosition('tine'));scene.add(tine.root);
   const rail=mesh(new T.CylinderGeometry(.055,.055,9.2,16),new T.MeshStandardMaterial({color:palette.brass,metalness:.8,roughness:.3}),scene,[0,.2,-1.2]);rail.rotation.z=Math.PI/2;
   const loom=createLoomScene({position:LOOM_STAGE_PLACEMENT.position});loom.root.scale.setScalar(LOOM_STAGE_PLACEMENT.scale);loom.root.visible=false;scene.add(loom.root);
+  const fm=createTensionerScene();fm.root.position.fromArray(FM_STAGE_PLACEMENT.position);fm.root.scale.setScalar(FM_STAGE_PLACEMENT.scale);fm.root.visible=false;scene.add(fm.root);
   const paths=new Map();
   garden.forEach((b,i)=>paths.set(`garden/${i}`,b));choir.forEach((b,i)=>paths.set(`choir/${i}`,b));paths.set('tine/0',tine);
   let sizeW=0,sizeH=0;
@@ -35,5 +37,5 @@ export function createWorld(canvas, fixedSize = null) {
     controls.update();render();
   }
   function dispose(){controls.dispose();scene.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});renderer.dispose();}
-  return {scene,camera,renderer,controls,garden,choir,tine,rail,loom,paths,render,view,dispose};
+  return {scene,camera,renderer,controls,garden,choir,tine,rail,loom,fm,paths,render,view,dispose};
 }

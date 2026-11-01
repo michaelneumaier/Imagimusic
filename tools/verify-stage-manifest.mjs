@@ -1,5 +1,5 @@
 import {isDeepStrictEqual} from 'node:util';
-import {attachLoomPerformance,validateComposition} from '../src/stage/composition.js';
+import {attachComposition,validateComposition} from '../src/stage/composition.js';
 import {validatePatch} from '../src/model.js';
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
@@ -21,7 +21,7 @@ export function verifyStageManifest(saved){
   try{composition=validateComposition(saved.composition);}catch{throw new Error('Composition is not canonical');}
   if(!isDeepStrictEqual(composition,saved.composition))throw new Error('Composition is not canonical');
  }
- const passage=attachLoomPerformance(createPerformance(saved.instrument,saved.sampleRate),composition);
+ const passage=attachComposition(createPerformance(saved.instrument,saved.sampleRate),composition);
  if(!Number.isFinite(saved.duration)||saved.duration<=0||saved.duration>passage.duration)throw new Error('Invalid export duration');
  const frames=createStageFrames(passage),project=frame=>frames.project(frame,saved.camera);
  const expected=createTraceManifest({...passage,duration:saved.duration},{fps:saved.fps,project});

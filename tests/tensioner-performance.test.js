@@ -36,3 +36,27 @@ test('v2 joins FM and Loom without changing v1 or the base score, and keeps long
  assert.throws(()=>validateComposition({...old,version:2}));
  assert.throws(()=>validateComposition({...c,fm:{enabled:'yes',settings:DEFAULT_TENSIONER}}));
 });
+
+test('ensemble FM scene replays exact standalone poses through onset, decay, end and reverse seeks',async()=>{
+ const {createStageFrames}=await import('../src/stage/frame.js');
+ const {createTensionerScene,applyTensionerScene,tensionerSceneFrame}=await import('../src/tensioner/scene.js');
+ const {applyStage}=await import('../src/stage/projection.js');
+ const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]};
+ const c={...structuredClone(DEFAULT_COMPOSITION),version:2,fm:{enabled:true,settings:{...DEFAULT_TENSIONER,ratio:.01}}};
+ const base=createPerformance(DEFAULT_PATCH),p=attachComposition(base,c),frames=createStageFrames(p);
+ const bindings=frames.bindings.filter(b=>b.target.startsWith('fm/'));
+ assert.equal(bindings.length,6);
+ const world={fm:createTensionerScene()},standalone=createTensionerScene();
+ const poses=s=>[s.carriage.position.x,...s.halo.scale.toArray(),s.halo.material.emissiveIntensity,s.arm.rotation.z,s.arm.visible,s.disc.visible,...s.rod.position.toArray(),...s.rod.quaternion.toArray(),...s.rod.scale.toArray()];
+ const times=[0,p.fm.time-.001,p.fm.time,p.fm.time+.125,p.fm.time+3,p.fm.duration-.01,p.fm.duration,p.duration];
+ for(const t of [...times,...times.toReversed()]){
+  const frame=frames.sample(t,camera),state=tensionerPerformanceFrame(p.fm,t);
+  const applied=applyStage(frame,bindings,world);
+  applyTensionerScene(tensionerSceneFrame(state),standalone);
+  assert.ok(applied.every(b=>!b.missing));assert.equal(world.fm.root.visible,true);
+  assert.deepEqual(poses(world.fm),poses(standalone));
+ }
+ const plain=createStageFrames(base).sample(p.fm.time,camera);
+ assert.notDeepEqual(frames.sample(p.fm.time,camera).stage.camera,plain.stage.camera);
+ applyStage(plain,[],world);assert.equal(world.fm.root.visible,false);
+});

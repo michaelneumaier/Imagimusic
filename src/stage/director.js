@@ -5,6 +5,7 @@ export const CAMERA_BINDING={id:'camera/pose',target:'camera',param:'pose',field
 export function createDirector(passage){
   const gestures=passage.events.map(({family,voice})=>({time:voice.noteOn,weight:voice.velocity,point:stagePosition(family,voice.slot).map((v,i)=>v+(i===1?(family==='tine'?.7:1.5):0))}));
   if(passage.loom)gestures.push(...passage.loom.events.map(e=>({time:e.time,weight:e.velocity,point:stagePosition('loom',e.body).map((v,i)=>v+(i===1?1:0))})));
+  if(passage.fm)gestures.push({time:passage.fm.time,weight:.7,point:stagePosition('fm').map((v,i)=>v+(i===1?.8:0))});
   return (t,mode='manual',manual={position:[9,6.5,12],target:[0,1,0]})=>{
     if(mode==='manual')return {position:[...manual.position],target:[...manual.target]};
     if(mode==='establish'){

@@ -31,3 +31,17 @@ test('composed artifact verifies its saved arrangement and rejects omitted or ch
  const changed=structuredClone(m);changed.composition.loom.settings.coupling=.02;assert.equal(verifyStageManifest(changed).valid,false);
  const malformed=structuredClone(m);malformed.composition.extra=true;assert.throws(()=>verifyStageManifest(malformed),/canonical/);
 });
+
+test('FM composition proof includes the featured model and rejects omitted or changed settings',async()=>{
+ const {attachComposition,DEFAULT_COMPOSITION}=await import('../src/stage/composition.js');
+ const {DEFAULT_TENSIONER}=await import('../src/fm.js');
+ const {createStageFrames}=await import('../src/stage/frame.js');
+ const composition={...structuredClone(DEFAULT_COMPOSITION),version:2,fm:{enabled:true,settings:{...DEFAULT_TENSIONER}}};
+ const passage=attachComposition(createPerformance(DEFAULT_PATCH),composition),frames=createStageFrames(passage);
+ const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]},project=frame=>frames.project(frame,camera);
+ const m={...createTraceManifest({...passage,duration:8},{project}),instrument:DEFAULT_PATCH,composition,camera,width:1280,height:720,videoDuration:8,codecs:{video:'avc',audio:'aac'}};
+ assert.equal(verifyStageManifest(m).valid,true);
+ const omitted=structuredClone(m);delete omitted.composition;assert.equal(verifyStageManifest(omitted).valid,false);
+ const changed=structuredClone(m);changed.composition.fm.settings.index=2;assert.equal(verifyStageManifest(changed).valid,false);
+ const malformed=structuredClone(m);malformed.composition.fm.settings.extra=true;assert.throws(()=>verifyStageManifest(malformed),/canonical/);
+});
