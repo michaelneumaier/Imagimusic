@@ -132,3 +132,19 @@ test('the musical study: stillness, change, an opposite answer, and a return to 
   assert.equal(v(at(23), 45).gate, 'released'); assert.equal(v(at(23), 45).effectiveNoteOff, 22);
   assert.equal(at(30).reported.unsupported.length, 0);
 });
+
+test('compileExpression gives results identical to evaluateExpression at every sampled time, on every fixture, much faster', async () => {
+  const { compileExpression, composeExpressiveStudy } = await import('../src/midi2/expression.js');
+  const scores = [composeExpressiveStudy(), composeExpressiveChord(), composeExpressiveChord({ scene: 'detachOnly' }), composeExpressiveChord({ scene: 'resetOnly' })];
+  for (const s of scores) {
+    const compiled = compileExpression(s), times = [];
+    for (let t = 0; t <= 26; t += 0.0137) times.push(+t.toFixed(4));
+    for (const e of s.events) times.push(e.time, e.time - 1e-9, e.time + 1e-9);
+    for (const t of times) if (t >= 0) assert.deepEqual(compiled.at(t), evaluateExpression(s, t), `t = ${t}`);
+    assert.throws(() => compiled.at(NaN), /finite/);
+    assert.throws(() => { compiled.score = null; }, TypeError);
+    const n = 2000, t0 = performance.now(); for (let i = 0; i < n; i++) compiled.at(i * 0.011); const compiledMs = performance.now() - t0;
+    const t1 = performance.now(); for (let i = 0; i < 200; i++) evaluateExpression(s, i * 0.11); const plainMs = (performance.now() - t1) * (n / 200);
+    console.log(`compiled vs plain evaluation, ${s.source.name}: ${compiledMs.toFixed(1)} ms vs ~${plainMs.toFixed(0)} ms per ${n} calls`);
+  }
+});

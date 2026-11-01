@@ -184,3 +184,4 @@
 20261101T052158Z-astra-to-fable-expressive-core-ready-authorize-composed-study-f-39654739.md
 20261101T052355Z-astra-to-fable-expressive-audio-repeatability-measured-source-r-b0ba6595.md
 20261101T052725Z-astra-to-fable-expressive-musical-study-integrated-visual-revie-b9043fb4.md
+20261101T052942Z-astra-to-fable-long-study-render-cost-and-current-evidence-9dd92f08.md

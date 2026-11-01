@@ -72,67 +72,64 @@ const smoothAt = (s, t, tau) => s.target + (s.v0 - s.target) * Math.exp(-Math.ma
 const retarget = (s, t, tau, target) => { s.v0 = smoothAt(s, t, tau); s.target = target; s.t0 = t; };
 const half = (value) => (value - BEND_CENTER) / (value < BEND_CENTER ? BEND_CENTER : UINT32_MAX - BEND_CENTER);   // −1..+1, exact center
 
-/** Evaluate the score at time t. Pure; analytic in t; released voices stay until the instrument retires them. */
-export function evaluateExpression(score, t) {
-  validateExpressionScore(score);
-  if (!(typeof t === 'number' && Number.isFinite(t))) throw new Error('t must be a finite number.');
-  const tau = score.mapping.smoothingSeconds, neutral = score.mapping.neutral;
-  const channels = new Map(), perNote = new Map(), voices = [];
-  const reported = { unsupported: new Map(), partial: new Map() };
+// ---- state machine: advance(state, event) and output(state, t) ----
+// The score's effect on state is sequential in event order; the output at any t is a pure function of the state after the
+// last event with time ≤ t, and t. `compileExpression` validates once and keeps an immutable snapshot after every event, so
+// evaluating at any t is a binary search plus the output function, with results identical to a from-scratch evaluation.
+function initialState() { return { channels: new Map(), perNote: new Map(), voices: [], reported: { unsupported: new Map(), partial: new Map() } }; }
+function advance(state, e, score) {
+  const tau = score.mapping.smoothingSeconds, neutral = score.mapping.neutral, { channels, perNote, voices, reported } = state, time = e.time;
   const count = (map, key, extra) => { const cur = map.get(key) ?? { count: 0, ...extra }; cur.count++; map.set(key, cur); };
-  const chan = e => { const k = `${e.group}:${e.channel}`; if (!channels.has(k)) channels.set(k, { bend: smooth(0, 0), bendRaw: BEND_CENTER, sensitivityHcu: channelBendSensitivityToHcu(DEFAULT_CHANNEL_SENSITIVITY_RC00), perNoteSensitivityRaw: DEFAULT_SENSITIVITY_Q7_25, sustainOn: false, pendingOff: [] }); return channels.get(k); };
-  const note = e => { const k = `${e.group}:${e.channel}:${e.noteNumber}`; if (!perNote.has(k)) perNote.set(k, { pitch725: null, pressure: smooth(0, 0), brightness: smooth(controller32ToUnit(neutral.brightness32), 0), timbre: smooth(controller32ToUnit(neutral.timbre32), 0), bendUnit: smooth(0, 0), raw: { pressure32: 0, brightness32: neutral.brightness32, timbre32: neutral.timbre32, perNotePitchBend32: BEND_CENTER, pitch725: null }, attached: new Set() }); return perNote.get(k); };
-  const resetNote = (n, time) => { n.pitch725 = null; retarget(n.pressure, time, tau, 0); retarget(n.brightness, time, tau, controller32ToUnit(neutral.brightness32)); retarget(n.timbre, time, tau, controller32ToUnit(neutral.timbre32)); retarget(n.bendUnit, time, tau, 0); n.raw = { pressure32: 0, brightness32: neutral.brightness32, timbre32: neutral.timbre32, perNotePitchBend32: BEND_CENTER, pitch725: null }; };
-
-  for (const e of score.events) {
-    if (e.time > t) break;
-    const time = e.time;
-    if (e.type === 'noteOn') {
-      const c = chan(e), n = note(e);
-      const v = { voiceId: voices.length, address: { group: e.group, channel: e.channel, noteNumber: e.noteNumber }, noteOn: time, velocity16: e.velocity16, attributeType8: e.attributeType8, attributeData16: e.attributeData16,
-        effectiveNoteOff: null, offRequested: null, detached: false, frozen: null, sensitivityRaw: c.perNoteSensitivityRaw, state: n, channelState: c };
-      if (e.attributeType8 === 1 || e.attributeType8 === 2) count(reported.partial, `attributeType${e.attributeType8}`, { missing: 'attribute data not interpreted (manufacturer/profile specific)' });
-      else if (e.attributeType8 > ATTRIBUTE_PITCH_7_9) count(reported.unsupported, `attributeType${e.attributeType8}`, { reason: 'reserved attribute type (§7.4.14)' });
-      n.attached.add(v); voices.push(v);
-    } else if (e.type === 'noteOff') {
-      const c = chan(e), n = note(e);
-      const v = [...n.attached].concat(voices.filter(x => x.state === n && !n.attached.has(x))).filter(x => x.offRequested === null && x.address.group === e.group && x.address.channel === e.channel).sort((a, b) => a.voiceId - b.voiceId)[0];   // oldest open voice on the address
-      if (v) { v.offRequested = time; if (c.sustainOn) c.pendingOff.push(v); else v.effectiveNoteOff = time; }
-    } else if (e.type === 'polyPressure') { const n = note(e); retarget(n.pressure, time, tau, controller32ToUnit(e.data32)); n.raw.pressure32 = e.data32; }
-    else if (e.type === 'perNoteController') {
-      const n = note(e);
-      if (e.index8 === PER_NOTE_PITCH) { n.pitch725 = e.data32; n.raw.pitch725 = e.data32; }                  // stepped by choice (§7.4.15.2)
-      else if (e.index8 === PER_NOTE_BRIGHTNESS) { retarget(n.brightness, time, tau, controller32ToUnit(e.data32)); n.raw.brightness32 = e.data32; }
-      else if (e.index8 === PER_NOTE_TIMBRE) { retarget(n.timbre, time, tau, controller32ToUnit(e.data32)); n.raw.timbre32 = e.data32; }
-      else count(reported.partial, `perNoteController${e.index8}`, { missing: 'recognized per-note controller with no instrument mapping (Appendix A)' });
-    } else if (e.type === 'perNoteManagement') {
-      const n = note(e);
-      if (!e.flags.detach && !e.flags.reset) { count(reported.unsupported, 'perNoteManagementNoFlags', { reason: 'D = S = 0 has no defined function (§7.4.5)' }); continue; }
-      if (e.flags.detach) {   // policy: freeze the EVALUATED per-note values (in-flight ramp included); raw keeps the last message
-        for (const v of n.attached) { v.detached = true; v.frozen = { pressure: smoothAt(n.pressure, time, tau), brightness: smoothAt(n.brightness, time, tau), timbre: smoothAt(n.timbre, time, tau), bendUnit: smoothAt(n.bendUnit, time, tau), pitch725: n.pitch725, raw: { ...n.raw } }; }
-        n.attached.clear();
-      }
-      if (e.flags.reset) resetNote(n, time);   // S: the address's state resets; voices still attached follow it (§7.4.5)
-    } else if (e.type === 'perNotePitchBend') { const n = note(e); retarget(n.bendUnit, time, tau, half(e.data32)); n.raw.perNotePitchBend32 = e.data32; }   // unit −1..1; each voice applies its own latched sensitivity
-    else if (e.type === 'pitchBend') { const c = chan(e); retarget(c.bend, time, tau, half(e.data32) * c.sensitivityHcu); c.bendRaw = e.data32; }
-    else if (e.type === 'controlChange') {
-      const c = chan(e);
-      if (e.index8 === SUSTAIN) {
-        const on = sustain32IsOn(e.data32);
-        if (c.sustainOn && !on) { for (const v of c.pendingOff) v.effectiveNoteOff = time; c.pendingOff = []; }
-        c.sustainOn = on;
-      } else if (e.index8 === 121) count(reported.partial, 'controlChange121', { missing: 'Reset All Controllers not implemented; per-note state is left alone as Appendix B.2 requires' });
-      else if ([0, 6, 32, 38, 98, 99, 100, 101].includes(e.index8)) count(reported.unsupported, `controlChange${e.index8}`, { reason: 'ignored in the MIDI 2.0 Protocol (§7.4.6 recommendations)' });
-      else count(reported.unsupported, `controlChange${e.index8}`, { reason: 'controller not mapped' });
-    } else if (e.type === 'registeredController') {
-      const c = chan(e), key = `${e.bank8}/${e.index8}`;
-      if (key === '0/7') c.perNoteSensitivityRaw = e.data32;                                   // latched by subsequent Note Ons (§7.4.13.1)
-      else if (key === '0/0') { try { c.sensitivityHcu = channelBendSensitivityToHcu(e.data32); } catch { count(reported.unsupported, 'registeredController0/0', { reason: 'cents field outside 0..99' }); } }
-      else count(reported.unsupported, `registeredController${key}`, { reason: 'registered controller not supported' });
-    } else count(reported.unsupported, e.kind, { reason: 'message outside the supported subset' });
-  }
-
-  const out = voices.map(v => {
+  const chan = () => { const k = `${e.group}:${e.channel}`; if (!channels.has(k)) channels.set(k, { bend: smooth(0, 0), bendRaw: BEND_CENTER, sensitivityHcu: channelBendSensitivityToHcu(DEFAULT_CHANNEL_SENSITIVITY_RC00), perNoteSensitivityRaw: DEFAULT_SENSITIVITY_Q7_25, sustainOn: false, pendingOff: [] }); return channels.get(k); };
+  const note = () => { const k = `${e.group}:${e.channel}:${e.noteNumber}`; if (!perNote.has(k)) perNote.set(k, { pitch725: null, pressure: smooth(0, 0), brightness: smooth(controller32ToUnit(neutral.brightness32), 0), timbre: smooth(controller32ToUnit(neutral.timbre32), 0), bendUnit: smooth(0, 0), raw: { pressure32: 0, brightness32: neutral.brightness32, timbre32: neutral.timbre32, perNotePitchBend32: BEND_CENTER, pitch725: null }, attached: new Set() }); return perNote.get(k); };
+  const resetNote = (n) => { n.pitch725 = null; retarget(n.pressure, time, tau, 0); retarget(n.brightness, time, tau, controller32ToUnit(neutral.brightness32)); retarget(n.timbre, time, tau, controller32ToUnit(neutral.timbre32)); retarget(n.bendUnit, time, tau, 0); n.raw = { pressure32: 0, brightness32: neutral.brightness32, timbre32: neutral.timbre32, perNotePitchBend32: BEND_CENTER, pitch725: null }; };
+  if (e.type === 'noteOn') {
+    const c = chan(), n = note();
+    const v = { voiceId: voices.length, address: { group: e.group, channel: e.channel, noteNumber: e.noteNumber }, noteOn: time, velocity16: e.velocity16, attributeType8: e.attributeType8, attributeData16: e.attributeData16,
+      effectiveNoteOff: null, offRequested: null, detached: false, frozen: null, sensitivityRaw: c.perNoteSensitivityRaw, state: n, channelState: c };
+    if (e.attributeType8 === 1 || e.attributeType8 === 2) count(reported.partial, `attributeType${e.attributeType8}`, { missing: 'attribute data not interpreted (manufacturer/profile specific)' });
+    else if (e.attributeType8 > ATTRIBUTE_PITCH_7_9) count(reported.unsupported, `attributeType${e.attributeType8}`, { reason: 'reserved attribute type (§7.4.14)' });
+    n.attached.add(v); voices.push(v);
+  } else if (e.type === 'noteOff') {
+    const c = chan(), n = note();
+    const v = [...n.attached].concat(voices.filter(x => x.state === n && !n.attached.has(x))).filter(x => x.offRequested === null && x.address.group === e.group && x.address.channel === e.channel).sort((a, b) => a.voiceId - b.voiceId)[0];   // oldest open voice on the address
+    if (v) { v.offRequested = time; if (c.sustainOn) c.pendingOff.push(v); else v.effectiveNoteOff = time; }
+  } else if (e.type === 'polyPressure') { const n = note(); retarget(n.pressure, time, tau, controller32ToUnit(e.data32)); n.raw.pressure32 = e.data32; }
+  else if (e.type === 'perNoteController') {
+    const n = note();
+    if (e.index8 === PER_NOTE_PITCH) { n.pitch725 = e.data32; n.raw.pitch725 = e.data32; }                  // stepped by choice (§7.4.15.2)
+    else if (e.index8 === PER_NOTE_BRIGHTNESS) { retarget(n.brightness, time, tau, controller32ToUnit(e.data32)); n.raw.brightness32 = e.data32; }
+    else if (e.index8 === PER_NOTE_TIMBRE) { retarget(n.timbre, time, tau, controller32ToUnit(e.data32)); n.raw.timbre32 = e.data32; }
+    else count(reported.partial, `perNoteController${e.index8}`, { missing: 'recognized per-note controller with no instrument mapping (Appendix A)' });
+  } else if (e.type === 'perNoteManagement') {
+    const n = note();
+    if (!e.flags.detach && !e.flags.reset) { count(reported.unsupported, 'perNoteManagementNoFlags', { reason: 'D = S = 0 has no defined function (§7.4.5)' }); return; }
+    if (e.flags.detach) {   // policy: freeze the EVALUATED per-note values (in-flight ramp included); raw keeps the last message
+      for (const v of n.attached) { v.detached = true; v.frozen = { pressure: smoothAt(n.pressure, time, tau), brightness: smoothAt(n.brightness, time, tau), timbre: smoothAt(n.timbre, time, tau), bendUnit: smoothAt(n.bendUnit, time, tau), pitch725: n.pitch725, raw: { ...n.raw } }; }
+      n.attached.clear();
+    }
+    if (e.flags.reset) resetNote(n);   // S: the address's state resets; voices still attached follow it (§7.4.5)
+  } else if (e.type === 'perNotePitchBend') { const n = note(); retarget(n.bendUnit, time, tau, half(e.data32)); n.raw.perNotePitchBend32 = e.data32; }   // unit −1..1; each voice applies its own latched sensitivity
+  else if (e.type === 'pitchBend') { const c = chan(); retarget(c.bend, time, tau, half(e.data32) * c.sensitivityHcu); c.bendRaw = e.data32; }
+  else if (e.type === 'controlChange') {
+    const c = chan();
+    if (e.index8 === SUSTAIN) {
+      const on = sustain32IsOn(e.data32);
+      if (c.sustainOn && !on) { for (const v of c.pendingOff) v.effectiveNoteOff = time; c.pendingOff = []; }
+      c.sustainOn = on;
+    } else if (e.index8 === 121) count(reported.partial, 'controlChange121', { missing: 'Reset All Controllers not implemented; per-note state is left alone as Appendix B.2 requires' });
+    else if ([0, 6, 32, 38, 98, 99, 100, 101].includes(e.index8)) count(reported.unsupported, `controlChange${e.index8}`, { reason: 'ignored in the MIDI 2.0 Protocol (§7.4.6 recommendations)' });
+    else count(reported.unsupported, `controlChange${e.index8}`, { reason: 'controller not mapped' });
+  } else if (e.type === 'registeredController') {
+    const c = chan(), key = `${e.bank8}/${e.index8}`;
+    if (key === '0/7') c.perNoteSensitivityRaw = e.data32;                                   // latched by subsequent Note Ons (§7.4.13.1)
+    else if (key === '0/0') { try { c.sensitivityHcu = channelBendSensitivityToHcu(e.data32); } catch { count(reported.unsupported, 'registeredController0/0', { reason: 'cents field outside 0..99' }); } }
+    else count(reported.unsupported, `registeredController${key}`, { reason: 'registered controller not supported' });
+  } else count(reported.unsupported, e.kind, { reason: 'message outside the supported subset' });
+}
+function output(state, t, score) {
+  const tau = score.mapping.smoothingSeconds;
+  const voices = state.voices.map(v => {
     const n = v.state, c = v.channelState, f = v.frozen;
     const pressure = f ? f.pressure : smoothAt(n.pressure, t, tau), brightness = f ? f.brightness : smoothAt(n.brightness, t, tau), timbre = f ? f.timbre : smoothAt(n.timbre, t, tau);
     const perNoteBendHcu = (f ? f.bendUnit : smoothAt(n.bendUnit, t, tau)) * pitch725ToHcu(v.sensitivityRaw), pitch725 = f ? f.pitch725 : n.pitch725;   // same scaling as values.perNoteBendToHcu
@@ -143,7 +140,35 @@ export function evaluateExpression(score, t) {
       sensitivityHcu: pitch725ToHcu(v.sensitivityRaw), pitchHcu, hz: hcuToHz(Math.min(127.999, Math.max(0, pitchHcu))), pressure01: pressure, brightness01: brightness, timbre01: timbre,
       raw: { velocity16: v.velocity16, attributeType8: v.attributeType8, attributeData16: v.attributeData16, sensitivityQ7_25: v.sensitivityRaw, channelPitchBend32: c.bendRaw, ...(f ? f.raw : n.raw) } };
   });
-  return { t, voices: out, reported: { unsupported: [...reported.unsupported].map(([type, r]) => ({ type, ...r })), partial: [...reported.partial].map(([type, r]) => ({ type, ...r })) } };
+  return { t, voices, reported: { unsupported: [...state.reported.unsupported].map(([type, r]) => ({ type, ...r })), partial: [...state.reported.partial].map(([type, r]) => ({ type, ...r })) } };
+}
+
+/** Validate once and precompute an immutable snapshot of the state after every event. `at(t)` is then a binary search plus the
+ *  output function; results are identical to `evaluateExpression(score, t)` (tested), with none of the per-call revalidation. */
+export function compileExpression(score) {
+  validateExpressionScore(score);
+  const events = score.events, snapshots = [structuredClone(initialState())], state = initialState();
+  for (const e of events) { advance(state, e, score); snapshots.push(structuredClone(state)); }   // structuredClone keeps the voice ↔ state references and Sets
+  const times = events.map(e => e.time);
+  return Object.freeze({
+    score,
+    at(t) {
+      if (!(typeof t === 'number' && Number.isFinite(t))) throw new Error('t must be a finite number.');
+      let lo = 0, hi = times.length;                                   // count of events with time ≤ t
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (times[mid] <= t) lo = mid + 1; else hi = mid; }
+      return output(snapshots[lo], t, score);
+    },
+  });
+}
+
+/** Evaluate the score at time t. Pure; analytic in t; released voices stay until the instrument retires them.
+ *  Validates and replays on every call; use `compileExpression(score).at(t)` for repeated evaluation. */
+export function evaluateExpression(score, t) {
+  validateExpressionScore(score);
+  if (!(typeof t === 'number' && Number.isFinite(t))) throw new Error('t must be a finite number.');
+  const state = initialState();
+  for (const e of score.events) { if (e.time > t) break; advance(state, e, score); }
+  return output(state, t, score);
 }
 
 // ---- fixture: the expressive chord (proposal 011 rev. 2) ----
