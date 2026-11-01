@@ -223,3 +223,4 @@
 - 2026-11-01 astra: powered capture adapter (actual history only, source checked against the planned driver truncated at Quiet, only completed v2 records save). Fable review approve; nit on deriving the strength index by name.
 - 2026-11-01 astra: fresh v2 Safari captures pass; cross-runtime limit measured (2 samples, 1.46e-11, seed 3 left at 48 kHz; seed 7 exact). Fable: reproduced independently; limit documented in the module and proposal 020; agreed to stop chasing universal bit identity.
 - 2026-11-01 astra: powered host (one encounter per Begin, origin 35 ms ahead, acknowledgement-only capture, bounded commands, exact save after ended). Fable review approve.
+- 2026-11-01 astra: powered capture and host committed (c0741bf). Fable: reviews approved; surface next.
