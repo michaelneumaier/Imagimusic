@@ -81,3 +81,5 @@ Grove movie export: src/grove/movie-plan.js, export.js, world fixed-size option;
 Rest worklet scheduling: src/grove/contact-events.js and tests/grove-contact-events.test.js; integer sample-frame application acknowledgements, stable event order, bounded per-passage identities. Fable owns contact model/record renderer; no live route change before shared-stepper equivalence.
 
 Rest shared-engine worklet: src/grove/contact-worklet.js and contact-prepare-worker.js; tests/grove-contact-audio.html/js. Imports Fable's src/rest/engine.js; per-body contact composition, actual applied acknowledgements and fatal stop. Offline browser equivalence only until admission and capture v2 integration are validated.
+
+Rest capture adapter: src/grove/contact-capture.js and tests/grove-contact-capture.test.js; translate complete audio-thread acknowledgement streams into Fable's validated v2 record, with browser replay equivalence.

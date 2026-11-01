@@ -1,5 +1,7 @@
 import {composeGrove} from '../src/score/grove.js';
 import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
+import {createRestCapture} from '../src/grove/contact-capture.js';
+import {renderRestRecord} from '../src/score/grove-rest.js';
 import {renderRestPassage} from '../src/rest/engine.js';
 const $=id=>document.getElementById(id),report={version:1,generated:new Date().toISOString(),userAgent:navigator.userAgent,results:[]};
 function prepare(grove,sampleRate){return new Promise((resolve,reject)=>{const worker=new Worker('../src/grove/contact-prepare-worker.js',{type:'module'});worker.onmessage=({data})=>{worker.terminate();data.error?reject(new Error(data.error)):resolve(data.recipe);};worker.onerror=e=>{worker.terminate();reject(new Error(e.message));};worker.postMessage({grove,voice:DEFAULT_VOICE_CONFIG,sampleRate});});}
@@ -49,14 +51,16 @@ try{
  // fade as saved audio, rejects later input, and reports the exact ending.
  {
   const sampleRate=48000,frames=1024,recipe=await prepare(composeGrove({seed:7}),sampleRate),context=new OfflineAudioContext(2,frames,sampleRate);await context.audioWorklet.addModule('../src/grove/contact-worklet.js');
-  const events=[{id:'strike',kind:'strike',frame:0,body:0,position:1,velocity:.5},{id:'rest',kind:'contact',frame:32,body:0,zone:2,strength:1},{id:'quiet',kind:'quiet',frame:512,fadeFrames:64},{id:'too-late',kind:'strike',frame:520,body:1,position:1,velocity:1},{id:'quiet-again',kind:'quiet',frame:530,fadeFrames:128}];
-  const node=new AudioWorkletNode(context,'imagimusic-grove-contact',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{recipe,events,generation:'quiet'}}),acks=[];let timer,finished;
-  const received=new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(new Error('Missing Quiet completion')),10000);node.onprocessorerror=()=>reject(new Error('Rest processor failed'));node.port.onmessage=({data})=>{if(data.type==='error')reject(new Error(data.message));else if(data.type==='processed')acks.push(...data.events);else if(data.type==='finished'){finished=data;resolve();}};});node.connect(context.destination);
+  const events=[{id:'strike',kind:'strike',frame:64,body:0,position:1,velocity:.5},{id:'rest',kind:'contact',frame:96,body:0,zone:2,strength:1},{id:'quiet',kind:'quiet',frame:512,fadeFrames:64},{id:'too-late',kind:'strike',frame:520,body:1,position:1,velocity:1},{id:'quiet-again',kind:'quiet',frame:530,fadeFrames:128}];
+  const node=new AudioWorkletNode(context,'imagimusic-grove-contact',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{recipe,events,generation:'quiet'}}),acks=[],capture=createRestCapture(recipe,{generation:'quiet'});let timer,finished;
+  const received=new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(new Error('Missing Quiet completion')),10000);node.onprocessorerror=()=>reject(new Error('Rest processor failed'));node.port.onmessage=({data})=>{try{capture.consume(data);}catch(error){reject(error);return;}if(data.type==='error')reject(new Error(data.message));else if(data.type==='processed')acks.push(...data.events);else if(data.type==='finished'){finished=data;resolve();}};});node.connect(context.destination);
   const [buffer]=await Promise.all([context.startRendering(),received]).finally(()=>clearTimeout(timer));node.disconnect();node.port.close();
-  const expected=renderRestPassage(recipe,{strikes:[{frame:0,body:0,position:1,velocity:.5}],contacts:[{body:0,zone:2,strength:1,start:32,end:512}],frames});for(const channel of expected)for(let i=0;i<frames;i++)channel[i]*=Math.max(0,Math.min(1,1-(i-512)/64));
+  const expected=renderRestPassage(recipe,{strikes:[{frame:64,body:0,position:1,velocity:.5}],contacts:[{body:0,zone:2,strength:1,start:96,end:512}],frames});for(const channel of expected)for(let i=0;i<frames;i++)channel[i]*=Math.max(0,Math.min(1,1-(i-512)/64));
   let maxDifference=0;for(let ch=0;ch<2;ch++)for(let i=0;i<frames;i++)maxDifference=Math.max(maxDifference,Math.abs(buffer.getChannelData(ch)[i]-expected[ch][i]));
   if(maxDifference!==0||finished.frame!==576||finished.ended.frame!==512||finished.ended.fadeFrames!==64||acks.length!==5||acks.slice(3).some(a=>a.accepted||a.reason!=='ended'))throw new Error('Quiet fade, contact release or terminal event handling differs');
-  report.results.push({seed:7,sampleRate,frames,case:'sample-exact Quiet and terminal acknowledgements',maxDifference,finished,acknowledgements:acks});
+  const record=capture.snapshot(),replay=renderRestRecord(record,recipe).channels;let captureDifference=0;for(let ch=0;ch<2;ch++)for(let i=0;i<replay[ch].length;i++)captureDifference=Math.max(captureDifference,Math.abs(replay[ch][i]-buffer.getChannelData(ch)[i+capture.originFrame]));
+  if(capture.originFrame!==64||replay[0].length!==512||captureDifference!==0)throw new Error('Saved Rest record differs from actual audio');
+  report.results.push({seed:7,sampleRate,frames,case:'sample-exact Quiet, acknowledged v2 capture and replay',maxDifference,captureDifference,originFrame:capture.originFrame,record,finished,acknowledgements:acks});
  }
  report.passed=true;$('status').textContent='5/5 shared-engine AudioWorklet checks passed.';
 }catch(error){report.passed=false;report.error=error.message;$('status').textContent='FAILED · '+error.message;}
