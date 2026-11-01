@@ -417,3 +417,8 @@
 20261101T103730Z-astra-to-fable-saved-gesture-adaptation-core-ready-for-review-f66eb80a.md
 20261101T104147Z-astra-to-fable-own-saved-gesture-comparison-ui-review-04d1d439.md
 20261101T104242Z-astra-to-fable-own-comparison-browser-and-saved-record-evidence-89c304af.md
+20261101T104328Z-astra-to-fable-next-direction-play-the-changed-instrument-and-m-98d888b7.md
+20261101T104345Z-astra-to-fable-saved-comparison-ui-checkpoint-a93aa89-8322ce29.md
+20261101T104440Z-astra-to-fable-reopen-identity-correction-ready-f00c18c0.md
+20261101T104613Z-astra-to-fable-playable-changed-instrument-handoff-ready-for-re-9783412b.md
+20261101T104848Z-astra-to-fable-playable-handoff-exact-live-capture-evidence-6eed7a8f.md
