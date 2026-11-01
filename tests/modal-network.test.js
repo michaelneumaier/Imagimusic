@@ -103,3 +103,17 @@ test('damping approximation evidence: discarded off-diagonal damping is reported
   assert.ok(coarse.relative / fine.relative > 8, 'empirical check: halving the step reduces the observed discrepancy by roughly an order of magnitude, as RK4 convergence predicts');
   assert.ok(fine.relative < 1e-4, `empirical check: the finest-step observed discrepancy is small (got ${fine.relative}); not a rigorous bound`);
 });
+
+test('the comparison tool\'s normalization: a grove wrapped with M = 1 beam partials (tip attachment, shape normalized) has groveSystem\'s normal modes exactly', async () => {
+  const { composeGrove, groveSystem, GROVE_SEEDS } = await import('../src/score/grove.js');
+  const set = modesOf({ kind: 'beam', support: 'clamped-free', material: GEOMETRY_MATERIALS.steel, lengthM: 0.065, thicknessM: 0.001, widthM: 0.01 }, { count: 1 });
+  const tip = set.weightsAt(1)[0];
+  for (const seed of GROVE_SEEDS) {
+    const g = composeGrove({ seed }), base = groveSystem(g);
+    const bodies = g.bodies.map(b => ({ mass: b.mass, frequencies: [b.hz], decayRates: [g.loss], shape: u => set.weightsAt(u) }));
+    const edges = g.bridges.map(e => ({ a: e.a, b: e.b, kc: e.coupling * g.bodies[e.a].mass * (2 * Math.PI * g.bodies[e.a].hz) ** 2 / (tip * tip), ua: 1, ub: 1 }));
+    const wrapped = modalNetwork({ bodies, edges });
+    for (let r = 0; r < 3; r++) assert.ok(Math.abs(wrapped.normalFreqsHz[r] - base.normalFreqsHz[r]) < 1e-9 * base.normalFreqsHz[r], `seed ${seed} mode ${r}`);
+    assert.ok(wrapped.gammas.every(gm => Math.abs(gm - g.loss) < 1e-12));
+  }
+});
