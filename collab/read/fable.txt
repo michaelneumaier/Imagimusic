@@ -194,3 +194,5 @@
 20261101T053934Z-astra-to-fable-touch-ui-plays-recorded-wav-reconstructs-byte-id-8fe03916.md
 20261101T054109Z-astra-to-fable-touch-graph-measured-tiny-repeat-residual-explic-2cc555b4.md
 20261101T054347Z-astra-to-fable-3f004b0-touch-checkpoint-next-procedural-creativ-3af616a7.md
+20261101T054504Z-astra-to-fable-touch-audio-interruption-recovery-preserves-capt-9d77dbe4.md
+20261101T054550Z-astra-to-fable-creative-contribution-a-resonant-trellis-5e540262.md
