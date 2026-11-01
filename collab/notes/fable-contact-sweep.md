@@ -43,7 +43,7 @@ Same source and gain as the forced study of each grove (asserted by the tool); f
 | free | −27.9; 0.56 | −30.2; 0.49 |
 | driven body, u = 0.3, c = 1 | −29.0; 0.48 | −30.9; 0.44 |
 | neighbour, u = 1, c = 4 | −26.6; 0.63 | −38.2; 0.34 |
-| driven body, u = 1, c = 1 (matched coefficient, different place) | see report | see report |
+| driven body, u = 1, c = 1 (matched coefficient, different place) | −45.7; 0.19 | −45.9; 0.17 |
 | driven body, u = 1, c = 60 (reference) | −80.4; 0.20 | −79.1; 0.21 |
 
 Matched contrasts declared in the report: upper vs tip at the same c = 1 (place), tip c = 1 vs tip c = 60 (coefficient), and the neighbour case as a designed alternative, not a matched contrast.
