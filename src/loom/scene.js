@@ -1,6 +1,7 @@
 import * as T from '../../vendor/three/build/three.module.js';
 import {mesh} from '../stage/bodies.js';
 import {applyBindings,validateBindings} from '../bindings.js';
+import {strikerPose} from '../excitation.js';
 
 export function createLoomScene({position=[0,0,1]}={}){
 const root=new T.Group();root.position.fromArray(position);
@@ -19,12 +20,12 @@ const bridge=new T.Line(new T.BufferGeometry().setFromPoints(points),new T.LineB
 return {root,bodies,bridge};
 }
 
-const settingsInputs=['loom.frequency','loom.coupling','loom.detune','loom.loss'];
+const settingsInputs=['loom.frequency','loom.coupling','loom.detune','loom.loss','loom.score'];
 export const LOOM_BINDINGS=validateBindings([
  ...[0,1].flatMap(i=>[
   {id:`loom/${i}/width`,target:`loom/slot${i}`,param:'width',field:`stage.loom.bodies[${i}].envelope`,map:v=>.8+v*3,inputs:settingsInputs,label:'interpreted',note:'Amplified displacement-envelope width; fast exchange uses mean level.'},
   {id:`loom/${i}/glow`,target:`loom/slot${i}`,param:'glow',field:`stage.loom.bodies[${i}].envelope`,map:v=>v*5,inputs:settingsInputs,label:'interpreted',note:'Displacement-envelope glow, not mechanical energy.'},
-  {id:`loom/${i}/striker`,target:`loom/slot${i}`,param:'striker',field:`stage.loom.bodies[${i}].reach`,map:v=>2.7-.23*v,inputs:[],label:'interpreted',note:'Scheduled approach and recovery around the nearest strike; no contact-force simulation.'},
+  {id:`loom/${i}/striker`,target:`loom/slot${i}`,param:'striker',field:`stage.loom.bodies[${i}].reach`,map:v=>2.7-.23*v,inputs:['loom.score'],label:'interpreted',note:'Scheduled approach and recovery around the nearest strike; no contact-force simulation.'},
  ]),
  {id:'loom/bridge/opacity',target:'loom/bridge',param:'opacity',field:'stage.loom.bridgeOpacity',inputs:settingsInputs,label:'interpreted',note:'Coupling indicator and response-envelope brightness, not instantaneous energy flow.'},
 ]);
@@ -32,17 +33,19 @@ export const LOOM_BINDINGS=validateBindings([
 export function loomSceneFrame(frame,settings,{active=true}={}){
  const bodies=[0,1].map(body=>{
   const hit=frame.strikes.filter(e=>e.body===body).sort((a,b)=>Math.abs(a.age)-Math.abs(b.age))[0],age=hit?.age;
-  const reach=age===undefined?0:age<0?Math.max(0,1+age/.18)**2:Math.max(0,1-age/.28)**2;
+  const reach=age===undefined?0:strikerPose(age,0).reach;
   return {envelope:active?frame.envelope[body]:0,reach:active?reach:0,eventId:active?hit?.id??null:null};
  });
- return {t:frame.time,stage:{loom:{bodies,averaged:frame.averaged,bridgeOpacity:settings.coupling===0?.08:.25+Math.min(.7,bodies.reduce((sum,b)=>sum+b.envelope,0)*2)}}};
+ const strength=Math.min(1,settings.coupling/.004);
+ return {t:frame.time,stage:{loom:{bodies,averaged:frame.averaged,bridgeOpacity:.08+strength*(.17+Math.min(.7,bodies.reduce((sum,b)=>sum+b.envelope,0)*2))}}};
+}
+export function setLoomParameter(scene,target,param,value){
+ if(target==='loom/bridge'){scene.bridge.material.opacity=value;return;}
+ const body=scene.bodies[Number(target.at(-1))];
+ if(param==='width')body.body.scale.x=value;
+ if(param==='glow')body.body.material.emissiveIntensity=value;
+ if(param==='striker')body.striker.position.y=value;
 }
 export function applyLoomScene(frame,scene){
- return applyBindings(frame,LOOM_BINDINGS,(target,param,value)=>{
-  if(target==='loom/bridge'){scene.bridge.material.opacity=value;return;}
-  const body=scene.bodies[Number(target.at(-1))];
-  if(param==='width')body.body.scale.x=value;
-  if(param==='glow')body.body.material.emissiveIntensity=value;
-  if(param==='striker')body.striker.position.y=value;
- });
+ return applyBindings(frame,LOOM_BINDINGS,(target,param,value)=>setLoomParameter(scene,target,param,value));
 }

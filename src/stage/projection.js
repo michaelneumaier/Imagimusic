@@ -1,3 +1,4 @@
+import {setLoomParameter} from '../loom/scene.js';
 import { createKeeperProjection,keeperBindings,applyKeeper,pumpOperators } from './keepers.js';
 import { CAMERA_BINDING } from './director.js';
 import { stageInputsFor } from '../bindings-catalog.js';
@@ -51,7 +52,9 @@ export function stageBindings({camera=false,performers=false,performance}={}){
   return validateBindings(list);
 }
 export function applyStage(frame,bindings,world){
+  if(world.loom)world.loom.root.visible=!!frame.stage?.loom;
   return applyBindings(frame,bindings,(target,param,value)=>{
+    if(target.startsWith('loom/')){world.loom.root.visible=true;setLoomParameter(world.loom,target,param,value);return;}
     if(target.startsWith('performer/')){applyKeeper(world,value);return;}
     if(target==='camera'){world.camera.position.fromArray(value.position);world.controls.target.fromArray(value.target);world.camera.lookAt(world.controls.target);return;}
     const [family,slotName]=target.split('/'),slot=Number(slotName.slice(4));

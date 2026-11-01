@@ -53,3 +53,7 @@ Shipping-default verification complete: harness v7 finished12/12. Full and air d
 ## Shared frame sampler and browser scene parity
 
 Preview, export and artifact verification now use src/stage/frame.js. Existing full-movie manifest still regenerates1007/1007 hashes. Safari stage-parity harness:48kHz,114 AudioContext-clock RAF frames over2s plus210 full-passage attack/end boundary samples; all324 state and actual Three scene pose hashes match fresh-world replay in reverse timestamp order. Pose proof includes transforms, visibility, material values, tine geometry positions and camera. Silent harness uses the audio clock only, not live sound-engine snapshots; engine-vs-score snapshot parity remains a separate gate. Actual stage page loaded and entered live playback using the consolidated sampler. Verifier now requires validatePatch output to deep-equal saved instrument; malformed/noncanonical inputs fail clearly.
+
+## Real audio-engine snapshot parity
+
+Safari26.6.2,48kHz,seed731: tests/stage-engine-parity.html completed both checks over2,011 live AudioContext-clock samples through the33.5394s passage. Engine-derived snapshots and planned snapshots match for every raw state frame and every projected body/Keeper/chamber frame. Comparator explicitly normalizes bookkeeping IDs/order and snaps both sides' timeline fields to nanoseconds before four-digit trace hashing. Evidence: renders/engine-parity-731-20261101T014804.json. This checks sound-engine state against the planned picture; it does not assert waveform identity between live and offline audio.

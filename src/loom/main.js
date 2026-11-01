@@ -1,5 +1,5 @@
 import {createWorld} from '../stage/world.js';
-import {createLoomScene,loomSceneFrame,applyLoomScene} from './scene.js';
+import {loomSceneFrame,applyLoomScene} from './scene.js';
 import {DEFAULT_LOOM,makeLoom,loomVisualEnvelope,stereoWav} from './model.js';
 import {createLoomPerformance,loomPerformanceFrame} from './performance.js';
 import {createLoomRenderJob} from './render-job.js';
@@ -7,7 +7,7 @@ const $=id=>document.getElementById(id);
 let settings={...DEFAULT_LOOM},study=makeLoom(settings),context,source,gain,origin=0,playing=false,pcm=null,request=0,passage=null,renderJob=null,studyTime=0,studying=false;
 const world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
 world.rail.visible=false;world.camera.position.set(6,4.5,9);world.controls.target.set(0,1.1,1);world.controls.update();
-const loom=createLoomScene();world.scene.add(loom.root);
+const loom=world.loom;loom.root.position.set(0,0,1);loom.root.scale.setScalar(1);loom.root.visible=true;
 function quiet(){studyTime=0;studying=false;request++;renderJob?.cancel();renderJob=null;if(source){const now=context.currentTime;gain.gain.cancelScheduledValues(now);gain.gain.setValueAtTime(1,now);gain.gain.linearRampToValueAtTime(0,now+.025);source.stop(now+.03);source=null;}playing=false;$('status').textContent='Settled. Choose a strike or conversation.';}
 async function strike(body){
  quiet();const token=request;pcm=null;$('save').disabled=true;$('status').textContent='Preparing the coupled response…';
