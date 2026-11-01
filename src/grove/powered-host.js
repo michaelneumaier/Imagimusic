@@ -71,6 +71,14 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
   const relative=snapshot.frame-snapshot.originFrame,frame=Math.max(0,relative),v=visualFromState(recipe,snapshot.state,snapshot.key),fade=snapshot.ended?Math.max(0,1-(frame-snapshot.ended.frame)/snapshot.ended.fadeFrames):1;
   return {...v,envelope:v.envelope.map(x=>x*fade),time:frame/recipe.sampleRate,driverActive:relative>=0&&!snapshot.ended&&frame>=driver.startFrame&&frame<driver.startFrame+driver.forcedFrames};
  }
+ /** Release audio for browser-cache parking while retaining only a finished encounter. */
+ function park(){
+  if(disposed)return;token++;prepareAbort?.abort();renderAbort?.abort();prepareAbort=renderAbort=null;rendering=null;pendingContact=null;detach();
+  const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
+  failure=null;quietRequested=false;
+  if(capture?.state!=='complete'){capture=recipe=driver=snapshot=pcm=timing=null;finishedTime=0;}
+  setState(capture?'ended':'idle');
+ }
  function dispose(){if(disposed)return;disposed=true;token++;prepareAbort?.abort();renderAbort?.abort();detach();context?.close();state='disposed';pcm=null;}
- return {begin,send,quiet,resume,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get timing(){return timing?{...timing}:null;},get stats(){return capture?.stats??null;}};
+ return {begin,send,quiet,resume,park,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get timing(){return timing?{...timing}:null;},get stats(){return capture?.stats??null;}};
 }

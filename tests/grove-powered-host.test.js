@@ -41,3 +41,12 @@ test('a hand released during preparation leaves no invented contact in the recor
 test('cancelling preparation clears held intent before the next encounter',async()=>{
  const wait=deferred();let calls=0;const s=setup({prepare:()=>++calls===1?wait.promise:Promise.resolve(prepared)}),first=s.host.begin({});s.host.send({kind:'contact',zone:1});s.host.quiet();assert.equal(s.host.send({kind:'contact',zone:0}),false);await s.host.begin({});wait.resolve(prepared);await first;assert.deepEqual(s.nodes[0].options.processorOptions.events,[]);s.finish();assert.deepEqual(s.host.recording().contacts,[]);s.host.dispose();
 });
+test('parking a completed encounter closes audio, retains its record and allows a fresh context',async()=>{
+ let created=0,s;s=setup({createContext:()=>{created++;return s.context;}});await s.host.begin({});s.finish();const record=s.host.recording(),pcm=await s.host.saveAudio();s.host.park();assert.equal(s.context.state,'closed');assert.equal(s.host.state,'ended');assert.deepEqual(s.host.recording(),record);assert.strictEqual(await s.host.saveAudio(),pcm);await s.host.begin({});assert.equal(created,2);assert.equal(s.host.state,'playing');s.host.dispose();
+});
+test('parking an unfinished encounter does not fabricate a finished capture',async()=>{
+ const s=setup();await s.host.begin({});s.host.send({kind:'contact',zone:0});s.host.park();assert.equal(s.host.state,'idle');assert.equal(s.nodes[0].closed,true);assert.equal(s.host.send({kind:'contact',zone:1}),false);assert.throws(()=>s.host.recording(),/Begin/);await s.host.begin({});assert.equal(s.host.state,'playing');s.host.dispose();
+});
+test('parking during preparation preserves an earlier complete capture and rejects stale preparation',async()=>{
+ const wait=deferred();let calls=0;const s=setup({prepare:()=>++calls===1?Promise.resolve(prepared):wait.promise});await s.host.begin({});s.finish();const record=s.host.recording(),begin=s.host.begin({});s.host.park();assert.equal(s.host.state,'ended');assert.deepEqual(s.host.recording(),record);wait.resolve(prepared);assert.equal(await begin,false);assert.equal(s.nodes.length,1);s.host.dispose();
+});

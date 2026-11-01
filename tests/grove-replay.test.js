@@ -11,3 +11,6 @@ test('Quiet supersedes a pending resume and stale ended callbacks cannot end a n
 test('deferred audio resumes inside the gesture and Quiet cancels preparation without starting sound',async()=>{
  const {context,sources,pcm}=fixture();let resolve,resumed=false;context.resume=async()=>{resumed=true;};const player=createGroveReplay({createContext:()=>context});const prepared=new Promise(r=>resolve=r),playing=player.play(prepared);assert.equal(resumed,true);await Promise.resolve();player.stop();resolve(pcm);await playing;assert.equal(sources.length,0);await player.play(Promise.resolve(pcm));assert.equal(sources.length,1);
 });
+test('parking releases the old audio context and a new user playback creates another',async()=>{
+ const a=fixture(),b=fixture();let created=0,closed=0;a.context.close=b.context.close=async()=>{closed++;};const player=createGroveReplay({createContext:()=>++created===1?a.context:b.context});await player.play(a.pcm);player.park();assert.equal(player.state,'idle');assert.equal(closed,1);assert.equal(a.context.onstatechange,null);await player.play(b.pcm);assert.equal(created,2);assert.equal(b.sources.length,1);assert.equal(player.state,'playing');player.dispose();
+});

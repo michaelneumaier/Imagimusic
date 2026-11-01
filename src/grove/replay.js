@@ -21,5 +21,6 @@ export function createGroveReplay({createContext=()=>new AudioContext(),onChange
    node.start(origin);state='playing';emit();
   }catch(error){if(own!==token)return;state='error';emit();throw error;}
  }
- return {play,stop,time,get state(){return state;},dispose(){stop();context?.close();}};
+ function park(){stop();const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}}
+ return {play,stop,time,park,get state(){return state;},dispose(){stop();context?.close();}};
 }
