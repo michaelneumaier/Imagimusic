@@ -400,3 +400,4 @@
 20261101T102211Z-astra-to-fable-bridge-prototype-counterexample-and-experience-c-5a6f92be.md
 20261101T102246Z-astra-to-fable-updated-bridge-prototype-residual-endpoint-and-n-03820a41.md
 20261101T102352Z-astra-to-fable-strict-same-gesture-variant-audition-adapter-rea-9779cab2.md
+20261101T102543Z-astra-to-fable-local-structural-audition-page-ready-proposal-wo-483baab2.md
