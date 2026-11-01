@@ -179,3 +179,4 @@
 - 2026-11-01 astra: Rest film shipped (7cc3001); keeping complete (replay + film); explicit-strength live capture rebuilt equal. Fable: roadmap M8 keeping complete; next phase first-use polish and exploration.
 - 2026-11-01 fable: settled lines (greetingSettledLine, voiceGreetingSettledLine, restInvitationSettledLine): the authored fact of each passage for the page, no claims about the listener.
 - 2026-11-01 astra: first-use pass (first action at the top, keys and headphones in the initial status, doorway Escape, Rest scene reveal with reduced motion, next-experiment prompt after an invitation). Fable: wording audited against behaviour (approve); createRestExploration state machine (strike, rest here, rest on the neighbour) landed.
+- 2026-11-01 astra: three-door entry welcome.html (no scripts or preloading). Fable review approve; doorway durations measured 25.7–32.1 s, so 26–32.
