@@ -1,4 +1,4 @@
-import {composeGrove,GROVE_SEEDS,describeGrove,composeGroveGreeting,greetingStrikes,greetingDuration,greetingBeatSeconds} from '../score/grove.js';
+import {composeGrove,GROVE_SEEDS,describeGrove} from '../score/grove.js';
 import {createImpulseTransport} from '../touch/transport.js';
 import {holdVelocity} from '../touch/session.js';
 import {stereoWav} from '../loom/model.js';
@@ -7,6 +7,7 @@ import {createGroveVoiceSession} from './voice-session.js';
 import {createGroveSession} from './session.js';
 import {createGroveStudyJob} from './render-job.js';
 import {createGroveReplay} from './replay.js';
+import {createGroveGreetingPlan,groveGreetingFrames} from './greeting.js';
 import {bindGrovePlaying,groveStrikeZone} from './interaction.js';
 import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
@@ -34,7 +35,7 @@ function buildPads(){
 }
 function rebuildScene(){if(!world)return;if(sculpture){world.scene.remove(sculpture.root);sculpture.dispose();}sculpture=createGroveScene(grove);world.scene.add(sculpture.root);}
 function configure(){
- stopReplay();clearHolds();mode='live';grove=composeGrove({seed:Number($('seed').value)});greeting=composeGroveGreeting(grove);buildPads();rebuildScene();const d=describeGrove(grove);
+ stopReplay();clearHolds();mode='live';grove=composeGrove({seed:Number($('seed').value)});greeting=createGroveGreetingPlan(grove,rich()?DEFAULT_VOICE_CONFIG:null);buildPads();rebuildScene();const d=describeGrove(grove);
  $('identity').textContent=`GROVE ${grove.seed} · ${grove.topology.toUpperCase()}`;$('model-detail').textContent=`Grove ${grove.seed}: ${grove.topology}, ${grove.bridges.length} connections. Its normal modes are ${d.normalFreqsHz.map(f=>f.toFixed(2)).join(', ')} Hz; the complete impulse response lasts ${d.ringSeconds.toFixed(2)} seconds, with a short final fade. Different bodies can carry different amounts of each mode. A farther body is not guaranteed to respond later or more quietly.`;
  if(rich()){const v=createGroveVoice(grove);$('model-detail').textContent=`Grove ${grove.seed}: ${grove.topology}, ${grove.bridges.length} connections; ${v.normalFreqsHz.length} coupled modes. The displayed low band contains ${v.lowBandIndex.map(i=>v.normalFreqsHz[i].toFixed(2)).join(', ')} Hz. Response length ${v.ring.toFixed(2)} seconds. A farther body is not guaranteed to respond later or more quietly.`;}
  $('model-core').textContent=rich()?'The optional voice models three bodies with three beam-family partials each, coupled through attachment-point springs. It has nine normal modes with assigned decay rates. The stereo sound mixes displacement pickups by horizontal layout; there is no acoustic radiation or room simulation. Camera movement changes only the view.':'Three lumped masses and springs generate the sound. All gestures join that same linear system. It has three normal modes, one shared damping rate, and no acoustic radiation or room simulation. The sound is a stereo mixture of displacement pickups, placed across the stereo field by the bodies’ horizontal layout. Camera movement changes only the view.';
@@ -48,7 +49,7 @@ async function enter(){
  try{await transport.enable({grove,voice:rich()?DEFAULT_VOICE_CONFIG:null});if(own!==enterToken)return;status('Touch a body or its numbered pad, or hear the grove’s greeting.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){if(own===enterToken)status(error.message,true);}
 }
 $('begin').onclick=enter;$('voice').onchange=()=>{configure();enter();};$('seed').onchange=()=>{configure();enter();};
-$('greeting').onclick=()=>{clearHolds();const previous=mode;try{const sr=transport.recording().sampleRate;mode='greeting';transport.playSequence(greetingStrikes(greeting).map(note=>({frame:Math.round(note.time*sr),body:note.body,velocity:note.velocity})));status('A short greeting, one body at a time. Choose Your turn when you want to play.');$('hint').textContent='The greeting is authored. The response of the connected bodies comes from the model.';}catch(error){mode=previous;status(error.message,true);}};
+$('greeting').onclick=()=>{clearHolds();const previous=mode;try{const sr=transport.recording().sampleRate;mode='greeting';transport.playSequence(groveGreetingFrames(greeting,sr));status(rich()?'One body, three places. Then the others answer. Choose Your turn when you want to play.':'A short greeting, one body at a time. Choose Your turn when you want to play.');$('hint').textContent='The greeting is authored. The response of the connected bodies comes from the model.';}catch(error){mode=previous;status(error.message,true);}};
 $('replay').onclick=async()=>{clearHolds();mode='replay';status('Listening back to your finished passage…');try{await replay.play(transport.saveAudio());}catch(error){status(error.message,true);}};
 $('quiet').onclick=()=>{clearHolds();if(mode==='replay'){stopReplay();$('quiet').disabled=true;status('Quiet. Your original passage is still here.');}else transport.quiet();};$('new').onclick=()=>{stopReplay();clearHolds();mode='live';transport.newPassage();status('Your turn. Touch one body and stay with what answers.');$('hint').textContent='Hold a body or its numbered pad, then release. A longer hold gives a stronger touch.';};
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){$('quiet').click();return;}if(e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,select,textarea'))return;const body=keys.indexOf(e.key.toLowerCase());if(body>=0){e.preventDefault();start(body,`k-${body}`);}});
@@ -62,7 +63,7 @@ function draw(){
  const time=mode==='replay'?replay.time():transport.time(),frame=transport.session?.visual(time);if(world){applyGroveScene(sculpture,frame??{},pads.map((_,i)=>held.has(i)?holdVelocity(performance.now()-held.get(i).start):0),rich()?pads.map((_,i)=>DEFAULT_VOICE_CONFIG.positions[held.get(i)?.position??1]):[]);world.render();}
  for(const [body,hold] of held)pads[body].style.setProperty('--hold',`${holdVelocity(performance.now()-hold.start)*100}%`);
  let phase=transport.state==='ended'?'QUIET':transport.state==='preparing'?'OPENING THE GROVE':transport.state==='idle'?'BEFORE THE GESTURE':transport.state==='suspended'?'PAUSED':'ROOM TO LISTEN';
- if(mode==='greeting'&&transport.state==='playing'){const section=greeting.sections.findLast(s=>greetingBeatSeconds(greeting,s.beats[0])<=time);phase=time>=greetingDuration(greeting,grove)?'THE GREETING HAS SETTLED':section?.id==='silence'?'LET THE RESPONSE FINISH':section?section.id.toUpperCase():'BEFORE THE GREETING';}
+ if(mode==='greeting'&&transport.state==='playing'){const section=greeting.sections.findLast(s=>s.start<=time);phase=time>=greeting.duration?'THE GREETING HAS SETTLED':section?.id==='silence'?'LET THE RESPONSE FINISH':section?section.id.toUpperCase():'BEFORE THE GREETING';}
  if(mode==='replay')phase=replay.state==='ended'?'YOUR PASSAGE HAS SETTLED':'LISTENING BACK';$('phase').textContent=phase;requestAnimationFrame(draw);
 }
 draw();

@@ -2,7 +2,8 @@ import {mixImpulseRecording} from '../src/touch/session.js';
 import {createGroveVoiceSession} from '../src/grove/voice-session.js';
 import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
 import {createGroveStudyJob} from '../src/grove/render-job.js';
-import {composeGrove,composeGroveGreeting,greetingStrikes} from '../src/score/grove.js';
+import {composeGrove} from '../src/score/grove.js';
+import {createGroveGreetingPlan,groveGreetingFrames} from '../src/grove/greeting.js';
 import {scheduleTouchImpulse,scheduleTouchFade} from '../src/touch/transport.js';
 
 const $=id=>document.getElementById(id),report={version:2,criteria:{mixMaxDifference:1e-6,repeatMaxDifference:1e-7,maxPeak:.9},generated:new Date().toISOString(),userAgent:navigator.userAgent,results:[]};
@@ -18,7 +19,7 @@ try{
  for(const [setting,sampleRate,quiet] of [[3,48000,false],[3,48000,true],[7,44100,false],[7,44100,true],[11,48000,false],[11,48000,true]]){
   $('status').textContent=`Checking ${setting}, ${sampleRate} Hz, ${quiet?'with Quiet':'full tail'}…`;
   const grove=composeGrove({seed:setting}),settings={grove,voice:DEFAULT_VOICE_CONFIG},session=createGroveVoiceSession(settings,sampleRate);
-  for(const [index,note] of greetingStrikes(composeGroveGreeting(grove)).entries()){const admitted=session.strike({frame:Math.round(note.time*sampleRate),body:note.body,position:index%3,velocity:note.velocity});if(!admitted.accepted)throw new Error('Fixture admission failed');}
+  for(const event of groveGreetingFrames(createGroveGreetingPlan(grove,DEFAULT_VOICE_CONFIG),sampleRate)){const admitted=session.strike(event);if(!admitted.accepted)throw new Error('Fixture admission failed');}
   if(quiet)session.finish(Math.round(9.13729*sampleRate));
   const record=session.snapshot(),bank=await createGroveStudyJob(settings,sampleRate).promise,expected=mixImpulseRecording(record,bank),a=await graph(record,bank,expected.channels[0].length),b=await graph(record,bank,expected.channels[0].length);
   const comparison=compare(a,expected.channels),repeat=compare(a,b);

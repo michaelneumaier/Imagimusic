@@ -21,3 +21,13 @@ No subjective listening-quality judgment, speaker recording, measured shell acou
 ## Causal scene follow-up
 
 The tendrils previously curved low but ended at the body centers. Their endpoints now explicitly meet the lower shell tips, matching the downward strike-position convention; their sag stays below both endpoints. Safari seed 7 was reloaded and visually inspected at 320 × 656. A separate warm ring projects recent recorded strike locations for live playing, authored greeting and replay; its .3-second decay uses event age, with no accumulated animation state. It remains an input cue, not a simulated traveling wave. Focused anatomy and cue tests pass (2/2). Fable's follow-up review was requested; no approval is claimed yet.
+
+## Positional invitation
+
+The richer voice now uses Fable's dedicated 15-strike greeting: the same body at upper, middle and bridge tip twice each; the neighbor answers; the third enters; a shared middle touch; silence. The page adapter preserves position and rounds only the audio-clock event time to sample frames. Original retains its own 12-strike recipe. All events are admitted for both voices across all three curated seeds at 44.1 and 48 kHz. Full suite: 314/314 passed.
+
+The browser six-case harness now uses this actual positional greeting, rather than cycling positions over the earlier phrase. Safari 26.6.2: all six passed, maximum saved-mix and repeated-render difference both 7.450580596923828e-9; maximum absolute peak 0.04650016874074936. Report: ignored `renders/grove-voice-greeting-audio-report.json`, generated 2026-11-01T06:36:22.401Z. Earlier first-play and audio reports remain separate evidence.
+
+Fable approved the bridge-endpoint and strike-marker slice in review 2dd3f8f, superseding the pending status above. Astra approved the three-position greeting recipe following its explicit exactly-three-position contract correction; review `collab/reviews/20261101T0637Z-astra-reviews-positional-greeting.md`.
+
+Safari page flow additionally verified: Enter → Hear its greeting → “LET THE RESPONSE FINISH” → “THE GREETING HAS SETTLED” → save gestures → Your turn → keyboard A → Quiet. The downloaded `renders/grove-voice-greeting-capture.json` has all 15 frames/body/position/velocity fields exactly matching the authored plan. Fable approved the page adapter and integration in f55fc47. These checks verify interaction and scheduling, not subjective musical appeal.
