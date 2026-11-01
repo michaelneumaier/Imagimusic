@@ -240,3 +240,4 @@
 - 2026-11-01 astra: powered return fix committed (412b0b0); trace reveal to move after settled; the other routes to be inspected individually (APIs differ), reopen first.
 - 2026-11-01 astra: reopen page parks on a cached departure; trace controls revealed after the first settled encounter, after keeping, then kept available. Fable review approve both.
 - 2026-11-01 astra: reopen return and trace reveal committed (e812c4a) with browser evidence; Fable approvals at 101512Z.
+- 2026-11-01 astra: Rest cached-page return (park keeps only an ended passage, re-enable on the next passage for the new context). Fable review approve.
