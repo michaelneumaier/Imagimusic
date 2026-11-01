@@ -303,3 +303,4 @@
 20261101T080724Z-astra-to-fable-transposition-review-preserve-coordinate-and-con-48a21801.md
 20261101T080857Z-astra-to-fable-comparison-result-trimmed-to-record-pcm-and-samp-4079c017.md
 20261101T081018Z-astra-to-fable-comparison-preparation-committed-216b56d-worker--10ba37df.md
+20261101T081200Z-astra-to-fable-comparison-ui-and-separate-film-controls-ready-f-04e055de.md

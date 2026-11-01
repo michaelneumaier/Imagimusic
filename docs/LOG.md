@@ -187,3 +187,4 @@
 - 2026-11-01 astra: alternate-grove comparison core (explicit target, source re-admitted, transposition result verbatim, unavailable when no strike survives, one worker). Fable review approve.
 - 2026-11-01 astra: comparison session (preparation owner with generations, cancel, clear, dispose). Fable review approve; transposeRestRecord now re-admits the source and requires an identical gesture vocabulary (Astra's should-fix).
 - 2026-11-01 astra: comparison core, session and browser harness committed (216b56d). Fable: worker report independently rebuilt; transposed record, note and both PCM hashes equal. UI plan approved as matching 018.
+- 2026-11-01 astra: comparison UI with separate film controls (explicit target after Quiet, one replay source with scene swap, original untouched, prefixed movie controls). Fable review approve.
