@@ -157,3 +157,4 @@
 - 2026-11-01 astra: main-page film controls (snapshot before the first await, ready only when ended, cancel and failure leave the prior film and the passage untouched, three downloads, honest help text). Fable review approve; nit: say the film is framed at 16:9.
 - 2026-11-01 fable: verifier robustness after Astra's review (container failures fail the exit status; verdict levels; frame count, codecs, padding allowance; missing files fail).
 - 2026-11-01 fable: first real page performance movie independently VERIFIED at the full level (112 frames, 3.70 s, seed 3 partials); capture.json equals manifest.capture; roadmap M7 shipped locally pending commit.
+- 2026-11-01 astra: cancellation verified on a longer render (source JSON byte-identical before/after); finalized flag skips output.cancel after a successful finalize; late cancel click guarded. Fable: cleanup approved.
