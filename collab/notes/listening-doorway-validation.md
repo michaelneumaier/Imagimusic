@@ -1,0 +1,11 @@
+# Listening doorway — Astra evidence, 2026-11-01
+
+Implementation: listen.html/css and src/listen/{main,journeys,transport}. Fable's composer supplies the authored gestures and fixed-system settings; UI wording is separated in journeys.js.
+
+- Full suite passed 256/256 after journey integration; four focused transport tests pass after peer-review fade correction. Covers superseded preparation, pause/seek/resume, old-source ending, replay, retry and Quiet during attack.
+- Safari 26.6.2 desktop: Close kin prepared and played; chapters progressed to Letting go; Quiet paused, timeline seek changed position, Continue resumed from that position. Selecting Tight weave reset time, invalidated the old WAV, changed URL and instrument-edit link. Reload preserved selection without autoplay. Still camera toggled on. Selecting A little distance restored its own settings.
+- Downloaded Close kin WAV: 48 kHz, 1,538,705 stereo frames (32.056354 s), 6,154,864 bytes. Byte-identical with independent Node renderLoomPerformance/createLoomPerformance + stereoWav for that study. Saved locally in ignored renders/listening-close-kin.wav.
+- Responsive Safari viewport 400×656 exposed horizontal instrument cropping and an extra control row. Aspect-dependent camera zoom keeps both bodies within the narrow view; shortening Save sound keeps playback in two rows. Rechecked screenshots for first-screen typography, Listen visibility, cards, and the paired bodies. This is responsive desktop-browser evidence, not a physical-phone audio/performance test.
+- Fable review 20261101T0516Z-fable-reviews-listening-doorway.md: approve with attack fade should-fix. Fixed release to start from analytic current attack gain instead of 1; regression at 10 ms checks gain .2. Explicit pause-on-seek retained so silent inspection does not unexpectedly restart sound.
+
+No listening judgment, consciousness/inner-state effect or drug-experience reproduction is claimed. This is one reduced physical sound model with interpreted visible envelopes. The page starts sound only after Listen; a selected study's URL is reproducible on this local installation. Settings transferred to the workbench do not transfer the authored study score.
