@@ -5,3 +5,6 @@
 .voice-settings{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:16px 0;font-size:12px;color:var(--muted)}.voice-settings[hidden]{display:none}.voice-settings label{display:flex;gap:12px;align-items:center}.voice-settings p{margin:0;line-height:1.6}.voice-settings select{max-width:230px}@media(max-width:700px){.voice-settings{gap:10px}.voice-settings label{flex-wrap:wrap}.voice-settings select{max-width:220px}}
 
 .movie-help{font-size:.85rem;color:var(--muted,#a9adb5);line-height:1.6}#movie-status{font-size:.9rem}#movie-output{margin-top:1.5rem}#movie-preview{display:block;width:100%;max-width:900px;aspect-ratio:16/9;background:#141a22;border-radius:8px}.movie-downloads{display:flex;flex-wrap:wrap;gap:.7rem;margin:1rem 0}.movie-downloads a{color:inherit;border:1px solid #ffffff30;border-radius:999px;padding:.7rem 1rem;text-decoration:none;font-size:.85rem}#movie-caption{font-size:.9rem}
+
+/* Finished-passage tools appear only after the gesture has ended. */
+.keeping{display:block}.passage-buttons{display:flex;gap:10px;flex-wrap:wrap}#passage-actions[hidden],#passage-comparison[hidden],#after-quiet[hidden]{display:none}#after-quiet{font:13px/1.7 system-ui;max-width:600px}#passage-actions>.movie-help{max-width:700px}

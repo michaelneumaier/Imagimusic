@@ -137,3 +137,5 @@ Grove movie verification: `node tools/verify-grove-movie.mjs path/to/manifest.js
 After Quiet in Rest, **Carry the gesture** lets you explicitly choose another curated Grove and hear its response to your finished passage. The comparison preserves gesture coordinates, strengths and timing, reports any strikes the target cannot accept, and offers separate sound, gesture and film downloads named with both seeds. The original capture and its controls remain available. Cancel preparation keeps the previous comparison. A new passage or a Grove change clears the comparison. **Follow a gesture** provides optional guidance driven only by accepted strikes and contacts.
 
 On Grove and Rest, film previews and Listen back take turns; Quiet stops either. Save film files before starting another passage or changing Grove (or Voice on Grove): those actions clear the local preview and its download links.
+
+Grove and Rest keep replay, saving and film controls out of the first encounter. After Quiet finishes a nonempty passage, those actions appear below the body pads; Rest also reveals its alternate-Grove comparison. Beginning another passage hides them again.

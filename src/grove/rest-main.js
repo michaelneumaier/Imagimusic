@@ -55,6 +55,7 @@ function sync(){
  $('invite').disabled=!active||!!invitation||has||!!host.stats?.activeContacts;$('quiet').disabled=filmsPlaying()?false:replayMode?!['preparing','playing','suspended'].includes(replay.state):!['ready','playing','suspended'].includes(state);$('replay').disabled=!ended||!has||replay.state==='preparing';$('new').disabled=!ended;$('save').disabled=!ended||!has||saving;$('score').disabled=!ended||!has;$('seed').disabled=state==='preparing';
  syncComparison();syncExploration();movie.setReady(ended&&has&&!!world);
  for(const {strike,rest} of buttons){strike.disabled=!open();rest.disabled=!open();}
+ const finished=ended&&has,hadFocus=$('passage-actions').contains(document.activeElement)||$('passage-comparison').contains(document.activeElement);$('passage-actions').hidden=!finished;$('passage-comparison').hidden=!finished;$('after-quiet').hidden=finished;if(!finished&&hadFocus)buttons.find(p=>!p.strike.disabled)?.strike.focus();
 }
 function strike(body,position=Number($('position').value)){if(!open())return;host.send({kind:'strike',body,position,velocity:.55});status('Listen for the others.');}
 function hand(body,key,zone=Number($('position').value)){
