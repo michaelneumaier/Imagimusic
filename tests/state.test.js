@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { collectState, traceHash, traceSequence, STATE_VERSION } from '../src/state.js';
-import { DEFAULT_BELLOWS, validateBellows } from '../src/dynamics.js';
+import { DEFAULT_BELLOWS, validateBellows, voiceDynamics } from '../src/dynamics.js';
 import { FrameClock } from '../src/clock.js';
 
 const gardenVoice = { id: 7, slot: 2, noteHz: 196, velocity: 0.8, noteOn: 1, end: 5, position: 0.4, approach: 0.18,
@@ -39,6 +39,34 @@ test('a stolen bellows voice fades only after stolenAt, never before (future-ste
   assert.ok(Math.abs(at(1.62).level / at(1.6).level - 0.5) < 1e-9);
   assert.equal(at(1.62).stage, 'release');
   assert.equal(collectState(1.7, { bellows: { voices: [stolen] } }).voices.length, 0);
+});
+
+test('a stolen bellows voice freezes amp/env at stolenAt then fades, matching the audio engine mid-attack', async () => {
+  const { bellowsState } = await import('../src/bellows-audio.js');
+  const slow = validateBellows({ ...DEFAULT_BELLOWS, adsr: { a: 1, d: 0.5, s: 0.5, r: 0.5 } });
+  const snap = { id: 9, slot: 0, noteHz: 220, velocity: 0.8, noteOn: 1, noteOff: null, bellows: slow, stolenAt: 1.5, stolenFade: 0.04 };
+  const frozen = voiceDynamics(1.5, snap, slow, 48000);
+  const engineVoice = { ...snap, patch: { bellows: slow }, stolenAmp: frozen.amp.level, stolenEnv: frozen.env.level };
+  for (const t of [1.5, 1.52, 1.535]) {
+    const mine = collectState(t, { bellows: { voices: [snap] } }).voices[0], theirs = bellowsState(engineVoice, t, 48000);
+    assert.ok(Math.abs(mine.level - theirs.amp.level) < 1e-12, `amp at ${t}: ${mine.level} vs ${theirs.amp.level}`);
+    assert.ok(Math.abs(mine.modules.env.level - theirs.env.level) < 1e-12, `env at ${t}`);
+    assert.ok(Math.abs(mine.exciter.fill01 - theirs.bellows.fill01) < 1e-12, `fill at ${t}`);
+  }
+  // Frozen, not drifting: halfway through the fade the env is half of its value at the steal, not half of the live attack.
+  const half = collectState(1.52, { bellows: { voices: [snap] } }).voices[0];
+  assert.ok(Math.abs(half.modules.env.level - frozen.env.level * 0.5) < 1e-12);
+  assert.ok(Math.abs(half.modules.env.level - voiceDynamics(1.52, snap, slow, 48000).env.level * 0.5) > 1e-4);
+  // Filter and LFO keep following their automation during the fade.
+  assert.equal(half.modules.lfo.phase01, voiceDynamics(1.52, snap, slow, 48000).lfo.phase01);
+});
+
+test('bellows voices exist only from noteOn: a scheduled future breath does not appear before its onset', () => {
+  const future = { ...bellowsVoice, id: 4, noteOn: 3, noteOff: 4 };
+  const at = t => collectState(t, { bellows: { voices: [bellowsVoice, future] } }).voices.map(v => v.id);
+  assert.deepEqual(at(1.5), ['3']); assert.deepEqual(at(3), ['4']); assert.deepEqual(at(2.9), []);
+  assert.equal(collectState(1.5, snaps).voices.find(v => v.family === 'bellows').noteOn, 1);
+  assert.equal(collectState(1.5, snaps).voices.find(v => v.family === 'garden').noteOn, 1);
 });
 
 test('a held bellows voice persists and a finished one is dropped after its release', () => {

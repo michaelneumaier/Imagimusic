@@ -34,7 +34,7 @@ function modalVoice(family, voice, t, dampers) {
   else if (age < 0 && pose.visible) stage = 'attack';
   return {
     id: String(voice.id), family, slot: voice.slot, resonator: `${family}/${voice.slot}`,
-    noteHz: voice.noteHz, velocity: voice.velocity, age, stage, level,
+    noteHz: voice.noteHz, velocity: voice.velocity, noteOn: voice.noteOn, age, stage, level,
     exciter: { kind: 'strike', pos01: voice.position ?? 0.5, contact: pose.contact, reach: pose.reach, visible: pose.visible },
     damper: { pressure: dampers && dampers.includes(voice.slot) ? 1 : 0 },
     modes,
@@ -44,21 +44,26 @@ function modalVoice(family, voice, t, dampers) {
 
 function bellowsVoice(voice, t, sampleRate) {
   const d = voiceDynamics(t, voice, voice.bellows, sampleRate);
-  let fade = 1;
-  if (voice.stolenAt !== undefined && t >= voice.stolenAt) fade = Math.max(0, 1 - (t - voice.stolenAt) / (voice.stolenFade ?? 0.04));
-  const envLevel = d.env.level * fade, ampLevel = d.amp.level * fade;
+  // A stolen voice matches BellowsAudio.steal(): amp and env are FROZEN at the value they had at stolenAt and
+  // then ramp linearly to zero; filter, LFO, and source pitch keep following their already-scheduled automation.
+  let envLevel = d.env.level, ampLevel = d.amp.level, stolen = false;
+  if (voice.stolenAt !== undefined && t >= voice.stolenAt) {
+    const frozen = voiceDynamics(voice.stolenAt, voice, voice.bellows, sampleRate);
+    const fade = Math.max(0, 1 - (t - voice.stolenAt) / (voice.stolenFade ?? 0.04));
+    envLevel = frozen.env.level * fade; ampLevel = frozen.amp.level * fade; stolen = true;
+  }
   const age = t - voice.noteOn;
   return {
     id: String(voice.id), family: 'bellows', slot: voice.slot, resonator: `bellows/${voice.slot}`,
-    noteHz: voice.noteHz, velocity: voice.velocity, age,
-    stage: fade < 1 ? 'release' : d.env.stage, level: ampLevel,
+    noteHz: voice.noteHz, velocity: voice.velocity, noteOn: voice.noteOn, age,
+    stage: stolen ? 'release' : d.env.stage, level: ampLevel,
     exciter: { kind: 'air', pos01: 0, contact: envLevel, fill01: 1 - envLevel },
     damper: { pressure: 0 },
     modules: {
-      env: { type: 'env', level: envLevel, stage: d.env.stage },
+      env: { type: 'env', level: envLevel, stage: stolen ? 'release' : d.env.stage },
       filter: { type: 'filter', cutoffHz: d.filter.cutoffHz, resonance: d.filter.resonance, aperture01: d.filter.aperture01 },
       lfo: { type: 'lfo', value: d.lfo.value, phase01: d.lfo.phase01 },
-      source: { type: 'source', kind: d.source.kind, level: d.source.level * fade, frequencyHz: d.source.frequencyHz },
+      source: { type: 'source', kind: d.source.kind, level: envLevel, frequencyHz: d.source.frequencyHz },
       amp: { type: 'amp', level: ampLevel },
     },
   };
@@ -77,9 +82,11 @@ export function collectState(t, snapshots = {}) {
       if (t >= voice.noteOn - approach && t <= voice.end + 1e-9) voices.push(modalVoice(family, voice, t, snap.dampers));
     }
   }
+  // Bellows voices have no visible pre-breath mechanism, so they exist only from noteOn (a scheduled future
+  // breath must not overwrite the current occupant of its slot) until release end or steal end.
   if (snapshots.bellows) for (const voice of snapshots.bellows.voices ?? []) {
     const end = voice.stolenAt !== undefined ? voice.stolenAt + (voice.stolenFade ?? 0.04) : voice.noteOff === null || voice.noteOff === undefined ? Infinity : voice.noteOff + voice.bellows.adsr.r;
-    if (t <= end) voices.push(bellowsVoice(voice, t, sampleRate));
+    if (t >= voice.noteOn && t <= end) voices.push(bellowsVoice(voice, t, sampleRate));
   }
   const sum = voices.reduce((s, v) => s + v.level, 0);
   return {

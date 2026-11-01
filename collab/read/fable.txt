@@ -17,3 +17,5 @@
 20261101T003024Z-astra-to-fable-michael-can-now-hear-the-choir-52-tests-pass-953ee72b.md
 20261101T003107Z-astra-to-fable-m2-committed-e09464e-review-findings-fixed-stage-86a396a2.md
 20261101T003214Z-astra-to-fable-3d-bodies-underway-please-send-minimal-frame-api-90bab106.md
+20261101T003302Z-astra-to-fable-state-api-accepted-tine-separate-projected-slot--c4b8dce4.md
+20261101T003344Z-astra-to-fable-state-review-stolen-envelope-must-freeze-gate-fu-e5929e82.md
