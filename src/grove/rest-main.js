@@ -1,5 +1,5 @@
 import {composeGrove} from '../score/grove.js';
-import {composeRestInvitation} from '../score/grove-rest.js';
+import {composeRestInvitation,createRestExploration} from '../score/grove-rest.js';
 import {createRestHost} from './contact-host.js';
 import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
@@ -10,21 +10,34 @@ import {restWorkerJob} from './contact-job.js';
 import {restReplayFrame} from './rest-replay-picture.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),strikeKeys=['a','s','d'],restKeys=['j','k','l'],hands=new Map();
-let grove=composeGrove({seed:3}),world,sculpture,picking,invitation=null,saving=false,buttons=[],viewToken=0,replayMode=false,picture=null,pictureAbort=null,playToken=0;
+let grove=composeGrove({seed:3}),world,sculpture,picking,invitation=null,saving=false,buttons=[],viewToken=0,replayMode=false,picture=null,pictureAbort=null,playToken=0,exploring=false,exploration=null;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const replay=createGroveReplay({onChange:({state})=>{if(!replayMode)return;sync();if(state==='ended')status('Your passage has settled. Listen again, keep it, or begin another.');if(state==='suspended')status('Listening was interrupted. Listen back restarts your saved passage.');}});
 function stopReplay(){playToken++;replayMode=false;pictureAbort?.abort();pictureAbort=null;replay.stop();sync();}
 const movie=bindGroveMovieControls({getSource:()=>{stopReplay();return {recording:host.recording(),pcm:host.saveAudio(),camera:{position:world.camera.position.toArray(),target:world.controls.target.toArray()}};}});
-const host=createRestHost({onChange:({state,error})=>{sync();if(state==='error')status(error.message,true);else if(state==='ended'){hands.clear();status(invitation?'Your turn: strike once, rest on that body, then try its neighbor.':'Quiet. Keep this passage, or begin your own.');}else if(state==='suspended')status('Audio paused. Resume keeps this passage; hands and Quiet can still be released.');},onDecision:ack=>{if(!ack.accepted&&ack.reason!=='ended')status(ack.reason==='headroom'?'Let this ring breathe before another strike.':'This passage is full of gestures. Choose Quiet, keep it, and begin another.');}});
+const host=createRestHost({onChange:({state,error})=>{sync();if(state==='error'){clearExploration();status(error.message,true);}else if(state==='ended'){hands.clear();status(invitation?'Your turn: strike once, rest on that body, then try its neighbor.':'Quiet. Keep this passage, or begin your own.');}else if(state==='suspended')status('Audio paused. Resume keeps this passage; hands and Quiet can still be released.');},onDecision:ack=>{advanceExploration(ack);if(!ack.accepted&&ack.reason!=='ended')status(ack.reason==='headroom'?'Let this ring breathe before another strike.':'This passage is full of gestures. Choose Quiet, keep it, and begin another.');}});
+function clearExploration(){exploring=false;exploration=null;syncExploration();}
+function syncExploration(){
+ const active=open(),fresh=active&&!host.stats?.strikes&&!host.stats?.activeContacts;
+ if(!exploring)$('explore-prompt').textContent=fresh?'Try a gesture with one body and its neighbor, or play freely.':host.state==='preparing'?'Opening the instrument…':host.state==='idle'?'Enter Rest to try an optional gesture with a body and its neighbor.':'Begin a fresh passage to follow a gesture, or keep exploring freely.';
+ $('explore').disabled=!fresh||exploring;$('explore-stop').hidden=!exploring;$('explore').parentElement.parentElement.dataset.active=String(exploring);
+}
+function advanceExploration(ack){
+ if(!exploring||invitation||!ack.accepted)return;
+ if(ack.event.kind==='quiet'){clearExploration();return;}
+ if(!exploration){if(ack.event.kind!=='strike')return;exploration=createRestExploration(host.recipe,{body:ack.event.body});}
+ const before=exploration.state.step,next=exploration.acknowledge(ack);
+ if(before!==next.step)$('explore-prompt').textContent=next.prompt;
+}
 function open(){return !invitation&&['ready','playing'].includes(host.state);}
 function sync(){
  const state=host.state,active=['ready','playing'].includes(state),ended=state==='ended',has=!!host.stats?.strikes;
  $('begin').disabled=active||state==='preparing'||state==='ending';$('begin').textContent=state==='preparing'?'Opening Rest…':state==='suspended'?'Resume Rest ↗':ended?'Begin another ↗':active?'Rest is open':'Enter Rest ↗';
  $('invite').disabled=!active||!!invitation||has||!!host.stats?.activeContacts;$('quiet').disabled=replayMode?!['preparing','playing','suspended'].includes(replay.state):!['ready','playing','suspended'].includes(state);$('replay').disabled=!ended||!has||replay.state==='preparing';$('new').disabled=!ended;$('save').disabled=!ended||!has||saving;$('score').disabled=!ended||!has;$('seed').disabled=state==='preparing';
- movie.setReady(ended&&has&&!!world);
+ syncExploration();movie.setReady(ended&&has&&!!world);
  for(const {strike,rest} of buttons){strike.disabled=!open();rest.disabled=!open();}
 }
-function strike(body,position=Number($('position').value)){if(!open())return;host.send({kind:'strike',body,position,velocity:.55});status('Let the ring reveal its neighbors.');}
+function strike(body,position=Number($('position').value)){if(!open())return;host.send({kind:'strike',body,position,velocity:.55});status('Listen for the others.');}
 function hand(body,key,zone=Number($('position').value)){
  if(!open()||hands.has(body))return;const result=host.send({kind:'contact',body,zone,strength:Number($('strength').value)});if(result.queued)hands.set(body,key);
 }
@@ -37,11 +50,12 @@ function build(){
  if(world){if(sculpture){world.scene.remove(sculpture.root);sculpture.dispose();}sculpture=createGroveScene(grove);world.scene.add(sculpture.root);}$('identity').textContent=`GROVE ${grove.seed}`;sync();
 }
 function revealInstrument(){if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
-async function enter(){try{if(host.state==='suspended'){await host.resume();status('Rest is open again.');return;}if(host.state==='ended'){newPassage();return;}invitation=null;status('Preparing the connected bodies…');await host.enable(grove);if(host.state==='ready'){status('Strike once. Rest a hand while it rings, then lift.');revealInstrument();}}catch(error){status(error.message,true);}}
-function newPassage(){stopReplay();picture=null;releaseAll();viewToken++;invitation=null;host.newPassage();status('Your turn. Strike once, rest on that body, then try its neighbor.');sync();revealInstrument();}
+async function enter(){try{if(host.state==='suspended'){await host.resume();status('Rest is open again.');return;}if(host.state==='ended'){newPassage();return;}invitation=null;clearExploration();status('Preparing the connected bodies…');await host.enable(grove);if(host.state==='ready'){status('Strike once. Rest a hand while it rings, then lift.');revealInstrument();}}catch(error){status(error.message,true);}}
+function newPassage(){stopReplay();picture=null;releaseAll();viewToken++;invitation=null;clearExploration();host.newPassage();status('Your turn. Strike once, rest on that body, then try its neighbor.');sync();revealInstrument();}
+$('explore').onclick=()=>{if($('explore').disabled)return;exploring=true;exploration=null;$('explore-prompt').textContent='Strike any body once. Listen to its ring.';syncExploration();$('explore-prompt').parentElement.scrollIntoView({block:'nearest'});};$('explore-stop').onclick=clearExploration;
 $('begin').onclick=enter;$('new').onclick=newPassage;$('quiet').onclick=()=>{if(replayMode){stopReplay();status('Quiet. Your saved passage is still here.');return;}releaseAll();host.quiet();status(host.state==='suspended'?'Quiet is waiting for Resume.':'Letting this passage settle…');};
-$('invite').onclick=()=>{try{releaseAll();invitation=composeRestInvitation(host.recipe);host.schedule(invitation.commands);revealInstrument();status('First a free ring. Then a hand, a neighbor, and all three together.');sync();}catch(error){invitation=null;status(error.message,true);}};
-$('seed').onchange=()=>{stopReplay();picture=null;releaseAll();viewToken++;invitation=null;grove=composeGrove({seed:Number($('seed').value)});build();status('Preparing this grove…');host.enable(grove).then(()=>status('Strike once. Rest a hand while it rings, then lift.')).catch(error=>status(error.message,true));const url=new URL(location.href);url.searchParams.set('seed',grove.seed);history.replaceState(null,'',url);};
+$('invite').onclick=()=>{try{clearExploration();releaseAll();invitation=composeRestInvitation(host.recipe);host.schedule(invitation.commands);revealInstrument();status('First a free ring. Then a hand, a neighbor, and all three together.');sync();}catch(error){invitation=null;status(error.message,true);}};
+$('seed').onchange=()=>{stopReplay();picture=null;releaseAll();viewToken++;invitation=null;clearExploration();grove=composeGrove({seed:Number($('seed').value)});build();status('Preparing this grove…');host.enable(grove).then(()=>status('Strike once. Rest a hand while it rings, then lift.')).catch(error=>status(error.message,true));const url=new URL(location.href);url.searchParams.set('seed',grove.seed);history.replaceState(null,'',url);};
 function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 $('score').onclick=()=>{try{download(JSON.stringify(host.recording(),null,2),'application/json',`imagimusic-rest-${grove.seed}.json`);}catch(error){status(error.message,true);}};
 $('save').onclick=async()=>{const own=viewToken,seed=grove.seed;saving=true;sync();status('Rebuilding your passage for the sound file…');try{const pcm=await host.saveAudio();if(own!==viewToken)return;download(stereoWav(pcm),'audio/wav',`imagimusic-rest-${seed}.wav`);status('Your passage is saved as sound.');}catch(error){if(own===viewToken)status(error.message,true);}finally{saving=false;sync();}};

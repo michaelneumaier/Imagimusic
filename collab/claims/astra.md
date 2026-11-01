@@ -95,3 +95,5 @@ Rest movie extension: movie-plan/export/shared controls, movie-plan-worker.js an
 First-minute experience: listen.html/listen main, grove.html, rest.html/rest-main; initial action/keyboard hints, consistent Escape, Rest scene reveal, exploratory next gesture after invitation.
 
 First-use doorway: welcome.html/welcome.css, entry links in owned index/listen/Grove/Rest pages. Lightweight three-choice landing without audio/WebGL preparation; existing lab retained.
+
+Optional Rest exploration UI: rest.html/css and rest-main.js; feed processed audio acknowledgements to Fable's guide, choose the body from the player's first accepted strike, and clear guidance across passage lifecycle changes. Model fixes remain Fable-owned.
