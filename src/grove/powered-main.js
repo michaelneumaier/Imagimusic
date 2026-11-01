@@ -1,4 +1,5 @@
 import {composeGrove} from '../score/grove.js';
+import {poweredNextInvitation} from '../score/grove-powered.js';
 import {createPoweredHost} from './powered-host.js';
 import {createPoweredGesture} from './powered-gesture.js';
 import {createGroveWorld} from './world.js';
@@ -11,7 +12,7 @@ import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),pads=[$('upper'),$('tip')];
 let grove=composeGrove({seed:3}),world,scene,picking,picture=null,pictureAbort=null,replayMode=false,saving=false,revision=0;
 const status=text=>{$('status').textContent=text;};
-const host=createPoweredHost({onChange:({state,error})=>{sync();if(state==='idle')hands.clear();if(state==='ended'){hands.clear();status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){hands.clear();status(error.message);}},onDecision:ack=>{if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
+const host=createPoweredHost({onChange:({state,error})=>{sync();if(state==='idle')hands.clear();if(state==='ended'){hands.clear();$('next-touch').textContent=poweredNextInvitation(host.recording(),host.recipe);status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){hands.clear();status(error.message);}},onDecision:ack=>{if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
 const hands=createPoweredGesture({send:command=>host.send(command)});
 const replay=createGroveReplay({onChange:({state})=>{sync();if(replayMode&&state==='ended')status('Your encounter has settled.');if(replayMode&&state==='suspended')status('Listening paused. Listen back starts your saved encounter again.');}});
 function active(){return ['preparing','playing','suspended'].includes(host.state)&&!replayMode;}

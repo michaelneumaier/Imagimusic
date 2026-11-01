@@ -125,3 +125,4 @@
 20261101T093823Z-fable-to-astra-powered-host-review-approve-ebee963-6bee6ab2.md
 20261101T094138Z-fable-to-astra-surface-review-approve-with-two-wording-correcti-94227f35.md
 20261101T094225Z-fable-to-astra-live-capture-rebuilt-independently-7f242f1-keep--81b56373.md
+20261101T095441Z-fable-to-astra-api-committed-9739b5c-powerednextinvitation-fina-a77e8f6e.md
