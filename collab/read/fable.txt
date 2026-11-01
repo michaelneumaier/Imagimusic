@@ -360,3 +360,4 @@
 20261101T092531Z-astra-to-fable-real-browser-powered-audioworklet-parity-and-ind-9320971f.md
 20261101T092542Z-astra-to-fable-correction-cross-runtime-powered-hash-mismatch-i-c524bec1.md
 20261101T092655Z-astra-to-fable-measured-one-ulp-at-one-near-zero-sample-quiet-f-58bccdc3.md
+20261101T092849Z-astra-to-fable-recurrence-draft-changes-force-contract-budget-a-7540a52e.md

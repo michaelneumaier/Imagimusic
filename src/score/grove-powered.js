@@ -14,7 +14,12 @@ import { createGroveRestRecipe, recipeForRecord, validateRestRecord, REST_RECORD
 import { REST_MAX_SECONDS, REST_QUIET_FADE_SECONDS } from '../rest/limits.js';
 import { POWERED_RECIPE_VERSION, createPoweredEngine, renderPoweredPassage, poweredForceAt, forceRotation, createForceSequence, contactStateKey } from '../rest/powered-engine.js';
 import { visualFromState } from '../rest/engine.js';
-export const POWERED_RECORD_KIND = 'imagimusic-grove-powered', POWERED_RECORD_VERSION = 1, POWERED_CEILING_SHARE = 0.5;
+export const POWERED_RECORD_KIND = 'imagimusic-grove-powered', POWERED_RECORD_VERSION = 2, POWERED_FORCE_LAW = 'rotation-recurrence-v1', POWERED_CEILING_SHARE = 0.5;
+// Version 2 declares the source as the rotation recurrence from stored constants (version 1, a sample-held Math.sin source, never shipped: it was not
+// bit-identical across JavaScript engines). Limitations, stated: the recurrence's amplitude drifts by O(n·ε) over n samples (about 1e-11 relative over
+// two minutes); that drift is part of the declared input, not an error; the budget below sums the actual declared samples, so it is exact for the
+// declared input. The scalar recurrence uses specified IEEE arithmetic; equality of a whole render across runtimes is a matter of measurement, not
+// of this declaration (the model operators are computed per runtime).
 
 /** Add the declared force direction and per-state Γ to a Rest recipe (one augmented exponential per contact state, off the audio thread). */
 export function createPoweredRecipe(recipe, { body = 0, position = 1 } = {}) {
@@ -31,8 +36,10 @@ export function createPoweredRecipe(recipe, { body = 0, position = 1 } = {}) {
 }
 
 /** The largest amplitude the declared driver may have: its full budget at (1 − share) of the ceiling, from the exact held-force integral. */
-export function poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames }) {
-  const sr = recipe.sampleRate; let integral = 0; for (let n = 0; n < forcedFrames; n++) integral += Math.abs(Math.sin(2 * Math.PI * frequencyHz * n / sr)) / sr;
+export function poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames, rotation }) {
+  // The budget sums the ACTUAL declared samples: the recurrence at unit amplitude from the stored (or, at composition, freshly computed) rotation constants.
+  const sr = recipe.sampleRate, seq = createForceSequence({ rotation: rotation ?? forceRotation(frequencyHz, sr), startFrame: 0, forcedFrames, amplitude: 1 });
+  let integral = 0; for (let n = 0; n < forcedFrames; n++) integral += Math.abs(seq.next()) / sr;
   // A drive whose declared samples are all zero (for example forcedFrames = 1, where f₀ = sin 0 = 0) injects nothing, so any amplitude is within budget.
   if (!(integral > 0)) return Infinity;
   return (1 - POWERED_CEILING_SHARE) * recipe.admissionCeiling / (recipe.outputGain * recipe.driver.energyFactorMax * recipe.driver.directionNorm * integral);
@@ -41,11 +48,12 @@ export function poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames }) {
 const stable = v => JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, x[k]])) : x);
 /** Validate a powered record against its powered recipe. Strikes and contacts follow the Rest rules; the driver is bounded and matches the recipe's direction. */
 export function validatePoweredRecord(record, recipe) {
-  if (record?.kind !== POWERED_RECORD_KIND || record.version !== POWERED_RECORD_VERSION) throw new Error('not a powered record (version 1).');
+  if (record?.kind !== POWERED_RECORD_KIND || record.version !== POWERED_RECORD_VERSION) throw new Error(`not a powered record (version ${POWERED_RECORD_VERSION}).`);
   const { driver, ...rest } = record, restRecord = { ...rest, kind: REST_RECORD_KIND, version: REST_RECORD_VERSION };
   validateRestRecord(restRecord, recipe);   // schema, canonical grove/voice/zones/strengths, chronology, contacts, Quiet closure, bounds
   if (!driver || typeof driver !== 'object') throw new Error('driver is required.');
-  const keys = Object.keys(driver).sort().join(); if (keys !== 'amplitude,body,forcedFrames,frequencyHz,position,rotation,startFrame') throw new Error('driver must have exactly amplitude, body, forcedFrames, frequencyHz, position, rotation, startFrame.');
+  const keys = Object.keys(driver).sort().join(); if (keys !== 'amplitude,body,forcedFrames,frequencyHz,law,position,rotation,startFrame') throw new Error('driver must have exactly amplitude, body, forcedFrames, frequencyHz, law, position, rotation, startFrame.');
+  if (driver.law !== POWERED_FORCE_LAW) throw new Error(`driver.law must be ${POWERED_FORCE_LAW}.`);
   // The declared input is the recurrence from the stored rotation constants (bit-exact in every runtime); they must agree with the frequency to 1e-12.
   const rot = forceRotation(driver.frequencyHz, recipe.sampleRate);
   if (!driver.rotation || typeof driver.rotation !== 'object' || Object.keys(driver.rotation).sort().join() !== 'cos,sin' || !Number.isFinite(driver.rotation.cos) || !Number.isFinite(driver.rotation.sin) || Math.abs(driver.rotation.cos - rot.cos) > 1e-12 || Math.abs(driver.rotation.sin - rot.sin) > 1e-12) throw new Error('driver.rotation must be { cos, sin } of 2π·frequencyHz/sampleRate (stored, so every runtime renders the same declared force).');
@@ -99,11 +107,11 @@ export function poweredRecipeForRecord(record) {
 
 /** The bounded first encounter as a record: the declared driver (2 s on, 3 s release), the player's c = 1 contacts at u = 0.3 or u = 1 on the driven body, then Quiet. */
 export function composeEncounterRecord(recipe, { contacts = [], frequencyHz = recipe.grove.bodies[recipe.driver.body].hz, forceSeconds = 2, ringSeconds = 3, startFrame = 0 } = {}) {
-  const sr = recipe.sampleRate, forcedFrames = Math.round(forceSeconds * sr), amplitude = poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames });
+  const sr = recipe.sampleRate, forcedFrames = Math.round(forceSeconds * sr), rotation = forceRotation(frequencyHz, sr), amplitude = poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames, rotation });
   if (!Number.isFinite(amplitude)) throw new Error('the planned drive integrates to zero; choose a longer forceSeconds.');
   const ended = { frame: startFrame + forcedFrames + Math.round(ringSeconds * sr), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
   const record = { version: POWERED_RECORD_VERSION, kind: POWERED_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })),
-    driver: { body: recipe.driver.body, position: recipe.driver.position, frequencyHz, amplitude, startFrame, forcedFrames, rotation: forceRotation(frequencyHz, sr) }, events: [], contacts: contacts.map((c, i) => ({ ...c, order: i })), ended };
+    driver: { body: recipe.driver.body, position: recipe.driver.position, frequencyHz, amplitude, startFrame, forcedFrames, rotation, law: POWERED_FORCE_LAW }, events: [], contacts: contacts.map((c, i) => ({ ...c, order: i })), ended };
   return validatePoweredRecord(record, recipe);
 }
 export { createGroveRestRecipe, poweredForceAt, forceRotation, createForceSequence };

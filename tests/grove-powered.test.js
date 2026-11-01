@@ -4,14 +4,14 @@ import { composeGrove, GROVE_SEEDS } from '../src/score/grove.js';
 import { DEFAULT_VOICE_CONFIG } from '../src/score/grove-voice.js';
 import { createGroveRestRecipe, renderRestRecord, restInvitationRecord, composeRestInvitation } from '../src/score/grove-rest.js';
 import { composeForcedStudy, renderForcedStudy } from '../src/score/forced-study.js';
-import { createPoweredRecipe, composeEncounterRecord, renderPoweredRecord, validatePoweredRecord, validatePoweredAdmission, poweredRecipeForRecord, canonicalPoweredRecord, POWERED_RECORD_KIND } from '../src/score/grove-powered.js';
+import { createPoweredRecipe, composeEncounterRecord, renderPoweredRecord, validatePoweredRecord, validatePoweredAdmission, poweredRecipeForRecord, canonicalPoweredRecord, poweredAmplitudeLimit, POWERED_RECORD_KIND, POWERED_RECORD_VERSION, POWERED_FORCE_LAW } from '../src/score/grove-powered.js';
 import { createPoweredEngine, poweredForceAt, createForceSequence, forceRotation, contactStateKey } from '../src/rest/powered-engine.js';
 
 test('powered engine parity: constant contacts equal the audited forced study; zero force equals the Rest route; switches are continuous and within budget', () => {
   const sr = 8000;
   for (const seed of GROVE_SEEDS) {
     const base = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1, firm: 60 } }), recipe = createPoweredRecipe(base);
-    // (a) Constant-contact parity with the forced study (same force history, same contact for the whole passage).
+    // (a) Constant-contact parity with the forced study: the study's sample-held Math.sin source and the record's declared recurrence differ by rounding only (1e-9 of amplitude), so parity holds below 1e-6 of peak, not bit-exactly.
     const study = composeForcedStudy(base, { forceSeconds: 1, ringSeconds: 1.5, strength: 'firm' }), studyOut = renderForcedStudy(study);
     const rec = composeEncounterRecord(recipe, { forceSeconds: 1, ringSeconds: 1.5 });
     assert.ok(Math.abs(rec.driver.amplitude - study.driver.amplitude) < 1e-12 * study.driver.amplitude, 'the same declared amplitude (half the ceiling)');
@@ -26,7 +26,7 @@ test('powered engine parity: constant contacts equal the audited forced study; z
     // (b) Zero amplitude with strikes and contacts equals the Rest route (the invitation needs the default three zones and strengths).
     const full = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), fullPowered = createPoweredRecipe(full);
     const inv = restInvitationRecord(full, composeRestInvitation(full, { tempo: 120 }));
-    const powered = { ...inv, kind: POWERED_RECORD_KIND, version: 1, driver: { body: 0, position: 1, frequencyHz: full.grove.bodies[0].hz, amplitude: 0, startFrame: 0, forcedFrames: 1, rotation: forceRotation(full.grove.bodies[0].hz, sr) } };
+    const powered = { ...inv, kind: POWERED_RECORD_KIND, version: POWERED_RECORD_VERSION, driver: { body: 0, position: 1, frequencyHz: full.grove.bodies[0].hz, amplitude: 0, startFrame: 0, forcedFrames: 1, rotation: forceRotation(full.grove.bodies[0].hz, sr), law: POWERED_FORCE_LAW } };
     const a = renderPoweredRecord(powered, fullPowered), b = renderRestRecord(inv, full); let worst = 0, peak = 0;
     for (let i = 0; i < a.channels[0].length; i++) { worst = Math.max(worst, Math.abs(a.channels[0][i] - b.channels[0][i])); peak = Math.max(peak, Math.abs(b.channels[0][i])); }
     assert.ok(worst / peak < 1e-7, `${seed}: zero force equals the Rest route (${worst / peak})`);
@@ -101,4 +101,15 @@ test('early Quiet at frame 1 with one forced frame: the only applied force is ze
   const planned = composeEncounterRecord(recipe), early = { ...planned, driver: { ...planned.driver, forcedFrames: 1 }, contacts: [], ended: { frame: 1, fadeFrames: planned.ended.fadeFrames } };
   validatePoweredRecord(early, recipe);
   const pcm = renderPoweredRecord(early, recipe); assert.equal(pcm.channels[0].length, 1 + early.ended.fadeFrames); assert.ok(pcm.channels.every(c => c.every(v => v === 0)), 'f0 = 0, so silence throughout');
+});
+
+test('version 2 contract: the force law is declared, the budget sums the actual recurrence samples, and the planned amplitude sits exactly at its share of the ceiling', () => {
+  const sr = 8000, base = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1 } }), recipe = createPoweredRecipe(base);
+  const rec = composeEncounterRecord(recipe); assert.equal(rec.version, 2); assert.equal(rec.driver.law, 'rotation-recurrence-v1');
+  const seq = createForceSequence(rec.driver); let integral = 0; for (let n = 0; n < rec.driver.forcedFrames; n++) integral += Math.abs(seq.next()) / sr;
+  const bound = recipe.outputGain * recipe.driver.energyFactorMax * recipe.driver.directionNorm * integral;
+  assert.ok(Math.abs(bound - 0.5 * recipe.admissionCeiling) < 1e-12, `the declared drive's budget is exactly half the ceiling (${bound})`);
+  assert.ok(Math.abs(poweredAmplitudeLimit(recipe, rec.driver) - rec.driver.amplitude) < 1e-12 * rec.driver.amplitude, 'the limit is computed from the stored rotation');
+  const v1 = structuredClone(rec); v1.version = 1; assert.throws(() => validatePoweredRecord(v1, recipe), /version 2/);
+  const law = structuredClone(rec); law.driver.law = 'sample-held-sin'; assert.throws(() => validatePoweredRecord(law, recipe), /driver.law/);
 });
