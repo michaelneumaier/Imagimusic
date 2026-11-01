@@ -19,16 +19,21 @@ export function composeForcedStudy(recipe, { body = 0, position = 1, frequencyHz
   const strengthIndex = recipe.strengths.findIndex(st => st.name === strength); if (strengthIndex < 0) throw new Error(`strength ${strength} is not in the recipe.`);
   const bridge = g.bridges.find(e => e.a === body || e.b === body); if (!bridge) throw new Error('the body needs a bridge.');
   const neighbor = bridge.a === body ? bridge.b : bridge.a, tip = recipe.zones.length - 1;
-  const direction = recipe.strikeVectors[position][body], directionNorm = Math.sqrt(direction.reduce((a, v) => a + v * v, 0)), fmax = Math.max(...recipe.energyFactors);
-  // Budget (Astra): √(2E(t)) ≤ √(2E₀) + ‖b‖∫|f|; with E₀ = 0 and ∫|f| = A·T·2/π for a sinusoid, the output ceiling G·fmax·‖b‖·A·T·2/π ≤ ceilingFraction·admissionCeiling.
-  const integralPerUnitAmplitude = forceSeconds * 2 / Math.PI, amplitude = ceilingFraction * recipe.admissionCeiling / (recipe.outputGain * fmax * directionNorm * integralPerUnitAmplitude);
+  const direction = recipe.strikeVectors[position][body], directionNorm = Math.sqrt(direction.reduce((a, v) => a + v * v, 0)), fmax = Math.max(...recipe.energyFactors), sr = recipe.sampleRate;
+  // Budget (Astra): √(2E(t)) ≤ √(2E₀) + ‖b‖∫|f|, E₀ = 0. The declared input is the sample-held sinusoid over the actual forced frames, so the integral is
+  // the exact sum Σ|sin(2π f n/sr)|/sr over those frames (not a cycle average); the amplitude is chosen from it and the predicted bound follows from the actual input.
+  const forcedFrames = Math.round(forceSeconds * sr); let integralPerUnitAmplitude = 0; for (let n = 0; n < forcedFrames; n++) integralPerUnitAmplitude += Math.abs(Math.sin(2 * Math.PI * hz * n / sr)) / sr;
+  if (!(integralPerUnitAmplitude > 0)) throw new Error('the declared force integrates to zero over the forced frames.');
+  const amplitude = ceilingFraction * recipe.admissionCeiling / (recipe.outputGain * fmax * directionNorm * integralPerUnitAmplitude);
   const predictedBound = recipe.outputGain * fmax * directionNorm * amplitude * integralPerUnitAmplitude;
   const contact = { body: null, zone: tip, strength: strengthIndex };
   return {
     version: FORCED_STUDY_VERSION, kind: FORCED_STUDY_KIND, grove: g, voice: recipe.voice, sampleRate: recipe.sampleRate, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })), outputGain: recipe.outputGain,
-    driver: { body, position, u: recipe.positions[position], frequencyHz: hz, amplitude, forceSeconds, ringSeconds, law: 'sample-held sinusoid f_n = A·sin(2π·f·n/sr) for n < forceSeconds·sr, then 0; exact affine zero-order-hold evolution x ← Φx + Γf; a powered driver, not a bow, hand, breath or actuator',
-      units: 'A in newtons applied along the unit strike direction b = φ(u)/√m (mass-normalized velocity rows); pickups and gain as the Rest recipe', budget: { ceilingFraction, admissionCeiling: recipe.admissionCeiling, directionNorm, energyFactorMax: fmax, integralAbsForce: amplitude * integralPerUnitAmplitude, predictedOutputBound: predictedBound, statement: '√(2E(t)) ≤ √(2E₀) + ‖b‖∫|f|, E₀ = 0; |out| ≤ outputGain·fmax·√(2E); the amplitude is chosen so this bound is ceilingFraction of the admission ceiling; it is conservative and not perceptual loudness' } },
+    pickupVectors: recipe.pickupVectors.map(v => v.slice()),   // the two stereo pickup vectors (mass-normalized displacement rows), so the study rebuilds standalone
+    driver: { body, position, u: recipe.positions[position], frequencyHz: hz, amplitude, forceSeconds, forcedFrames, ringSeconds, law: 'sample-held sinusoid f_n = A·sin(2π·f·n/sr) for n < forceSeconds·sr, then 0; exact affine zero-order-hold evolution x ← Φx + Γf; a powered driver, not a bow, hand, breath or actuator',
+      units: 'A in newtons applied along the unit strike direction b = φ(u)/√m (mass-normalized velocity rows); pickups and gain as the Rest recipe', budget: { ceilingFraction, admissionCeiling: recipe.admissionCeiling, directionNorm, energyFactorMax: fmax, integralAbsForce: amplitude * integralPerUnitAmplitude, integralMethod: 'exact sum of |f_n|/sr over the forced frames of the declared sample-held sinusoid', predictedOutputBound: predictedBound, statement: '√(2E(t)) ≤ √(2E₀) + ‖b‖∫|f|, E₀ = 0; |out| ≤ outputGain·fmax·√(2E); the amplitude is chosen so this bound is ceilingFraction of the admission ceiling; it is conservative and not perceptual loudness' } },
     cases: [{ id: 'free', contacts: [] }, { id: 'hand-on-driven', contacts: [{ ...contact, body }] }, { id: 'hand-on-neighbor', contacts: [{ ...contact, body: neighbor }] }],
+    intervals: { driverSeconds: [0, forcedFrames / sr], contactSeconds: [0, forcedFrames / sr + ringSeconds], note: 'in the two hand cases the contact remains for the whole study, through the driver-released interval; driver release is not a hand lift' },
     neighbor, interpretation: 'three renders of one identical force history under three contact states; what differs is the instrument, never the source; measurements describe the files and claim nothing about hearing',
   };
 }
@@ -44,31 +49,34 @@ export function renderForcedStudy(study, { traceHz = 60 } = {}) {
   const pans = study.grove.layout.map(({ x }) => [Math.cos((x + 1) * Math.PI / 4) / Math.sqrt(study.grove.bodies.length), Math.sin((x + 1) * Math.PI / 4) / Math.sqrt(study.grove.bodies.length)]);
   // pickupScale is a recipe quantity; recover it from the stored outputGain-independent convention by rebuilding the recipe lazily would cost the matrices,
   // so the study stores pickup vectors explicitly when rendered the first time.
-  const pickups = study.pickupVectors ?? (() => { throw new Error('study.pickupVectors missing: compose with attachPickups(recipe) first.'); })();
+  const pickups = study.pickupVectors; if (!Array.isArray(pickups) || pickups.length !== 2 || pickups.some(v => v.length !== dim)) throw new Error('study.pickupVectors must be the two stereo pickup vectors.');
   const forcedFrames = Math.round(d.forceSeconds * sr), total = forcedFrames + Math.round(d.ringSeconds * sr), results = [];
   const forceAt = i => (i < forcedFrames ? d.amplitude * Math.sin(2 * Math.PI * d.frequencyHz * i / sr) : 0);
   for (const c of study.cases) {
     const contacts = c.contacts.map(k => ({ body: k.body, u: study.zones[k.zone], c: study.strengths[k.strength].c }));
     const st = forcedStepper(system, { contacts, sampleRate: sr, direction }), channels = [new Float32Array(total), new Float32Array(total)];
-    let x = new Float64Array(dim), next = new Float64Array(dim), integral = 0, peak = 0, peakBoundRatio = 0, ratioAfter10ms = 0, ratioAtRelease = 0, maxEnergy = 0, eForced = 0, eRing = 0, lowAtRelease = 0;
-    const traceEvery = Math.max(1, Math.round(sr / traceHz)), trace = { hz: sr / traceEvery, times: [], energy: [], sqrt2E: [], budgetSqrt2E: [], force: [] };
+    let x = new Float64Array(dim), next = new Float64Array(dim), integral = 0, peak = 0, peakBoundRatio = 0, ratioAfter10ms = 0, ratioAtRelease = 0, maxEnergy = 0, eForced = 0, eRing = 0, outputAtRelease = 0;
+    // Trace contract: a point at t = 0 for the initial state, then the post-step state at t = (i+1)/sr every `traceEvery` samples, always including the exact
+    // release boundary t = forcedFrames/sr and the final endpoint t = total/sr. `force` is the force applied over the interval that ends at that time.
+    // `bound` is the state-derived output ceiling outputGain·√(2E)·fmax; `budgetSqrt2E` is the cumulative forcing budget ‖b‖∫|f| (a different quantity).
+    const traceEvery = Math.max(1, Math.round(sr / traceHz)), trace = { hz: sr / traceEvery, times: [0], energy: [0], sqrt2E: [0], bound: [0], budgetSqrt2E: [0], force: [0] };
+    const G = study.outputGain, outputOf = v => { let l = 0, r = 0; for (let k = 0; k < n; k++) { l += pickups[0][k] * v[k]; r += pickups[1][k] * v[k]; } return [G * l, G * r]; };
     for (let i = 0; i < total; i++) {
-      let l = 0, r = 0; for (let k = 0; k < n; k++) { l += pickups[0][k] * x[k]; r += pickups[1][k] * x[k]; }
-      const out0 = study.outputGain * l, out1 = study.outputGain * r; channels[0][i] = out0; channels[1][i] = out1;
+      const [out0, out1] = outputOf(x); channels[0][i] = out0; channels[1][i] = out1;
       const a = Math.max(Math.abs(out0), Math.abs(out1)); peak = Math.max(peak, a); if (i < forcedFrames) eForced += out0 * out0 + out1 * out1; else eRing += out0 * out0 + out1 * out1;
       const f = forceAt(i); st.stepInto(x, f, next); const t = x; x = next; next = t; integral += Math.abs(f) / sr;
       const E = stateEnergy(system, x); maxEnergy = Math.max(maxEnergy, E);
+      if (i + 1 === forcedFrames) { const [r0, r1] = outputOf(x); outputAtRelease = Math.max(Math.abs(r0), Math.abs(r1)); }
       // The budget is tight by construction at the very first forced samples (one zero-order-hold step from rest makes √(2E) = ‖b‖·h·|f| to first order), so the
       // informative ratios are after the first 10 ms and at release; the overall maximum is kept for completeness.
       const bound = study.outputGain * d.budget.energyFactorMax * st.directionNorm * integral; if (bound > 0) { const ratio = Math.sqrt(2 * E) * study.outputGain * d.budget.energyFactorMax / bound; peakBoundRatio = Math.max(peakBoundRatio, ratio); if (i >= 0.01 * sr && i < forcedFrames) ratioAfter10ms = Math.max(ratioAfter10ms, ratio); if (i === forcedFrames - 1) ratioAtRelease = ratio; }
-      if (i === forcedFrames - 1) lowAtRelease = a;
-      if (i % traceEvery === 0) { trace.times.push(i / sr); trace.energy.push(E); trace.sqrt2E.push(Math.sqrt(2 * E)); trace.budgetSqrt2E.push(st.directionNorm * integral); trace.force.push(f); }
+      if ((i + 1) % traceEvery === 0 || i + 1 === forcedFrames || i + 1 === total) { trace.times.push((i + 1) / sr); trace.energy.push(E); trace.sqrt2E.push(Math.sqrt(2 * E)); trace.bound.push(G * d.budget.energyFactorMax * Math.sqrt(2 * E)); trace.budgetSqrt2E.push(st.directionNorm * integral); trace.force.push(f); }
     }
-    results.push({ id: c.id, contacts: c.contacts, observedPeak: peak, predictedOutputBound: d.budget.predictedOutputBound, boundRatioMax: peakBoundRatio, boundRatioAfter10ms: ratioAfter10ms, boundRatioAtRelease: ratioAtRelease, rmsForced: Math.sqrt(eForced / (2 * forcedFrames)), rmsRing: Math.sqrt(eRing / (2 * Math.max(1, total - forcedFrames))), maxEnergy, peakAtRelease: lowAtRelease, trace, pcm: { sampleRate: sr, channels } });
+    results.push({ id: c.id, contacts: c.contacts, observedPeak: peak, predictedOutputBound: d.budget.predictedOutputBound, boundRatioMax: peakBoundRatio, boundRatioAfter10ms: ratioAfter10ms, boundRatioAtRelease: ratioAtRelease, rmsForced: Math.sqrt(eForced / (2 * forcedFrames)), rmsRing: Math.sqrt(eRing / (2 * Math.max(1, total - forcedFrames))), maxEnergy, outputAtRelease, trace, pcm: { sampleRate: sr, channels } });
   }
-  return { frames: total, forcedFrames, releaseFrame: forcedFrames, markers: { forceActive: [0, forcedFrames / sr], released: [forcedFrames / sr, total / sr] }, cases: results };
+  return { frames: total, forcedFrames, releaseFrame: forcedFrames, markers: { forceActive: [0, forcedFrames / sr], released: [forcedFrames / sr, total / sr], contactSeconds: study.intervals.contactSeconds, note: study.intervals.note }, cases: results };
 }
 
-/** Attach the recipe's pickup vectors to a study so renderForcedStudy needs no recipe (they are small, and they define the sound exactly as the Rest route does). */
-export const attachPickups = (study, recipe) => ({ ...study, pickupVectors: recipe.pickupVectors.map(v => v.slice()) });
+/** Kept for callers that had the earlier two-step form; the study now carries its pickup vectors from composition. */
+export const attachPickups = study => study;
 export { REST_STRENGTHS };

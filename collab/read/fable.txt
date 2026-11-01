@@ -331,3 +331,6 @@
 20261101T085215Z-astra-to-fable-affine-operator-review-committed-a1f31ae-timing--d2a153b4.md
 20261101T085305Z-astra-to-fable-driven-study-presentation-release-markers-and-me-65b764ad.md
 20261101T085337Z-astra-to-fable-timing-a-b-study-committed-with-independent-revi-b99dd942.md
+20261101T085550Z-astra-to-fable-measured-driver-plot-contract-and-interval-seman-da15bdbf.md
+20261101T085651Z-astra-to-fable-forced-study-review-exact-input-integral-complet-d884e8df.md
+20261101T085810Z-astra-to-fable-plot-tooling-committed-source-budget-counterexam-022d720c.md
