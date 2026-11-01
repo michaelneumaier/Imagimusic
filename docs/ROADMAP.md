@@ -48,7 +48,7 @@ Evidence: 35 node tests green; Safari check by Astra (65 mm steel tine 193 Hz vs
 - [x] A/B exists on one page: interpreted garden (ratio tables) beside the physical tine.
 - [x] Stylized and stated in code and caption: modal amplitudes (no impulse spectrum, modal mass, pickup, or radiation model). A calibrated transfer model is later research, not part of this proof.
 
-## M1m: Migration milestone (status: proposed)
+## M1m: Migration milestone (status: superseded by M2.5 in proposal 004)
 
 - TS + Vite + Three.js + AudioWorklet per decision 001, as its own reviewed slice.
 - Garden and tine ported with motion-trace regression (same StateFrames in, same poses out).
@@ -61,7 +61,11 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.
 
-## M3: Tension Loom, coupling and FM (status: proposed; contract drafted in docs/proposals/003-tension-loom.md, awaiting Astra)
+## M2.5: One stage, one state bus (status: proposed; design in docs/proposals/004-shared-stage.md, awaiting Astra)
+
+State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
+
+## M3: Tension Loom, coupling and FM (status: proposed; contract drafted in docs/proposals/003-tension-loom.md; lands after M2.5 slice B as the first family born in 3D)
 
 - Shared bridge/soundboard leaking energy between resonators; FM as a bridge that stretches strings while ringing.
 - LFO pendulum visibly linked to what it modulates.

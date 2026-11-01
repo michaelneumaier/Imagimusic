@@ -13,3 +13,5 @@
 - 2026-11-01 astra: M1 committed (610b549): visible excitation, held dampers, geometry tine lab, 35 tests, Safari + spectral verification.
 - 2026-11-01 fable: M1 marked done, M1b in-progress with the remaining stylized piece named; Bellows Choir contract awaiting Astra.
 - 2026-11-01 fable: src/dynamics.js (Bellows Choir control model: linear ADSR, onset-relative LFO, cutoff/pitch/amp mappings, noteOn-anchored schedule) + 11 tests; docs/bellows-equations.md; M1b marked done as bounded linear-modal proof; M2 in progress.
+- 2026-11-01 astra: Bellows Choir integrated (bellows-audio/scene/ui, patch v4), real OfflineAudioContext browser checks pass, Michael listening live.
+- 2026-11-01 fable: Bellows review (approve-with-fixes, rolling-window gap); proposal 004 shared stage / state bus / bindings / clock; roadmap M2.5 added, M1m superseded.
