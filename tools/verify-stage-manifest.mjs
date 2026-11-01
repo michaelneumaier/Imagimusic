@@ -1,4 +1,5 @@
 import {isDeepStrictEqual} from 'node:util';
+import {attachLoomPerformance,validateComposition} from '../src/stage/composition.js';
 import {validatePatch} from '../src/model.js';
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
@@ -15,7 +16,12 @@ export function verifyStageManifest(saved){
  if(saved.fps!==30||saved.sampleRate!==48000)throw new Error('Unsupported export timebase');
  if(!['manual','establish','follow','detail'].includes(saved.camera.mode??'manual'))throw new Error('Unknown camera mode');
  for(const key of ['position','target'])if(!Array.isArray(saved.camera[key])||saved.camera[key].length!==3||!saved.camera[key].every(Number.isFinite))throw new Error(`Invalid camera ${key}`);
- const passage=createPerformance(saved.instrument,saved.sampleRate);
+ let composition;
+ if(saved.composition!==undefined){
+  try{composition=validateComposition(saved.composition);}catch{throw new Error('Composition is not canonical');}
+  if(!isDeepStrictEqual(composition,saved.composition))throw new Error('Composition is not canonical');
+ }
+ const passage=attachLoomPerformance(createPerformance(saved.instrument,saved.sampleRate),composition);
  if(!Number.isFinite(saved.duration)||saved.duration<=0||saved.duration>passage.duration)throw new Error('Invalid export duration');
  const frames=createStageFrames(passage),project=frame=>frames.project(frame,saved.camera);
  const expected=createTraceManifest({...passage,duration:saved.duration},{fps:saved.fps,project});

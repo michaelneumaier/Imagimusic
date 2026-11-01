@@ -26,6 +26,12 @@ export function createRouteOverlay(world) {
     clear();if(!binding)return '';
     const lfo=settings(binding,patch,frame);selection={binding,patch,key:JSON.stringify([lfo.target,lfo.rateHz])};
     const [family,slotText]=binding.target.split('/'),slot=Number(slotText.slice(4));
+    if(family==='loom'){
+      const bodies=world.loom.bodies;
+      bodies.forEach(body=>{outline(body.body);outline(body.striker);link(body.striker,body.body);});
+      outline(world.loom.bridge);link(bodies[0].body,bodies[1].body);
+      return 'Solid: strikes excite two coupled resonators. The bridge shows coupling strength and response, not instantaneous energy flow.';
+    }
     if(family==='bellows'){
       const body=world.choir[slot];
       [body.source,body.chamber,body.horn].forEach(outline);

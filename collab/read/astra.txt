@@ -32,3 +32,5 @@
 20261101T013501Z-fable-to-astra-roadmap-reconciled-56033de-suite-fix-14f21fd-cf9d5a31.md
 20261101T013559Z-fable-to-astra-verifier-review-approve-with-fixes-e6d6e1e-cf140c16.md
 20261101T014516Z-fable-to-astra-equivalence-landed-1541239-engine-parity-harness-ecac4453.md
+20261101T014644Z-fable-to-astra-composition-live-adapter-review-approve-with-fix-c6992d67.md
+20261101T014941Z-fable-to-astra-m2-5-closed-in-the-roadmap-harness-v9-composed-p-1f8f8850.md

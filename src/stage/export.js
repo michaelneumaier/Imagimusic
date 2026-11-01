@@ -1,3 +1,4 @@
+import { attachLoomPerformance, DEFAULT_COMPOSITION } from './composition.js';
 import { createStageFrames } from './frame.js';
 import { createTraceManifest } from './manifest.js';
 import { Output, Mp4OutputFormat, BufferTarget, CanvasSource, AudioBufferSource, Quality, canEncodeVideo, canEncodeAudio } from '../../vendor/mediabunny/mediabunny.mjs';
@@ -10,11 +11,11 @@ import { createWorld } from './world.js';
 import { renderPerformanceAudio } from './render-audio.js';
 
 /** Fixed-time scene sampling; codec bytes may differ between hardware/browser implementations. */
-export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{}, durationLimit=Infinity}={}) {
+export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{}, durationLimit=Infinity, composition=DEFAULT_COMPOSITION}={}) {
   const width=1280,height=720,fps=30,sampleRate=48000;
   if(!await canEncodeVideo('avc',{width,height,frameRate:fps}) || !await canEncodeAudio('aac',{sampleRate,numberOfChannels:1}))
     throw new Error('This browser cannot encode H.264/AAC video. Use a browser with both WebCodecs encoders.');
-  const passage=createPerformance(patch,sampleRate),duration=Math.min(passage.duration,durationLimit);
+  const passage=attachLoomPerformance(createPerformance(patch,sampleRate),composition),duration=Math.min(passage.duration,durationLimit);
   const clock=new FrameClock({fps}),times=clock.times(duration),frames=createStageFrames(passage),bindings=frames.bindings;
   const project=frame=>frames.project(frame,cameraPose);
   let stopped=false;
@@ -45,7 +46,7 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
       video.close();
     })()];
     await Promise.all(tasks);check();onProgress('Finishing the MP4…');await output.finalize();check();
-    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,instrument:patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default and air choir; codec bytes implementation-dependent'}};
+    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,...(passage.composition?{composition:passage.composition}:{}),instrument:patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default and air choir; codec bytes implementation-dependent'}};
   }catch(error){stopped=true;await output.cancel().catch(()=>{});await Promise.allSettled(tasks);throw error;}
   finally{world.dispose();}
 }

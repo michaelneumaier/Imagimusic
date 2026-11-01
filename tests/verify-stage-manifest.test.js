@@ -18,3 +18,16 @@ test('artifact verifier checks camera frames and metadata, including truncated e
  const changed=structuredClone(m);changed.camera.mode='detail';assert.equal(verifyStageManifest(changed).valid,false);
  assert.throws(()=>verifyStageManifest({...m,duration:Infinity}));
 });
+
+test('composed artifact verifies its saved arrangement and rejects omitted or changed Loom settings',async()=>{
+ const {attachLoomPerformance,DEFAULT_COMPOSITION}=await import('../src/stage/composition.js');
+ const {createStageFrames}=await import('../src/stage/frame.js');
+ const composition=structuredClone(DEFAULT_COMPOSITION);composition.loom.enabled=true;
+ const passage=attachLoomPerformance(createPerformance(DEFAULT_PATCH),composition),frames=createStageFrames(passage);
+ const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]},project=frame=>frames.project(frame,camera);
+ const m={...createTraceManifest({...passage,duration:2},{project}),instrument:DEFAULT_PATCH,composition,camera,width:1280,height:720,videoDuration:2,codecs:{video:'avc',audio:'aac'}};
+ assert.equal(verifyStageManifest(m).valid,true);
+ const omitted=structuredClone(m);delete omitted.composition;assert.equal(verifyStageManifest(omitted).valid,false);
+ const changed=structuredClone(m);changed.composition.loom.settings.coupling=.02;assert.equal(verifyStageManifest(changed).valid,false);
+ const malformed=structuredClone(m);malformed.composition.extra=true;assert.throws(()=>verifyStageManifest(malformed),/canonical/);
+});

@@ -12,6 +12,8 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
   world.garden.forEach((body,i)=>{body.root.userData.bindingTarget=`garden/slot${i}`;body.damper.userData.bindingParam='damper';body.layers.forEach((shell,n)=>shell.userData.bindingParam=`mode${n}`);body.striker.userData.bindingParam='striker';});
   world.choir.forEach((body,i)=>{body.root.userData.bindingTarget=`bellows/slot${i}`;body.chamber.userData.bindingParam='aperture';body.bellows.userData.bindingParam='fill';body.horn.userData.bindingParam='level';body.pendulum.userData.bindingParam='swing';body.fastArc.userData.bindingParam='fast';});
   world.tine.root.userData.bindingTarget='tine/slot8';world.tine.damper.userData.bindingParam='damper';world.tine.beam.userData.bindingParam='deflection';world.tine.striker.userData.bindingParam='reach';
+  world.loom.bodies.forEach((body,i)=>{body.body.userData.bindingTarget=`loom/slot${i}`;body.body.userData.bindingParam='width';body.striker.userData.bindingTarget=`loom/slot${i}`;body.striker.userData.bindingParam='striker';});
+  world.loom.bridge.userData.bindingTarget='loom/bridge';world.loom.bridge.userData.bindingParam='opacity';
   function choose(target,param){
     const choices=bindings.filter(b=>b.target===target);if(!choices.length)return;
     select.replaceChildren();for(const binding of choices){const option=document.createElement('option');option.value=binding.id;option.textContent=binding.param;select.append(option);}
