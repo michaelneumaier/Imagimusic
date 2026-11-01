@@ -114,11 +114,19 @@ page change.
 
 Unit strike on body 0 at u = 0.6, attachments and pickups at the tip,
 M = 3 beam partials (decay rates ∝ frequency anchored to the grove loss),
-equal reference force, the same pickup level, pan and gain rule for both
-voices, 48 kHz. `renders/grove-voice-<seed>-m1.wav` and `-m3.wav` for the
+equal reference force, 48 kHz. The pickup level, pan and gain follow the
+same **rules** for both voices (the 0.19 level mapped to the largest modal
+amplitude over all unit strikes and pickups; the gain from the worst unit
+stereo bound over every struck body and channel), which does not make the
+physical pickup gains identical: each voice's `pickupScale` is reported
+(seed 3: 5.22 for M = 1, 11.31 for M = 3; the output gain is 0.45 for both
+because neither bound exceeds 1). The "modal centroid estimate" weights
+normal-mode frequencies by each mode's envelope energy over the first
+0.5 s and ignores cross terms between nearby modes; it is not a PCM
+spectral centroid. `renders/grove-voice-<seed>-m1.wav` and `-m3.wav` for the
 A/B; `renders/grove-voice-report.json` for the numbers.
 
-| Seed | Voice | Normal modes (Hz) | Partials > −40 dB at 50 ms | Centroid (first 0.5 s) | Peak / RMS (first s) | Low-band swells (body: s × ratio) |
+| Seed | Voice | Normal modes (Hz) | Partials > −40 dB at 50 ms | Modal centroid estimate (first 0.5 s) | Peak (full render) / RMS (first s) | Low-band swells (body: s × ratio) |
 | --- | --- | --- | --- | --- | --- | --- |
 | 3 | M = 1 | 128.7 / 131.2 / 132.2 | 3 | 131.6 Hz | 0.0565 / 0.0267 | 1: 0.222 × 0.175; 2: 0.436 × 0.804 |
 | 3 | M = 3 | the same three, + 804 / 819 / 820, + 2251 / 2293 / 2295 | 5 | 157.9 Hz | 0.0613 / 0.0269 | 1: 0.222 × 0.175; 2: 0.438 × 0.804 |
@@ -133,9 +141,9 @@ the relationship readout, the low-band swells, is identical in time and
 ratio; the added partials sit at the beam's 6.3× and 17.5× ratios, two of
 them above −40 dB at 50 ms, and decay 6–18× faster than the fundamentals
 (0.38 s and 0.14 s against 2.4 s for seed 3), so they color the onset and
-leave the ring to the low modes; the centroid rises 10–20% and RMS is
-essentially equal, so the difference is timbre, not loudness; peaks rise
-8–13%. Whether this sounds like a thing with a material is for the
+leave the ring to the low modes; the modal centroid estimate rises 10–20%
+and RMS is essentially equal, so the difference is timbre, not loudness;
+full-render peaks rise 8–13%. Whether this sounds like a thing with a material is for the
 audition; the discarded damping on these voices is ≈ 8e-5 relative.
 
 ## Scope and ownership

@@ -136,3 +136,4 @@
 - 2026-11-01 fable: 015b tools/grove-voice-compare.mjs (M = 1 vs M = 3 beam partials at equal force and conventions; WAVs and report under renders/); proposal 015 carries the measured table (low-band swells identical, centroid +10–20%, RMS equal, partials decay 6–18× faster).
 - 2026-11-01 astra: ODE wording correction (no bound claims); grove replay (listen back to the finished passage). Fable: wording corrected (496546a); replay review approve.
 - 2026-11-01 astra: replay browser-validated at 320×656; building the local A/B surface from the 015b report and WAVs. Fable: test guarding the comparison tool's attachment normalization (M = 1 beam wrapper reproduces groveSystem modes on the curated seeds).
+- 2026-11-01 astra: A/B tool review (gain rule over all bodies, full-render peak, centroid scoped as a modal estimate, per-voice pickupScale). Fable: fixed and regenerated; numbers unchanged; proposal captions corrected.
