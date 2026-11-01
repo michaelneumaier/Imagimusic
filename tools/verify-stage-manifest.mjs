@@ -1,4 +1,5 @@
 import {createScorePerformance} from '../src/stage/score-performance.js';
+import {createImportedPerformance} from '../src/stage/imported-performance.js';
 import {isDeepStrictEqual} from 'node:util';
 import {attachComposition,validateComposition} from '../src/stage/composition.js';
 import {validatePatch} from '../src/model.js';
@@ -22,7 +23,18 @@ export function verifyStageManifest(saved){
   try{composition=validateComposition(saved.composition);}catch{throw new Error('Composition is not canonical');}
   if(!isDeepStrictEqual(composition,saved.composition))throw new Error('Composition is not canonical');
  }
- const passage=saved.score===undefined?attachComposition(createPerformance(saved.instrument,saved.sampleRate),composition):createScorePerformance(saved.instrument,saved.score,composition,saved.sampleRate);
+ if(saved.score!==undefined&&saved.imported!==undefined)throw new Error('Manifest cannot contain both an authored score and imported MIDI.');
+ let passage;
+ if(saved.imported!==undefined){
+  if(saved.importedComposition===undefined)throw new Error('Imported manifest requires the original ensemble selection.');
+  passage=createImportedPerformance(saved.instrument,saved.imported,saved.importedComposition,saved.sampleRate);
+  for(const field of ['imported','importedComposition','composition','mappingReport','childrenDisabledByImport']){
+   if(!isDeepStrictEqual(passage[field],saved[field]))throw new Error(`Imported manifest ${field} does not match its reconstructed mapping.`);
+  }
+ }else{
+  for(const field of ['importedComposition','mappingReport','childrenDisabledByImport'])if(saved[field]!==undefined)throw new Error(`Unexpected ${field} without imported MIDI.`);
+  passage=saved.score===undefined?attachComposition(createPerformance(saved.instrument,saved.sampleRate),composition):createScorePerformance(saved.instrument,saved.score,composition,saved.sampleRate);
+ }
  if(saved.score!==undefined&&(!isDeepStrictEqual(passage.score,saved.score)||!isDeepStrictEqual(passage.patch,saved.instrument)))throw new Error('Score and instrument must be canonical and use the same seed and tempo');
  if(!Number.isFinite(saved.duration)||saved.duration<=0||saved.duration>passage.duration)throw new Error('Invalid export duration');
  const frames=createStageFrames(passage),project=frame=>frames.project(frame,saved.camera);

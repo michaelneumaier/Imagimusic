@@ -1,4 +1,5 @@
 import {createScorePerformance} from './score-performance.js';
+import {createImportedPerformance} from './imported-performance.js';
 import { attachComposition, DEFAULT_COMPOSITION } from './composition.js';
 import { createStageFrames } from './frame.js';
 import { createTraceManifest } from './manifest.js';
@@ -12,11 +13,12 @@ import { createWorld } from './world.js';
 import { renderPerformanceAudio } from './render-audio.js';
 
 /** Fixed-time scene sampling; codec bytes may differ between hardware/browser implementations. */
-export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{}, durationLimit=Infinity, composition=DEFAULT_COMPOSITION,score=null}={}) {
+export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{}, durationLimit=Infinity, composition=DEFAULT_COMPOSITION,score=null,imported=null}={}) {
   const width=1280,height=720,fps=30,sampleRate=48000;
+  if(score!==null&&imported!==null)throw new Error('Choose one source: authored score or imported MIDI.');
   if(!await canEncodeVideo('avc',{width,height,frameRate:fps}) || !await canEncodeAudio('aac',{sampleRate,numberOfChannels:1}))
     throw new Error('This browser cannot encode H.264/AAC video. Use a browser with both WebCodecs encoders.');
-  const passage=score?createScorePerformance(patch,score,composition,sampleRate):attachComposition(createPerformance(patch,sampleRate),composition),duration=Math.min(passage.duration,durationLimit);
+  const passage=imported!==null?createImportedPerformance(patch,imported,composition,sampleRate):score?createScorePerformance(patch,score,composition,sampleRate):attachComposition(createPerformance(patch,sampleRate),composition),duration=Math.min(passage.duration,durationLimit);
   const clock=new FrameClock({fps}),times=clock.times(duration),frames=createStageFrames(passage),bindings=frames.bindings;
   const project=frame=>frames.project(frame,cameraPose);
   let stopped=false;
@@ -47,7 +49,8 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
       video.close();
     })()];
     await Promise.all(tasks);check();onProgress('Finishing the MP4…');await output.finalize();check();
-    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,...(passage.composition?{composition:passage.composition}:{}),...(passage.score?{score:passage.score}:{}),instrument:passage.patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default, air choir, three tested Loom arrangements, and default featured FM with and without Loom; codec bytes implementation-dependent'}};
+    const importedFields=passage.imported?{imported:passage.imported,importedComposition:passage.importedComposition,mappingReport:passage.mappingReport,childrenDisabledByImport:passage.childrenDisabledByImport}:{};
+    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,...(passage.composition?{composition:passage.composition}:{}),...(passage.score?{score:passage.score}:{}),...importedFields,instrument:passage.patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default, air choir, three tested Loom arrangements, and default featured FM with and without Loom; codec bytes implementation-dependent'}};
   }catch(error){stopped=true;await output.cancel().catch(()=>{});await Promise.allSettled(tasks);throw error;}
   finally{world.dispose();}
 }
