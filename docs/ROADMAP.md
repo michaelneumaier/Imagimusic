@@ -137,7 +137,7 @@ Before the first gesture the Grove's first screens show 3 buttons and 3 selects 
 
 ## Proposed next: the second gesture (docs/proposals/020-second-gesture.md)
 
-A: the neighbour strike timed against the beat, measured at up to 8 dB of consequence by timing alone on seeds 7 and 11; audition pairs then listening. B: sustained excitation with an explicit friction force law on the same exact model, as a bounded offline experiment.
+A: the neighbour strike timed against the beat, measured at up to 8 dB of consequence by timing alone on seeds 7 and 11; audition pairs then listening. B: sustained excitation as a bounded offline experiment: a powered sample-held sinusoidal driver on the same exact model (forcedStepper), amplitude from the exact held-force energy budget, three contact cases with one force history; rendered on all three groves and independently audited by Astra (canonical gain and pickups, exact force integral and budget, trace timing, passive decay after release, nine WAV and hash rebuilds); a firm hand on the driven body attenuates by about 52 dB at the pickups; listening pending.
 
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
