@@ -60,3 +60,4 @@
 - 2026-11-01 fable: src/fm.js FM tensioner core (closed-form FM phase, Bessel reference, screening heuristic + measured convergence −122 dB, sample-aligned fade, serializable constant index, ratio floor 0.01, zero-index bandwidth) + 11 tests; proposal 007 rev. 3.
 - 2026-11-01 astra: FM tensioner scene with six declared bindings, Safari-checked.
 - 2026-11-01 astra: FM tensioner study page (tensioner.html) on the validated core via a shared audio render job; Fable review approve.
+- 2026-11-01 fable: FM full-passband residual measurement (equivalent lowpass both rates, matched delay, pipeline floor): −154 dB typical, −87 dB at the screening boundary; recorded in fm.js and proposal 007.

@@ -122,6 +122,51 @@ test('measured convergence: 48 kHz render vs decimated 192 kHz render agree belo
   assert.ok(worstDb < -50, `residual ${worstDb.toFixed(1)} dB exceeds the −50 dB target`);
 });
 
+// Full-passband time-domain residual. Both renders pass through the SAME continuous-time filter (a Blackman-windowed
+// sinc with the same cutoff in Hz and the same window length in seconds, so the linear-phase delay is identical in
+// seconds at both rates); the high-rate output is then decimated by 4 and subtracted from the low-rate output sample
+// by sample. This sees everything inside the passband: folded energy between bins and phase errors alike. The
+// pipeline's own floor (filter mismatch between the two sampled designs) is measured on a pure tone that cannot alias.
+function firLowpass(x, rate, cutoffHz, windowSeconds, stride = 1) {
+  const taps = Math.round(windowSeconds * rate) + 1, mid = (taps - 1) / 2, fcN = cutoffHz / rate, h = new Float64Array(taps); let sum = 0;
+  for (let i = 0; i < taps; i++) { const n = i - mid, sinc = n === 0 ? 2 * fcN : Math.sin(2 * Math.PI * fcN * n) / (Math.PI * n), w = 0.42 - 0.5 * Math.cos(2 * Math.PI * i / (taps - 1)) + 0.08 * Math.cos(4 * Math.PI * i / (taps - 1)); h[i] = sinc * w; sum += h[i]; }
+  for (let i = 0; i < taps; i++) h[i] /= sum;
+  const outputs = Math.ceil(x.length / stride), y = new Float64Array(outputs);          // y[m] = filtered x at n = m·stride
+  for (let m = 0; m < outputs; m++) { const n = m * stride; let acc = 0; const i0 = Math.max(0, mid - n), i1 = Math.min(taps, x.length + mid - n); for (let i = i0; i < i1; i++) acc += h[i] * x[n + i - mid]; y[m] = acc; }
+  return { y, delaySamples: mid };
+}
+function passbandResidualDb(renderAt, loRate, seconds, windowSeconds) {
+  const hiRate = 4 * loRate, cutoff = 0.4 * loRate;
+  const lo = renderAt(loRate).subarray(0, Math.round(seconds * loRate)), hi = renderAt(hiRate).subarray(0, Math.round(seconds * hiRate));
+  const fl = firLowpass(lo, loRate, cutoff, windowSeconds), fh = firLowpass(hi, hiRate, cutoff, windowSeconds, 4);   // hi filtered only where the decimation keeps it
+  assert.equal(fh.delaySamples, 4 * fl.delaySamples, 'equal filter delay in seconds at both rates');
+  const margin = Math.round(0.05 * loRate), end = lo.length - margin;
+  let num = 0, den = 0;
+  for (let n = margin; n < end; n++) { const a = fl.y[n], b = fh.y[n]; num += (a - b) * (a - b); den += a * a; }
+  return 10 * Math.log10(num / den);
+}
+test('full-passband residual: 48 kHz (and 44.1 kHz) renders vs equivalently filtered, decimated 4× renders, reported against the pipeline floor', () => {
+  const cases = [
+    ['default 220 / ratio 2 / index 3', core({ carrierHz: 220, ratio: 2, index: 3, indexDecayS: 0.8, ampDecayS: 1.5 }), 48000, 0.008],
+    ['low fm 220 / ratio 0.01 / index 3', core({ carrierHz: 220, ratio: 0.01, index: 3, indexDecayS: 4, ampDecayS: 1.5 }), 48000, 0.008],
+    ['default at 44.1 kHz', core({ carrierHz: 220, ratio: 2, index: 3, indexDecayS: 0.8, ampDecayS: 1.5 }), 44100, 800 / 44100],   // window × rate must be even so the filter centre is a sample at both rates
+  ];
+  // Largest 0.1-step index that still passes screening at 48 kHz for a high carrier × ratio: a point near the boundary.
+  let boundaryIndex = 0; for (let I = 0.1; I <= 10; I = Math.round((I + 0.1) * 10) / 10) { if (aliasScreening(core({ carrierHz: 1500, ratio: 4, index: I }), 48000).accepted) boundaryIndex = I; else break; }
+  assert.ok(boundaryIndex > 0);
+  cases.push([`near screening boundary 1500 / ratio 4 / index ${boundaryIndex}`, core({ carrierHz: 1500, ratio: 4, index: boundaryIndex, constantIndex: true, ampDecayS: 1.5 }), 48000, 0.008]);
+  const report = {};
+  for (const [name, tn, loRate, windowS] of cases) {
+    const span = 0.6;   // seconds compared; the index is highest at the start, so the hardest part of the note is inside it
+    const floor = passbandResidualDb(rate => { const n = Math.round(span * rate), x = new Float32Array(n); for (let i = 0; i < n; i++) x[i] = 0.2 * Math.sin(2 * Math.PI * 1000 * i / rate); return x; }, loRate, span, windowS);
+    const residual = passbandResidualDb(rate => renderTensioner(tn, rate), loRate, span, windowS);
+    report[name] = { residualDb: Number(residual.toFixed(1)), pipelineFloorDb: Number(floor.toFixed(1)) };
+    // Target, stated honestly: within 6 dB of the pipeline's own floor, or below −50 dB absolute.
+    assert.ok(residual < -50 || residual < floor + 6, `${name}: residual ${residual.toFixed(1)} dB vs floor ${floor.toFixed(1)} dB`);
+  }
+  console.log('fm full-passband residuals (dB, RMS re signal, 1 s, after equivalent lowpass at 0.4·rate):', JSON.stringify(report));
+});
+
 test('fade and finite end: sample-aligned end, last sample exactly zero, Float32 render equals fround(sample)', () => {
   const tn = core({ ampDecayS: 0.3 }), sr = 48000, { samples, endS } = tensionerEnd(tn, sr);
   const x = renderTensioner(tn, sr);

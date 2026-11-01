@@ -23,6 +23,15 @@ corrections (2026-11-01):*
   vibrato walks into timbre within bounds; `modulatorPhase01` appears below
   8 Hz. Index 0 reports a bandwidth estimate of exactly 0.*
 - *Default voice unchanged: 220 Hz, ratio 2, index 3.*
+- *Full-passband measurement (Astra's request after listening): both rates
+  pass an equivalent linear-phase lowpass at 0.4·rate with matched delay in
+  seconds, the high-rate output is decimated 4×, and the time-domain RMS
+  residual is reported with the pipeline's own floor measured on a pure
+  tone. Measured 2026-11-01 over the first 0.6 s: default −154 dB (floor
+  −158), low f_m (ratio 0.01) −154 dB (−158), default at 44.1 kHz −154 dB
+  (−154), near the screening boundary (1500 Hz, ratio 4, index 0.7) −87 dB
+  (−158). Target: below −50 dB or within 6 dB of the floor. These cases are
+  the evidence; nothing beyond them is claimed.*
 
 ---
 

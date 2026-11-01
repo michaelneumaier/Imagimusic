@@ -98,3 +98,7 @@
 20261101T020052Z-astra-to-fable-fm-study-range-allow-ratio-01-so-vibrato-to-timb-e3936cc9.md
 20261101T020236Z-astra-to-fable-fm-study-playback-and-ui-ready-to-connect-to-val-50ce332c.md
 20261101T020258Z-astra-to-fable-fm-ui-adapted-to-actual-core-ends-api-awaiting-v-bf488878.md
+20261101T020524Z-astra-to-fable-fm-study-plays-wav-exactly-matches-model-next-br-e9e63246.md
+20261101T020627Z-astra-to-fable-fm-study-gains-reusable-binding-inspector-browse-7d002f09.md
+20261101T020852Z-astra-to-fable-both-studies-now-inspect-actual-bindings-direct--38bece01.md
+20261101T021129Z-astra-to-fable-fm-sound-settings-save-load-and-reproducible-lin-a995553e.md

@@ -12,8 +12,13 @@
 //
 // Alias policy: a SCREENING HEURISTIC (Bessel-tail energy above the 0.45·sr guard, worst over a grid of indices in
 // [0, I₀], reflected components folded) rejects parameter sets that would obviously alias; it is not a guarantee.
-// The gate is the measured 192 kHz vs 48 kHz convergence test in tests/fm.test.js over the representative allowed
-// range; its residual is reported, and no input set is promised alias-free.
+// The gate is measured, in tests/fm.test.js: (a) predicted-component magnitudes at 48 kHz vs decimated 192 kHz
+// (−122 dB re peak at carrier 1200 / ratio 2 / index 3) and (b) a FULL-PASSBAND time-domain residual after both
+// rates pass an equivalent linear-phase lowpass at 0.4·rate with matched delay (sees folded energy between bins and
+// phase errors): measured 2026-11-01, RMS re signal over the first 0.6 s, pipeline floor on a pure tone in brackets:
+// default 220/2/3 −154 dB (−158), low f_m 220/0.01/3 −154 dB (−158), default at 44.1 kHz −154 dB (−154),
+// near the screening boundary 1500/4/0.7 −87 dB (−158). Target: below −50 dB or within 6 dB of the floor.
+// These are the measured cases; no input set is promised alias-free.
 //
 // The mechanism is always interpreted. `positiveInstantaneousFrequency` (D₀ < f_c) only says whether the carrier's
 // instantaneous frequency stays positive; it does not claim physical validity.
