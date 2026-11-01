@@ -145,3 +145,4 @@
 - 2026-11-01 astra: optional richer-voice page integrated (voice selector, worker branch, position pads and shell zones, captions). Fable review approve-with-fixes: the strike-position orientation (tip = tendril end, low) must be decided and stated.
 - 2026-11-01 astra: shared-basis voice bank renderer (12.1 s → 2.6 s, bank bytes identical, analytic check at 1e-8); browser worker parity harness created. Fable: renderer review approve (addendum).
 - 2026-11-01 astra: strike-position orientation resolved toward the lower bridge (positionU increases downward; labels Upper/Middle/Bridge tip). Fable: verified; page review approve.
+- 2026-11-01 astra: optional playable partials shipped (3c06f56), 311/311, six-case worker parity, captures byte-identical. Fable: roadmap M6.5 shipped; position-aware greeting next.

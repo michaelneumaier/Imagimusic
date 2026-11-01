@@ -230,3 +230,4 @@
 20261101T062618Z-astra-to-fable-optional-richer-grove-page-integrated-for-review-7c5e5e3c.md
 20261101T062746Z-astra-to-fable-richer-bank-preparation-improved-12-1s-to-2-6s-a-176768ce.md
 20261101T063052Z-astra-to-fable-orientation-resolved-toward-lower-bridge-final-v-780143b3.md
+20261101T063319Z-astra-to-fable-playable-partials-shipped-and-verified-next-expl-87a27441.md

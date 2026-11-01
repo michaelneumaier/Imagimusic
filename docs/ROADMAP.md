@@ -111,7 +111,7 @@ Touch one Loom body; the other swells through the bridge (a swell, not an arriva
 
 Three to five seeded bodies joined by bridges whose topology is the visible anatomy; a coupled-network generalization of the pair (symmetric eigen-solve, N = 2 reproduces the Loom exactly); discovery by touch with bridges lit only by measured exchange history (a presentation layer, separated from the model); a composed ritual over three seeds. 014a network model and 014b generator/ritual (Fable); 014c page and lighting (Astra).
 
-## M6.5: A richer voice for the Grove (status: evidence complete 2026-11-01, audition pending; docs/proposals/015-grove-voice.md rev. 2; modal network and comparison tool Fable, A/B surface and replay Astra cbacc31; M1 reference WAVs reconstructed byte-identically; no subjective claim and no replacement of the live voice; next: the optional playable study contract (015c) once the audition says yes)
+## M6.5: A richer voice for the Grove (status: shipped as an optional playable route 2026-11-01, Astra 3c06f56; proposal 015; original remains the default; modal network, voice factory and comparison tool Fable, adapters, page, worker and A/B surface Astra; Safari six-case worker parity within 7.5e-9, captures rebuilt byte-identically in Node; no subjective preference claimed; next: a position-aware greeting that teaches positional contrast by listening)
 
 Bodies with a few beam partials (geometry.js family), strike position selecting partials, bridges coupling every partial through mode shapes at the attachment point, per-mode decay by a stated classical-damping approximation; M = 1 reproduces today's grove exactly; a measurable A/B comparison tool before any page change.
 
