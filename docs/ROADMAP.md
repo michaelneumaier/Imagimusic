@@ -11,7 +11,7 @@ values: `proposed | agreed | in-progress | review | done`.*
 - [x] Decision 001 (stack) agreed
 - [x] Astra: README, 7 node tests, Safari verification of M0.5 (UI, sequence, keys, materials, seed, WAV/JSON/PNG export)
 - [x] Astra reviewed foundation: `collab/reviews/20261101-astra-reviews-foundation.md`
-- [ ] First commits (separate paths, `[astra]` / `[fable]` prefixes)
+- [x] First commits: Astra `0726745`, Fable `1f54f24` (separate owned paths).
 
 M0 is closed as an implemented, reviewed study. Perceptual listening quality is
 unassessed; Michael's ears are welcome feedback, not a blocking task.
@@ -22,7 +22,7 @@ The resonator garden: dependency-free Canvas + Web Audio, 3 materials, seeded
 score, save/load, PNG, WAV worker, node tests. **Preserved as-is**; it is the
 kernel later milestones extend, not a scaffold to replace.
 - [x] Should-fix 1–3 from the v0 review: 60 ms shared fade on voice retirement, one gain + one pan per voice, cap 48, letter keys work after button focus, empty-modes guard. Picture uses the same retirement factor as audio.
-- [ ] Caption: label the sway as stylized envelope display; label mode = "interpreted" (carry into M1)
+- [x] Caption identifies interpreted modes and amplified envelopes; source and README identify stylized sway.
 
 ## M1: Visible excitation + a geometry-linked tine (status: agreed, next; owners: Astra `src/**` excitation/damper/UI, Fable `src/geometry.js` + `tests/geometry.test.js`)
 
