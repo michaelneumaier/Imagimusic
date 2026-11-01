@@ -148,7 +148,9 @@ the picture but never falsifies timing or replaces the mechanism. A change
 to physical coupling is model work, not presentation. Nothing here claims to
 induce a state, measure consciousness, reproduce a drug experience, or map
 frequencies to consciousness. Evidence for this direction is listening:
-auditions record what listeners say, and never score it.
+auditions record what listeners say about meaning and feeling as quotes,
+never as a score of an inner state. Ordinary usability is measured as
+usual (can a newcomer start playback, return to a chosen phrase).
 
 ## Non-goals for now
 
