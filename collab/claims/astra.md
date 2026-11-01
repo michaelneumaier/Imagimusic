@@ -11,3 +11,5 @@ Lab state migration: src/snapshots.js, tests/snapshots.test.js and owned lab ren
 Inspector route overlay: src/stage/route-overlay.js and inspector integration, stage.html.
 
 Procedural camera direction: src/stage/director.js, layout.js, world/projection/main/export integration, tests/director.test.js.
+
+Keeper scene foundation: src/stage/keeper-rig.js, tests/keeper-rig.test.js. Pure two-link articulation, endpoint-preserving reach checks; planner remains Fable-owned.
