@@ -27,3 +27,40 @@ test('camera direction participates in export hashes and declared bindings',()=>
  assert.equal(compareManifests(a,createTraceManifest(passage,{project:project('establish')})).equal,false);
  const binding=stageBindings({camera:true}).find(b=>b.target==='camera');assert.equal(binding.field,'stage.camera');
 });
+
+test('legacy follow poses retain their pre-cadence digest at 240 timestamps',async()=>{
+ const {createHash}=await import('node:crypto');
+ const p=createPerformance(DEFAULT_PATCH),d=createDirector(p);
+ const poses=Array.from({length:240},(_,i)=>d(i*p.duration/239,'follow'));
+ assert.equal(createHash('sha256').update(JSON.stringify(poses)).digest('hex'),'9882bd8f58fabcea4cef6dc34e7b2d5820e21e880f0df84c1f2b89e65d0cf46b');
+});
+
+test('conversation camera stays smooth, seek-independent, and widens the opening and release',async t=>{
+ const {composeConversation,beatSeconds}=await import('../src/score/conversation.js');
+ const {createScorePerformance}=await import('../src/stage/score-performance.js');
+ const {DEFAULT_COMPOSITION}=await import('../src/stage/composition.js');
+ const {DEFAULT_TENSIONER}=await import('../src/fm.js');
+ const composition={...DEFAULT_COMPOSITION,version:2,loom:{...DEFAULT_COMPOSITION.loom,enabled:true},fm:{enabled:true,settings:DEFAULT_TENSIONER}};
+ for(const character of ['calm','bright','restless']){
+  const score=composeConversation({character}),p=createScorePerformance(DEFAULT_PATCH,score,composition),direct=createDirector(p);
+  let last,maxStep=0,maxRadius=0;
+  const spans=[[],[],[]];
+  for(let time=0;time<=p.duration;time+=1/240){
+   const pose=direct(time,'follow');assert.ok([...pose.position,...pose.target].every(Number.isFinite));
+   if(last)maxStep=Math.max(maxStep,Math.hypot(...pose.position.map((v,i)=>v-last.position[i])),Math.hypot(...pose.target.map((v,i)=>v-last.target[i])));
+   maxRadius=Math.max(maxRadius,Math.hypot(...pose.position));last=pose;
+   const distance=Math.hypot(...pose.position.map((v,i)=>v-pose.target[i]));
+   if(time<beatSeconds(score,16))spans[0].push(distance);
+   else if(time<beatSeconds(score,48))spans[1].push(distance);
+   else if(time>=beatSeconds(score,64)-4&&time<beatSeconds(score,64))spans[2].push(distance);
+  }
+  assert.ok(maxStep<.05,`max step ${maxStep}`);assert.ok(maxRadius<20,`radius ${maxRadius}`);
+  const means=spans.map(values=>values.reduce((a,b)=>a+b)/values.length);
+  assert.ok(means[0]>means[1]+1);assert.ok(means[2]>means[1]+2);
+  for(const beat of [0,16,32,48,64]){
+   const time=beatSeconds(score,beat),expected=direct(time,'follow');direct(p.duration,'follow');direct(0,'follow');assert.deepEqual(direct(time,'follow'),expected);
+   const before=direct(time-1e-7,'follow'),after=direct(time+1e-7,'follow');assert.ok(Math.hypot(...after.position.map((v,i)=>v-before.position[i]))<1e-5);
+  }
+  t.diagnostic(JSON.stringify({character,maxStep,maxRadius,meanDistances:means}));
+ }
+});
