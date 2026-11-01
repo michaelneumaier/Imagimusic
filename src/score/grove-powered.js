@@ -142,26 +142,49 @@ export function poweredRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
 }
 
 // ---- after the encounter (proposal 021): what was just done, and the same touch on another grove ----
-/** One sentence of fact from a powered record: when the hands rested, where, and when the source stopped; no claim about the listener. */
-export function poweredSettledLine(record, recipe) {
+/** One sentence of fact from a powered record: when the hands rested, where, and when the source stopped; no claim about the listener. At most
+ *  `maxContacts` intervals are spelled out (a record may hold 256); the rest are counted. The page shows the next invitation, not this line. */
+export function poweredSettledLine(record, recipe, { maxContacts = 4 } = {}) {
   validatePoweredRecord(record, recipe);
   const sr = recipe.sampleRate, d = record.driver, zoneName = z => (recipe.zones[z] === 1 ? 'the bridge tip' : recipe.zones[z] === 0.3 ? 'the upper zone' : `u = ${recipe.zones[z]}`), t = f => (f / sr).toFixed(1) + ' s';
   // A capture stores the actual forced frames; when Quiet fell at the source's end there was no release interval, so the source was stopped by Quiet.
   const source = d.forcedFrames === 0 ? 'The source never ran.' : `The source ran for ${t(d.forcedFrames)}${record.ended && record.ended.frame === d.startFrame + d.forcedFrames ? ' (stopped by Quiet)' : ''}.`;
-  const hands = record.contacts.length ? record.contacts.map(c => `a hand at ${zoneName(c.zone)} from ${t(c.start)} to ${t(c.end)}`).join(', ') : 'no hand rested on the body';
+  const spelled = record.contacts.slice(0, maxContacts).map(c => `a hand at ${zoneName(c.zone)} from ${t(c.start)} to ${t(c.end)}`), more = record.contacts.length - spelled.length;
+  const hands = record.contacts.length ? spelled.join(', ') + (more > 0 ? ` and ${more} more` : '') : 'no hand rested on the body';
   return `${source} ${hands.charAt(0).toUpperCase() + hands.slice(1)}; the rest was the instrument answering.`;
 }
 
-/** The same touch on another grove: identical contact timing and positions, with the target grove's own declared source (its amplitude comes from its
- *  own budget, so levels differ by grove and are stated); the source is never transplanted as a force in newtons across instruments. */
-export function transposePoweredRecord(record, sourceRecipe, targetRecipe) {
+/** The same touch on another grove (proposal 021; a model experiment, no UI): identical contact timing and positions on another curated grove,
+ *  with the target grove's OWN ordinary encounter source: its tuning, and the amplitude of its standard planned drive (plannedForcedFrames, the
+ *  encounter's 2 s by default), truncated at the same early Quiet exactly as the source record was, so a short record is never louder than the
+ *  target's ordinary encounter. Records with strikes are refused rather than silently stripped: the first encounter has none. A force in newtons
+ *  is never transplanted between instruments of different mass and gain. Reviewed with Astra so far: the planned-level correction only; general
+ *  transposition semantics remain a proposal until a real listening need justifies a surface. */
+export function transposePoweredRecord(record, sourceRecipe, targetRecipe, { plannedForcedFrames = 2 * sourceRecipe.sampleRate } = {}) {
   validatePoweredAdmission(record, sourceRecipe);
+  if (record.events.length) throw new Error('records with strikes are not transposed (the first encounter has none); nothing is dropped silently.');
   if (targetRecipe.sampleRate !== sourceRecipe.sampleRate || targetRecipe.bodies !== sourceRecipe.bodies) throw new Error('target recipe must match the source in sample rate and body count.');
   const stable = v => JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, x[k]])) : x);
   if (stable(targetRecipe.positions) !== stable(sourceRecipe.positions) || stable(targetRecipe.zones) !== stable(sourceRecipe.zones) || stable(targetRecipe.strengths) !== stable(sourceRecipe.strengths) || stable(targetRecipe.voice) !== stable(sourceRecipe.voice) || targetRecipe.driver.body !== sourceRecipe.driver.body || targetRecipe.driver.position !== sourceRecipe.driver.position) throw new Error('target recipe must use the same positions, zones, strengths, voice and driver direction as the source; no remapping is defined.');
-  const d = record.driver, frequencyHz = targetRecipe.grove.bodies[d.body].hz, rotation = forceRotation(frequencyHz, targetRecipe.sampleRate), amplitude = d.forcedFrames > 0 ? poweredAmplitudeLimit(targetRecipe, { frequencyHz, forcedFrames: d.forcedFrames, rotation }) : 0;
-  const out = { ...structuredClone(record), grove: targetRecipe.grove, voice: targetRecipe.voice, outputGain: targetRecipe.outputGain, zones: targetRecipe.zones.slice(), strengths: targetRecipe.strengths.map(st => ({ name: st.name, c: st.c })), events: [],
-    driver: { ...d, frequencyHz, rotation, amplitude: Number.isFinite(amplitude) ? amplitude : 0 } };
+  const d = record.driver;
+  if (!Number.isSafeInteger(plannedForcedFrames) || plannedForcedFrames < d.forcedFrames) throw new Error('plannedForcedFrames must be an integer at least the record\'s actual forced frames.');
+  const frequencyHz = targetRecipe.grove.bodies[d.body].hz, rotation = forceRotation(frequencyHz, targetRecipe.sampleRate);
+  // The target's ordinary source level: its budget over the PLANNED drive; the actual (possibly truncated) forcedFrames of the record are kept.
+  const amplitude = poweredAmplitudeLimit(targetRecipe, { frequencyHz, forcedFrames: plannedForcedFrames, rotation });
+  if (!Number.isFinite(amplitude)) throw new Error('the planned drive integrates to zero on the target.');
+  const out = { ...structuredClone(record), grove: targetRecipe.grove, voice: targetRecipe.voice, outputGain: targetRecipe.outputGain, zones: targetRecipe.zones.slice(), strengths: targetRecipe.strengths.map(st => ({ name: st.name, c: st.c })),
+    driver: { ...d, frequencyHz, rotation, amplitude } };
   validatePoweredAdmission(out, targetRecipe);
-  return { record: out, note: `the same hands at the same moments on Grove ${targetRecipe.grove.seed}; its source runs at that grove's own tuning (${frequencyHz.toFixed(1)} Hz) and declared level, so levels differ by grove` };
+  return { record: out, plannedForcedFrames, note: `the same hands at the same moments on Grove ${targetRecipe.grove.seed}; its source is that grove's ordinary encounter source (${frequencyHz.toFixed(1)} Hz at its own declared level for a ${(plannedForcedFrames / targetRecipe.sampleRate).toFixed(1)} s drive), truncated at the same Quiet as the original; levels differ by grove` };
+}
+
+/** The immediate next-gesture invitation, from the acknowledged record only: one line that names the one meaningful change not yet tried. */
+export function poweredNextInvitation(record, recipe) {
+  validatePoweredRecord(record, recipe);
+  const zonesUsed = new Set(record.contacts.map(c => recipe.zones[c.zone])), upper = zonesUsed.has(0.3), tip = zonesUsed.has(1);
+  if (record.driver.forcedFrames === 0) return 'Begin again, and let the source run before you decide anything.';
+  if (!upper && !tip) return 'Next time, rest a hand on the first body while the source runs, and lift when you want to hear what remains.';
+  if (upper && !tip) return 'Next time, rest the hand at the bridge tip instead and listen for what changes.';
+  if (tip && !upper) return 'Next time, rest the hand at the upper zone instead and listen for what changes.';
+  return 'You have tried both places. Next time, move the hand from one to the other while the source runs, or lift earlier.';
 }

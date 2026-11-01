@@ -120,7 +120,15 @@ test('after the encounter: a settled line of facts, and the same touch on anothe
   const a = mk(3), b = mk(7), rec = composeEncounterRecord(a, { contacts: [{ body: 0, zone: 0, strength: 0, start: 1600, end: 6400 }, { body: 0, zone: 1, strength: 0, start: 6480, end: 12000 }] });
   const line = poweredSettledLine(rec, a); assert.match(line, /source ran for 2\.0 s/); assert.match(line, /upper zone from 0\.2 s to 0\.8 s/); assert.match(line, /bridge tip from 0\.8 s to 1\.5 s/); assert.ok(!/feel|calm|should/i.test(line));
   const early = { ...rec, driver: { ...rec.driver, forcedFrames: 4000 }, contacts: [], ended: { frame: 4000, fadeFrames: rec.ended.fadeFrames } }; assert.match(poweredSettledLine(early, a), /stopped by Quiet/); assert.match(poweredSettledLine(early, a), /no hand rested/i);
-  const t = transposePoweredRecord(rec, a, b); assert.equal(t.record.grove.seed, 7); assert.deepEqual(t.record.contacts, rec.contacts); assert.notEqual(t.record.driver.amplitude, rec.driver.amplitude); assert.match(t.note, /own tuning/);
+  const t = transposePoweredRecord(rec, a, b); assert.equal(t.record.grove.seed, 7); assert.deepEqual(t.record.contacts, rec.contacts); assert.notEqual(t.record.driver.amplitude, rec.driver.amplitude); assert.match(t.note, /ordinary encounter source/);
+  // An early-Quiet record keeps the target's ORDINARY source level (planned 2 s budget), never a louder one from its shortened forced frames.
+  const earlyRec = { ...rec, driver: { ...rec.driver, forcedFrames: 4000 }, contacts: [], ended: { frame: 4000, fadeFrames: rec.ended.fadeFrames } }, te = transposePoweredRecord(earlyRec, a, b), tb = composeEncounterRecord(b);
+  assert.ok(Math.abs(te.record.driver.amplitude - tb.driver.amplitude) < 1e-12 * tb.driver.amplitude, 'the target amplitude equals its ordinary encounter amplitude'); assert.equal(te.record.driver.forcedFrames, 4000, 'truncated at the same Quiet');
+  const withStrike = { ...rec, events: [{ frame: 0, order: 9, body: 1, position: 1, velocity: 0.2 }] }; assert.throws(() => transposePoweredRecord(withStrike, a, b), /records with strikes are not transposed/);
+  const { poweredNextInvitation } = await import('../src/score/grove-powered.js');
+  assert.match(poweredNextInvitation(rec, a), /tried both places/); assert.match(poweredNextInvitation(earlyRec, a), /rest a hand on the first body/);
+  assert.match(poweredNextInvitation({ ...rec, contacts: [rec.contacts[0]] }, a), /bridge tip instead/); assert.match(poweredNextInvitation({ ...rec, contacts: [{ ...rec.contacts[1], order: 0 }] }, a), /upper zone instead/);
+  assert.match(poweredNextInvitation({ ...earlyRec, driver: { ...earlyRec.driver, forcedFrames: 0 }, ended: { frame: 0, fadeFrames: 200 } }, a), /let the source run/);
   assert.equal(t.record.driver.frequencyHz, b.grove.bodies[0].hz); const pcm = renderPoweredRecord(t.record, b); assert.equal(pcm.channels[0].length, rec.ended.frame + rec.ended.fadeFrames);
   const other = createPoweredRecipe(createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 0.6], strengths: { c1: 1 } })); assert.throws(() => transposePoweredRecord(rec, a, other), /same positions, zones/);
 });
