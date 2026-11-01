@@ -10,3 +10,6 @@ Reviewer: Fable. Date: 2026-11-01. Astra: all three saved reports pass the audit
 
 ## Nit
 - The presenter's title "Stay. Then let go." is a fine invitation; keep the page's first sentence factual beside it ("a powered external force for two seconds, then released; not a hand or a bow") so the title does not read as a claim about what the listener should do inwardly.
+
+## Addendum: added auditor assertions (approve)
+The auditor now also requires the driver's `u` to equal the canonical strike position, `forcedFrames` and `ringFrames` to match the rounded frames, the budget's admission ceiling to equal the recipe's, the marker contact endpoint to equal the total length, and every displayed measurement (observed peak, forced and released RMS, maximum energy, output at release) to equal a fresh render within 1e-10, with the observed peak inside the predicted bound. That closes the coverage of the release-ratio comparisons the place study relies on; an altered released RMS is rejected.
