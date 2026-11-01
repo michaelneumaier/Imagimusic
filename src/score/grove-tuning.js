@@ -2,13 +2,16 @@
 // A Grove's identity is its cents pattern, masses, couplings (fractions of each source body's own stiffness), loss, topology and layout; its
 // cluster base is one of the garden notes. Transposing moves the base and recomputes every body's hz from the SAME cents, so the physical
 // recipe is rebuilt at the new pitch: every bridge stiffness kc = coupling · m · (2πf)² scales with the frequency ratio squared, every modal
-// frequency scales by the ratio, and the loss (decay rates in 1/s) is unchanged, so decay times in seconds stay the same while Q scales with
+// frequency scales by the ratio (to the same rounding), and the loss (decay rates in 1/s) is unchanged, so decay times in seconds stay the same while Q scales with
 // frequency. This is not playback-rate transposition. Nothing here claims what the result sounds like.
 import { validateGrove, canonicalGrove } from './grove.js';
+import { NOTES, frequency } from '../model.js';
 
-/** The garden's lower five notes, as composeGrove draws them: C3, E♭3, G3, B♭3, C4. validateGrove accepts no other cluster base. */
-export const GARDEN_NOTES = Object.freeze([48, 51, 55, 58, 60]);
-export const noteFrequency = midi => 440 * 2 ** ((midi - 69) / 12);
+/** This helper's scope: the garden's lower five notes, the ones composeGrove draws a cluster base from (C3, E♭3, G3, B♭3, C4). validateGrove
+ *  itself accepts any of the garden's NOTES; the restriction here keeps an ensemble within the generator's own range. Frequencies come from the
+ *  same model table validateGrove checks against. */
+export const GARDEN_NOTES = Object.freeze(NOTES.slice(0, 5));
+export const noteFrequency = frequency;
 const round = (v, places) => Number(v.toFixed(places));
 
 /** The frequency ratio of a transposition between two garden notes. */

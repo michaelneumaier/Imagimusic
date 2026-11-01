@@ -19,3 +19,9 @@
 - src/score/forced-study.js, tests/forced-study.test.js: powered-driver study (Fable).
 - tools/render-forced-study.mjs: powered-driver study renderer (Fable).
 - tools/render-place-study.mjs: contact place comparison under the driver (Fable).
+- src/score/grove-powered.js, tests/grove-powered.test.js: powered encounter recipe and record (Fable, 2026-11-01).
+- src/score/grove-pulse.js, tests/grove-pulse.test.js: open phrase score, proposal 023 (Fable, 2026-11-01).
+- tools/measure-open-phrase-residual.mjs: residual ring at the open phrase hand-off (Fable, 2026-11-01).
+- src/score/grove-tuning.js, tests/grove-tuning.test.js: whole-cluster retuning helper (Fable, 2026-11-01).
+- src/score/grove-ensemble.js, tests/grove-ensemble.test.js: three-part ensemble phrase (Fable, 2026-11-01).
+- tools/grove-voice-compare.mjs, docs/proposals/016–023 (Fable).
