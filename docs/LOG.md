@@ -305,3 +305,4 @@
 - 2026-11-01 astra: readiness UI verified natively with a controlled missing page (check exit 1, labels, restore, exit 0); readiness-vs-freshness note added. Fable: UI review confirmed, approve stands; HEAD-405 fallback remains an optional nit.
 - 2026-11-01 astra: catalog restart resilience committed (ae52ba3); checkpoint closed. Fable: roadmap M14 updated.
 - 2026-11-01 astra: lab index brand link now points to project.html with an aria-label; nothing else changed. Fable: approve.
+- 2026-11-01 astra: lab brand return link verified and committed (5b31165).
