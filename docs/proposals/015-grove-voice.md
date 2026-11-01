@@ -49,13 +49,12 @@ reports what it discards, `‖offdiag(V D Vᵀ)‖_F / ‖D‖_F`. Evidence
 (tests/modal-network.test.js, a representative three-body voice with
 three partials each, struck at u = 0.6): discarded damping 7.9e-5
 relative; against a direct RK4 integration of `M q̈ + C q̇ + K q = 0` with
-`C = diag(2 m γ)` over 0.6 s the closed form's discrepancy is 8.0e-5 at
-h = 1/192000 and 5.0e-6 at h = 1/384000, falling ≈16× per halving, so the
-integrator's own error dominates and the approximation error on this case
-is below the finest-step discrepancy (≈ 5e-6 of peak displacement); the
-reference-to-reference difference bounds the numerical error. This is a
-discrepancy at a finite step, not a measured approximation error (Astra's
-refinement). The undamped eigenproblem is exact.
+`C = diag(2 m γ)` over 0.6 s the observed discrepancy is 8.0e-5 at h = 1/192000 and 5.0e-6
+at h = 1/384000, falling ≈16× per halving as RK4's own convergence
+predicts: evidence that the integrator dominates what is observed, not a
+rigorous bound on the approximation error (errors can cancel; Astra's
+correction). The thresholds in the test are empirical checks. The
+undamped eigenproblem is exact.
 
 ## What stays intimate
 

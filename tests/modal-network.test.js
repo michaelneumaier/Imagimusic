@@ -79,8 +79,9 @@ test('damping approximation evidence: discarded off-diagonal damping is reported
   const sys = modalNetwork({ bodies, edges });
   assert.ok(Number.isFinite(sys.dampingResidual) && sys.dampingResidual >= 0 && sys.dampingResidual < 1, `discarded off-diagonal damping, relative Frobenius: ${sys.dampingResidual}`);
   // Direct integration of M q̈ + C q̇ + K q = 0 with C = diag(2 m_k γ_k) (the pair's 2γM convention per partial), RK4, from the strike's
-  // initial velocity. Run at two step sizes: the discrepancy to the closed form falls ~16× per halving (RK4's own error dominates), so the
-  // finest-step discrepancy is an upper bound on the approximation error, and the two-step difference bounds the numerical error.
+  // initial velocity. Run at two step sizes and REPORT the observed discrepancy and its refinement trend (≈16× per halving is RK4's own
+  // convergence); this is evidence that the integrator dominates the discrepancy, not a rigorous bound on the approximation error
+  // (errors can cancel). The thresholds below are empirical checks, not proofs.
   const strike = sys.strike(0, 0.6, 0.01), n = sys.n, rates = bodies.flatMap(b => b.decayRates);
   const acc = (q, v) => q.map((_, k) => { let kq = 0; for (let l = 0; l < n; l++) kq += sys.K[k][l] * q[l]; return -(2 * rates[k] * v[k]) - kq / sys.m[k]; });
   const integrate = (h, T, sampleEvery) => {
@@ -98,7 +99,7 @@ test('damping approximation evidence: discarded off-diagonal damping is reported
   const T = 0.6, coarse = integrate(1 / 192000, T, 96), fine = integrate(1 / 384000, T, 192);   // both sampled every 0.5 ms
   let numerical = 0; for (let i = 0; i < fine.samples.length; i++) for (let k = 0; k < n; k++) numerical = Math.max(numerical, Math.abs(fine.samples[i][k] - coarse.samples[i][k]));
   numerical /= fine.scale;
-  console.log(`closed form vs direct damped RK4 (0.6 s, 9 coordinates): discrepancy at h = 1/192000: ${coarse.relative.toExponential(3)}; at h = 1/384000: ${fine.relative.toExponential(3)}; reference-to-reference difference ${numerical.toExponential(3)} (RK4 error dominates; approximation error ≤ finest discrepancy); discarded off-diagonal damping ${sys.dampingResidual.toExponential(3)} relative`);
-  assert.ok(coarse.relative / fine.relative > 8, 'halving the step reduces the discrepancy by about 16×: the integrator, not the approximation, dominates');
-  assert.ok(fine.relative < 1e-4, `finest-step discrepancy bounds the approximation error (got ${fine.relative})`);
+  console.log(`closed form vs direct damped RK4 (0.6 s, 9 coordinates): observed discrepancy at h = 1/192000: ${coarse.relative.toExponential(3)}; at h = 1/384000: ${fine.relative.toExponential(3)} (refinement trend ≈ ${(coarse.relative / fine.relative).toFixed(1)}×); reference-to-reference difference ${numerical.toExponential(3)}; discarded off-diagonal damping ${sys.dampingResidual.toExponential(3)} relative. Evidence of convergence, not a bound.`);
+  assert.ok(coarse.relative / fine.relative > 8, 'empirical check: halving the step reduces the observed discrepancy by roughly an order of magnitude, as RK4 convergence predicts');
+  assert.ok(fine.relative < 1e-4, `empirical check: the finest-step observed discrepancy is small (got ${fine.relative}); not a rigorous bound`);
 });
