@@ -5,7 +5,8 @@
 // every part; a common ending (the first accepted Quiet in any part ends every part in the SAME frame through its own queue, with a
 // '$ensemble-quiet' acknowledgement for parts without their own); fail-all with the affected part named when known. Mix: Float32(engine
 // sample) × common fade → Float32 part; Float32 parts × 1/3 accumulated in Float64 → one Float32 rounding, written straight into the output
-// (no per-block allocation unless postAudio is on). Optional state snapshots every 1024 frames for the picture, as the contact processor posts
+// (no per-block PCM buffer is allocated unless postAudio is on; acknowledgement and snapshot messages allocate when they are posted, and the
+// per-part apply callbacks are cached in the constructor so the per-sample queue drain creates no closures). Optional state snapshots every 1024 frames for the picture, as the contact processor posts
 // them. This is NOT a real-time performance claim; the output-side measurement gate stands before any playable claim.
 import {REST_MAX_EVENTS,REST_MAX_CONTACTS,REST_MAX_SECONDS,REST_QUIET_FADE_SECONDS} from '../rest/limits.js';
 import {createRestEngine,contactStateKey} from '../rest/engine.js';
@@ -25,7 +26,8 @@ class GroveEnsembleProcessor extends AudioWorkletProcessor{
    if(recipe.channels!==recipes[0].channels)throw new Error('Ensemble parts must share the channel count');
   }
   this.generation=generation;this.mixGain=mixGain;this.postAudio=postAudio;this.snapshots=snapshots;this.nextSnapshot=0;this.stopped=false;this.finished=false;this.ending=null;this.origin=null;this.channels=recipes[0].channels;this.sum=new Float64Array(recipes[0].channels);
-  this.parts=recipes.map((recipe,index)=>({index,recipe,engine:createRestEngine(recipe),queue:createContactEventQueue({capacity:1025,maxEvents:4097}),commands:new Map(),contacts:Array(recipe.bodies).fill(null),contactsChanged:false,sample:new Float64Array(recipe.channels),acks:[],strikes:0,contactStarts:0,accepted:0,refused:0,ended:null}));
+  this.parts=recipes.map((recipe,index)=>({index,recipe,engine:createRestEngine(recipe),queue:createContactEventQueue({capacity:1025,maxEvents:4097}),commands:new Map(),contacts:Array(recipe.bodies).fill(null),contactsChanged:false,sample:new Float64Array(recipe.channels),acks:[],strikes:0,contactStarts:0,accepted:0,refused:0,ended:null,applyAck:null}));
+  for(const p of this.parts)p.applyAck=ack=>this.apply(p,ack);
   this.port.onmessage=({data})=>{let part;try{if(data.type!=='events')throw new Error('Unknown ensemble message');part=data.part;this.enqueue(data.part,data.events);this.port.postMessage({type:'queued',generation:this.generation,part:data.part,ids:data.events.map(e=>e.id)});}catch(error){this.fail(error,currentFrame,part);}};
   if(!Array.isArray(parts)||parts.length>3)throw new Error('Ensemble parts must be an array of at most three command lists');
   parts.forEach((events,part)=>this.enqueue(part,events??[]));
@@ -73,8 +75,8 @@ class GroveEnsembleProcessor extends AudioWorkletProcessor{
   try{
    for(;i<n;i++){
     const frame=currentFrame+i;if(this.ending&&frame>=this.ending.frame+this.ending.fadeFrames){for(const channel of channels)channel.fill(0,i);this.finished=true;this.finishedFrame=frame;break;}
-    for(const p of this.parts){current=p;p.contactsChanged=false;p.queue.applyThrough(frame,ack=>this.apply(p,ack));}
-    if(this.ending&&this.ending.frame===frame)for(const p of this.parts)if(!p.ended){current=p;this.schedule(p,{id:'$ensemble-quiet',kind:'quiet',frame,fadeFrames:this.ending.fadeFrames});p.queue.applyThrough(frame,ack=>this.apply(p,ack));if(!p.ended)throw new Error('Common ending was not applied to every part');}
+    for(const p of this.parts){current=p;p.contactsChanged=false;p.queue.applyThrough(frame,p.applyAck);}
+    if(this.ending&&this.ending.frame===frame)for(const p of this.parts)if(!p.ended){current=p;this.schedule(p,{id:'$ensemble-quiet',kind:'quiet',frame,fadeFrames:this.ending.fadeFrames});p.queue.applyThrough(frame,p.applyAck);if(!p.ended)throw new Error('Common ending was not applied to every part');}
     for(const p of this.parts)if(p.contactsChanged){current=p;p.engine.setContacts(contactStateKey(p.contacts));}
     const fade=this.ending?Math.max(0,Math.min(1,1-(frame-this.ending.frame)/this.ending.fadeFrames)):1;
     sum.fill(0);
