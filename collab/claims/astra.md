@@ -123,3 +123,5 @@ Rest cached return: contact-host park/newPassage renewal, rest-main persisted li
 Grove film cached return: main.js keeps completed movie URLs/listeners on persisted departure, cancels pending movie work; existing quiet/stop behavior remains. Current Listen/Touch/Expressive handlers do not dispose their transports.
 Adaptation prototype review: collab/reviews/*astra* and local renders/bridge-metric-review counterexample; independent spring-power identity audit and experience constraints, no edits to Fable's model prototype.
 Variant audition boundary: src/grove/rest-variant.js and tests/grove-rest-variant.test.js; explicit target Grove, strict all-gesture preservation, record-only reconstruction; experiment adapter only, no production UI yet.
+Structural audition surface: variant-audition.html and src/grove/variant-audition.js; local explicit original/changed fixture playback on one shared audio element, optional study unlinked from main routes.
+Fixture regeneration: tools/render-rest-variant.mjs renders fixed 20% bridge comparison from supplied finished Rest JSON; bounded through variant adapter, matching gain required.
