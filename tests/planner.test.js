@@ -7,11 +7,12 @@ import { createPerformance } from '../src/stage/performance.js';
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) <= eps, `${a} vs ${b}`);
 
 test('a slow melody needs one actor and every assignment brackets its note with approach and recovery', () => {
-  const events = [0, 3, 7, 2, 5].map((slot, i) => ({ id: `e${i}`, slot, noteOn: 1 + i * 1.5 }));
+  const events = [0, 3, 7, 2, 5].map((slot, i) => ({ id: `e${i}`, slot, noteOn: 1 + i * 1.5, position: 0.3 + i * 0.1, velocity: 0.7 }));
   const plan = planPerformers(events, { slots: 8 });
   assert.equal(plan.actors.length, 1); assert.deepEqual(plan.unplanned, []);
-  for (const a of plan.actors[0].assignments) { assert.ok(a.arriveBy <= a.noteOn - DEFAULT_PLANNER.approach + 1e-12); close(a.leaveAt, a.noteOn + DEFAULT_PLANNER.recover); }
+  for (const a of plan.actors[0].assignments) { assert.ok(a.arriveBy <= a.noteOn - DEFAULT_PLANNER.approach + 1e-12); close(a.leaveAt, a.noteOn + DEFAULT_PLANNER.recover); assert.equal(a.approach, DEFAULT_PLANNER.approach); assert.equal(a.velocity, 0.7); }
   assert.deepEqual(plan.actors[0].assignments.map(a => a.eventId), ['e0', 'e1', 'e2', 'e3', 'e4']);
+  plan.actors[0].assignments.forEach((a, i) => close(a.position, 0.3 + i * 0.1));
 });
 
 test('simultaneous distant notes spawn actors; the music decides the anatomy', () => {
@@ -43,8 +44,19 @@ test('poses are pure functions of time: rest, travel at the configured speed, ap
   assert.equal(mid.phase, 'travel'); close(mid.slot, 3.5 + 2.5 * (0.25 / 0.5));
   assert.equal(actorPose(plan, id, 2 - 0.1).phase, 'approach');
   const contact = actorPose(plan, id, 2); assert.equal(contact.phase, 'contact'); assert.equal(contact.slot, 6); assert.equal(contact.eventId, 'a');
-  assert.equal(actorPose(plan, id, 2.2).phase, 'recover');
+  assert.equal(actorPose(plan, id, 2.05).phase, 'recover');
+  assert.equal(actorPose(plan, id, 2.2).phase, 'approach');  // already approaching the quick repeat
   assert.equal(actorPose(plan, id, 2.3).eventId, 'b');       // same-slot repeat served without travel
+  // The repeat at 2.3 needs its approach from 2.12, so the first recovery is truncated to 2.12 and the picture shows it.
+  const [first, second] = plan.actors[0].assignments;
+  assert.equal(first.truncated, true); close(first.leaveAt, 2.3 - 0.18); assert.equal(second.truncated, false);
+  assert.equal(actorPose(plan, id, 2.11).phase, 'recover'); assert.equal(actorPose(plan, id, 2.11).truncated, true);
+  assert.equal(actorPose(plan, id, 2.13).phase, 'approach'); assert.equal(actorPose(plan, id, 2.13).eventId, 'b');
+  assert.equal(first.approach, 0.18);
+  // A repeat sooner than minRecover after contact cannot be served by the same actor and spawns another.
+  const tooFast = planPerformers([{ id: 'a', slot: 6, noteOn: 2 }, { id: 'b', slot: 6, noteOn: 2.2 }], { slots: 8, speedSlotsPerSecond: 5 });
+  assert.equal(tooFast.actors.length, 2);
+  assert.throws(() => planPerformers([], { slots: 8, minRecover: 1 }), /minRecover/);
   assert.deepEqual(actorPose(plan, id, 10), { slot: 6, phase: 'rest', progress01: 0, eventId: null });
   const times = [2.2, 0, 2, 1.9, 10, depart + 0.25];
   const shuffled = times.map(t => actorPose(plan, id, t)), ordered = [...times].sort((x, y) => x - y).map(t => actorPose(plan, id, t));

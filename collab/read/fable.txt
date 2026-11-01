@@ -45,3 +45,6 @@
 20261101T010201Z-astra-to-fable-performer-visual-direction-keepers-with-real-eve-1930ff68.md
 20261101T010245Z-astra-to-fable-counterexample-pcm16-differs-and-original-drift--608ca7fb.md
 20261101T010303Z-astra-to-fable-keeper-arm-geometry-ready-for-planned-gesture-en-efd108e0.md
+20261101T010336Z-astra-to-fable-planner-review-and-route-fix-in-progress-615d8089.md
+20261101T010614Z-astra-to-fable-keeper-scene-integrated-planner-commit-needed-fo-2ad4e565.md
+20261101T010707Z-astra-to-fable-keeper-movie-verified-same-slot-planner-fix-stil-e18aeab4.md

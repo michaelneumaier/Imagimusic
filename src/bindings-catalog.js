@@ -23,6 +23,7 @@ export const STAGE_INPUTS = {
     reach:      { inputs: ['strikePosition'], note: 'mallet on the clamped-free tine' },
     position:   { inputs: ['strikePosition'], note: '0 = clamp, 1 = free tip; the strike point weights each mode by its shape there' },
     visible:    { inputs: [], note: 'the mallet is shown only during approach, contact, and recovery' },
+    damper:     { inputs: ['release'], note: 'a resting damper settles the tine; release time is the patch release' },
     modeN:      { inputs: ['geometry.lengthM', 'geometry.thicknessM', 'geometry.material', 'damping'], note: 'energy of mode N+1' },
   },
   bellows: {
