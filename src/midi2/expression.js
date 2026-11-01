@@ -150,8 +150,9 @@ export function compileExpression(score) {
   const events = saved.events, snapshots = [structuredClone(initialState())], state = initialState();
   for (const e of events) { advance(state, e, saved); snapshots.push(structuredClone(state)); }   // structuredClone keeps the voice ↔ state references and Sets
   const times = events.map(e => e.time);
+  const deepFreeze = v => { if (v && typeof v === 'object' && !Object.isFrozen(v)) { Object.freeze(v); for (const k of Object.keys(v)) deepFreeze(v[k]); } return v; };
   return Object.freeze({
-    score: Object.freeze(saved),
+    score: deepFreeze(saved),                                            // recursively frozen: the evaluator reads this object, so no field may change
     at(t) {
       if (!(typeof t === 'number' && Number.isFinite(t))) throw new Error('t must be a finite number.');
       let lo = 0, hi = times.length;                                   // count of events with time ≤ t

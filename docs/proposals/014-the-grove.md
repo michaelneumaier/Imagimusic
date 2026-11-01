@@ -1,4 +1,4 @@
-# Proposal 014 (rev. 2): The Grove, a resonant trellis of seeded bodies whose anatomy is their sound
+# Proposal 014 (rev. 3): The Grove, a resonant trellis of seeded bodies whose anatomy is their sound
 
 *Fable, 2026-11-01, answering Astra's request after the touch checkpoint,
 reconciled with Astra's own contribution, "a resonant trellis"
@@ -25,30 +25,34 @@ small tree) come later on the same model once three has been heard.
 
 A **grove** (the trellis) is three bodies hung from one frame and joined
 by tendrils. A seed chooses the topology (chain or triangle at N = 3),
-each body's tuning within a shared mode and its mass, each tendril's
-stiffness, and the shared loss. **The visible anatomy is the network:**
-joined bodies hang near each other, body volume encodes mass and tendril
-thickness encodes stiffness, both on a disclosed bounded scale, and a
-tendril is drawn only where a coupling exists in the model. The frame, the
-suspension, the spacing and the mineral/glass/copper appearance are
-artistic interpretation and are labeled so; a tendril's apparent length
-implies no beam model. Re-rolling the seed gives a different plausible
-anatomy of a different sound, which is the project's original ambition made
-literal.
+each body's tuning within a near-resonant cluster and its mass, each
+tendril's stiffness, and the shared loss. **Link existence follows the
+model:** a tendril is drawn only where a coupling exists; body volume
+encodes mass and tendril thickness encodes stiffness on a disclosed
+bounded scale; tuning maps to a disclosed visual property. **Everything
+else is design:** the frame, the suspension, spacing, shell form,
+materials (mineral, glass, copper) and artistic scale are the artists'
+choices, labeled as interpretation, and the lumped sound-source masses and
+springs are distinguished from the interpreted shell acoustics. That
+distinction is what lets the form be free. Re-rolling the seed gives a
+different plausible anatomy of a different sound.
 
 ## The interaction: a ritual of touch
 
-- **Discovery by listening.** You touch one body; the bodies joined to it
-  swell (the pair's behavior, now across a network); bodies two bridges
-  away swell later and less. Before any touch, the bridges are faint. The
-  page never tells you the topology; you find it by what answers. Each
-  bridge brightens only in proportion to the **measured** exchange it has
-  carried so far (the modeled envelope on the far body attributable to
-  touches on the near one, accumulated), so the picture of the anatomy is
-  earned by playing, not drawn in advance. This is the "optional
-  presentation from actual response history" Astra asked for, and it is
-  separated from the body model: bridges exist and couple whether or not
-  they are lit; lighting is a record of what you have heard.
+- **Discovery by listening and looking.** You touch one body; the others
+  participate through the network, each according to the modes it carries.
+  Graph distance promises nothing by itself (detuning, multiple paths and
+  mode shapes decide), so the generator **curates** seeds and the docs
+  state exactly what each seed exhibits, measured (for example: "touching
+  body A, body C's first swell comes later and smaller than B's"); nothing
+  about "two bridges away" is baked into tests or captions. The real
+  topology is drawn faint but visible from the start (the model's edges),
+  and each body's endpoint brightens from its **actual drawn envelope**.
+  A later response-history presentation may show what each body has done
+  over the passage, explicitly as response history, never as flow through
+  an edge or an energy attribution (a receiver's envelope cannot be
+  assigned to one edge when paths overlap). No claim that playing "earns"
+  the anatomy; the listener may look and discover freely.
 - **The greeting (ritual).** A short composed score, Astra's "authored
   greeting", introduces the grove one body at a time: a single body alone;
   its neighbor; the far body arriving late and less; a shared touch on all;
@@ -62,15 +66,21 @@ literal.
 
 ## The model (Fable), an honest generalization
 
-`src/coupling.js` gains a **coupled network**: N lumped masses on their
-own springs, joined by bridge springs on the chosen edges, with
-proportional damping. Equations of motion `M ẍ + C ẋ + K x = f`, with `K`
-the symmetric stiffness matrix (diagonal from tunings, off-diagonal from
-bridges) and `C = γ M` (the pair's loss model, extended). Modes from a
-symmetric eigen-decomposition (Jacobi rotations, dependency-free, exact to
-rounding; verified against `coupledPair` for N = 2 to 1e-12); a strike on
-body `b` projects onto the modes; each pickup body's response is the modal
-sum, exactly as the pair's `pickupModes`. Everything downstream (envelope,
+`src/coupling.js` gains a **coupled network** beside the untouched
+`coupledPair`: N lumped masses on their own springs, joined by bridge
+springs on the chosen edges, with the pair's damping convention exactly
+(`M ẍ + 2γ M ẋ + K x = 0`, amplitude decay `e^{−γt}`, damped frequencies
+`√(λ − γ²)`, underdamped required), mass-normalized `A = M^{−1/2} K
+M^{−1/2}` symmetric. Modes by cyclic Jacobi rotations (dependency-free);
+tests check the residual `‖A V − V Λ‖ ≤ 1e-12·‖A‖` (relative to the matrix
+norm) and `‖VᵀV − I‖ ≤ 1e-12`. Degenerate eigenvalues have an arbitrary
+basis, sign and order, so the N = 2 comparison with `coupledPair` is on
+**reconstructed displacement and velocity at sampled times** (1e-12
+relative), never on raw eigenvectors; tests also cover unequal masses,
+disconnected and isotropic systems, repeated eigenvalues, and symmetric
+edge validation (duplicate or self edges rejected). A strike on body `b`
+projects onto the modes; each pickup body's response is the modal sum,
+with the pair's pickup level convention. Everything downstream (envelope,
 stillness bound, meeting, answerPeak) generalizes by replacing "the other
 body" with "each other body".
 
@@ -83,6 +93,10 @@ existing artifact is unchanged.
 Bounds: N ≤ 5 in the model (3 in the first encounter), edges ≤ 6,
 tunings 80–600 Hz, coupling 0–0.04 per bridge, masses within a 1:4 range,
 loss 0.2–2, like the pair; modes ≤ 5 so the pickup sum stays cheap.
+Tunings are curated as near-resonant clusters (within a few tens of cents)
+because wide intervals decouple bodies perceptually despite physical links;
+a deliberately contrasting body is allowed when its measured participation
+is reported.
 
 ## The generator (Fable)
 
@@ -115,13 +129,13 @@ the measured facts.
   covers all four shapes over a seed range; measured facts ordered as the
   docs claim; ritual validated (solo touches one body; the far body's
   first touch comes after its neighbor's; nothing in the silence).
-- Page: the usual harness row (grove ritual rendered twice at both rates,
-  bounded, silent tail); the response-history lighting reads only the
-  model's envelopes (test: with no touches, all bridges at the faint
-  level; after a touch on body 0, only bridges on the path from body 0
-  change).
-- Audition with the question list: did you find the connections by
-  listening? did a far answer surprise you? did you want another grove?
+- Page: the usual harness row (grove greeting rendered twice at both
+  rates, bounded, silent tail); endpoint brightness reads only each body's
+  drawn envelope (test: with no touches, all endpoints at rest and the
+  topology faint; after a touch, every body's endpoint follows its own
+  envelope, no edge-flow quantity anywhere).
+- Audition with the question list: did you notice who answered whom? did
+  an answer surprise you? did you want another grove?
 
 ## Why this is the slice
 

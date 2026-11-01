@@ -157,6 +157,10 @@ test('compileExpression is isolated: mutating the input score or a returned resu
   const r = compiled.at(2.9); r.voices[0].address.noteNumber = 1; r.voices[0].raw.brightness32 = 5; r.voices.length = 0;
   assert.equal(JSON.stringify(compiled.at(2.9)), before, 'returned objects are copies');
   assert.throws(() => { compiled.score.mapping = null; }, TypeError);
+  assert.throws(() => { compiled.score.mapping.smoothingSeconds = 0.09; }, TypeError, 'nested config is frozen');
+  assert.throws(() => { compiled.score.events[0].time = 7; }, TypeError, 'nested events are frozen');
+  assert.throws(() => { compiled.score.mapping.neutral.brightness32 = 0; }, TypeError);
+  assert.equal(JSON.stringify(compiled.at(2.9)), before);
   const r2 = evaluateExpression(composeExpressiveChord(), 2.9); r2.voices[0].address.noteNumber = 9;
   assert.equal(JSON.stringify(evaluateExpression(composeExpressiveChord(), 2.9)), before);
 });
