@@ -125,3 +125,4 @@ Adaptation prototype review: collab/reviews/*astra* and local renders/bridge-met
 Variant audition boundary: src/grove/rest-variant.js and tests/grove-rest-variant.test.js; explicit target Grove, strict all-gesture preservation, record-only reconstruction; experiment adapter only, no production UI yet.
 Structural audition surface: variant-audition.html and src/grove/variant-audition.js; local explicit original/changed fixture playback on one shared audio element, optional study unlinked from main routes.
 Fixture regeneration: tools/render-rest-variant.mjs renders fixed 20% bridge comparison from supplied finished Rest JSON; bounded through variant adapter, matching gain required.
+Bridge-work audit: tools/audit-bridge-work.mjs independent interval-by-interval endpoint-power quadrature, preserves pre-impulse right endpoints, reports production differences and spring storage residual for supplied Rest capture.
