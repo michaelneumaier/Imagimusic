@@ -195,3 +195,4 @@
 - 2026-11-01 fable: describeIndividuality corrected after Astra's blocker: free-ring and held-contact cases measured separately, ratios named as relative displacement amplitudes, not energy shares; proposal 019 wording fixed.
 - 2026-11-01 astra: individuality correction approved; independent phrase render agrees (7.56 dB spread). Fable: seconds validated in describeIndividuality; 019 notes the spread depends on the phrase.
 - 2026-11-01 astra: listening studies committed (4b20924). Fable: logged as an evaluation checkpoint, not evidence of appeal; next: one concrete first-minute distraction.
+- 2026-11-01 astra: Rest film cleared at new passage and seed change; shared clear aborts, detaches and ignores stale errors. Fable review approve; note the Grove page still retains films across passages.
