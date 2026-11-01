@@ -62,7 +62,9 @@ function bellowsVoice(voice, t, sampleRate) {
     modules: {
       env: { type: 'env', level: envLevel, stage: stolen ? 'release' : d.env.stage },
       filter: { type: 'filter', cutoffHz: d.filter.cutoffHz, resonance: d.filter.resonance, aperture01: d.filter.aperture01 },
-      lfo: { type: 'lfo', value: d.lfo.value, phase01: d.lfo.phase01 },
+      // Note-local LFO settings travel with the voice (its own bellows block), so a renderer can draw the pendulum
+      // a breath was started with even after the controls changed for the next breath.
+      lfo: { type: 'lfo', value: d.lfo.value, phase01: d.lfo.phase01, target: voice.bellows.lfo.target, rateHz: voice.bellows.lfo.rateHz, wave: voice.bellows.lfo.wave },
       source: { type: 'source', kind: d.source.kind, level: envLevel, frequencyHz: d.source.frequencyHz },
       amp: { type: 'amp', level: ampLevel },
     },
@@ -89,9 +91,11 @@ export function collectState(t, snapshots = {}) {
     if (t >= voice.noteOn && t <= end) voices.push(bellowsVoice(voice, t, sampleRate));
   }
   const sum = voices.reduce((s, v) => s + v.level, 0);
+  // Held dampers are global state (a resting creature on an idle slot is still visible), not voice state.
+  const dampers = { garden: [...(snapshots.garden?.dampers ?? [])].map(Number).sort((a, b) => a - b), tine: [...(snapshots.tine?.dampers ?? [])].map(Number).sort((a, b) => a - b) };
   return {
     v: STATE_VERSION, t, voices,
-    global: { families: Object.keys(snapshots).filter(k => ['garden', 'tine', 'bellows'].includes(k)), decayTaus: DECAY_TAUS },
+    global: { families: Object.keys(snapshots).filter(k => ['garden', 'tine', 'bellows'].includes(k)), decayTaus: DECAY_TAUS, dampers },
     out: { modeledIntensity: 1 - Math.exp(-sum), measuredRms: null },
   };
 }

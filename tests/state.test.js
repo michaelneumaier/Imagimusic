@@ -69,6 +69,19 @@ test('bellows voices exist only from noteOn: a scheduled future breath does not 
   assert.equal(collectState(1.5, snaps).voices.find(v => v.family === 'garden').noteOn, 1);
 });
 
+test('held dampers are global state visible on idle slots, and choir LFO settings are note-local', () => {
+  const frame = collectState(1.5, { ...snaps, garden: { voices: [], dampers: [5, 2] }, tine: { voices: [], dampers: [8] } });
+  assert.deepEqual(frame.global.dampers, { garden: [2, 5], tine: [8] });
+  assert.equal(frame.voices.filter(v => v.family !== 'bellows').length, 0);
+  assert.deepEqual(collectState(1.5, { bellows: snaps.bellows }).global.dampers, { garden: [], tine: [] });
+  const changed = validateBellows({ ...DEFAULT_BELLOWS, lfo: { wave: 'square', rateHz: 7, depthOct: 1, target: 'pitch' } });
+  const voices = [bellowsVoice, { ...bellowsVoice, id: 4, slot: 2, bellows: changed }];
+  const [a, b] = collectState(1.5, { bellows: { voices } }).voices;
+  assert.deepEqual([a.modules.lfo.target, a.modules.lfo.rateHz, a.modules.lfo.wave], ['cutoff', DEFAULT_BELLOWS.lfo.rateHz, 'sine']);
+  assert.deepEqual([b.modules.lfo.target, b.modules.lfo.rateHz, b.modules.lfo.wave], ['pitch', 7, 'square']);
+  assert.ok(typeof a.modules.lfo.value === 'number' && typeof b.modules.lfo.phase01 === 'number');
+});
+
 test('a held bellows voice persists and a finished one is dropped after its release', () => {
   assert.equal(collectState(50, { bellows: { voices: [{ ...bellowsVoice, noteOff: null }] } }).voices.length, 1);
   assert.equal(collectState(2 + DEFAULT_BELLOWS.adsr.r + 0.01, snaps).voices.filter(v => v.family === 'bellows').length, 0);
