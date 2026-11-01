@@ -111,6 +111,34 @@ does the body sound like a thing with a material, and is the swell of the
 others still the first thing you notice? Only if both are yes does the
 page change.
 
+## The comparison, measured (015b, `tools/grove-voice-compare.mjs`)
+
+Unit strike on body 0 at u = 0.6, attachments and pickups at the tip,
+M = 3 beam partials (decay rates ∝ frequency anchored to the grove loss),
+equal reference force, the same pickup level, pan and gain rule for both
+voices, 48 kHz. `renders/grove-voice-<seed>-m1.wav` and `-m3.wav` for the
+A/B; `renders/grove-voice-report.json` for the numbers.
+
+| Seed | Voice | Normal modes (Hz) | Partials > −40 dB at 50 ms | Centroid (first 0.5 s) | Peak / RMS (first s) | Low-band swells (body: s × ratio) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3 | M = 1 | 128.7 / 131.2 / 132.2 | 3 | 131.6 Hz | 0.0565 / 0.0267 | 1: 0.222 × 0.175; 2: 0.436 × 0.804 |
+| 3 | M = 3 | the same three, + 804 / 819 / 820, + 2251 / 2293 / 2295 | 5 | 157.9 Hz | 0.0613 / 0.0269 | 1: 0.222 × 0.175; 2: 0.438 × 0.804 |
+| 7 | M = 1 | 130.7 / 131.1 / 133.3 | 3 | 131.1 Hz | 0.0362 / 0.0140 | 1: 0.200 × 0.358; 2: 0.360 × 0.251 |
+| 7 | M = 3 | + 816 / 820 / 828, + 2285 / 2295 / 2317 | 5 | 143.8 Hz | 0.0423 / 0.0141 | 1: 0.200 × 0.358; 2: 0.360 × 0.251 |
+| 11 | M = 1 | 196.4 / 198.6 / 201.5 | 3 | 197.3 Hz | 0.0280 / 0.0134 | 1: 0.200 × 0.760; 2: 0.100 × 0.624 |
+| 11 | M = 3 | + 1229 / 1231 / 1234, + 3439 / 3445 / 3454 | 5 | 233.8 Hz | 0.0318 / 0.0135 | 1: 0.200 × 0.760; 2: 0.100 × 0.624 |
+
+What the numbers say, and no more: the three low modes are unchanged to
+the hertz (the attachment normalization makes M = 1 today's grove), so
+the relationship readout, the low-band swells, is identical in time and
+ratio; the added partials sit at the beam's 6.3× and 17.5× ratios, two of
+them above −40 dB at 50 ms, and decay 6–18× faster than the fundamentals
+(0.38 s and 0.14 s against 2.4 s for seed 3), so they color the onset and
+leave the ring to the low modes; the centroid rises 10–20% and RMS is
+essentially equal, so the difference is timbre, not loudness; peaks rise
+8–13%. Whether this sounds like a thing with a material is for the
+audition; the discarded damping on these voices is ≈ 8e-5 relative.
+
 ## Scope and ownership
 
 - 015a (Fable), landed: `modalNetwork` in `src/coupling.js` (N bodies × M

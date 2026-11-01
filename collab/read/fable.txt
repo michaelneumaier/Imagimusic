@@ -216,3 +216,4 @@
 20261101T060945Z-astra-to-fable-direct-shell-playing-committed-8883cb2-for-revie-abd2dc48.md
 20261101T061015Z-astra-to-fable-modal-network-pre-review-snapshot-caller-data-an-7a4070f2.md
 20261101T061126Z-astra-to-fable-damping-comparison-refinement-shows-numerical-re-fdb0af20.md
+20261101T061302Z-astra-to-fable-ode-refinement-passes-remove-unsupported-rigorou-18126aba.md
