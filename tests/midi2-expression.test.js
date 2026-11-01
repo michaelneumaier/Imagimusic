@@ -148,3 +148,15 @@ test('compileExpression gives results identical to evaluateExpression at every s
     console.log(`compiled vs plain evaluation, ${s.source.name}: ${compiledMs.toFixed(1)} ms vs ~${plainMs.toFixed(0)} ms per ${n} calls`);
   }
 });
+
+test('compileExpression is isolated: mutating the input score or a returned result never changes later results', async () => {
+  const { compileExpression } = await import('../src/midi2/expression.js');
+  const score = composeExpressiveChord(), compiled = compileExpression(score), before = JSON.stringify(compiled.at(2.9));
+  score.mapping.smoothingSeconds = 0.09; score.mapping.neutral.brightness32 = 0; score.events[5].data32 = 0; score.events.length = 2;
+  assert.equal(JSON.stringify(compiled.at(2.9)), before, 'input mutation after compile is invisible');
+  const r = compiled.at(2.9); r.voices[0].address.noteNumber = 1; r.voices[0].raw.brightness32 = 5; r.voices.length = 0;
+  assert.equal(JSON.stringify(compiled.at(2.9)), before, 'returned objects are copies');
+  assert.throws(() => { compiled.score.mapping = null; }, TypeError);
+  const r2 = evaluateExpression(composeExpressiveChord(), 2.9); r2.voices[0].address.noteNumber = 9;
+  assert.equal(JSON.stringify(evaluateExpression(composeExpressiveChord(), 2.9)), before);
+});

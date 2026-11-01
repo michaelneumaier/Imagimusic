@@ -136,7 +136,7 @@ function output(state, t, score) {
     const base = v.attributeType8 === ATTRIBUTE_PITCH_7_9 ? pitch79ToHcu(v.attributeData16) : pitch725 !== null ? pitch725ToHcu(pitch725) : v.address.noteNumber;
     const pitchHcu = base + perNoteBendHcu + smoothAt(c.bend, t, tau);                            // channel bend acts on detached voices too
     const gate = v.effectiveNoteOff !== null && t >= v.effectiveNoteOff ? 'released' : 'held';
-    return { voiceId: v.voiceId, address: v.address, noteOn: v.noteOn, velocity01: velocity16ToUnit(v.velocity16), effectiveNoteOff: v.effectiveNoteOff, gate, detached: v.detached,
+    return { voiceId: v.voiceId, address: { ...v.address }, noteOn: v.noteOn, velocity01: velocity16ToUnit(v.velocity16), effectiveNoteOff: v.effectiveNoteOff, gate, detached: v.detached,
       sensitivityHcu: pitch725ToHcu(v.sensitivityRaw), pitchHcu, hz: hcuToHz(Math.min(127.999, Math.max(0, pitchHcu))), pressure01: pressure, brightness01: brightness, timbre01: timbre,
       raw: { velocity16: v.velocity16, attributeType8: v.attributeType8, attributeData16: v.attributeData16, sensitivityQ7_25: v.sensitivityRaw, channelPitchBend32: c.bendRaw, ...(f ? f.raw : n.raw) } };
   });
@@ -146,17 +146,17 @@ function output(state, t, score) {
 /** Validate once and precompute an immutable snapshot of the state after every event. `at(t)` is then a binary search plus the
  *  output function; results are identical to `evaluateExpression(score, t)` (tested), with none of the per-call revalidation. */
 export function compileExpression(score) {
-  validateExpressionScore(score);
-  const events = score.events, snapshots = [structuredClone(initialState())], state = initialState();
-  for (const e of events) { advance(state, e, score); snapshots.push(structuredClone(state)); }   // structuredClone keeps the voice ↔ state references and Sets
+  const saved = JSON.parse(canonicalExpressionScore(score));          // isolated copy: later mutation of the caller's score cannot reach the evaluator
+  const events = saved.events, snapshots = [structuredClone(initialState())], state = initialState();
+  for (const e of events) { advance(state, e, saved); snapshots.push(structuredClone(state)); }   // structuredClone keeps the voice ↔ state references and Sets
   const times = events.map(e => e.time);
   return Object.freeze({
-    score,
+    score: Object.freeze(saved),
     at(t) {
       if (!(typeof t === 'number' && Number.isFinite(t))) throw new Error('t must be a finite number.');
       let lo = 0, hi = times.length;                                   // count of events with time ≤ t
       while (lo < hi) { const mid = (lo + hi) >> 1; if (times[mid] <= t) lo = mid + 1; else hi = mid; }
-      return output(snapshots[lo], t, score);
+      return output(snapshots[lo], t, saved);                           // output builds fresh objects (address and raw are copies), so a caller cannot reach a snapshot
     },
   });
 }

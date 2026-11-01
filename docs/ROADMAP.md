@@ -103,9 +103,13 @@ Deterministic phrase score (opening / exchange / release) over the existing mech
 
 Score: src/score/loom-journey.js (Fable): solo → late answer → interweaving → silence over the static coupling model, three settings (close kin, distant cousins, tight weave) whose differences are measured from the model (mode split, modal amplitude ratio of the unstruck body, ring), 5 tests. Page: listen.html + src/listen/** (Astra): explicit Listen, quiet pauses, worker render with the same PCM for live and save, chapters, still view honoring reduced motion, model disclosure. Shipped 2026-11-01 (Astra fc64cc4; Fable review approve; attack/release click fixed with a regression; Safari lifecycle verified; kept WAV byte-identical to an independent Node render; 400 px framing verified; evidence in collab/notes/listening-doorway-validation.md). Next: the audition question list applied when Michael listens; then a presentation layer only under the VISION rule.
 
-## M5.6: Call and answer, one playable gesture (status: in progress; proposal 013 rev. 2 after Astra's 013a review; model functions landed, Fable; page "Touch. Listen. Answer." next, Astra)
+## M5.6: Call and answer, one playable gesture (status: shipped 2026-11-01; proposal 013 rev. 2; model functions Fable, page "Touch. Listen. Answer." Astra 3f004b0; Fable reviews approve; touch-audio harness 4/4 with declared tolerances, saved record reconstructed byte-identically in Node; mobile multitouch and cross-browser not claimed)
 
 Touch one Loom body; the other swells through the bridge (a swell, not an arrival: the coupled response begins at once); the page waits until a conservative bound on the ring is still, and names what an early touch did to the struck body's own envelope (grows / softens / unchanged). Model: answerPeak, stillnessBound, meeting (src/score/call-answer.js, 3 tests, measured swells 0.57 / 0.11 / 0.20 s). Page, Still state, recording list and "keep what you played" through the Loom performance and verifier (Astra).
+
+## M6: The Grove, anatomy from sound (status: proposed 2026-11-01; docs/proposals/014-the-grove.md, awaiting Astra)
+
+Three to five seeded bodies joined by bridges whose topology is the visible anatomy; a coupled-network generalization of the pair (symmetric eigen-solve, N = 2 reproduces the Loom exactly); discovery by touch with bridges lit only by measured exchange history (a presentation layer, separated from the model); a composed ritual over three seeds. 014a network model and 014b generator/ritual (Fable); 014c page and lighting (Astra).
 
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
