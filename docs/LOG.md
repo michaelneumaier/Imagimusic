@@ -70,3 +70,4 @@
 - 2026-11-01 astra: playable FM ensemble (fm-audio.js, stage toggle, links, inspector/route); Safari combined passage played through. Fable review approve.
 - 2026-11-01 astra: approved the FM convergence test as scoped evidence; v11 running; live readout carries positiveInstantaneousFrequency.
 - 2026-11-01 fable: measured interval stated explicitly (0.05–0.55 s); harness v12 compares FM contribution against the same composition with FM disabled (asserted silent before entrance, positive after).
+- 2026-11-01 astra: combined FM+Loom movie verified 1007/1007 (renders/conservatory-fm-loom-731.mp4). Fable: harness v13 focused mode (?focus=) and slow/custom FM cases.

@@ -3,15 +3,21 @@ import { createPerformance } from '../src/stage/performance.js';
 import { renderPerformanceAudio, compareRenders } from '../src/stage/render-audio.js';
 const results = [];
 const assert = (value, message) => { if (!value) throw new Error(message); };
+// Focused mode: ?focus=<text> runs only the checks whose name contains that text (case-insensitive), e.g. ?focus=featured%20FM,
+// so a changed check can be re-run without the full diagnostic matrix. Skipped checks are listed as SKIPPED and kept out of
+// the pass count. ?fm=<canonical FM patch JSON> adds a custom FM case to the featured-FM check. Default is the full suite.
+const params = new URLSearchParams(location.search), focus = params.get('focus');
 async function check(name, run) {
-  const row = document.createElement('li'); row.textContent = name + ' — running'; document.getElementById('results').append(row);
+  const row = document.createElement('li'); document.getElementById('results').append(row);
+  if (focus && !name.toLowerCase().includes(focus.toLowerCase())) { row.textContent = 'SKIPPED (focus) · ' + name; results.push({ name, skipped: true }); return; }
+  row.textContent = name + ' — running';
   try { const detail = await run(); row.textContent = 'PASS · ' + name; const code = document.createElement('pre'); code.textContent = JSON.stringify(detail, null, 2); row.append(code); results.push({ name, passed: true, detail }); }
   catch (error) { row.textContent = 'FAIL · ' + name + ': ' + error.message; results.push({ name, passed: false, error: error.message }); }
 }
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 12;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 13;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -182,8 +188,11 @@ await check('Shipping default: featured FM tensioner (composition v2), alone and
   const { attachComposition, DEFAULT_COMPOSITION } = await import('../src/stage/composition.js');
   const { DEFAULT_TENSIONER } = await import('../src/fm.js');
   const out = {};
-  for (const [name, loomEnabled] of [['fm only', false], ['fm + loom', true]]) {
-    const composition = { ...structuredClone(DEFAULT_COMPOSITION), version: 2, fm: { enabled: true, settings: { ...DEFAULT_TENSIONER } } };
+  const { readTensionerSearch } = await import('../src/tensioner/patch.js');
+  const cases = [['fm only', false, { ...DEFAULT_TENSIONER }], ['fm + loom', true, { ...DEFAULT_TENSIONER }], ['fm slow vibrato (ratio 0.01) + loom', true, { ...DEFAULT_TENSIONER, ratio: 0.01, indexDecayS: 4 }]];
+  if (params.has('fm')) cases.push(['fm custom (from ?fm=) + loom', true, readTensionerSearch(location.search).settings]);
+  for (const [name, loomEnabled, settings] of cases) {
+    const composition = { ...structuredClone(DEFAULT_COMPOSITION), version: 2, fm: { enabled: true, settings } };
     composition.loom.enabled = loomEnabled;
     const composed = attachComposition(createPerformance(DEFAULT_PATCH, 48000), composition);
     assert(composed.fm, 'FM tone not attached');
@@ -226,8 +235,8 @@ await check('Air choir passage stays bounded and repeatable', async () => {
   assert(s.peak > .01 && s.peak < 1, 'Peak outside range'); assert(r.identical, `air render differed: max ${r.maxDiff} at ${r.atSeconds}s`);
   return { ...s, ...r };
 });
-const passed = results.filter(r => r.passed).length;
-document.getElementById('summary').textContent = `${passed}/${results.length} stage render checks passed.`;
+const ran = results.filter(r => !r.skipped), passed = ran.filter(r => r.passed).length;
+document.getElementById('summary').textContent = `${passed}/${ran.length} stage render checks passed${focus ? ` (focused on "${focus}"; ${results.length - ran.length} skipped)` : ''}.`;
 if (passage) { const button = document.getElementById('wav'); button.disabled = false; button.onclick = () => { const url = URL.createObjectURL(new Blob([encodeWav(passage, 48000)], { type: 'audio/wav' })); const a = document.createElement('a'); a.href = url; a.download = `imagimusic-stage-${DEFAULT_PATCH.seed}.wav`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }
 const reportText = JSON.stringify({ generated: new Date().toISOString(), ...environment, results, matrix }, null, 2);
 const report = document.createElement('pre'); report.textContent = reportText; document.body.append(report);
