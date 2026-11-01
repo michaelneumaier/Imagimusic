@@ -5,14 +5,14 @@
 // Ensemble rules: a common origin (first accepted gesture in any part) with one auto-Quiet at origin + REST_MAX_SECONDS; a common ending (the first
 // accepted Quiet in any part ends every part at that frame with the same fade; other parts receive a '$ensemble-quiet' acknowledgement at that frame);
 // fail-all (any error in any part stops all parts, silence, one error message). Mix arithmetic, identical to the offline study: each part's sample is
-// read in Float64, times the common fade, rounded to Float32 (the part PCM); the Float32 parts times mixGain are accumulated in Float64 and rounded
+// read in Float64, rounded to Float32, times the common fade, rounded again (exactly renderRestRecord's Float32 in-place fade: the part PCM); the Float32 parts times mixGain are accumulated in Float64 and rounded
 // once to Float32 for the output. The mixed Float32 blocks are also posted as {type:'audio', frame, channels} so the capture is the processor's own
 // output, sample-exact, independent of any downstream node. Verifies real-worklet computation and logical alignment; NOT CPU budget or underruns.
 import {REST_MAX_EVENTS,REST_MAX_CONTACTS,REST_MAX_SECONDS,REST_QUIET_FADE_SECONDS} from '../src/rest/limits.js';
 import {createRestEngine,contactStateKey} from '../src/rest/engine.js';
 import {createContactEventQueue} from '../src/grove/contact-events.js';
 export const ENSEMBLE_DIAGNOSTIC_NAME='imagimusic-ensemble-diagnostic';
-export const ENSEMBLE_MIX_ARITHMETIC='Float64 engine sample × common fade → Float32 part; Float32 parts × mixGain accumulated in Float64 → one Float32 rounding → output and capture';
+export const ENSEMBLE_MIX_ARITHMETIC='Float32(engine sample) × common fade → Float32 part (as renderRestRecord); Float32 parts × mixGain accumulated in Float64 → one Float32 rounding → output and capture';
 class EnsembleDiagnosticProcessor extends AudioWorkletProcessor{
  constructor(options){
   super();const {recipes,parts=[],generation='diagnostic',mixGain=1/3,postAudio=true}=options.processorOptions??{};
@@ -23,7 +23,7 @@ class EnsembleDiagnosticProcessor extends AudioWorkletProcessor{
    if(!Array.isArray(recipe.energyFactors)||recipe.energyFactors.length!==recipe.channels||!recipe.energyFactors.every(v=>Number.isFinite(v)&&v>0)||!Number.isFinite(recipe.admissionCeiling)||recipe.admissionCeiling<=0||recipe.admissionCeiling>.9)throw new Error('Rest recipe needs a conservative energy admission bound');
    if(recipe.channels!==recipes[0].channels)throw new Error('Ensemble parts must share the channel count');
   }
-  this.generation=generation;this.mixGain=mixGain;this.postAudio=postAudio;this.stopped=false;this.finished=false;this.ending=null;this.origin=null;this.channels=recipes[0].channels;
+  this.generation=generation;this.mixGain=mixGain;this.postAudio=postAudio;this.sum=new Float64Array(recipes[0].channels);this.stopped=false;this.finished=false;this.ending=null;this.origin=null;this.channels=recipes[0].channels;
   this.parts=recipes.map((recipe,index)=>({index,recipe,engine:createRestEngine(recipe),queue:createContactEventQueue({capacity:1025,maxEvents:4097}),commands:new Map(),contacts:Array(recipe.bodies).fill(null),contactsChanged:false,sample:new Float64Array(recipe.channels),acks:[],strikes:0,contactStarts:0,accepted:0,refused:0,ended:null}));
   this.port.onmessage=({data})=>{try{if(data.type!=='events')throw new Error('Unknown ensemble message');this.enqueue(data.part,data.events);this.port.postMessage({type:'queued',generation:this.generation,part:data.part,ids:data.events.map(e=>e.id)});}catch(error){this.fail(error,currentFrame);}};
   if(!Array.isArray(parts)||parts.length>3)throw new Error('Ensemble parts must be an array of at most three command lists');
@@ -51,7 +51,7 @@ class EnsembleDiagnosticProcessor extends AudioWorkletProcessor{
   if(p.ended)decision={accepted:false,reason:'ended'};
   else if(event.kind==='quiet'){
    p.ended={frame:ack.appliedFrame,fadeFrames:event.fadeFrames};p.contacts.fill(null);p.contactsChanged=true;
-   if(!this.ending){this.ending={frame:ack.appliedFrame,fadeFrames:event.fadeFrames};for(const other of this.parts)if(other!==p&&!other.ended&&![...other.commands.values()].some(c=>c.kind==='quiet'&&c.frame===ack.appliedFrame&&c.fadeFrames===event.fadeFrames))this.schedule(other,{id:'$ensemble-quiet',kind:'quiet',frame:ack.appliedFrame,fadeFrames:event.fadeFrames});}
+   if(!this.ending)this.ending={frame:ack.appliedFrame,fadeFrames:event.fadeFrames};
    else if(this.ending.frame!==ack.appliedFrame||this.ending.fadeFrames!==event.fadeFrames)throw new Error('Ensemble parts ended at different frames');
   }
   else if(event.kind==='strike'&&p.strikes>=REST_MAX_EVENTS)decision={accepted:false,reason:'strike-limit'};
@@ -72,10 +72,14 @@ class EnsembleDiagnosticProcessor extends AudioWorkletProcessor{
   try{
    for(;i<n;i++){
     const frame=currentFrame+i;if(this.ending&&frame>=this.ending.frame+this.ending.fadeFrames){this.finished=true;this.finishedFrame=frame;break;}
-    for(const p of this.parts){p.contactsChanged=false;p.queue.applyThrough(frame,ack=>this.apply(p,ack));if(p.contactsChanged)p.engine.setContacts(contactStateKey(p.contacts));}
+    // Phase 1: drain every part's queue through this frame. Phase 2: if the ensemble ending was set at this frame, end every other part in the
+    // SAME frame with a '$ensemble-quiet' acknowledgement (through its own queue, so acknowledgement order stays valid), whichever part began it.
+    for(const p of this.parts){p.contactsChanged=false;p.queue.applyThrough(frame,ack=>this.apply(p,ack));}
+    if(this.ending&&this.ending.frame===frame)for(const p of this.parts)if(!p.ended){this.schedule(p,{id:'$ensemble-quiet',kind:'quiet',frame,fadeFrames:this.ending.fadeFrames});p.queue.applyThrough(frame,ack=>this.apply(p,ack));if(!p.ended)throw new Error('Common ending was not applied to every part');}
+    for(const p of this.parts)if(p.contactsChanged)p.engine.setContacts(contactStateKey(p.contacts));
     const fade=this.ending?Math.max(0,Math.min(1,1-(frame-this.ending.frame)/this.ending.fadeFrames)):1;
-    const sum=new Float64Array(this.channels);
-    for(const p of this.parts){p.engine.read(p.sample);for(let ch=0;ch<this.channels;ch++){const part=Math.fround(p.sample[ch]*fade);if(!Number.isFinite(part))throw new Error('Non-finite Rest output');sum[ch]+=part*this.mixGain;}p.engine.step();}
+    const sum=this.sum;sum.fill(0);
+    for(const p of this.parts){p.engine.read(p.sample);for(let ch=0;ch<this.channels;ch++){const part=Math.fround(Math.fround(p.sample[ch])*fade);if(!Number.isFinite(part))throw new Error('Non-finite Rest output');sum[ch]+=part*this.mixGain;}p.engine.step();}
     for(let ch=0;ch<this.channels;ch++)mixed[ch][i]=Math.fround(sum[ch]);
    }
   }catch(error){this.fail(error,currentFrame+i);for(const channel of channels)channel.fill(0);return false;}

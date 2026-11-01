@@ -315,3 +315,4 @@
 - 2026-11-01 astra: notebook layout native checks complete (source retained, tables scroll, raw disclosure, adversarial text literal).
 - 2026-11-01 astra: notebook layout committed (a79e858).
 - 2026-11-01 astra: bounded browser diagnostic (three engines in one worklet processor, fixture only; page and preparation worker by Astra). Fable: tests/ensemble-diagnostic-worklet.js (contact-processor semantics per part, common origin and ending, fail-all, declared mix arithmetic, audio posted from the processor) with a headless Node test (per-part captures rebuild the phrase records; mix exact to the offline sum before the fade).
+- 2026-11-01 astra: diagnostic WIP corrections (fade exactly as renderRestRecord; two-phase common ending so a Quiet from any part ends all in the same frame; preallocated sum). Fable: applied; mix now exact on every frame including the fade; Quiet tested from each part.

@@ -28,9 +28,20 @@ test('three engines in one processor: per-part acknowledgements rebuild the phra
  captures.forEach((capture,i)=>{const rec=capture.snapshot(),shift=capture.originFrame-finished.origin;assert.deepEqual(rec.events.map(e=>({...e,frame:e.frame+shift})),records[i].events.map(e=>({frame:e.frame,order:e.order,body:e.body,position:e.position,velocity:e.velocity})).map((e,k)=>({...e,order:rec.events[k].order})),`part ${i} events`);assert.deepEqual(rec.contacts.map(c=>[c.body,c.zone,c.strength,c.start+shift,c.end+shift]),records[i].contacts.map(c=>[c.body,c.zone,c.strength,c.start,c.end]),`part ${i} contacts`);assert.equal(rec.ended.frame+shift,records[i].ended.frame);});
  // Mix: the declared arithmetic on the offline part PCM.
  const parts=records.map((r,i)=>renderRestRecord(r,recipes[i])),n=parts[0].channels[0].length;assert.equal(audio[0].length,n);
- let exactOutsideFade=true,maxFade=0;const fadeStart=phrase.endFrame;
- for(let ch=0;ch<2;ch++)for(let k=0;k<n;k++){const expected=Math.fround(parts.reduce((s,pcm)=>s+pcm.channels[ch][k]*(1/3),0));const d=Math.abs(audio[ch][k]-expected);if(k<fadeStart){if(d!==0)exactOutsideFade=false;}else maxFade=Math.max(maxFade,d);}
- assert.ok(exactOutsideFade,'mix equals the offline sum exactly before the fade');assert.ok(maxFade<=2e-7,`fade region within rounding (${maxFade})`);assert.ok(audio[0].some(v=>v!==0));
+ let mismatches=0;
+ for(let ch=0;ch<2;ch++)for(let k=0;k<n;k++){const expected=Math.fround(parts.reduce((s,pcm)=>s+pcm.channels[ch][k]*(1/3),0));if(audio[ch][k]!==expected)mismatches++;}
+ assert.equal(mismatches,0,'mix equals the offline sum exactly on every frame, fade included');assert.ok(audio[0].some(v=>v!==0));
+});
+test('a Quiet originating in ANY part ends every part in the same frame',()=>{
+ const phrase=composeEnsemblePhrase(recipes);
+ for(const origin of [0,1,2]){
+  const parts=phrase.parts.map(part=>part.commands.filter(c=>c.kind!=='quiet'));parts[origin].push({id:'quiet-from-'+origin,kind:'quiet',frame:30000,fadeFrames:200});
+  const {finished,error,acks}=run({recipes,parts,generation:'diag'});
+  assert.equal(error,null,'part '+origin);assert.deepEqual(finished.ended,{frame:30000,fadeFrames:200});assert.ok(finished.parts.every(x=>x.ended.frame===30000&&x.ended.fadeFrames===200),'all parts ended at 30000 when part '+origin+' began the Quiet');
+  const quiets=acks.map(ms=>ms.flatMap(m=>m.events).filter(a=>a.event.kind==='quiet'&&a.accepted).map(a=>[a.id,a.appliedFrame]));assert.deepEqual(quiets.map(q=>q[0][1]),[30000,30000,30000]);assert.equal(quiets[origin][0][0],'quiet-from-'+origin);
+  const captures=recipes.map(r=>createRestCapture(r,{generation:'diag'}));acks.forEach((ms,i)=>{for(const m of ms)captures[i].consume({type:'processed',generation:'diag',events:m.events});captures[i].consume({type:'finished',generation:'diag',frame:finished.frame,ended:finished.ended});});
+  captures.forEach(c=>assert.equal(c.state,'complete'));
+ }
 });
 test('ensemble rules: a Quiet in one part ends all parts at that frame; a never-struck part is silent with its contacts acknowledged; errors fail all',()=>{
  const phrase=composeEnsemblePhrase(recipes),parts=phrase.parts.map(part=>part.commands.filter(c=>c.kind!=='quiet'));

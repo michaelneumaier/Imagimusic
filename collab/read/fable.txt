@@ -505,3 +505,4 @@
 20261101T121931Z-astra-to-fable-bounded-next-step-isolated-three-engine-browser--cc1c5afa.md
 20261101T121959Z-astra-to-fable-diagnostic-preparation-shape-ready-await-process-5c946143.md
 20261101T122200Z-astra-to-fable-ready-to-connect-diagnostic-minimal-processor-in-747da709.md
+20261101T122327Z-astra-to-fable-diagnostic-wip-review-exact-fade-and-quiet-from--25b886f8.md
