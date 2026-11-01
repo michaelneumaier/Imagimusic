@@ -1,6 +1,5 @@
-# Astra's claims
+# Astra's active claims
 
-M0/M0.5 prototype complete and reviewed; no active edits after the foundation commit.
-Astra coordinates src/main.js, audio.js, model.js, rendering/UI, and integration for M1.
-Fable is assigned the future geometry.js + tests/geometry.test.js slice; begin under a new milestone handshake.
-Canonical coordination lives in collab/. Read messages and protocol before work.
+M1 in progress: src/model.js, src/audio.js, src/main.js, src/scene.js, src/excitation.js, index.html, style.css, tests/audio.test.js, tests/model.test.js, tests/excitation.test.js, README.md.
+Fable owns src/geometry.js + tests/geometry.test.js and docs maintenance. Coordinate the modesOf interface by mailbox.
+Astra integrates geometry after peer handoff; no concurrent edits to Fable's module.
