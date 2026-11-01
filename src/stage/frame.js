@@ -1,3 +1,4 @@
+import {sectionAt} from '../score/conversation.js';
 import {tensionerPerformanceFrame} from '../tensioner/performance.js';
 import {tensionerSceneFrame,TENSIONER_BINDINGS} from '../tensioner/scene.js';
 import {loomPerformanceFrame} from '../loom/performance.js';
@@ -14,6 +15,7 @@ export function createStageFrames(performance){
  if(performance.fm)bindings.push(...TENSIONER_BINDINGS);
  const project=(frame,camera)=>{
   const result=base(frame);
+  if(performance.score)result.global={...result.global,score:sectionAt(performance.score,frame.t)};
   if(performance.loom)result.stage.loom=loomSceneFrame(loomPerformanceFrame(performance.loom,frame.t),performance.loom.settings).stage.loom;
   if(performance.fm)result.stage.tensioner=tensionerSceneFrame(tensionerPerformanceFrame(performance.fm,frame.t)).stage.tensioner;
   result.stage.camera=direct(frame.t,camera.mode??'manual',camera);

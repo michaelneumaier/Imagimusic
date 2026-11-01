@@ -1,3 +1,5 @@
+import {composeConversation} from '../score/conversation.js';
+import {createScorePerformance,readScoreSearch,scoreURL} from './score-performance.js';
 import {DEFAULT_TENSIONER} from '../fm.js';
 import {prepareFMAudio} from './fm-audio.js';
 import {readCompositionSearch,compositionURL,compositionPageURL} from './composition-link.js';
@@ -20,11 +22,20 @@ let activePatch=structuredClone(DEFAULT_PATCH), importError='';
 if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
 let composition=structuredClone(DEFAULT_COMPOSITION);
 try{composition=readCompositionSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the default ensemble.';}
+let score=null;
+try{score=readScoreSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the seeded passage.';}
+const buildPerformance=(sampleRate=48000)=>score?createScorePerformance(activePatch,score,composition,sampleRate):attachComposition(createPerformance(activePatch,sampleRate),composition);
 let preparation=null,loomVoice=null,fmVoice=null;
-let performance=attachComposition(createPerformance(activePatch),composition),frames=createStageFrames(performance);
+let performance;
+try{performance=buildPerformance();}
+catch(error){
+ if(!score)throw error;
+ importError+=(importError?' ':'')+error.message+'. Using the seeded passage.';score=null;performance=buildPerformance();
+}
+let frames=createStageFrames(performance);
 const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=frames.bindings;
 const captions=composition.loom.enabled?[...CAPTIONS,{label:'modeled / interpreted',text:'Tension Loom is a pair of coupled resonators. Each sound channel follows one body’s modeled displacement. Width and glow amplify its response envelope; the bridge is a coupling indicator, not a measurement of energy flow.'}]:[...CAPTIONS];
-if(composition.fm?.enabled)captions.push({label:'interpreted',text:'The FM tensioner enters eight beats into the score. Carriage travel follows modulation decay; halo width estimates occupied bandwidth. Slow modulation shows phase; fast modulation shows a static disc. The linkage does not simulate physical tension.'});
+if(composition.fm?.enabled)captions.push({label:'interpreted',text:'The FM tensioner enters at the time set by the score. Carriage travel follows modulation decay; halo width estimates occupied bandwidth. Slow modulation shows phase; fast modulation shows a static disc. The linkage does not simulate physical tension.'});
 for(const caption of captions){const p=document.createElement('p');p.className='caption';const strong=document.createElement('strong');strong.textContent=caption.label.toUpperCase()+' · ';p.append(strong,document.createTextNode(caption.text));$('captions').append(p);}
 function stop(){if(playing)study.seek(Math.min(performance.duration,live.time));request++;preparation?.abort();preparation=null;loomVoice?.stop();loomVoice=null;fmVoice?.stop();fmVoice=null;playing=false;audio.stop();choir?.stop();$('perform').textContent='▶ Play the passage';$('stage-state').textContent='SILENT STUDY · SEED '+performance.patch.seed;}
 function schedule(){
@@ -43,7 +54,7 @@ $('perform').onclick=async()=>{
   $('perform').textContent='Cancel preparation';$('stage-state').textContent='PREPARING ENSEMBLE…';
   try{await audio.enable();if(token!==request)return;
     choir??=new BellowsAudio(audio.context,audio.master);audio.stop();choir.stop();
-    performance=attachComposition(createPerformance(activePatch,audio.context.sampleRate),composition);frames=createStageFrames(performance);
+    performance=buildPerformance(audio.context.sampleRate);frames=createStageFrames(performance);
     const preparedLoom=await prepareLoomAudio(performance,audio.context,audio.master,{signal});
     if(token!==request){preparedLoom?.stop();return;}loomVoice=preparedLoom;
     const preparedFM=await prepareFMAudio(performance,audio.context,audio.master,{signal});
@@ -53,6 +64,17 @@ $('perform').onclick=async()=>{
   }catch(error){if(token!==request)return;stop();if(error.name!=='AbortError')$('error').textContent=error.message;}
 };
 $('quiet').onclick=stop;
+$('passage').value=score?'conversation':'seeded';
+$('score-tempo').value=performance.patch.tempo;$('score-tempo-value').textContent=performance.patch.tempo+' BPM';
+$('character').value=score?.controls.character??'calm';$('density').value=score?.controls.density??.7;$('density-value').textContent=Math.round(Number($('density').value)*100)+'%';
+$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;
+function changeScore(){
+ stop();const next=$('passage').value==='seeded'?null:composeConversation({seed:performance.patch.seed,tempo:Number($('score-tempo').value),density:Number($('density').value),character:$('character').value});
+ location.href=scoreURL(location.href,next);
+}
+$('passage').onchange=changeScore;$('character').onchange=changeScore;$('density').onchange=changeScore;$('score-tempo').onchange=changeScore;
+$('density').oninput=()=>{$('density-value').textContent=Math.round(Number($('density').value)*100)+'%';};
+$('score-tempo').oninput=()=>{$('score-tempo-value').textContent=$('score-tempo').value+' BPM';};
 $('loom-enabled').checked=composition.loom.enabled;
 $('loom-study').href=compositionPageURL(location.href,'loom.html',composition);
 $('loom-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,{...composition,loom:{...composition.loom,enabled:$('loom-enabled').checked}});};
@@ -74,6 +96,8 @@ try{
   function draw(){
     const t=playing?live.time:study.time,frame=frames.sample(t,{mode:$('direction').value,position:world.camera.position.toArray(),target:world.controls.target.toArray()});
     const applied=applyStage(frame,frames.bindings,world);inspector.update(frame);world.render();
+    $('score-readout').hidden=!frame.global.score;
+    if(frame.global.score)$('score-readout').textContent=`${frame.global.score.id.toUpperCase()} · Bar ${frame.global.score.bar} · ${score.controls.character} · Density ${score.controls.density}`;
     $('fm-readout').hidden=!frame.stage.tensioner;
     if(frame.stage.tensioner)$('fm-readout').textContent=`FM carrier ${performance.fm.settings.carrierHz} Hz · Modulator ${performance.fm.core.modulatorHz.toFixed(2)} Hz · ${frame.stage.tensioner.positiveInstantaneousFrequency?'Positive instantaneous frequency':'Signed instantaneous frequency; digital FM'} · Entrance ${performance.fm.time.toFixed(2)} s`;
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
@@ -89,15 +113,15 @@ $('cancel-render').onclick=()=>{renderAbort?.abort();$('error').textContent='Can
 $('render-manifest').onclick=()=>{if(lastManifest)downloadArtifact(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),`imagimusic-render-${lastManifest.instrument.seed}.json`);};
 $('movie').onclick=async()=>{
   if(renderAbort||!world)return;stop();renderAbort=new AbortController();
-  for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled'])$(id).disabled=true;
+  for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo'])$(id).disabled=true;
   $('cancel-render').hidden=false;$('render-manifest').disabled=true;lastManifest=null;
   try{
     const {exportMovie}=await import('./export.js');
     const pose={position:world.camera.position.toArray(),target:world.controls.target.toArray(),mode:$('direction').value};
-    const result=await exportMovie(structuredClone(activePatch),pose,{composition,signal:renderAbort.signal,onProgress:message=>$('error').textContent=message});
-    downloadArtifact(result.blob,`imagimusic-conservatory-${activePatch.seed}.mp4`);
+    const result=await exportMovie(structuredClone(activePatch),pose,{composition,score,signal:renderAbort.signal,onProgress:message=>$('error').textContent=message});
+    downloadArtifact(result.blob,`imagimusic-conservatory-${performance.patch.seed}.mp4`);
     lastManifest=result.manifest;$('render-manifest').disabled=false;
     $('error').textContent=`Movie ready · ${result.manifest.frames} frames · 720p / 30 fps · synthesized soundtrack`;
   }catch(error){$('error').textContent=error.message;}
-  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled'])$(id).disabled=false;$('cancel-render').hidden=true;}
+  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo'])$(id).disabled=false;$('cancel-render').hidden=true;$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;}
 };

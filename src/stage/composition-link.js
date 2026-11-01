@@ -29,6 +29,7 @@ export function compositionURL(base,composition){
 /** Move between local studies without dropping the session-backed laboratory instrument. */
 export function compositionPageURL(base,page,composition){
  const source=new URL(base),destination=new URL(page,source);
+ if(source.searchParams.has('score'))destination.searchParams.set('score',source.searchParams.get('score'));
  if(source.searchParams.get('instrument')==='lab')destination.searchParams.set('instrument','lab');
  return compositionURL(destination,composition);
 }

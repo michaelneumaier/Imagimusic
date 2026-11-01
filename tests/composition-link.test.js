@@ -44,3 +44,17 @@ test('stage to either study and back retains the session-backed laboratory instr
  const ordinary=new URL(compositionPageURL('http://localhost/stage.html?instrument=unknown','loom.html',saved));
  assert.equal(ordinary.searchParams.has('instrument'),false);
 });
+
+ test('conversation score survives both study round trips without reordering events',async()=>{
+  const {compositionPageURL}=await import('../src/stage/composition-link.js');
+  const {composeConversation,canonicalScore}=await import('../src/score/conversation.js');
+  const {scoreURL,readScoreSearch}=await import('../src/stage/score-performance.js');
+  const score=composeConversation({seed:42,tempo:96,character:'restless',density:.5});
+  const source=scoreURL('http://localhost/stage.html?instrument=lab',score);
+  for(const page of ['loom.html','tensioner.html']){
+   const study=compositionPageURL(source,page,DEFAULT_COMPOSITION);
+   const returned=new URL(compositionPageURL(study,'stage.html',DEFAULT_COMPOSITION));
+   assert.equal(canonicalScore(readScoreSearch(returned.search)),canonicalScore(score));
+   assert.equal(returned.searchParams.get('instrument'),'lab');
+  }
+ });

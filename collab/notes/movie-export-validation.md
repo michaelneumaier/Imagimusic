@@ -93,3 +93,9 @@ Safari26.6.2/48kHz/seed731, harnessv13 with ?focus=featured%20FM:1/1 selected ch
 ## Authored-event audio integration fixture
 
 New tests/authored-render-browser.html/js runs an explicit compiler fixture through the real offline graph, not the forthcoming three-movement score. DEFAULT_PATCH, garden/tine per-note positions, eight overlapping pitched bellows notes forcing two steals, Loom strikes at5/6s, FM at7s, explicit40s hold. Safari26.6.2 passed both rates:44.1kHz1,764,000samples peak.08413127/RMS.00862383;48kHz1,920,000samples peak.08404797/RMS.00864122. Each rate was rendered twice with exactFloat32 identity,maxDiff0; last0.5s exactzero, duration40s, allfinite/bounded. Report renders/authored-render-report-20261101T024259.json preserves recipe, composition and comparisons. This verifies the compiler/audio integration for this fixture; no generated-phrase or live/offline waveform identity claim follows.
+
+### Generated conversation integration, 2026-11-01
+
+Safari scene-parity harness now accepts a saved `score` query or the default `conversation=1` fixture. With Loom and FM enabled, seed 731 / 84 BPM / calm / density 0.7 passed **341/341** comparisons: 112 AudioContext-clock animation frames and 229 attack, ending, and section-boundary samples, replayed in reverse on a fresh scene. Compared transforms, visibility, materials, tine deformation and camera. This is silent scene evidence, not audio waveform parity.
+
+Observed the live stage finish at 65.33 s with TAIL / bar 17, zero voices, nine Keepers, zero unassigned strikes and zero unreachable arms. After reload, the new Tempo 84 BPM and Density 70% controls displayed correctly. Both prior default and FM+Loom movie manifests still verify 1007/1007 frames under the score-aware verifier. Generated-score full movie and repeated audio checks remain pending.
