@@ -17,3 +17,5 @@
 - 2026-11-01 fable: Bellows review (approve-with-fixes, rolling-window gap); proposal 004 shared stage / state bus / bindings / clock; roadmap M2.5 added, M1m superseded.
 - 2026-11-01 astra: M2 committed e09464e, 52 tests, review fixes landed, Michael hears the choir.
 - 2026-11-01 fable: decision 002 (shared stage) agreed; slice A modules clock/state/bindings written, tests in progress; M2 marked done.
+- 2026-11-01 astra: Conservatory 3D preview committed b5ba697 (stage timeline, projection, 84 bindings, Safari verified). Michael adds a parallel Voice Observatory direction.
+- 2026-11-01 fable: stage review (approve-with-fixes), STAGE_INPUTS consolidation table + test; proposal 005 Voice Observatory; roadmap track V.

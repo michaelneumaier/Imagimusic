@@ -6,6 +6,44 @@ import { validateBindings } from './bindings.js';
 
 const clamp01 = v => Math.max(0, Math.min(1, v));
 
+// Per-parameter inputs and notes, keyed by family then stage parameter name, for the inspector: what a viewer is
+// told a motion depends on. The stage projection (src/stage/projection.js) looks these up by (family, param) so
+// aggregate per-slot fields and truthful inputs come from one place. 'modeN' covers mode0..mode4.
+export const STAGE_INPUTS = {
+  garden: {
+    modeN:   { inputs: ['material', 'brightness', 'damping', 'strikePosition', 'voice.velocity'], note: 'shell N shows the summed energy envelope of partial N+1 across overlapping strikes; slow sway is stylized, not audio-rate motion' },
+    striker: { inputs: ['strikePosition', 'tempo'], note: 'the mallet approaches so contact lands on the audible onset; where it lands changes which partials ring' },
+    damper:  { inputs: ['release'], note: 'a resting damper settles the body; release time is the patch release' },
+  },
+  tine: {
+    length:     { inputs: ['geometry.lengthM'], note: 'beam length from the patch geometry; pitch falls with the square of length' },
+    thickness:  { inputs: ['geometry.thicknessM'], note: 'beam thickness from the patch geometry; pitch rises with thickness' },
+    deflection: { inputs: ['geometry.lengthM', 'geometry.thicknessM', 'geometry.material', 'damping', 'strikePosition'], note: 'amplified, slowed mode-shape deflection; frequencies and shapes follow from geometry, amplitude weights are stylized' },
+    reach:      { inputs: ['strikePosition'], note: 'mallet on the clamped-free tine' },
+    position:   { inputs: ['strikePosition'], note: '0 = clamp, 1 = free tip; the strike point weights each mode by its shape there' },
+    visible:    { inputs: [], note: 'the mallet is shown only during approach, contact, and recovery' },
+    modeN:      { inputs: ['geometry.lengthM', 'geometry.thicknessM', 'geometry.material', 'damping'], note: 'energy of mode N+1' },
+  },
+  bellows: {
+    fill:      { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: 'bellows squeeze on attack, hold through sustain, relax on release (amp envelope)' },
+    aperture:  { inputs: ['bellows.cutoffHz', 'bellows.envAmount', 'bellows.keyTrack', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.noteHz'], note: 'iris opening = filter cutoff on a log scale (20 Hz closed, 20 kHz open)' },
+    level:     { inputs: ['bellows.adsr.s', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.velocity'], note: 'horn light follows modeled output level; no acoustic radiation is modeled' },
+    swing:     { inputs: ['bellows.lfo.rateHz', 'bellows.lfo.wave'], note: 'pendulum = LFO; above ~8 Hz only its swing range is drawn' },
+    resonance: { inputs: ['bellows.resonance'], note: 'membrane tautness = filter resonance' },
+    source:    { inputs: ['bellows.source'], note: 'reed / toothed wheel / jet; air has no fundamental, its pitch target scales playback rate' },
+    tautness:  { inputs: ['bellows.resonance'], note: 'membrane tautness = filter resonance' },
+  },
+  stage: {
+    intensity: { inputs: [], note: 'modeled output intensity (sum of voice levels), not a measured RMS' },
+  },
+};
+
+/** Look up inputs/note for a stage binding; 'mode3' falls back to 'modeN'. Returns null when nothing is declared. */
+export function stageInputsFor(family, param) {
+  const table = STAGE_INPUTS[family]; if (!table) return null;
+  return table[param] ?? (/^mode\d+$/.test(param) ? table.modeN ?? null : null);
+}
+
 export function defaultBindings({ gardenSlots = 8, tineSlot = 8, bellowsSlots = 6, modeLayers = 5 } = {}) {
   const list = [];
   for (let slot = 0; slot < gardenSlots; slot++) {

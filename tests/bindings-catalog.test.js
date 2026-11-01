@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultBindings } from '../src/bindings-catalog.js';
+import { defaultBindings, stageInputsFor, STAGE_INPUTS } from '../src/bindings-catalog.js';
+import { stageBindings } from '../src/stage/projection.js';
+
+test('every stage binding has declared per-parameter inputs and a note, so the inspector can answer truthfully', () => {
+  for (const b of stageBindings()) {
+    const [family, slotName] = b.target.split('/');
+    const entry = stageInputsFor(family, b.param);
+    assert.ok(entry, `no STAGE_INPUTS entry for ${family}/${b.param} (target ${b.target}, slot ${slotName})`);
+    assert.ok(Array.isArray(entry.inputs) && typeof entry.note === 'string' && entry.note.length > 10);
+  }
+  assert.deepEqual(stageInputsFor('garden', 'mode3'), STAGE_INPUTS.garden.modeN);
+  assert.equal(stageInputsFor('nope', 'x'), null); assert.equal(stageInputsFor('bellows', 'nope'), null);
+  assert.ok(STAGE_INPUTS.bellows.aperture.inputs.includes('voice.noteHz') && STAGE_INPUTS.bellows.resonance.inputs.includes('bellows.resonance'));
+});
 import { applyBindings, explainBinding } from '../src/bindings.js';
 import { collectState } from '../src/state.js';
 import { DEFAULT_BELLOWS, validateBellows } from '../src/dynamics.js';

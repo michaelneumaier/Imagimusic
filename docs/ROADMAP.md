@@ -67,6 +67,8 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 - [ ] Slice A: `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); snapshots + canvases rewired to the bus, trace regression live-vs-offline at identical timestamps (Astra integration)
 - [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
+  - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
+  - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
@@ -90,6 +92,10 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 
 - Visual skins (palette, lighting, environment) that never change timing; regression compares motion traces across skins.
 - Michael-facing knobs documented in one page.
+
+## Track V (parallel): Voice Observatory (status: planning; proposal docs/proposals/005-voice-observatory.md, awaiting Astra)
+
+Michael's new direction (2026-11-01, relayed by Astra): live human voice → highly reactive, detailed visual feedback. Measured / estimated / inferred tiers; V0 normal voice → V1 resonances → V2 articulation and beatbox → V3 optional research. No microphone code until the plan is agreed. Does not displace the Conservatory track.
 
 ## Later research (not scheduled)
 
