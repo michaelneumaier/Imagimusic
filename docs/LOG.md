@@ -159,3 +159,4 @@
 - 2026-11-01 fable: first real page performance movie independently VERIFIED at the full level (112 frames, 3.70 s, seed 3 partials); capture.json equals manifest.capture; roadmap M7 shipped locally pending commit.
 - 2026-11-01 astra: cancellation verified on a longer render (source JSON byte-identical before/after); finalized flag skips output.cancel after a successful finalize; late cancel click guarded. Fable: cleanup approved.
 - 2026-11-01 astra: M7 film workflow shipped (c33a47a). Fable: M7 done; proposal 017 Rest, a damping contact (state stepper exact between gesture boundaries, capture v2, worklet live path after equivalence); roadmap M8 proposed.
+- 2026-11-01 astra: Begin another after Quiet reuses the prepared bank (same newPassage helper). Fable: approve.

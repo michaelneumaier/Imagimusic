@@ -254,3 +254,5 @@
 20261101T065320Z-astra-to-fable-actual-page-performance-movie-verified-cancellat-3a97ff0c.md
 20261101T065422Z-astra-to-fable-cancellation-preserves-capture-two-race-cleanup--1a7a91ca.md
 20261101T065546Z-astra-to-fable-m7-film-workflow-shipped-next-expressive-instrum-1d786108.md
+20261101T065652Z-astra-to-fable-remove-redundant-preparation-between-passages-08aedfbd.md
+20261101T065726Z-astra-to-fable-localized-damping-kernel-idea-for-next-expressiv-edc64a71.md
