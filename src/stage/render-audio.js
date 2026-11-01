@@ -33,10 +33,11 @@ export const FAMILIES = ['garden', 'tine', 'bellows'];
 
 //   sourceLifetime 'as-live' (default until the engine zeroes mode gains at their intended end) stops every source
 //              where the live engine does. 'outlive-render' re-schedules every source's stop to renderEnd + 1 s so
-//              NO source finishes during the render. Evidence (harness v4, Safari, 2026-11-01): every render in
-//              which a source finished drifted run-to-run beginning within one sample of the first finish, and
-//              every render in which none finished was bit-identical; when a source finishes, the engine changes
-//              the mix's input set at a scheduler-dependent quantum. 'outlive-render' is only a correct rendering
+//              NO source finishes during the render. Evidence (harness v4–v6, Safari, 2026-11-01): every render
+//              in which a source finished differed run-to-run, with differences observed after the first finish
+//              (the maximum-difference location, not the first difference, is what the harness reports), and
+//              every never-stopped control was bit-identical. The mechanism inside the engine is inferred, not
+//              established (decision 004). 'outlive-render' is only a correct rendering
 //              mode once each mode gain is set to exactly 0 at its intended end (otherwise the oscillator keeps
 //              sounding at the envelope's final ramp value); the garden engine must do that in strike().
 //   renderEnd  seconds; required for 'outlive-render' (renderPerformanceAudio passes performance.duration).
@@ -155,11 +156,12 @@ export function compareRenders(a, b, sampleRate = 48000, { window = 128, quiet =
   const blockMax = new Float32Array(Math.ceil(n / block));
   for (let i = 0; i < n; i++) { const m = Math.abs(a[i]); const k = Math.floor(i / block); if (m > blockMax[k]) blockMax[k] = m; }
   for (let i = 0; i < n; i++) { const k = Math.floor(i / block); local[i] = Math.max(blockMax[k], blockMax[k - 1] ?? 0, blockMax[k + 1] ?? 0, Math.abs(a[i]), Math.abs(b[i])); }
-  let max = 0, at = -1, sum = 0, maxUlps = 0, quietMax = 0, pcmDiffering = 0, pcmMaxStep = 0;
+  let max = 0, at = -1, first = -1, sum = 0, maxUlps = 0, quietMax = 0, pcmDiffering = 0, pcmMaxStep = 0;
   for (let i = 0; i < n; i++) {
     const d = Math.abs(a[i] - b[i]); sum += d * d;
     if (d > max) { max = d; at = i; }
     if (d > 0) {
+      if (first < 0) first = i;
       if (local[i] < quiet) { if (d > quietMax) quietMax = d; }
       else { const u = d / ulp32(local[i]); if (u > maxUlps) maxUlps = u; }
       const pa = Math.round(Math.max(-1, Math.min(1, a[i])) * 32767), pb = Math.round(Math.max(-1, Math.min(1, b[i])) * 32767);
@@ -168,7 +170,8 @@ export function compareRenders(a, b, sampleRate = 48000, { window = 128, quiet =
   }
   return {
     identical: max === 0 && a.length === b.length,
-    maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate,
+    maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate,   // location of the MAXIMUM difference
+    firstDiffSample: first, firstDiffSeconds: first < 0 ? null : first / sampleRate,                                      // location of the FIRST difference
     maxUlps32: maxUlps, quietMaxDiff: quietMax, ulpWindow: block, quietLevel: quiet,
     pcm16Identical: pcmDiffering === 0 && a.length === b.length, pcm16Differing: pcmDiffering, pcm16MaxStep: pcmMaxStep,
     lengths: [a.length, b.length],

@@ -58,7 +58,10 @@ test('renderPerformanceAudio defaults to outlive-render with the passage duratio
 
 test('compareRenders reports identity, max/rms difference, rounding units, and 16-bit PCM equality', () => {
   const a = new Float32Array([0, 0.5, -0.25, 0.1]), b = new Float32Array([0, 0.5, -0.25, 0.1]);
-  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, maxUlps32: 0, quietMaxDiff: 0, ulpWindow: 128, quietLevel: 1e-3, pcm16Identical: true, pcm16Differing: 0, pcm16MaxStep: 0, lengths: [4, 4] });
+  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, firstDiffSample: -1, firstDiffSeconds: null, maxUlps32: 0, quietMaxDiff: 0, ulpWindow: 128, quietLevel: 1e-3, pcm16Identical: true, pcm16Differing: 0, pcm16MaxStep: 0, lengths: [4, 4] });
+  // First difference and maximum difference are different locations and are reported separately.
+  const p = new Float32Array([0, 0.1, 0.2, 0.3, 0.4]), q = new Float32Array([0, 0.1 + 1e-6, 0.2, 0.3, 0.4 + 1e-3]);
+  const fm = compareRenders(p, q, 1); assert.equal(fm.firstDiffSample, 1); assert.equal(fm.atSample, 4); assert.equal(fm.firstDiffSeconds, 1);
   // Rounding units are measured against the local level, so a tiny difference beside a loud sample is small, and a
   // difference in a quiet stretch is reported raw instead of as thousands of units.
   const loud = new Float32Array(300).map((_, i) => i === 150 ? 0.5 : 0), loud2 = Float32Array.from(loud); loud2[149] = 2 ** -24;

@@ -16,14 +16,19 @@ passage duration. The state trace manifest was already deterministic.
 ## The controlled finding
 
 Across harness versions 3–6 on the same machine: every render in which a
-source finished during rendering drifted run-to-run, beginning within one
-sample of the first finish (lone strike 10.029 s vs. first mode stop
-10.029 s; damped lone strike 1.2188 s vs. 1.2184 s); every render in which
-no source finished was bit-identical over 12 s, garden included; the drift
-magnitude varied between runs by three orders (6e-8 to 2.3e-5), i.e. it is
-timing-dependent. Earlier attributions (summation-order rounding floor,
-node collection) were retracted when evidence refuted them. The mechanism
-inside the engine is **inferred, not proven**.
+source finished during rendering differed run-to-run, with differences
+observed after the first source finish (the harness reports the location
+of the MAXIMUM difference, not the first differing sample: lone strike
+maximum at 10.0294 s with the first mode stop at 10.0289 s, about 24
+samples later; damped lone strike maximum at 1.2188 s with the stop at
+1.2184 s; some v5 maxima later still), and every never-stopped control was
+bit-identical over 12 s, garden included. The drift magnitude varied
+between runs by three orders (6e-8 to 2.3e-5), i.e. it is timing-dependent.
+Earlier hypotheses (summation-order rounding floor, node collection,
+disconnect timing) did not explain all controls and were set aside; they
+were not each individually disproven. The source-finish relationship is
+strong and controlled; the exact onset of divergence and the mechanism
+inside the engine are **not established** by these metrics.
 
 ## Decision
 

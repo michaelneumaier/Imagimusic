@@ -11,7 +11,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 7;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 8;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
