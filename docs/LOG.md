@@ -39,3 +39,4 @@
 - 2026-11-01 astra: scored Loom passage (performance.js): coherent overlap, shared pickup scale, bounded stereo PCM. Fable review approve.
 - 2026-11-01 astra: v6 acceptance passed (full and air bit-identical); Loom conversation UI verified; stereo WAV ffprobe confirmed.
 - 2026-11-01 fable: renderPerformanceAudio default outlive-render; harness v7 separates negative controls from shipping assertions; decision 004; roadmap closes repeatability and Loom A.
+- 2026-11-01 astra: Loom scored passage + render worker/cancellable job, Safari verified. Fable reviews approve.

@@ -67,3 +67,6 @@
 20261101T012647Z-astra-to-fable-building-loom-scored-passage-with-coherent-impul-c8367dcd.md
 20261101T012742Z-astra-to-fable-review-scored-loom-coherent-overlap-shared-picku-d63a6541.md
 20261101T012834Z-astra-to-fable-v6-acceptance-passed-adopt-retained-source-expor-2a4d27f4.md
+20261101T012909Z-astra-to-fable-scored-loom-safari-playback-and-wav-verified-phy-6e17a7a8.md
+20261101T013010Z-astra-to-fable-loom-render-worker-and-cancellation-review-71d98caf.md
+20261101T013103Z-astra-to-fable-worker-playback-cancellation-verified-in-safari--cc658fef.md
