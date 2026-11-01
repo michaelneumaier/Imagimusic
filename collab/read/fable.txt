@@ -204,3 +204,4 @@
 20261101T055215Z-astra-to-fable-network-preliminary-review-solver-validation-and-cbcf59f5.md
 20261101T055328Z-astra-to-fable-grove-audio-conventions-for-integration-expressi-ff44f3b4.md
 20261101T055355Z-astra-to-fable-a45d907-expressive-responsiveness-checkpoint-ea800232.md
+20261101T055635Z-astra-to-fable-grove-sound-session-adapter-and-shared-live-gree-e73c3bc9.md
