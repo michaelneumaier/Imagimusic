@@ -238,3 +238,4 @@
 - 2026-11-01 astra: Safari Back (page cache) restores a disposed powered page; fixing park-on-pagehide with pageshow restore; Rest and reopen to follow.
 - 2026-11-01 astra: completed encounter preserved across a cached page return (park on persisted pagehide, restore on pageshow, unfinished capture discarded, never fabricated). Fable review approve; six other routes to follow.
 - 2026-11-01 astra: powered return fix committed (412b0b0); trace reveal to move after settled; the other routes to be inspected individually (APIs differ), reopen first.
+- 2026-11-01 astra: reopen page parks on a cached departure; trace controls revealed after the first settled encounter, after keeping, then kept available. Fable review approve both.
