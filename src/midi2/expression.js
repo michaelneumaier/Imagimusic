@@ -177,7 +177,14 @@ export function composeExpressiveChord({ scene = 'detachReset', smoothingSeconds
 // ---- the musical study (011c): stillness → change → answer → return, ~24 s, three voices ----
 // A3 (57) alone and plain; its pressure rises, then its brightness opens; E4 (64) answers by doing the opposite (bright
 // → closed) while A3 drifts up 30 cents and back; A2 (45) enters soft and still, A3 and E4 release under the sustain
-// pedal, everything returns to neutral, and the last thing heard is the plain tone an octave below the first.
+// pedal (their breath and light returning to neutral while still held), and the last thing heard is the plain tone an octave below the first.
+/** The study's phases in seconds, for captions; the same numbers the fixture is built from. */
+export const EXPRESSIVE_STUDY_PHASES = Object.freeze([
+  Object.freeze({ id: 'stillness', from: 0,  title: 'Stillness', description: 'One plain voice. Nothing changes for four seconds.' }),
+  Object.freeze({ id: 'change',    from: 4,  title: 'Change',    description: 'The same voice: breath rises, then light opens. Nothing else sounds.' }),
+  Object.freeze({ id: 'answer',    from: 9,  title: 'Answer',    description: 'A second voice enters bright and closes while the first drifts up thirty cents and back.' }),
+  Object.freeze({ id: 'return',    from: 16, title: 'Return',    description: 'The pedal holds the two while their breath and light return to neutral; a lower voice, plain and still, is what remains.' }),
+]);
 export function composeExpressiveStudy({ smoothingSeconds = 0.005 } = {}) {
   const neutral = { brightness32: U(0.5), timbre32: U(0.5) };
   const ev = [], add = (time, type, fields) => ev.push({ time, group: 0, channel: 0, type, ...fields });
@@ -199,9 +206,11 @@ export function composeExpressiveStudy({ smoothingSeconds = 0.005 } = {}) {
   // 4. Return: the pedal holds A3 and E4 past their note-offs; A2 enters soft and still; expression returns to neutral.
   add(15.5, 'controlChange', { index8: 64, data32: UINT32_MAX });
   off(16, 57); off(16, 64); on(16, 45, 0x4000);
+  // A3's breath and light return to neutral WHILE the pedal still holds it (16–18 s), so the return is heard before its release;
+  // A2, already plain, is what remains.
+  ramp(16, 17.5, 4, (t, u) => add(t, 'polyPressure', { noteNumber: 57, data32: U(0.75 * (1 - u)) }));
+  ramp(16, 17.5, 4, (t, u) => add(t, 'perNoteController', { noteNumber: 57, index8: PER_NOTE_BRIGHTNESS, data32: U(0.9 - 0.4 * u) }));
   add(18, 'controlChange', { index8: 64, data32: 0 });
-  ramp(18, 20, 4, (t, u) => add(t, 'polyPressure', { noteNumber: 57, data32: U(0.75 * (1 - u)) }));
-  ramp(18, 20, 4, (t, u) => add(t, 'perNoteController', { noteNumber: 57, index8: PER_NOTE_BRIGHTNESS, data32: U(0.9 - 0.4 * u) }));
   off(22, 45);
   const events = ev.map((e, i) => ({ ...e, i })).sort((a, b) => a.time - b.time || a.i - b.i).map(({ i, ...e }, order) => ({ ...e, order }));
   return validateExpressionScore({ version: EXPRESSION_VERSION, protocol: 'midi2', source: { kind: 'fixture', name: 'expressive-study' }, events, bounds: { maxVoices: 3, maxEvents: 64 }, mapping: { version: 1, instrument: 'bellows', smoothingSeconds, neutral } });

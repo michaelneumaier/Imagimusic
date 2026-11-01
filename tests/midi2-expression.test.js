@@ -124,9 +124,10 @@ test('the musical study: stillness, change, an opposite answer, and a return to 
   const r9 = at(9.3), r14 = at(14.5); assert.ok(v(r9, 64).brightness01 > 0.9 && v(r14, 64).brightness01 < 0.55);
   assert.ok(Math.abs(v(at(12.6), 57).pitchHcu - 57.3) < 0.02 && Math.abs(v(at(15.3), 57).pitchHcu - 57) < 0.02);
   assert.equal(v(at(12.6), 64).pitchHcu, 64);
-  // return: sustain holds the two releases until 18; A2 enters soft and stays neutral; everything else returns to neutral by 20
+  // return: sustain holds the two releases until 18 while A3's breath and light return to neutral (audible, before its release); A2 enters soft and stays neutral
   assert.deepEqual([v(at(17), 57).gate, v(at(17), 64).gate, v(at(17), 45).gate], ['held', 'held', 'held']);
   assert.deepEqual([v(at(18.5), 57).gate, v(at(18.5), 64).gate, v(at(18.5), 57).effectiveNoteOff], ['released', 'released', 18]);
+  assert.ok(v(at(17.99), 57).gate === 'held' && v(at(17.99), 57).pressure01 < 0.02 && Math.abs(v(at(17.99), 57).brightness01 - 0.5) < 0.02, 'the return is heard while A3 is still held');
   const r21 = at(21); assert.ok(v(r21, 57).pressure01 < 0.01 && Math.abs(v(r21, 57).brightness01 - 0.5) < 0.01 && Math.abs(v(r21, 45).brightness01 - 0.5) < 1e-9 && v(r21, 45).pressure01 === 0 && v(r21, 45).pitchHcu === 45);
   assert.equal(v(at(23), 45).gate, 'released'); assert.equal(v(at(23), 45).effectiveNoteOff, 22);
   assert.equal(at(30).reported.unsupported.length, 0);
