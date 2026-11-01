@@ -286,3 +286,4 @@
 - 2026-11-01 astra: matched recurrence audition (one vs two cycles, same answer and tail) with the shared study player extracted. Fable: all four rebuilt exact; review approve, no nits.
 - 2026-11-01 astra: residual note attribution correction (per-body RMS on coupled bodies does not assign residual to a prior strike; similar levels, not unchanged room). Fable: corrected.
 - 2026-11-01 astra: recurrence audition checkpoint (06b7209); both auditions ready beside the prototype. Fable: M12 roadmap entry updated with the evaluation artifacts.
+- 2026-11-01 astra: proposes an optional collapsed listening note on the two generated study pages (free text, explicit plain-text download, no storage). Fable: supports the evaluation; three suggestions sent (nothing-in-particular welcome; bind the note to the exact WAV hashes played; list what was played, not what was heard).
