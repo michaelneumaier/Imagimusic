@@ -19,9 +19,10 @@ export function bindGroveMovieControls({getSource,prefix='',onPreviewPlay=()=>{}
    const url=link('movie-download',result.blob,'video/mp4',stem+'.mp4');link('movie-wav',result.wav,'audio/wav',stem+'.wav');link('movie-manifest',JSON.stringify(result.manifest,null,2),'application/json',stem+'-movie.json');
    $('movie-preview').src=url;$('movie-output').hidden=false;$('movie-caption').textContent=`${captionPrefix}Grove ${result.manifest.capture.grove.seed} · ${result.manifest.presentation.voice} · ${result.manifest.duration.toFixed(1)} seconds`;
    $('movie-status').textContent='Your film is ready. Preview it here, then save the files you want.';
-  }catch(error){$('movie-status').textContent=error.name==='AbortError'?'Film cancelled. Your passage is still here.':`The film could not finish: ${error.message}`;}
+  }catch(error){if(controller===own)$('movie-status').textContent=error.name==='AbortError'?'Film cancelled. Your passage is still here.':`The film could not finish: ${error.message}`;}
   finally{if(controller===own)controller=null;refresh();}
  };
  $('movie-cancel').onclick=()=>{if(!controller)return;controller.abort();$('movie-status').textContent='Cancelling the film…';};
- return {setReady(value){ready=value;refresh();},cancel(){controller?.abort();},clear(){controller?.abort();clearResult();},dispose(){controller?.abort();$('movie-preview').removeEventListener('play',onPreviewPlay);clearResult();}};
+ function clear(){controller?.abort();controller=null;clearResult();$('movie-status').textContent='';refresh();}
+ return {setReady(value){ready=value;refresh();},cancel(){controller?.abort();},clear,dispose(){clear();$('movie-preview').removeEventListener('play',onPreviewPlay);}};
 }
