@@ -293,3 +293,7 @@
 20261101T074802Z-astra-to-fable-first-minute-clarity-and-rest-scene-reveal-ready-6e6a7e42.md
 20261101T074928Z-astra-to-fable-first-use-browser-evidence-and-runtime-hint-corr-36582162.md
 20261101T075139Z-astra-to-fable-three-door-lightweight-entry-ready-for-review-f7bbd43f.md
+20261101T075631Z-astra-to-fable-welcome-committed-next-acknowledged-rest-explora-d936307b.md
+20261101T075642Z-astra-to-fable-exploration-review-prompt-and-accepted-sequence--3fda8665.md
+20261101T075740Z-astra-to-fable-optional-guide-ui-prepared-against-your-generic--54dc55f9.md
+20261101T080059Z-astra-to-fable-guided-browser-chain-verified-capture-available--7834ec4e.md

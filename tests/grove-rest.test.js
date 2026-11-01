@@ -220,20 +220,52 @@ test('admission replay and reproducible strengths: an over-loud public record is
   const a = renderRestRecord(cr, rebuilt), b = renderRestRecord(cr, custom); assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])));
 });
 
-test('the guided exploration advances only on accepted gestures in the taught order: strike, rest here, rest on the neighbour', async () => {
-  const { createRestExploration, REST_EXPLORATION_STEPS } = await import('../src/score/grove-rest.js');
-  const recipe = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: 8000 }), x = createRestExploration(recipe), n = x.state.neighbor;
-  const ack = (frame, event, accepted = true) => x.acknowledge({ accepted, appliedFrame: frame, event });
-  assert.equal(x.state.step, 'ring');
-  assert.equal(ack(10, { kind: 'strike', body: 1 }).step, 'ring', 'another body does not count');
-  assert.equal(ack(20, { kind: 'strike', body: 0 }, false).step, 'ring', 'a rejected strike does not count');
-  assert.equal(ack(30, { kind: 'strike', body: 0 }).step, 'here');
-  assert.equal(ack(25, { kind: 'contact', body: 0, zone: 2, strength: 1 }).step, 'here', 'a hand before the strike is not the taught order');
-  assert.equal(ack(40, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'here', 'the neighbour is step three, not two');
-  assert.equal(ack(50, { kind: 'contact', body: 0, zone: 1, strength: 0 }).step, 'neighbor', 'a hand on the struck body after striking it');
-  assert.equal(ack(60, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'neighbor', 'needs a fresh strike first');
-  assert.equal(ack(70, { kind: 'strike', body: 0 }).step, 'neighbor');
-  assert.equal(ack(80, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'done'); assert.ok(x.state.done);
-  assert.equal(x.reset().step, 'ring'); assert.equal(REST_EXPLORATION_STEPS.length, 4);
-  for (const s of REST_EXPLORATION_STEPS) assert.ok(!/feel|should|calm/i.test(s.prompt));
+test('the guided exploration follows its own prompts: strike, strike again + rest here, lift, fresh strike + rest on the neighbour', async () => {
+  const { createRestExploration, REST_EXPLORATION_STEPS, restExplorationPrompt } = await import('../src/score/grove-rest.js');
+  const recipe = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: 8000 }), x = createRestExploration(recipe, { body: 1 }), n = x.state.neighbor, order = { i: 0 };
+  const ack = (frame, event, accepted = true) => x.acknowledge({ accepted, appliedFrame: frame, order: order.i++, event });
+  assert.equal(x.state.step, 'ring'); assert.match(x.state.prompt, /body 2 once/, 'prompts name the chosen body');
+  assert.equal(ack(10, { kind: 'strike', body: 0 }).step, 'ring', 'another body does not count');
+  assert.equal(ack(20, { kind: 'strike', body: 1 }, false).step, 'ring', 'a rejected strike does not count');
+  assert.equal(ack(30, { kind: 'strike', body: 1 }).step, 'here');
+  assert.equal(ack(40, { kind: 'contact', body: 1, zone: 2, strength: 1 }).step, 'here', 'the first-strike shortcut: a hand right after the first strike does not advance; the prompt asked for a second strike');
+  assert.equal(ack(50, { kind: 'contact', body: 1, zone: null }).step, 'here');
+  assert.equal(ack(60, { kind: 'strike', body: 1 }).step, 'here');
+  assert.equal(ack(70, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'here', 'the neighbour is not this step');
+  assert.equal(ack(80, { kind: 'contact', body: 1, zone: 1, strength: 0 }).step, 'lift', 'a hand on the struck body after the second strike');
+  assert.equal(ack(90, { kind: 'strike', body: 1 }).step, 'lift', 'a strike does not stand in for the lift');
+  assert.equal(ack(100, { kind: 'contact', body: 1, zone: null }).step, 'neighbor');
+  assert.equal(ack(110, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'neighbor', 'needs a fresh strike first');
+  assert.equal(ack(120, { kind: 'strike', body: 1 }).step, 'neighbor');
+  assert.equal(ack(130, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'done'); assert.ok(x.state.done);
+  assert.equal(x.reset().step, 'ring'); assert.deepEqual([...REST_EXPLORATION_STEPS], ['ring', 'here', 'lift', 'neighbor', 'done']);
+  for (const s of REST_EXPLORATION_STEPS) assert.ok(!/feel|should|calm|silence/i.test(restExplorationPrompt(s, 0, 1)), 'no claims about the listener or about hearing silence');
+  assert.throws(() => createRestExploration(recipe, { body: 3 }), /index the grove/);
+});
+
+test('exploration: a hand acknowledged at the strike frame counts only when its actual order is later; the neighbour is a bridged body on every seed', async () => {
+  const { createRestExploration } = await import('../src/score/grove-rest.js');
+  for (const seed of GROVE_SEEDS) {
+    const recipe = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: 8000 }), x = createRestExploration(recipe), g = recipe.grove;
+    assert.ok(g.bridges.some(e => (e.a === 0 && e.b === x.state.neighbor) || (e.b === 0 && e.a === x.state.neighbor)), `seed ${seed}: neighbour ${x.state.neighbor} is bridged to body 0`);
+    x.acknowledge({ accepted: true, appliedFrame: 50, order: 1, event: { kind: 'strike', body: 0 } });
+    x.acknowledge({ accepted: true, appliedFrame: 100, order: 5, event: { kind: 'strike', body: 0 } });
+    assert.equal(x.acknowledge({ accepted: true, appliedFrame: 100, order: 4, event: { kind: 'contact', body: 0, zone: 2, strength: 1 } }).step, 'here', 'same frame, earlier order: the hand came first');
+    assert.equal(x.acknowledge({ accepted: true, appliedFrame: 100, order: 6, event: { kind: 'contact', body: 0, zone: 2, strength: 1 } }).step, 'lift', 'same frame, later order: the hand came after the strike');
+    x.acknowledge({ accepted: true, appliedFrame: 200, order: 7, event: { kind: 'quiet', fadeFrames: 200 } }); assert.equal(x.state.step, 'lift', 'Quiet does not advance; the page resets on a new passage');
+    assert.equal(x.reset().step, 'ring');
+  }
+});
+
+test('the same gestures on another grove: a transposed Rest record validates, re-admits, and sounds different', async () => {
+  const { transposeRestRecord, restInvitationRecord, composeRestInvitation, renderRestRecord, canonicalRestRecord } = await import('../src/score/grove-rest.js');
+  const sr = 8000, a = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), b = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const record = restInvitationRecord(a, composeRestInvitation(a, { tempo: 120 })), { record: moved, dropped, note } = transposeRestRecord(record, a, b);
+  assert.equal(dropped.length, 0); assert.match(note, /every gesture/);
+  assert.equal(moved.grove.seed, 7); assert.equal(moved.events.length, record.events.length); assert.deepEqual(moved.contacts, record.contacts);
+  assert.notEqual(canonicalRestRecord(moved, b), canonicalRestRecord(record, a));
+  const x = renderRestRecord(record, a), y = renderRestRecord(moved, b); assert.equal(x.channels[0].length, y.channels[0].length);
+  assert.ok(x.channels[0].some((v, i) => v !== y.channels[0][i]), 'different bodies, different sound');
+  const loud = structuredClone(record); loud.events = Array.from({ length: 30 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); loud.contacts = []; loud.ended = { frame: 4000, fadeFrames: 200 };
+  const r = transposeRestRecord(loud, a, b); assert.ok(r.dropped.length > 0 && r.record.events.length + r.dropped.length === 30); assert.match(r.note, /left out/);
 });

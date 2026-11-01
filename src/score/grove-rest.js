@@ -261,33 +261,62 @@ export function restInvitationSettledLine(invitation) {
   return `A free ring. Then a firm hand on the struck body: its ring died under the hand. Then the same strike with the hand on body ${invitation.neighbor + 1} instead: the bridge carried the change and the ring was different, not simply quieter. All three with a light hand, then Quiet.`;
 }
 
-// ---- a compact guided exploration after the invitation: same strike, rest here, rest on the neighbour ----
-// Not an authored passage: the player plays, and the page shows one prompt at a time. Progress is decided only by acknowledged,
-// accepted gestures (the audio thread's decisions), never by requests. Pure state machine; the page feeds it acknowledgements.
-export const REST_EXPLORATION_STEPS = Object.freeze([
-  { id: 'ring', prompt: 'Strike the first body once and let it ring.' },
-  { id: 'here', prompt: 'Strike it again, and while it rings rest a hand on it. Lift when it is gone.' },
-  { id: 'neighbor', prompt: 'Strike it once more, and this time rest the hand on its neighbour instead.' },
-  { id: 'done', prompt: 'That is the whole gesture. Play on, or choose Quiet.' },
-]);
+// ---- a compact guided exploration after the invitation: strike, rest here, lift, fresh strike, rest on the neighbour ----
+// Not an authored passage: the player plays and the page shows one prompt at a time. Progress is decided only by acknowledged,
+// accepted gestures in the audio thread's actual order (a later frame, or the same frame with a later order), never by requests,
+// and never by any claim to hear silence: the lift step waits for the hand to lift, whenever the player chooses.
+export const REST_EXPLORATION_STEPS = Object.freeze(['ring', 'here', 'lift', 'neighbor', 'done']);
+export function restExplorationPrompt(step, body, neighbor) {
+  const b = `body ${body + 1}`, n = `body ${neighbor + 1}`;
+  return { ring: `Strike ${b} once and let it ring.`, here: `Strike ${b} again, and while it rings rest a hand on it.`, lift: 'Lift the hand when you want to hear what remains.',
+    neighbor: `Strike ${b} once more, and this time rest the hand on ${n} instead.`, done: 'That is the whole gesture: strike, rest here, lift, rest on the neighbour. Play on, or choose Quiet.' }[step];
+}
 export function createRestExploration(recipe, { body = 0 } = {}) {
-  const g = recipe.grove, bridge = g.bridges.find(e => e.a === body || e.b === body);
+  const g = recipe.grove;
+  if (!Number.isInteger(body) || body < 0 || body >= recipe.bodies) throw new Error('body must index the grove.');
+  const bridge = g.bridges.find(e => e.a === body || e.b === body);
   if (!bridge) throw new Error('the exploration needs a body with a bridge.');
   const neighbor = bridge.a === body ? bridge.b : bridge.a;
-  let step = 0, struck = false, lastStrikeFrame = -1;
-  const current = () => ({ step: REST_EXPLORATION_STEPS[step].id, prompt: REST_EXPLORATION_STEPS[step].prompt, body, neighbor, done: step === REST_EXPLORATION_STEPS.length - 1 });
+  let step = 0, struck = false, lastStrikeFrame = -1, lastStrikeOrder = -1;
+  const current = () => ({ step: REST_EXPLORATION_STEPS[step], prompt: restExplorationPrompt(REST_EXPLORATION_STEPS[step], body, neighbor), body, neighbor, done: step === REST_EXPLORATION_STEPS.length - 1 });
+  const after = ack => struck && (ack.appliedFrame > lastStrikeFrame || (ack.appliedFrame === lastStrikeFrame && (ack.order ?? -1) > lastStrikeOrder));
   return {
     get state() { return current(); },
-    /** Feed one acknowledgement { accepted, appliedFrame, event: { kind, body, zone } }. Returns the state after it. */
+    /** Feed one acknowledgement { accepted, appliedFrame, order, event: { kind, body, zone } }. Returns the state after it. */
     acknowledge(ack) {
       if (!ack?.accepted || !ack.event) return current();
-      const e = ack.event, kind = e.kind;
-      if (kind === 'strike' && e.body === body) { struck = true; lastStrikeFrame = ack.appliedFrame; if (step === 0) step = 1; return current(); }
-      const restOn = kind === 'contact' && e.zone !== null && e.zone !== undefined, afterStrike = struck && ack.appliedFrame > lastStrikeFrame;
-      if (step === 1 && restOn && e.body === body && afterStrike) { step = 2; struck = false; return current(); }
-      if (step === 2 && restOn && e.body === neighbor && afterStrike) { step = 3; return current(); }
+      const e = ack.event, id = REST_EXPLORATION_STEPS[step];
+      if (e.kind === 'strike' && e.body === body) {
+        if (id === 'ring') { step = 1; struck = false; return current(); }           // the first strike is consumed: the next step asks for another
+        struck = true; lastStrikeFrame = ack.appliedFrame; lastStrikeOrder = ack.order ?? -1; return current();
+      }
+      if (e.kind !== 'contact') return current();
+      const restOn = e.zone !== null && e.zone !== undefined;
+      if (id === 'here' && restOn && e.body === body && after(ack)) { step = 2; return current(); }
+      if (id === 'lift' && !restOn && e.body === body) { step = 3; struck = false; return current(); }
+      if (id === 'neighbor' && restOn && e.body === neighbor && after(ack)) { step = 4; return current(); }
       return current();
     },
-    reset() { step = 0; struck = false; lastStrikeFrame = -1; return current(); },
+    reset() { step = 0; struck = false; lastStrikeFrame = -1; lastStrikeOrder = -1; return current(); },
   };
+}
+
+// ---- the same gestures, another grove (proposal 018) ----
+/** Carry a Rest record's gestures (bodies, positions, zones, strengths, frames) onto another grove's recipe at the same rate. Strikes the
+ *  target would have rejected live are dropped and reported, never kept; contacts are copied; the result validates and re-admits. */
+export function transposeRestRecord(record, source, target) {
+  validateRestRecord(record, source);
+  if (target.sampleRate !== source.sampleRate || target.bodies !== source.bodies || target.positions.length !== source.positions.length || target.zones.length !== source.zones.length || target.strengths.length !== source.strengths.length) throw new Error('target recipe must match the source in rate, bodies, positions, zones and strengths.');
+  const engine = createRestEngine(target), kept = [], dropped = [];
+  const keyAt = i => contactStateKey(Array.from({ length: target.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  let frame = 0;
+  for (const k of record.events) {
+    for (; frame < k.frame; frame++) { engine.setContacts(keyAt(frame)); engine.step(); }
+    engine.setContacts(keyAt(frame));
+    const bound = engine.candidateBound(k.position, k.body, k.velocity);
+    if (bound <= target.admissionCeiling) { kept.push({ ...k }); engine.strike(k.position, k.body, k.velocity); } else dropped.push({ ...k, bound });
+  }
+  const out = { ...structuredClone(record), grove: target.grove, voice: target.voice, outputGain: target.outputGain, zones: target.zones.slice(), strengths: target.strengths.map(st => ({ name: st.name, c: st.c })), events: kept };
+  validateRestAdmission(out, target);
+  return { record: out, dropped, note: dropped.length ? `${dropped.length} strike(s) the other grove could not take at that loudness were left out.` : 'every gesture carried over.' };
 }

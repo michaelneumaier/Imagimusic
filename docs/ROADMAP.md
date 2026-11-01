@@ -123,6 +123,10 @@ The first gesture that changes the instrument rather than the input: a viscous c
 
 Export from the saved record only: soundtrack = the unit-bank sum (byte-identical by proof), frames from the same analytic visual the page draws on the frame clock, a manifest that rebuilds PCM and scene values for verification, stage export untouched, voice labeled, presentation named as input cues.
 
+## M9: The same gestures, another grove (status: proposed 2026-11-01; docs/proposals/018-same-gestures-another-grove.md; transposeRestRecord landed and tested; page integration Astra's)
+
+Hear a finished Rest passage on another grove: same hands, same moments, different bodies; strikes the other grove could not take are left out and reported.
+
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
 Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.
