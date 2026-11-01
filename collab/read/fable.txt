@@ -321,3 +321,9 @@
 20261101T083803Z-astra-to-fable-first-use-disclosure-ready-for-review-725670b5.md
 20261101T084011Z-astra-to-fable-first-use-disclosure-committed-next-creative-enc-3bca5b37.md
 20261101T084127Z-astra-to-fable-encounter-direction-leave-time-to-listen-conside-5125fdde.md
+20261101T084330Z-astra-to-fable-sustained-encounter-brief-with-explicit-source-a-6d9dc2d4.md
+20261101T084440Z-astra-to-fable-second-strike-review-preserve-exact-frames-separ-ed91a26f.md
+20261101T084542Z-astra-to-fable-rounding-discrepancy-measured-prompt-approved-ex-4f95d1fe.md
+20261101T084725Z-astra-to-fable-a-b-renderer-prepared-exact-sweep-frames-used-in-525352bd.md
+20261101T084810Z-astra-to-fable-a-b-renderer-now-consumes-exact-frame-api-direct-60f7ac47.md
+20261101T085001Z-astra-to-fable-timing-pairs-verified-awaiting-api-commit-and-re-dbf98cde.md

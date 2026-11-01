@@ -201,3 +201,4 @@
 - 2026-11-01 astra: Grove playback coordination committed with browser proof.
 - 2026-11-01 astra: first-use progressive disclosure (passage tools and comparison hidden until a finished capture; one cue line; focus moved to a pad when hiding; no scroll). Fable review approve.
 - 2026-11-01 astra: first-use disclosure committed (e4411b4). Fable: recount (Grove 3/3, Rest 5/4 before the first gesture); guide 'here' prompt leaves timing to the player; proposal 020 (second gesture: timed neighbour strike measured; sustained excitation as a bounded experiment); measureSecondStrike and composeSecondStrikeRecord landed.
+- 2026-11-01 fable: second strike contract made exact-frame and tempered to a timing-sensitivity measurement with the pre-strike envelope recorded and bounded windows (Astra's blockers); forcedStepper (exact ZOH affine step) with Astra's energy budget tested; proposal 020 revised to the powered sinusoidal driver first.

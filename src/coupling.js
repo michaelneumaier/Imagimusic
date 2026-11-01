@@ -365,8 +365,8 @@ export function freeDamping(network) {
   return C;
 }
 
-/** Φ = exp(S h) for S = [[0, I], [−A, −(C_free + Σ contacts)]], h = 1/sampleRate; returns { phi, n, dim: 2n, step(x) }. */
-export function stateStepper(network, { contacts = [], sampleRate } = {}) {
+/** The balanced, h-scaled state matrix S_b·h with S = [[0, I], [−A, −(C_free + Σ contacts)]] (shared by the passive and the forced stepper). */
+function scaledStateMatrix(network, contacts, sampleRate) {
   if (!Number.isInteger(sampleRate) || sampleRate < 1000 || sampleRate > 384000) throw new Error('sampleRate must be an integer in 1000..384000.');
   const { n, A } = network, dim = 2 * n, h = 1 / sampleRate, C = freeDamping(network);
   for (const contact of contacts) { const Ct = contactDamping(network, contact); for (let i = 0; i < n * n; i++) C[i] += Ct[i]; }
@@ -375,12 +375,35 @@ export function stateStepper(network, { contacts = [], sampleRate } = {}) {
   let aNorm = 0; for (let j = 0; j < n; j++) { let c = 0; for (let i = 0; i < n; i++) c += Math.abs(A[i][j]); aNorm = Math.max(aNorm, c); }
   const w0 = Math.sqrt(aNorm) || 1, S = new Float64Array(dim * dim);
   for (let i = 0; i < n; i++) { S[i * dim + (n + i)] = h * w0; for (let j = 0; j < n; j++) { S[(n + i) * dim + j] = -A[i][j] * h / w0; S[(n + i) * dim + (n + j)] = -C[i * n + j] * h; } }
-  const phiB = matrixExponential(S, dim), phi = new Float64Array(dim * dim);
-  for (let i = 0; i < dim; i++) for (let j = 0; j < dim; j++) phi[i * dim + j] = phiB[i * dim + j] * (i < n ? 1 : w0) / (j < n ? 1 : w0);
+  return { S, w0, dim, n, h };
+}
+const unbalance = (M, dim, n, w0) => { const out = new Float64Array(dim * dim); for (let i = 0; i < dim; i++) for (let j = 0; j < dim; j++) out[i * dim + j] = M[i * dim + j] * (i < n ? 1 : w0) / (j < n ? 1 : w0); return out; };
+
+/** Φ = exp(S h) for S = [[0, I], [−A, −(C_free + Σ contacts)]], h = 1/sampleRate; returns { phi, n, dim: 2n, step(x), stepInto(x, out) }. */
+export function stateStepper(network, { contacts = [], sampleRate } = {}) {
+  const { S, w0, dim, n } = scaledStateMatrix(network, contacts, sampleRate);
+  const phi = unbalance(matrixExponential(S, dim), dim, n, w0);
   /** Allocation-free: writes Φ x into out (caller-owned, must not alias x). */
   const stepInto = (x, out) => { if (out === x) throw new Error('stepInto: out must not alias x.'); for (let i = 0; i < dim; i++) { let s = 0; const row = i * dim; for (let j = 0; j < dim; j++) s += phi[row + j] * x[j]; out[i] = s; } return out; };
   const step = x => stepInto(x, new Float64Array(dim));
   return Object.freeze({ phi, n, dim, sampleRate, contacts: Object.freeze(contacts.map(c => Object.freeze({ ...c }))), step, stepInto });
+}
+
+/** Forced stepper (proposal 020 B): a force held constant over each sample on direction b (a mass-normalized velocity vector, e.g. the
+ *  velocity part of a unit strike vector). Exact affine zero-order-hold evolution x ← Φ x + Γ f with Γ = ∫₀ʰ e^{Sτ} dτ · b, both from
+ *  one exponential of the augmented matrix [[S h, b h], [0, 0]]. The declared input is the sample-held force, not a continuous curve. */
+export function forcedStepper(network, { contacts = [], sampleRate, direction } = {}) {
+  const { S, w0, dim, n } = scaledStateMatrix(network, contacts, sampleRate), h = 1 / sampleRate;
+  if (!direction || direction.length !== dim) throw new Error('direction must be a state-sized vector (force enters the velocity rows).');
+  for (let i = 0; i < n; i++) if (direction[i] !== 0) throw new Error('a force acts on velocity rows only; displacement rows of direction must be zero.');
+  const m = dim + 1, M = new Float64Array(m * m);
+  for (let i = 0; i < dim; i++) { for (let j = 0; j < dim; j++) M[i * m + j] = S[i * dim + j]; M[i * m + dim] = (i < n ? direction[i] : direction[i] / w0) * h; }   // balanced b·h
+  const E = matrixExponential(M, m), phiB = new Float64Array(dim * dim), gammaB = new Float64Array(dim);
+  for (let i = 0; i < dim; i++) { for (let j = 0; j < dim; j++) phiB[i * dim + j] = E[i * m + j]; gammaB[i] = E[i * m + dim]; }
+  const phi = unbalance(phiB, dim, n, w0), gamma = Float64Array.from(gammaB, (g, i) => (i < n ? g : g * w0));
+  const norm = Math.sqrt(direction.reduce((a, v) => a + v * v, 0));
+  const stepInto = (x, f, out) => { if (out === x) throw new Error('stepInto: out must not alias x.'); for (let i = 0; i < dim; i++) { let s = gamma[i] * f; const row = i * dim; for (let j = 0; j < dim; j++) s += phi[row + j] * x[j]; out[i] = s; } return out; };
+  return Object.freeze({ phi, gamma, n, dim, sampleRate, directionNorm: norm, contacts: Object.freeze(contacts.map(c => Object.freeze({ ...c }))), stepInto, step: (x, f) => stepInto(x, f, new Float64Array(dim)) });
 }
 
 /** The mass-normalized state the modal sums give at time t for strikes [{ body, u, J, time }] (bodies at rest before the first). */
