@@ -25,3 +25,7 @@ Direct shell playing peer review: Fable formally approved 8883cb2 in collab/revi
 Finished-capture replay (working tree): Safari320×656 exercised Enter → A/S gestures → Quiet → Listen back → natural ending. Status reached YOUR PASSAGE HAS SETTLED and replay remained available. Replay reads the same finished PCM saved by the capture mixer and uses its own audio clock for the original session's visual frame. It never edits recorded events or ending; Quiet during replay only stops playback. Two focused tests verify PCM copying, audio-clock position, cancelled preparation, stale completion isolation and interruption stopping. Peer review requested separately.
 
 Finished replay formally approved by Fable (review20261101T0617Z). Combined replay/audition checkpoint: full suite301/301; original capture/save numerical behavior retained.
+
+### Immediate passage restart
+
+After Quiet, the top action now says “Begin another” and uses the same prepared-bank reset as New passage. Changing seed or voice still rebuilds the corresponding instrument; Resume still handles an interrupted audio context. A reset into a suspended context explicitly asks the player to resume audio. Safari verified original seed 7: Enter → A → Quiet → Begin another (immediate ready, no preparation phase) → S → Quiet. This is an interaction-only change; the original capture is replaced as with New passage.
