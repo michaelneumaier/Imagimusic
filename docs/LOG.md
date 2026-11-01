@@ -150,3 +150,4 @@
 - 2026-11-01 astra: bridge endpoints moved to the lower-tip attachment (sag below the pair) and recorded strike cues (404ddd7). Fable review approve.
 - 2026-11-01 astra: positional greeting page integration (greeting.js adapter, plan sections drive the phase; 12 combinations admitted). Fable review approve; seven older missed messages acknowledged as superseded by later reviews.
 - 2026-11-01 astra: positional invitation shipped (d788107), 314/314, six-case parity, saved JSON equals authored events; proposes a movie of a saved Grove performance. Fable: milestone logged; proposal 016 with the constraints that keep the movie honest; roadmap M7 proposed.
+- 2026-11-01 astra: Grove movie core contract (plan from snapshot, supplied PCM, static camera, model-state hashes, separate world). Fable review: approve with four pins (verify PCM from record, AAC is lossy so keep the WAV beside, tail frames, presentation in or out of the hash).
