@@ -13,7 +13,7 @@ const $=id=>document.getElementById(id);
 function poseHash(world){
  const nodes=[];
  world.scene.traverse(o=>{
-  const materials=(Array.isArray(o.material)?o.material:[o.material]).filter(Boolean).map(m=>({color:m.color?.toArray(),emissive:m.emissive?.toArray(),intensity:m.emissiveIntensity,opacity:m.opacity}));
+  const materials=(Array.isArray(o.material)?o.material:[o.material]).filter(Boolean).map(m=>({color:m.color?.toArray(),emissive:m.emissive?.toArray(),intensity:m.emissiveIntensity,opacity:m.opacity,roughness:m.roughness,metalness:m.metalness,clearcoat:m.clearcoat,clearcoatRoughness:m.clearcoatRoughness}));
   nodes.push({position:o.position.toArray(),quaternion:o.quaternion.toArray(),scale:o.scale.toArray(),visible:o.visible,materials});
  });
  return traceHash({nodes,camera:world.camera.position.toArray(),rotation:world.camera.quaternion.toArray(),target:world.controls.target.toArray(),beam:Array.from(world.tine.beam.geometry.attributes.position.array)});
@@ -26,7 +26,9 @@ $('run').onclick=async()=>{
   const score=readScoreSearch(location.search)??(new URLSearchParams(location.search).get('conversation')==='1'?composeConversation():null);
   const build=()=>score?createScorePerformance(structuredClone(DEFAULT_PATCH),structuredClone(score),structuredClone(composition),context.sampleRate):attachComposition(createPerformance(structuredClone(DEFAULT_PATCH),context.sampleRate),structuredClone(composition));
   const passage=build(),frames=createStageFrames(passage);
-  const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]},captured=[];
+  const mode=new URLSearchParams(location.search).get('camera')??'follow';
+  if(!['follow','cinematic','establish','detail'].includes(mode))throw new Error('Unknown test camera mode');
+  const camera={mode,position:[9,6.5,12],target:[0,1,0]},captured=[];
   liveWorld=createWorld($('live'),{width:480,height:270});
   const origin=context.currentTime,clock=new WallClock(()=>context.currentTime-origin);
   await new Promise((resolve,reject)=>{
@@ -48,7 +50,7 @@ $('run').onclick=async()=>{
    if(traceHash(frame)!==row.state||poseHash(offlineWorld)!==row.pose)throw new Error(`Scene mismatch at ${row.t}s`);
   }
   offlineWorld.render();
-  $('result').textContent=JSON.stringify({passed:true,sampleRate:context.sampleRate,liveFrames:captured.length-boundaries.length,boundaryFrames:boundaries.length,framesCompared:captured.length,reverseReplay:true,scene:'transforms, visibility, material values, tine deformation, camera',audio:'clock only; no sound generated',composition,score},null,2);
+  $('result').textContent=JSON.stringify({passed:true,cameraMode:mode,sampleRate:context.sampleRate,liveFrames:captured.length-boundaries.length,boundaryFrames:boundaries.length,framesCompared:captured.length,reverseReplay:true,scene:'transforms, visibility, material values, tine deformation, camera (not rendered pixels)',audio:'clock only; no sound generated',composition,score},null,2);
  }catch(error){$('result').textContent='FAIL: '+error.message;}
  finally{await context?.close();liveWorld?.dispose();offlineWorld?.dispose();$('run').disabled=false;}
 };

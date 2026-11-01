@@ -1,4 +1,5 @@
 import {composeConversation} from '../score/conversation.js';
+import {readCameraSearch,cameraURL} from './camera-link.js';
 import {createScorePerformance,readScoreSearch,scoreURL} from './score-performance.js';
 import {DEFAULT_TENSIONER} from '../fm.js';
 import {prepareFMAudio} from './fm-audio.js';
@@ -19,6 +20,7 @@ import { applyStage, CAPTIONS } from './projection.js';
 const $=id=>document.getElementById(id);
 const audio=new InstrumentAudio();let choir=null,world=null,playing=false,origin=0,cursor=0,request=0;
 let activePatch=structuredClone(DEFAULT_PATCH), importError='';
+try{$('direction').value=readCameraSearch(location.search);}catch(error){importError=error.message+'. Using manual orbit.';}
 if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
 let composition=structuredClone(DEFAULT_COMPOSITION);
 try{composition=readCompositionSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the default ensemble.';}
@@ -86,12 +88,14 @@ $('fm-study').href=compositionPageURL(location.href,'tensioner.html',composition
 $('fm-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,{...composition,version:2,fm:{settings:composition.fm?.settings??{...DEFAULT_TENSIONER},enabled:$('fm-enabled').checked}});};
 $('seek').max=performance.duration;
 $('seek').oninput=()=>{stop();study.seek(Number($('seek').value));};
-$('view').onchange=()=>{ $('direction').value='manual'; if(world){world.controls.enabled=true;world.view($('view').value);$('camera-hint').textContent='DRAG TO ORBIT · SCROLL TO EXPLORE';} };
-$('direction').onchange=()=>{const manual=$('direction').value==='manual';if(world)world.controls.enabled=manual;$('camera-hint').textContent=manual?'DRAG TO ORBIT · SCROLL TO EXPLORE':'SCORE CAMERA · SCRUB TO EXPLORE';};
+function updateCameraMode(){const manual=$('direction').value==='manual';if(world)world.controls.enabled=manual;$('camera-hint').textContent=manual?'DRAG TO ORBIT · SCROLL TO EXPLORE':'SCORE CAMERA · SCRUB TO EXPLORE';}
+$('view').onchange=()=>{ $('direction').value='manual';history.replaceState(null,'',cameraURL(location.href,'manual'));updateCameraMode();if(world)world.view($('view').value);};
+$('direction').onchange=()=>{history.replaceState(null,'',cameraURL(location.href,$('direction').value));updateCameraMode();};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
 setInterval(schedule,25);
 try{
   world=createWorld($('world'));
+  updateCameraMode();
   const color=MATERIALS[activePatch.material].color;
   for(const body of world.garden)for(const shell of body.layers){shell.material.color.setRGB(...color.map(c=>c/255));shell.material.emissive.copy(shell.material.color);}
   stop();$('error').textContent=importError;
