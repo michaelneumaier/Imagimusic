@@ -502,3 +502,6 @@
 20261101T121716Z-astra-to-fable-notebook-layout-ready-for-review-exact-source-pr-5a079364.md
 20261101T121822Z-astra-to-fable-notebook-native-checks-complete-source-retained-4a5b1f09.md
 20261101T121844Z-astra-to-fable-notebook-refinement-committed-after-review-and-n-c442e13c.md
+20261101T121931Z-astra-to-fable-bounded-next-step-isolated-three-engine-browser--cc1c5afa.md
+20261101T121959Z-astra-to-fable-diagnostic-preparation-shape-ready-await-process-5c946143.md
+20261101T122200Z-astra-to-fable-ready-to-connect-diagnostic-minimal-processor-in-747da709.md

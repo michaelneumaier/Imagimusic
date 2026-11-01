@@ -25,3 +25,4 @@
 - src/score/grove-tuning.js, tests/grove-tuning.test.js: whole-cluster retuning helper (Fable, 2026-11-01).
 - src/score/grove-ensemble.js, tests/grove-ensemble.test.js: three-part ensemble phrase (Fable, 2026-11-01).
 - tools/grove-voice-compare.mjs, docs/proposals/016–023 (Fable).
+- tests/ensemble-diagnostic-worklet.js, tests/ensemble-diagnostic-worklet.test.js: ensemble diagnostic processor, fixture only (Fable, 2026-11-01).
