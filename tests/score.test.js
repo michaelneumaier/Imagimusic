@@ -125,6 +125,8 @@ test('the validator rejects what the families cannot do and what the schema does
   const mutate = f => { const s = structuredClone(ok); f(s); return s; };
   const rejects = (f, re) => assert.throws(() => validateScore(mutate(f)), re);
   rejects(s => s.events.push({ id: 'fm:release:2', family: 'fm', beat: 63, anchor: true }), /exactly one fm/);
+  rejects(s => { const fm = s.events.find(e => e.family === 'fm'); delete fm.anchor; fm.weight = 0.9; }, /fm event must be an anchor/);
+  assert.equal(compileScoreEvents(composeConversation({ density: 0 })).fmTime, beatSeconds(ok, 32), 'the FM entrance survives density 0');
   rejects(s => { s.events[0].slot = 8; }, /slot/);
   rejects(s => { s.events.find(e => e.family === 'loom').body = 2; }, /body/);
   rejects(s => { s.events.find(e => e.family === 'bellows').noteMidi = 97; }, /noteMidi/);

@@ -106,7 +106,8 @@ Score = {
   bounds; sections contiguous, half-open, non-empty; ids unique and of the
   form `family:section:n` with the section containing the beat; family in
   the five names (garden, tine, bellows, loom, fm; dampers are not a family); slot 0–7, body 0–1, noteMidi 36–96, velocity (0, 1],
-  durationBeats > 0; exactly one `fm`; `anchor` xor `weight`; at most 256
+  durationBeats > 0; exactly one `fm`, and it is an anchor; `anchor` xor
+  `weight`; at most 256
   candidate events and every onset and gate end within the compiler's
   120 s; unknown keys and coerced types rejected. **No
   reachability rule in the validator** (Astra's point 5): reachability is

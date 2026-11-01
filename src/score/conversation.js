@@ -71,7 +71,7 @@ export function validateScore(score) {
     if ((e.family === 'garden' || e.family === 'tine') && e.position !== undefined) within(e.position, 0, 1, `event ${e.id}.position`);
     if (e.family === 'bellows') { if (!Number.isInteger(e.noteMidi)) throw new Error(`event ${e.id}: noteMidi must be an integer.`); within(e.noteMidi, 36, 96, `event ${e.id}.noteMidi`); if (!(finite(e.durationBeats, `event ${e.id}.durationBeats`) > 0)) throw new Error(`event ${e.id}: durationBeats must be positive.`); }
     if (e.family === 'loom') { if (!Number.isInteger(e.body) || e.body < 0 || e.body >= LOOM_BODIES) throw new Error(`event ${e.id}: body must be 0 or 1.`); loomCount++; if (hasAnchor) loomAnchors++; }
-    if (e.family === 'fm') fmCount++;
+    if (e.family === 'fm') { fmCount++; if (!hasAnchor) throw new Error(`event ${e.id}: the fm event must be an anchor so the entrance survives every density.`); }
   });
   if (fmCount !== 1) throw new Error('Score must contain exactly one fm event.');
   if (loomCount && !loomAnchors) throw new Error('A score with Loom events needs at least one Loom anchor.');
