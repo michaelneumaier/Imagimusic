@@ -125,3 +125,9 @@ Added default-collapsed See the connections on adaptation audition. Three static
 
 Safari320×656: initial collapsed, disclosure revealed all3 snapshots, screenshot confirmed legible numbered bodies, consistent positions, equal Original widths and increasing1–3 thickness at third stage. Initial peer review approved the prior raw-coupling draft; requested refreshed review of the final relative mapping before claiming approval. Prior three-stage page305eb00/shared player approved separately in Fable103254Z review.
 Refreshed approval received in Fable103511Z message/addendum(c223657): final per-edge ratio mapping approved. Caption gives readable calibration (twice original width means twice original stiffness); accessible labels give numerical ratios. Baseline3 is SVG drawing-unit implementation detail, not a physical unit.
+
+### Own saved gesture: bounded preparation core
+
+Added rest-adaptation.js/worker for optional offline selected-file experiment. Existing Rest import parser bounds bytes/schema; additional20seconds including fade and<=48kHz gate occurs before recipe construction. Source bridge activity supplies one explicitk=.5 target. Strict variant rejects dropped strikes/unchanged structure; equal canonical output gain required. Returns untouched original record and one changed record with both PCM/pictures, exchange and declared rule. No live state changes or resampling. Both records alone reconstruct their sound. Worker transfers four channel buffers.
+
+Two focused tests passed: valid2strike/contact pair, exact source/gesture/ending/gain preservation and record-only PCM rebuilds; duration/rate rejection before recipe validation. Browser worker/UI not yet integrated. Requested Fable core review for next UI handoff; reuse existing import session's cancellation and previous-success behavior.
