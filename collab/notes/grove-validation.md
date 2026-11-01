@@ -8,7 +8,7 @@ Browser tests/grove-audio.html uses actual shared impulse/fade scheduler functio
 
 Focused 18 network, generator, anatomy, performance and shared transport checks passed. Fable approved adapter/transport in collab/reviews/20261101T0558Z-fable-reviews-grove-adapter.md. Page/caption review requested separately; responsive layout still to verify.
 
-Startup on the first navigation retained old shared module state; normal reload loaded the complete page. Added a visible module-load failure message instead of leaving blank controls if a future import fails. Replaced removed PCFSoftShadowMap with supported PCFShadowMap in the new world.
+The first navigation snapshot preceded complete page initialization; a subsequent reload showed the complete page. The snapshot alone does not establish a module cache failure. Added a visible module-load failure message instead of leaving blank controls if a future import fails. Replaced removed PCFSoftShadowMap with supported PCFShadowMap in the new world.
 
 Realism: three linear lumped masses, three normal modes and common damping. Fixed layout-derived stereo displacement pickups, not acoustic radiation. Shell volume follows mass and tuning changes proportions at fixed volume; shell surfaces, support, materials and amplified envelope movement are design. Bridges follow real model topology but do not display edge energy flow.
 
@@ -17,3 +17,5 @@ Follow-up: Fable page/caption review approved at collab/reviews/20261101T0604Z-f
 Direct scene playing follow-up: actual shell raycasting now routes a captured hold/release through the same session as pads. Safari at 400×656: held central shell click accepted as body 01, enabled recording downloads, and Quiet ended the passage. Two automated interaction tests verify current-transform picking, empty-space misses, camera isolation and release/cancel/reset behavior; the nine focused interaction/performance/transport tests pass. Pending-input ring is separate from modeled envelope glow. Blur/hide/Quiet/new passage/seed change reset holds and release pointer capture; audio interruption also resets pending holds. Physical multitouch remains unverified.
 
 Camera/pointer follow-up: an active OrbitControls drag keeps subsequent body touches in camera control instead of acquiring a musical gesture midway; third interaction regression passes. Full-suite checkpoint during concurrent modal-network development: 297 tests, 295 pass, two failures in Fable's new modal-network fixtures (missing explicit clamped-free support), reported to Fable. Direct-play files do not change the sound model. No whole-suite green claim for this checkpoint.
+
+Framing follow-up: moved the default camera closer so the directly playable shells occupy more of the scene. Safari responsive screenshots at 400×656 and 320×656 confirm the support, all bodies and numbered pads remain within the layout; the floor is intentionally cropped.
