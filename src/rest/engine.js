@@ -22,6 +22,8 @@ export function createRestEngine(recipe) {
     get key() { return key; },
     get state() { return Float64Array.from(x); },
     reset() { x.fill(0); phi = states.get(freeKey); key = freeKey; },
+    /** Restore a state and contact key (checkpoint replay). */
+    load(state, nextKey) { if (state.length !== dim) throw new Error('state has the wrong dimension.'); x.set(state); const p = states.get(nextKey); if (!p) throw new Error(`contact state ${nextKey} is not in the recipe.`); phi = p; key = nextKey; },
     /** Step 1. */
     strike(position, body, velocity) { const v = strikeVectors[position]?.[body]; if (!v || !Number.isFinite(velocity)) throw new Error('unknown strike position or body, or non-finite velocity.'); for (let i = n; i < dim; i++) x[i] += velocity * v[i]; },
     /** Step 2: select by key (see contactStateKey). Unknown keys are an error: the allowed states are finite and precomputed. */

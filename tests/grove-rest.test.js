@@ -52,3 +52,36 @@ test('cost: stepping the 18-dimensional voice state is measured, not assumed', (
   assert.ok(ms < 2000, 'one second of audio must step in well under one second here');
   for (const seed of GROVE_SEEDS) assert.ok(createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: 48000 }).contactStates.every(s => s.phi.every(Number.isFinite)));
 });
+
+test('capture v2: a Rest record validates, renders exactly, equals the bank route with no rests until the first unit fade, and replays any frame in any order', async () => {
+  const { validateRestRecord, canonicalRestRecord, renderRestRecord, restRecordLength, restRecordStates, REST_RECORD_KIND } = await import('../src/score/grove-rest.js');
+  const { createGroveVoiceSession } = await import('../src/grove/voice-session.js');
+  const { mixImpulseRecording } = await import('../src/touch/session.js');
+  const grove = composeGrove({ seed: 3 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const record = { version: 2, kind: REST_RECORD_KIND, seed: 3, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+    events: [{ frame: 0, order: 0, body: 0, position: 1, velocity: 0.4 }, { frame: 2401, order: 1, body: 2, position: 2, velocity: 0.6 }], contacts: [], ended: { frame: 3601, fadeFrames: 200 } };
+  validateRestRecord(record, recipe); assert.equal(JSON.parse(canonicalRestRecord(record, recipe)).kind, REST_RECORD_KIND);
+  // Same strikes through the bank route (voice session + unit bank mix).
+  const session = createGroveVoiceSession({ grove, voice: DEFAULT_VOICE_CONFIG }, sr); session.strike({ frame: 0, body: 0, position: 1, velocity: 0.4 }); session.strike({ frame: 2401, body: 2, position: 2, velocity: 0.6 }); session.finish(3601, 200);
+  const bank = renderVoiceBank(createVoiceInstrument(grove, DEFAULT_VOICE_CONFIG, sr)), viaBank = mixImpulseRecording(session.snapshot(), bank), exact = renderRestRecord(record, recipe);
+  assert.equal(exact.channels[0].length, viaBank.channels[0].length); assert.equal(restRecordLength(record, recipe), viaBank.channels[0].length);
+  const untilFade = Math.floor((recipe.ring - recipe.fade) * sr); let worst = 0, peak = 0;
+  for (let ch = 0; ch < 2; ch++) for (let i = 0; i < Math.min(untilFade, exact.channels[0].length); i++) { worst = Math.max(worst, Math.abs(exact.channels[ch][i] - viaBank.channels[ch][i])); peak = Math.max(peak, Math.abs(viaBank.channels[ch][i])); }
+  assert.ok(worst / peak < 1e-6, `bank route vs exact record render: ${worst / peak} of peak before the first unit fade`);
+  // With a rest: valid, non-overlapping per body; rejections are specific.
+  const rested = structuredClone(record); rested.contacts = [{ body: 0, zone: 2, strength: 1, start: 800, end: 2000, order: 2 }, { body: 0, zone: 1, strength: 0, start: 2000, end: 3000, order: 3 }];
+  validateRestRecord(rested, recipe); const pcm = renderRestRecord(rested, recipe); assert.ok(pcm.channels.every(c => c.every(Number.isFinite)));
+  const rejects = (f, re) => { const r = structuredClone(rested); f(r); assert.throws(() => validateRestRecord(r, recipe), re); };
+  rejects(r => { r.contacts[1].start = 1500; }, /overlaps/);
+  rejects(r => { r.contacts[1].order = 2; }, /unique across/);
+  rejects(r => { r.events[1].frame = 0; r.events[1].order = 0; }, /unique non-negative/);
+  rejects(r => { r.events.reverse(); }, /sorted by applied frame/);
+  rejects(r => { r.contacts[0].zone = 3; }, /index the recipe zones/);
+  rejects(r => { r.outputGain += 0.01; }, /does not belong/);
+  rejects(r => { r.events[0].requestedFrame = 0; }, /unexpected keys/);
+  // Any frame in any order from checkpoints equals a straight run.
+  const states = restRecordStates(rested, recipe, { every: 512 }), straight = createRestEngine(recipe), seen = [];
+  const keyAt = i => contactStateKey([0, 1, 2].map(b => { const c = rested.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  for (let i = 0; i < states.frames; i++) { if ([0, 1, 700, 2401, 2402, 3000, 3700].includes(i)) seen.push([i, straight.state]); for (const k of rested.events) if (k.frame === i) straight.strike(k.position, k.body, k.velocity); straight.setContacts(keyAt(i)); straight.step(); }
+  for (const [i, s] of seen.reverse()) { const r = states.stateAt(i); assert.ok(r.every((v, k) => v === s[k]), `frame ${i} from a checkpoint equals the straight run exactly`); }
+});
