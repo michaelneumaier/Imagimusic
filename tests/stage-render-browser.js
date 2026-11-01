@@ -11,7 +11,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 10;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 11;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -174,6 +174,33 @@ await check('Shipping default: composed passage (Loom duet enabled) identical, b
   const base = await renderPerformanceAudio(createPerformance(DEFAULT_PATCH, 48000), 48000);
   const vsBase = compareRenders(base, a.subarray(0, base.length), 48000);
   return { ...s, composedDuration: composed.duration, loomDuration: composed.loom.duration, loomStrikes: composed.loom.events.length, differsFromBase: !vsBase.identical, baseVsComposedMaxDiff: vsBase.maxDiff };
+});
+// v11: composition v2 with the featured FM tensioner (alone, and together with the Loom duet). Shipping rows: identical
+// twice with the default lifecycle, finite, bounded, silent tail, composed length; the FM tone's entrance (beat 8) is
+// reported so its contribution is visible against the base.
+await check('Shipping default: featured FM tensioner (composition v2), alone and with the Loom duet', async () => {
+  const { attachComposition, DEFAULT_COMPOSITION } = await import('../src/stage/composition.js');
+  const { DEFAULT_TENSIONER } = await import('../src/fm.js');
+  const out = {};
+  for (const [name, loomEnabled] of [['fm only', false], ['fm + loom', true]]) {
+    const composition = { ...structuredClone(DEFAULT_COMPOSITION), version: 2, fm: { enabled: true, settings: { ...DEFAULT_TENSIONER } } };
+    composition.loom.enabled = loomEnabled;
+    const composed = attachComposition(createPerformance(DEFAULT_PATCH, 48000), composition);
+    assert(composed.fm, 'FM tone not attached');
+    const a = await renderPerformanceAudio(composed, 48000), b = await renderPerformanceAudio(composed, 48000);
+    const r = compareRenders(a, b, 48000), s = stats(a);
+    matrix[`shipping default: composition v2 (${name})`] = r;
+    assert(r.identical, `${name}: not identical, max ${r.maxDiff} at ${r.atSeconds}s`);
+    assert(s.peak > .01 && s.peak < 1, `${name}: peak outside range ${s.peak}`);
+    assert(s.last50msPeak < 1e-3, `${name}: non-silent tail ${s.last50msPeak}`);
+    assert(Math.abs(a.length / 48000 - composed.duration) < 1 / 48000 + 1e-9, `${name}: length does not match composed duration`);
+    const base = await renderPerformanceAudio(createPerformance(DEFAULT_PATCH, 48000), 48000);
+    const entrance = Math.round(composed.fm.time * 48000); let before = 0, after = 0;
+    for (let i = Math.max(0, entrance - 4800); i < entrance; i++) before = Math.max(before, Math.abs(a[i] - (base[i] ?? 0)));
+    for (let i = entrance; i < Math.min(a.length, entrance + 48000); i++) after = Math.max(after, Math.abs(a[i] - (base[i] ?? 0)));
+    out[name] = { ...s, composedDuration: composed.duration, fmEntranceSeconds: composed.fm.time, fmDurationSeconds: composed.fm.duration, maxDiffVsBaseBeforeEntrance: before, maxDiffVsBaseAfterEntrance: after };
+  }
+  return out;
 });
 await check('WAV resolution: every SHIPPING row identical after 16-bit quantization (negative controls reported, not asserted)', async () => {
   const failing = Object.entries(matrix).filter(([k, r]) => !k.startsWith('negative control') && !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);

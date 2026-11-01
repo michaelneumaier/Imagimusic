@@ -84,7 +84,7 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 
-## M3: Tension Loom, coupling and FM (status: in-progress; proposal 003 revised; reciprocal pair model, study 01, scored passage, shared scene adapter, composition v1 with live and offline adapters done; done 2026-11-01: opt-in ensemble UI (?loom=1), composed exports verifiable (composition saved canonically in the manifest, verifier rebuilds with it; renders/conservatory-loom-731.mp4 1007/1007); composed audio identity verified for three arrangements after the duet-buffer padding fix (decision 004 scope extension); composed scene parity 361/361; FM tensioner (B): core implemented (src/fm.js, 11 tests, proposal 007 rev. 3) and Astra's scene with six declared bindings; next: study page with PCM-from-model playback, then ensemble opt-in like the Loom)
+## M3: Tension Loom, coupling and FM (status: in-progress; proposal 003 revised; reciprocal pair model, study 01, scored passage, shared scene adapter, composition v1 with live and offline adapters done; done 2026-11-01: opt-in ensemble UI (?loom=1), composed exports verifiable (composition saved canonically in the manifest, verifier rebuilds with it; renders/conservatory-loom-731.mp4 1007/1007); composed audio identity verified for three arrangements after the duet-buffer padding fix (decision 004 scope extension); composed scene parity 361/361; FM tensioner (B): core (src/fm.js, 12 tests incl. full-passband alias measurement), scene, study page with settings links, composition v2 foundation with a single featured tone and the offline adapter done; next: UI/frame/export/verifier migration to v2 (Astra) and the featured-FM harness rows (Fable))
 
 - Shared bridge/soundboard leaking energy between resonators; FM as a bridge that stretches strings while ringing.
 - LFO pendulum visibly linked to what it modulates.
@@ -104,7 +104,7 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 - Visual skins (palette, lighting, environment) that never change timing; regression compares motion traces across skins.
 - Michael-facing knobs documented in one page.
 
-## Track V (parallel): Voice Observatory (status: planning only, plan approved by Astra 2026-11-01 with measurement corrections; docs/proposals/005-voice-observatory.md)
+## Track V (parallel): Voice Observatory (status: planning only; V0–V3 order, tiers and ownership approved by Astra 2026-11-01; one-minute gesture review and three visual directions consolidated into docs/proposals/005-voice-observatory.md; first build when Michael lifts planning-only: woven spectrum beside a plain spectrogram)
 
 Michael's new direction (2026-11-01, relayed by Astra): live human voice → highly reactive, detailed visual feedback. Measured / estimated / inferred tiers; V0 normal voice mirror → V1 resonance portrait → V2 articulation and beatbox atlas → V3 creative performance (features on the stage bus, recorded trajectories by explicit choice); anatomy inference is a separate research track off the main line, never the main visual truth. Planning only: no microphone code. Does not displace the Conservatory track.
 

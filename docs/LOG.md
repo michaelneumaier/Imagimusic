@@ -64,3 +64,5 @@
 - 2026-11-01 astra: reusable study inspector (FM + Loom), FM sound settings save/load/links, Safari-verified. Fable review approve.
 - 2026-11-01 astra: FM ensemble v2 contract (single featured FM tone, performance.fm descriptor).
 - 2026-11-01 fable: render-audio attachFMSource: model PCM from the entrance, same master, outlive padding from the start offset; 165/165.
+- 2026-11-01 astra: approved Voice Observatory plan with wording refinements, gesture review and three visual directions; FM composition v2 foundation.
+- 2026-11-01 fable: proposal 005 consolidated (level+flatness mist, model-gated formants, Praat window note, targets gated on reference setup, gesture table, woven spectrum first); harness v11 featured-FM rows; FM foundation review approve.

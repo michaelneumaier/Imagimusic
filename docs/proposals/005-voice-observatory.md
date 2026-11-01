@@ -53,7 +53,10 @@ Two views, both driven by one feature frame, both inspectable:
      mark **dips in the estimated spectral envelope**; a dip is not identified
      as a nasal antiresonance unless a model supports that, so the label stays
      "envelope dip."
-   - **Noise mist**: unvoiced energy as fog; density from spectral flatness,
+   - **Noise mist** (interpretation): unvoiced energy as fog; density from
+     spectral flatness **and level together** (flatness alone is not a
+     measure of breath or unvoiced energy: a quiet, flat floor is not
+     breath),
      color from centroid, drift from the envelope. Unvoiced is a valid state,
      not a failed pitch.
    - **Transient impulses**: onset strength spawns a ring or shock whose size
@@ -170,13 +173,49 @@ folded in here and marked (A).*
 ## Limitations, stated up front
 
 - Formant estimation is speaker- and ceiling-dependent and can produce false
-  poles; it is an estimate with a confidence, never a fact.
-- Closed-mouth sounds break the vowel-LPC assumptions; we show raw spectral
+  poles; it is an estimate with a confidence, never a fact. Praat's
+  effective window duration differs from the full sample window, so every
+  benchmark record states both rather than comparing unlike "25 ms"
+  settings.
+- Numerical targets (1 % tracking, p95 ≤ 100 ms, formant tolerances) are
+  targets, not results, and none may be claimed met until the reference
+  setup (microphone, interface, browser) and the pitch range of the test
+  material are specified in the record.
+- Closed-mouth and nasal sounds often violate the ordinary-vowel LPC
+  assumptions, but formant estimates are **not categorically suppressed by
+  presumed mouth posture**: the raw spectrum is always kept, and estimates
+  are shown only when their own model checks pass (ceiling, pole validity,
+  bandwidth, stability), whatever the sound. Where they fail, we show raw spectral
   structure and envelope dips, not formants and not identified antiresonances.
 - Beatbox and unusual phonation produce signals a single-pitch model cannot
   describe; we never force one pitch.
 - Anatomy is not recoverable from a microphone; the observatory shows what
   the sound did, not what the body did.
+
+## First session and creative directions (consolidated from Astra's brief, 2026-11-01)
+
+The first session takes about a minute and needs no acoustics knowledge:
+
+| Gesture | What the picture should reveal | What we check |
+| --- | --- | --- |
+| Stay quiet, then gently sustain "ah" | A visible floor, then a spectrum and confident harmonic strands | Silence invents no pitch; the entrance is prompt |
+| Slide the pitch on "ah" | Harmonic spacing changes continuously | No stable octave jumps; resonance estimates not required in V0 |
+| Hold a pitch, change "ah–ee–oo" | Strength shifts among measured bands; V1 adds estimated resonance regions | Pitch and vowel colour stay visibly different gestures |
+| Close the lips into "mmm", reopen | The changed spectrum remains visible throughout | Humming never disappears because a vowel model loses confidence |
+| Alternate "sss", "shh", a gentle "p" | Different spectral distributions and a short attack | Noise represented without a fabricated note |
+| Stop abruptly | Live energy clears; any optional trail is visually separate | Processing delay and decorative persistence are distinguishable |
+
+Three creative directions share one analysis: a **woven spectrum**
+(harmonic threads; the filaments above), a **resonance lantern** (broad
+luminous bands), an **articulation landscape** (spectral energy as ridges,
+attacks as ripples). Start with the woven spectrum beside a plain
+spectrogram, then judge whether the other forms communicate more without
+obscuring the sound. Closed-mouth and unfamiliar sounds must stay
+interesting even when no classifier can name them.
+
+Status: planning order V0–V3 and the measured / estimated / inferred tiers
+are approved by Astra (2026-11-01); ownership as proposed; planning only
+until Michael lifts that.
 
 ## Decisions for Astra
 
