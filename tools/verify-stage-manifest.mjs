@@ -1,20 +1,23 @@
+import {isDeepStrictEqual} from 'node:util';
+import {validatePatch} from '../src/model.js';
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {createPerformance} from '../src/stage/performance.js';
-import {createProjection} from '../src/stage/projection.js';
-import {createDirector} from '../src/stage/director.js';
+import {createStageFrames} from '../src/stage/frame.js';
 import {createTraceManifest} from '../src/stage/manifest.js';
 
 /** Recompute scene proof from the saved instrument and camera, never trusting saved hashes. */
 export function verifyStageManifest(saved){
  if(!saved?.instrument||!saved.camera)throw new Error('Expected an exported stage manifest with instrument and camera');
+ let canonical;
+ try{canonical=validatePatch(saved.instrument);}catch{throw new Error('Instrument is not a canonical patch');}
+ if(!isDeepStrictEqual(canonical,saved.instrument))throw new Error('Instrument is not a canonical patch');
  if(saved.fps!==30||saved.sampleRate!==48000)throw new Error('Unsupported export timebase');
  if(!['manual','establish','follow','detail'].includes(saved.camera.mode??'manual'))throw new Error('Unknown camera mode');
  for(const key of ['position','target'])if(!Array.isArray(saved.camera[key])||saved.camera[key].length!==3||!saved.camera[key].every(Number.isFinite))throw new Error(`Invalid camera ${key}`);
  const passage=createPerformance(saved.instrument,saved.sampleRate);
  if(!Number.isFinite(saved.duration)||saved.duration<=0||saved.duration>passage.duration)throw new Error('Invalid export duration');
- const projection=createProjection(saved.instrument,{performance:passage}),director=createDirector(passage);
- const project=frame=>{const result=projection(frame);result.stage.camera=director(frame.t,saved.camera.mode??'manual',saved.camera);return result;};
+ const frames=createStageFrames(passage),project=frame=>frames.project(frame,saved.camera);
  const expected=createTraceManifest({...passage,duration:saved.duration},{fps:saved.fps,project});
  const mismatches=[];
  for(const field of ['v','seed','patch','fps','sampleRate','duration','frames','audioSamples','projected'])if(saved[field]!==expected[field])mismatches.push(field);

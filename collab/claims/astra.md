@@ -29,3 +29,5 @@ Loom scored passage: src/loom/performance.js and tests/loom-performance.test.js;
 Loom async preparation: src/loom/render-job.js, render-worker.js and tests/loom-render-job.test.js, cancel/supersede safe worker ownership and transfer.
 
 Export artifact verification: tools/verify-stage-manifest.mjs and tests/verify-stage-manifest.test.js, regenerate full projected timeline/camera and validate metadata independently of encoded bytes.
+
+Shared stage frame sampler: src/stage/frame.js, main/export/verifier integration, tests/stage-parity.html/js for real-browser scene pose replay at AudioContext timestamps and full-passage event boundaries.

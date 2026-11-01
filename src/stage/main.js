@@ -1,21 +1,20 @@
-import { createDirector } from './director.js';
+import { createStageFrames } from './frame.js';
 import { mountInspector } from './inspector.js';
 import { readStagePatch } from './exchange.js';
 import { DEFAULT_PATCH, MATERIALS } from '../model.js';
 import { InstrumentAudio } from '../audio.js';
 import { BellowsAudio } from '../bellows-audio.js';
-import { collectState, traceHash } from '../state.js';
+import { traceHash } from '../state.js';
 import { FrameClock, WallClock } from '../clock.js';
 import { createPerformance } from './performance.js';
 import { createWorld } from './world.js';
-import { createProjection, stageBindings, applyStage, CAPTIONS } from './projection.js';
+import { applyStage, CAPTIONS } from './projection.js';
 const $=id=>document.getElementById(id);
 const audio=new InstrumentAudio();let choir=null,world=null,playing=false,origin=0,cursor=0,request=0;
 let activePatch=structuredClone(DEFAULT_PATCH), importError='';
 if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
-let performance=createPerformance(activePatch),project=createProjection(performance.patch,{performance});
-let direct=createDirector(performance);
-const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=stageBindings({camera:true,performers:true,performance});
+let performance=createPerformance(activePatch),frames=createStageFrames(performance);
+const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=frames.bindings;
 for(const caption of CAPTIONS){const p=document.createElement('p');p.className='caption';const strong=document.createElement('strong');strong.textContent=caption.label.toUpperCase()+' · ';p.append(strong,document.createTextNode(caption.text));$('captions').append(p);}
 function stop(){if(playing)study.seek(Math.min(performance.duration,live.time));request++;playing=false;audio.stop();choir?.stop();$('perform').textContent='▶ Play the passage';$('stage-state').textContent='SILENT STUDY · SEED '+performance.patch.seed;}
 function schedule(){
@@ -33,7 +32,7 @@ $('perform').onclick=async()=>{
   if(playing){stop();return;}const token=++request;
   try{await audio.enable();if(token!==request)return;
     choir??=new BellowsAudio(audio.context,audio.master);audio.stop();choir.stop();
-    performance=createPerformance(activePatch,audio.context.sampleRate);project=createProjection(performance.patch,{performance});direct=createDirector(performance);
+    performance=createPerformance(activePatch,audio.context.sampleRate);frames=createStageFrames(performance);
     origin=audio.time+.1;cursor=0;playing=true;study.reset();$('seek').max=performance.duration;
     $('perform').textContent='Ⅱ Pause passage';$('stage-state').textContent='PLAYING · SEED '+performance.patch.seed;$('error').textContent='';schedule();
   }catch(error){stop();$('error').textContent=error.message;}
@@ -52,9 +51,8 @@ try{
   stop();$('error').textContent=importError;
   const inspector=mountInspector({world,canvas:$('world'),bindings,getPatch:()=>activePatch});
   function draw(){
-    const t=playing?live.time:study.time,frame=project(collectState(t,performance.snapshots));
-    frame.stage.camera=direct(t,$('direction').value,{position:world.camera.position.toArray(),target:world.controls.target.toArray()});
-    const applied=applyStage(frame,bindings,world);inspector.update(frame);world.render();
+    const t=playing?live.time:study.time,frame=frames.sample(t,{mode:$('direction').value,position:world.camera.position.toArray(),target:world.controls.target.toArray()});
+    const applied=applyStage(frame,frames.bindings,world);inspector.update(frame);world.render();
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
     $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices · ${frame.stage.performers.actors.length} Keepers · ${frame.stage.performers.unplanned.length} unassigned strikes · ${frame.stage.performers.actors.filter(a=>a.unreachable).length} unreachable arms`;
     requestAnimationFrame(draw);

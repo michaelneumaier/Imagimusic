@@ -1,11 +1,11 @@
-import { createDirector } from './director.js';
+import { createStageFrames } from './frame.js';
 import { createTraceManifest } from './manifest.js';
 import { Output, Mp4OutputFormat, BufferTarget, CanvasSource, AudioBufferSource, Quality, canEncodeVideo, canEncodeAudio } from '../../vendor/mediabunny/mediabunny.mjs';
 import { MATERIALS } from '../model.js';
 import { FrameClock } from '../clock.js';
-import { collectState, traceHash } from '../state.js';
+import { traceHash } from '../state.js';
 import { createPerformance } from './performance.js';
-import { createProjection, stageBindings, applyStage } from './projection.js';
+import { applyStage } from './projection.js';
 import { createWorld } from './world.js';
 import { renderPerformanceAudio } from './render-audio.js';
 
@@ -15,8 +15,8 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
   if(!await canEncodeVideo('avc',{width,height,frameRate:fps}) || !await canEncodeAudio('aac',{sampleRate,numberOfChannels:1}))
     throw new Error('This browser cannot encode H.264/AAC video. Use a browser with both WebCodecs encoders.');
   const passage=createPerformance(patch,sampleRate),duration=Math.min(passage.duration,durationLimit);
-  const clock=new FrameClock({fps}),times=clock.times(duration),baseProject=createProjection(patch,{performance:passage}),direct=createDirector(passage),bindings=stageBindings({camera:true,performers:true,performance:passage});
-  const project=frame=>{const result=baseProject(frame);result.stage.camera=direct(frame.t,cameraPose.mode??'manual',cameraPose);return result;};
+  const clock=new FrameClock({fps}),times=clock.times(duration),frames=createStageFrames(passage),bindings=frames.bindings;
+  const project=frame=>frames.project(frame,cameraPose);
   let stopped=false;
   function check(){if(stopped||signal?.aborted)throw new DOMException('Movie render cancelled.','AbortError');}
   check();onProgress('Synthesizing the soundtrack…');
@@ -38,7 +38,7 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
     await output.start();
     tasks=[(async()=>{await audio.add(buffer);audio.close();})(),(async()=>{
       for(let i=0;i<times.length;i++){
-        check();const frame=project(collectState(times[i],passage.snapshots));if(traceHash(frame)!==manifest.hashes[i])throw new Error('Scene state changed during export at frame '+i);applyStage(frame,bindings,world);world.render();
+        check();const frame=frames.sample(times[i],cameraPose);if(traceHash(frame)!==manifest.hashes[i])throw new Error('Scene state changed during export at frame '+i);applyStage(frame,bindings,world);world.render();
         await video.add(times[i],1/fps);
         if(i%8===0){onProgress(`Rendering frame ${i+1} / ${times.length}`);await new Promise(resolve=>setTimeout(resolve,0));}
       }
