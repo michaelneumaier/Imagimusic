@@ -1,3 +1,5 @@
+import {attachLoomPerformance} from '../src/stage/composition.js';
+import {readCompositionSearch} from '../src/stage/composition-link.js';
 import {DEFAULT_PATCH} from '../src/model.js';
 import {createPerformance} from '../src/stage/performance.js';
 import {createStageFrames} from '../src/stage/frame.js';
@@ -18,7 +20,8 @@ $('run').onclick=async()=>{
  $('run').disabled=true;let context,liveWorld,offlineWorld;
  try{
   context=new AudioContext();await context.resume();
-  const passage=createPerformance(DEFAULT_PATCH,context.sampleRate),frames=createStageFrames(passage);
+  const composition=readCompositionSearch(location.search);
+  const passage=attachLoomPerformance(createPerformance(DEFAULT_PATCH,context.sampleRate),composition),frames=createStageFrames(passage);
   const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]},captured=[];
   liveWorld=createWorld($('live'),{width:480,height:270});
   const origin=context.currentTime,clock=new WallClock(()=>context.currentTime-origin);
@@ -32,16 +35,16 @@ $('run').onclick=async()=>{
   });
   if(captured.length<5)throw new Error('Insufficient live frames; rerun with this tab visible');
   // Probe discrete transitions across the complete passage without waiting for wall time.
-  const boundaries=[0,passage.duration,...passage.events.flatMap(e=>[Math.max(0,e.voice.noteOn-.001),e.voice.noteOn,e.voice.noteOn+.001,e.voice.end])].sort((a,b)=>a-b);
+  const boundaries=[0,passage.duration,...passage.events.flatMap(e=>[Math.max(0,e.voice.noteOn-.001),e.voice.noteOn,e.voice.noteOn+.001,e.voice.end]),...(passage.loom?.events??[]).flatMap(e=>[e.time-.18,e.time-.001,e.time,e.time+.001,e.time+.28,e.end])].sort((a,b)=>a-b);
   for(const t of boundaries){const frame=frames.sample(t,camera);applyStage(frame,frames.bindings,liveWorld);captured.push({t,state:traceHash(frame),pose:poseHash(liveWorld)});}
   offlineWorld=createWorld($('offline'),{width:480,height:270});
-  const replay=createStageFrames(createPerformance(structuredClone(DEFAULT_PATCH),context.sampleRate));
+  const replay=createStageFrames(attachLoomPerformance(createPerformance(structuredClone(DEFAULT_PATCH),context.sampleRate),structuredClone(composition)));
   for(const row of [...captured].reverse()){
    const frame=replay.sample(row.t,camera);applyStage(frame,replay.bindings,offlineWorld);
    if(traceHash(frame)!==row.state||poseHash(offlineWorld)!==row.pose)throw new Error(`Scene mismatch at ${row.t}s`);
   }
   offlineWorld.render();
-  $('result').textContent=JSON.stringify({passed:true,sampleRate:context.sampleRate,liveFrames:captured.length-boundaries.length,boundaryFrames:boundaries.length,framesCompared:captured.length,reverseReplay:true,scene:'transforms, visibility, material values, tine deformation, camera',audio:'clock only; no sound generated'},null,2);
+  $('result').textContent=JSON.stringify({passed:true,composition,sampleRate:context.sampleRate,liveFrames:captured.length-boundaries.length,boundaryFrames:boundaries.length,framesCompared:captured.length,reverseReplay:true,scene:'transforms, visibility, material values, tine deformation, camera',audio:'clock only; no sound generated'},null,2);
  }catch(error){$('result').textContent='FAIL: '+error.message;}
  finally{await context?.close();liveWorld?.dispose();offlineWorld?.dispose();$('run').disabled=false;}
 };

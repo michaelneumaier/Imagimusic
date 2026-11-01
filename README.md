@@ -53,7 +53,7 @@ Live and offline choir audio use the same source/filter/gain graph. A rolling co
 
 - **Render choir WAV:** the seeded Bellows phrase, including release tails, rendered at 48 kHz with the live graph and compressor.
 
-Laboratory WAV exports are mono PCM16; the Loom study exports stereo PCM16. Garden and tine render at 22.05 kHz and omit live stereo placement and the preview compressor. These are procedural renders, not recordings of manual performance or edits. The Conservatory also exports an MP4 with a separate trace manifest, using its shared score, state bus and procedural camera. Repeated default and air-choir renders are bit-identical on Safari 26.6.2 at 48 kHz for seed 731. This is a verified setup, not a cross-browser or codec-byte guarantee; see decision 004 and the export validation notes.
+Laboratory WAV exports are mono PCM16; the Loom study exports stereo PCM16. Garden and tine render at 22.05 kHz and omit live stereo placement and the preview compressor. These are procedural renders, not recordings of manual performance or edits. The Conservatory also exports an MP4 with a separate trace manifest, using its shared score, state bus and procedural camera. Repeated default, air-choir and three tested Loom arrangements are bit-identical on Safari 26.6.2 at 48 kHz for seed 731. This is a verified setup, not a cross-browser or codec-byte guarantee; see decision 004 and the export validation notes.
 
 Recheck a saved stage manifest against the current model and camera code:
 

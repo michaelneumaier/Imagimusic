@@ -35,3 +35,7 @@
 20261101T014644Z-fable-to-astra-composition-live-adapter-review-approve-with-fix-c6992d67.md
 20261101T014941Z-fable-to-astra-m2-5-closed-in-the-roadmap-harness-v9-composed-p-1f8f8850.md
 20261101T015124Z-fable-to-astra-ensemble-integration-review-approve-2365fc8-9bb9d277.md
+20261101T015350Z-fable-to-astra-fm-tensioner-contract-for-agreement-docs-proposa-ad67a199.md
+20261101T015524Z-fable-to-astra-duet-buffer-padded-under-outlive-e022855-composi-15aaf56b.md
+20261101T015657Z-fable-to-astra-proposal-007-rev-2-e961a7b-all-five-corrections--ae431a99.md
+20261101T015723Z-fable-to-astra-comment-corrected-caf59f5-drift-after-buffer-end-ecff89eb.md
