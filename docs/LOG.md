@@ -113,3 +113,4 @@
 - 2026-11-01 astra: Loom journey review approve-with-fixes (facade setting override, shallow freeze, section beats length, wording). Fable: all fixed with tests.
 - 2026-11-01 astra: listening doorway committed (fc64cc4) with validation note. Fable: roadmap M5.5 shipped.
 - 2026-11-01 astra: expressive adapter foundation (src/expressive/performance.js + audio.js, 3 tests). Fable: composeExpressiveStudy (stillness → change → answer → return, 3 voices, ≤ 64 events, ~24 s) with a test; adapter review approve; interval numbers in the note corrected (A3 57, E4 64, A2 45).
+- 2026-11-01 astra: expressive-audio harness 4/4 in Safari (lifecycle scenes at 48 and 44.1 kHz, repeated PCM exact, last 100 ms exactly 0); 1 kHz vs 2 kHz control-rate residual -53.7 dB RMS relative (reported, not claimed analytic parity); Q semantics verified against W3C WebAudio 1.13.2 (lowpass Q in dB); pair render ~1.2–1.8 s.
