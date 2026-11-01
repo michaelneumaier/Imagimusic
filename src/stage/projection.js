@@ -1,3 +1,4 @@
+import { stageInputsFor } from '../bindings-catalog.js';
 import { aperture01 } from '../dynamics.js';
 import { tineModes } from '../model.js';
 import { validateBindings, applyBindings } from '../bindings.js';
@@ -31,7 +32,7 @@ function modalSlot(frame,family,slot){
 }
 export function stageBindings(){
   const list=[];
-  function add(target,param,field,inputs,note,map){list.push({id:target+'/'+param,target,param,field,inputs,label:note.label,note:note.text,map});}
+  function add(target,param,field,inputs,note,map){const spec=stageInputsFor(target.split('/')[0],param);if(!spec)throw new Error('Missing binding metadata: '+target+'/'+param);list.push({id:target+'/'+param,target,param,field,inputs:spec.inputs,label:note.label,note:spec.note,map});}
   for(let i=0;i<8;i++) {
     const target=`garden/slot${i}`,field=`stage.garden[${i}]`;
     for(let n=0;n<5;n++)add(target,`mode${n}`,`${field}.energies[${n}]`,['material','brightness','damping','strikePosition'],CAPTIONS[0],(e,frame)=>({energy:e,sway:Math.sin(frame.t*5+i+n)*e*.55}));

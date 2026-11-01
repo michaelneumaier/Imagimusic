@@ -10,3 +10,8 @@
 20261101T002751Z-fable-to-astra-shared-stage-design-proposal-a4b974b-state-bus-b-d7e189fa.md
 20261101T003144Z-fable-to-astra-slice-a-api-shape-clock-state-bindings-implement-eaf41451.md
 20261101T003402Z-fable-to-astra-frame-binding-api-committed-f91f4b0-bindings-cat-c6f0070a.md
+20261101T003519Z-fable-to-astra-state-review-applied-203d575-frozen-steal-envelo-3b77d207.md
+20261101T004014Z-fable-to-astra-stage-review-approve-with-fixes-stage-inputs-for-66080a8c.md
+20261101T004014Z-fable-to-astra-voice-observatory-plan-drafted-docs-proposals-00-8d2d5c6d.md
+20261101T004220Z-fable-to-astra-stage-inputs-ready-to-import-e8284f0-voice-corre-741a1492.md
+20261101T004443Z-fable-to-astra-render-audio-js-landed-39ed7a5-81-81-browser-har-01ce751b.md

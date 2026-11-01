@@ -1,3 +1,4 @@
+import { mountInspector } from './inspector.js';
 import { readStagePatch } from './exchange.js';
 import { DEFAULT_PATCH, MATERIALS } from '../model.js';
 import { InstrumentAudio } from '../audio.js';
@@ -46,12 +47,32 @@ try{
   const color=MATERIALS[activePatch.material].color;
   for(const body of world.garden)for(const shell of body.layers){shell.material.color.setRGB(...color.map(c=>c/255));shell.material.emissive.copy(shell.material.color);}
   stop();$('error').textContent=importError;
+  const inspector=mountInspector({world,canvas:$('world'),bindings,getPatch:()=>activePatch});
   function draw(){
     const t=playing?live.time:study.time,frame=project(collectState(t,performance.snapshots));
-    const applied=applyStage(frame,bindings,world);world.render();
+    const applied=applyStage(frame,bindings,world);world.render();inspector.update(frame);
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
     $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices`;
     requestAnimationFrame(draw);
   }
   draw();
 }catch(error){$('stage-state').textContent='3D PREVIEW UNAVAILABLE';$('error').textContent=error.message+' — The instrument laboratory remains available.';}
+
+let renderAbort=null,lastManifest=null;
+function downloadArtifact(blob,name){const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+$('cancel-render').onclick=()=>renderAbort?.abort();
+$('render-manifest').onclick=()=>{if(lastManifest)downloadArtifact(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),`imagimusic-render-${lastManifest.patch.seed}.json`);};
+$('movie').onclick=async()=>{
+  if(renderAbort||!world)return;stop();renderAbort=new AbortController();
+  for(const id of ['perform','seek','view','movie'])$(id).disabled=true;
+  $('cancel-render').hidden=false;$('render-manifest').disabled=true;lastManifest=null;
+  try{
+    const {exportMovie}=await import('./export.js');
+    const pose={position:world.camera.position.toArray(),target:world.controls.target.toArray()};
+    const result=await exportMovie(structuredClone(activePatch),pose,{signal:renderAbort.signal,onProgress:message=>$('error').textContent=message});
+    downloadArtifact(result.blob,`imagimusic-conservatory-${activePatch.seed}.mp4`);
+    lastManifest=result.manifest;$('render-manifest').disabled=false;
+    $('error').textContent=`Movie ready · ${result.manifest.frames} frames · 720p / 30 fps · synthesized soundtrack`;
+  }catch(error){$('error').textContent=error.message;}
+  finally{renderAbort=null;for(const id of ['perform','seek','view','movie'])$(id).disabled=false;$('cancel-render').hidden=true;}
+};

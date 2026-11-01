@@ -65,3 +65,11 @@ Runtime modules: model.js (patches and sound), geometry.js (beam/string equation
 Tests cover model limits, deterministic scores/PCM, version migration, audio voice lifecycle, silent modes, damper/retrigger behavior, synchronized fades, striker contact timing, geometry frequency scaling, mode nodes and shapes, and geometry/audio integration. Safari smoke checks exercise the actual controls and export workers. Perceptual listening, mobile performance and measured audiovisual latency remain separate evaluation work.
 
 Open `/tests/browser-audio.html` for real Web Audio offline checks: full versus rolling automation, seeded noise reproducibility, quiet release tails and finite maximum-resonance output. These checks render silently. Michael confirmed audible Safari playback through AirPods after restarting the page's audio session.
+
+## Procedural movie preview
+
+The Conservatory's **Render MP4** samples the scene at fixed 30 fps timestamps and synthesizes the soundtrack offline. It exports a 1280×720 H.264/AAC movie plus a JSON manifest containing the patch, camera and state hash for every frame. The selected camera position is captured at render start. Rendering is silent, local and cancellable; browser H.264 and AAC encoding support is checked first. The vendored Mediabunny 1.65.0 bundle handles encoding and muxing, with its license and npm integrity recorded under `vendor/mediabunny/`.
+
+Scene-state traces are repeatable. Encoded movie bytes can vary across browser/hardware implementations. Safari's full native audio graph currently shows small differences across identical offline renders; investigation is ongoing, so bit-identical PCM is not promised. The three-second export smoke check produced 90 video frames and a 48 kHz AAC track, verified with ffprobe and an extracted frame.
+
+Click an instrument body in the stage to inspect its motion bindings and their patch inputs. Dragging still orbits the camera. Export and inspector are preview features under peer review.

@@ -3,9 +3,9 @@ import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitCon
 import { gardenBody, choirBody, tineBody, mesh, palette } from './bodies.js';
 
 /** Scene construction only. Musical motion is applied through frame bindings. */
-export function createWorld(canvas) {
-  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+export function createWorld(canvas, fixedSize = null) {
+  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:!!fixedSize});
+  renderer.setPixelRatio(fixedSize ? 1 : Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
   const scene=new T.Scene();scene.background=new T.Color(0x101c20);scene.fog=new T.FogExp2(0x101c20,.026);
   const camera=new T.PerspectiveCamera(42,1,.1,100);camera.position.set(9,6.5,12);
@@ -23,7 +23,7 @@ export function createWorld(canvas) {
   const paths=new Map();
   garden.forEach((b,i)=>paths.set(`garden/${i}`,b));choir.forEach((b,i)=>paths.set(`choir/${i}`,b));paths.set('tine/0',tine);
   let sizeW=0,sizeH=0;
-  function resize(){const rect=canvas.getBoundingClientRect();if(rect.width===sizeW&&rect.height===sizeH)return;sizeW=rect.width;sizeH=rect.height;renderer.setSize(sizeW,sizeH,false);camera.aspect=sizeW/Math.max(1,sizeH);camera.updateProjectionMatrix();}
+  function resize(){const rect=fixedSize ?? canvas.getBoundingClientRect();if(rect.width===sizeW&&rect.height===sizeH)return;sizeW=rect.width;sizeH=rect.height;renderer.setSize(sizeW,sizeH,false);camera.aspect=sizeW/Math.max(1,sizeH);camera.updateProjectionMatrix();}
   function render(){resize();renderer.render(scene,camera);}
   function view(name){
     if(name==='choir'){camera.position.set(7,5,6);controls.target.set(0,1.3,-2.4);}
