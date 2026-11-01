@@ -1,0 +1,9 @@
+# MIDI desk intake milestone
+
+Local page: `midi.html`, using the peer-reviewed `readMidiFile` boundary. `preview.js` derives note-bearing track/channel groups without mutating the validated NoteList, and retains ignored-message categories. `desk.js` uses textContent for all filenames/track names/warnings, 50-row pagination, clear/replace cancellation, and an identity check on completion. No persistence, network upload, playback, mapping or MIDI2 claims.
+
+Five focused tests passed (two overview/example tests and three existing intake tests). Overview covers channel separation, all-note accounting, ignored-controller counts, valid triad data, key gates versus file duration, mutation preservation and rejection of stale timing. Existing intake tests cover exact-byte fingerprint, pre-read byte limits and pending-read cancellation.
+
+Safari manual checks: loaded built-in example, verified C4/E4/G4 with 0–0.5 second gates in a 0.75 second file, fingerprint visible (53 bytes, SHA-256 c72250e9c66c3b47b998a4269dec14333e2e49fbf812ec2065c89da12ac8db67), one ignored program-change message, and clear hides results. Inspected the desktop layout. Loaded a real generated local .mid through the native file picker. Reloaded final code after fixing selected-filename preservation, then loaded an invalid local .mid: named MThd error, chosen filename retained, no stale results; selecting the example recovered successfully and cleared that filename. Closed only the temporary test tab, returning to Michael's original preview.
+
+Not yet browser-tested: pagination with large files, narrow screens, or deliberately delayed File reads in the UI. Abort semantics have unit evidence at the intake boundary. Instrument assignment and mapping report remain the next integration milestone, dependent on Fable's mapping compiler.

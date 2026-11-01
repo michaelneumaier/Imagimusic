@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Imagimusic · MIDI desk</title><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="midi.css"></head>
+<body><header><a href="stage.html">imagimusic <span>THE MIDI DESK</span></a><a href="stage.html">Return to the conservatory ↗</a></header>
+<main>
+  <div class="intro"><div><p class="eyebrow">FROM NOTES TO MECHANISMS</p><h1>A score, opened.</h1></div><p>See the notes, timing, and details in your MIDI file.<br>Instrument mapping is the next step under construction.</p></div>
+  <section class="transport"><label class="file-choice">Choose MIDI file <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi"></label><button id="example">Try a small example</button><button id="clear" disabled>Clear</button></section>
+  <p>Files stay in this browser. Standard MIDI File formats 0 and 1, with musical tick timing, up to 256 KiB. This desk currently inspects the score; it does not play or assign instruments yet.</p>
+  <p id="status" role="status" aria-live="polite">Choose a file to begin.</p>
+  <div id="results" hidden>
+    <section class="source"><h2 id="file-name"></h2><p id="summary"></p><details><summary>Original file fingerprint</summary><p id="fingerprint" class="mono"></p><p>SHA-256 computed from the original bytes during this import. A saved claim would need the original file to be checked again.</p></details></section>
+    <section><h2>Tracks and channels</h2><p>Channels containing notes are listed here. Pitch names use middle C = C4 (MIDI 60). Track and channel numbers below start at 1.</p><div id="groups"></div></section>
+    <section><h2>Notes</h2><p>Times follow the file’s tempo map. Gates below are key-down durations, before sustain-pedal interpretation.</p><div id="notes"></div></section>
+    <section><h2>Interpretation notes</h2><div id="warnings"></div><h3>Messages not used as notes</h3><p>Sustain pedal events are retained separately. The counts below identify other messages ignored by this importer.</p><div id="ignored"></div></section>
+  </div>
+</main><script type="module" src="src/midi/desk.js"></script></body></html>
