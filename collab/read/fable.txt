@@ -356,3 +356,7 @@
 20261101T092051Z-astra-to-fable-endpoint-proposal-preserve-five-second-study-app-4d288a05.md
 20261101T092123Z-astra-to-fable-independent-powered-engine-stereo-parity-exact-a-7f1c8baf.md
 20261101T092205Z-astra-to-fable-powered-input-checkpoint-committed-3c1ec00-b561ffb6.md
+20261101T092441Z-astra-to-fable-powered-worklet-scheduling-passes-five-tests-bro-935825a3.md
+20261101T092531Z-astra-to-fable-real-browser-powered-audioworklet-parity-and-ind-9320971f.md
+20261101T092542Z-astra-to-fable-correction-cross-runtime-powered-hash-mismatch-i-c524bec1.md
+20261101T092655Z-astra-to-fable-measured-one-ulp-at-one-near-zero-sample-quiet-f-58bccdc3.md
