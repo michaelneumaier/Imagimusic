@@ -320,3 +320,26 @@ test('the second gesture: exact frames author the record, the measurement is per
   for (const bad of [{ after: Infinity }, { window: 0 }, { start: NaN }, { window: 11 }]) assert.throws(() => measureSecondStrike(r3, { steps: 2, ...bad }), /finite number/);
 });
 
+
+test('bridge energy exchange is measurable per bridge and a declared bounded adaptation yields a valid, different grove', async () => {
+  const { bridgeEnergyExchange, adaptGroveByExchange, restInvitationRecord, composeRestInvitation, describeIndividuality } = await import('../src/score/grove-rest.js');
+  const { validateGrove, GROVE_BOUNDS } = await import('../src/score/grove.js');
+  const sr = 8000, grove = composeGrove({ seed: 3 }), recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr }), rec = restInvitationRecord(recipe, composeRestInvitation(recipe, { tempo: 120 }));
+  const ex = bridgeEnergyExchange(rec, recipe);
+  assert.equal(ex.bridges.length, grove.bridges.length); assert.ok(ex.total > 0); assert.ok(Math.abs(ex.bridges.reduce((s, b) => s + b.share, 0) - 1) < 1e-12);
+  for (const b of ex.bridges) { assert.ok(b.activity > 0 && Number.isFinite(b.workOnA) && Number.isFinite(b.workOnB)); assert.ok(Math.abs(b.storageChange - b.finalStoredEnergy) < 2e-3 * Math.max(b.activity, 1e-30) + 1e-12, `bridge ${b.a}-${b.b}: −(workOnA + workOnB) equals the spring energy stored at the end within quadrature error (${Math.abs(b.storageChange - b.finalStoredEnergy) / b.activity} of activity)`); }
+  const struck = ex.bridges.filter(b => b.a === 0 || b.b === 0); assert.ok(struck.some(b => (b.a === 0 ? b.transferAtoB : -b.transferAtoB) > 0), 'energy left the struck body across at least one of its bridges');
+  assert.throws(() => adaptGroveByExchange(grove, { bridges: ex.bridges.map(b => ({ ...b, share: NaN })) }), /finite/); assert.throws(() => adaptGroveByExchange(grove, { bridges: ex.bridges.map(b => ({ ...b, share: 0.9 })) }), /at most 1/);
+  assert.throws(() => adaptGroveByExchange(composeGrove({ seed: 7 }), ex), /describe|different grove/);
+  const zero = { ...ex, bridges: ex.bridges.map(b => ({ ...b, share: 0 })) }; assert.deepEqual(adaptGroveByExchange(grove, zero, { k: 0.5 }), JSON.parse(JSON.stringify(validateGrove(grove))), 'all-zero shares return the exact source');
+  const sameCouplings = { ...ex, grove: ex.grove.replace('"seed":3', '"seed":99') }; assert.throws(() => adaptGroveByExchange(grove, sameCouplings), /different grove/);
+  assert.match(ex.measure, /not of the listener/);
+  const adapted = adaptGroveByExchange(grove, ex, { k: 0.5 }); validateGrove(adapted);
+  assert.ok(adapted.bridges.every(b => b.coupling >= GROVE_BOUNDS.coupling[0] && b.coupling <= GROVE_BOUNDS.coupling[1]));
+  assert.ok(adapted.bridges.some((b, i) => b.coupling > grove.bridges[i].coupling), 'the bridges that carried most grew');
+  assert.deepEqual(adapted.bodies, grove.bodies, 'nothing but coupling changes'); assert.deepEqual(adaptGroveByExchange(grove, ex, { k: 0.5 }), adapted, 'deterministic');
+  const before = describeIndividuality(recipe).facts, after = describeIndividuality(createGroveRestRecipe(adapted, DEFAULT_VOICE_CONFIG, { sampleRate: sr })).facts;
+  assert.notDeepEqual(before.beatRatesHz, after.beatRatesHz, 'a measurable consequence: the beat rates change');
+  assert.deepEqual(adaptGroveByExchange(grove, ex, { k: 0 }), JSON.parse(JSON.stringify(validateGrove(grove))), 'k = 0 changes nothing');
+  assert.throws(() => adaptGroveByExchange(grove, ex, { k: 3 }), /0\.\.2/);
+});

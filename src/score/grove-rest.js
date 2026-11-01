@@ -3,6 +3,7 @@
 // and time-invariant, and Φ = exp(S h) advances it exactly at the sample instants, up to the matrix-exponential's truncation
 // (Taylor to 24 terms after scaling to ‖·‖₁ ≤ 0.5) and floating-point roundoff; there is no time-stepping approximation.
 import { createGroveVoice, voiceSystem, grovePans, DEFAULT_VOICE_CONFIG } from './grove-voice.js';
+import { canonicalGrove, validateGrove, GROVE_BOUNDS } from './grove.js';
 import { stateStepper, strikeImpulse, contactDamping } from '../coupling.js';
 import { REST_RECIPE_VERSION, contactStateKey, createRestEngine, renderRestPassage, visualFromState } from '../rest/engine.js';
 import { REST_MAX_EVENTS, REST_MAX_CONTACTS, REST_MAX_SECONDS, REST_QUIET_FADE_SECONDS } from '../rest/limits.js';
@@ -420,4 +421,52 @@ export function measureSecondStrike(recipe, { body = 0, steps = 12, velocity = 0
   const best = points.reduce((a, p) => (p.dB > a.dB ? p : a)), worst = points.reduce((a, p) => (p.dB < a.dB ? p : a));
   return { body, neighbor, beatPeriodSeconds: +beatPeriod.toFixed(3), lowModesHz: low.map(f => +f.toFixed(1)), points, best, worst, rangeDb: +(best.dB - worst.dB).toFixed(2),
     measure: `low-band displacement RMS of body ${body + 1} at its pickup over ${window} s starting ${after} s after the neighbour strike's exact frame, relative to the single strike over the identical window; each delay also changes carrier phase and the first ring's decay, so this is a timing-sensitivity measurement, not a listening claim and not a claim that the visible envelope predicts the outcome` };
+}
+
+// ---- the grove you attend to (proposal 022): what each bridge did, and a declared, bounded adaptation between passages ----
+/** Bridge work during a Rest record, from the state. With d = x_a − x_b at the attachments and F = kc·d: the bridge does work on body a at the rate
+ *  P_a = −F·ẋ_a and on body b at P_b = F·ẋ_b, and P_a + P_b = −d/dt(½ kc d²), the change of the spring's stored energy (Astra's correction: F·(ẋ_b − ẋ_a)
+ *  alone is spring storage change, not transfer). Reported per bridge: workOnA, workOnB (signed, model energy units), storageChange = −(workOnA + workOnB),
+ *  transferAtoB = (workOnB − workOnA)/2 (exact when the spring is unstrained at both ends of the passage), and activity = ∫(|P_a| + |P_b|), the energy
+ *  moved in or out of the two bodies through this bridge including the spring's storage cycling; shares are of activity. Measurement only. */
+export function bridgeEnergyExchange(record, recipe) {
+  validateRestAdmission(record, recipe);
+  const g = recipe.grove, { system, family } = voiceSystem(g, recipe.voice), n = system.n, sr = recipe.sampleRate, engine = createRestEngine(recipe), frames = restRecordLength(record, recipe), u = recipe.voice.attachU;
+  const bridges = g.bridges.map(br => ({ a: br.a, b: br.b, coupling: br.coupling, kc: br.coupling * g.bodies[br.a].mass * (2 * Math.PI * g.bodies[br.a].hz) ** 2 / (family.attachFundamental * family.attachFundamental),
+    wa: system.snapshot[br.a].shape(u), wb: system.snapshot[br.b].shape(u), oa: system.offsets[br.a], ob: system.offsets[br.b], ma: Math.sqrt(g.bodies[br.a].mass), mb: Math.sqrt(g.bodies[br.b].mass), workOnA: 0, workOnB: 0, activity: 0, peakForce: 0, lastStrain: 0, prevPa: null, prevPb: null }));
+  const byFrame = new Map(); for (const k of record.events) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
+  const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  for (let i = 0; i < frames; i++) {
+    const due = byFrame.get(i); if (due) for (const k of due) engine.strike(k.position, k.body, k.velocity);
+    engine.setContacts(keyAt(i)); const x = engine.state;
+    for (const br of bridges) {
+      let xa = 0, xb = 0, va = 0, vb = 0;
+      for (let j = 0; j < br.wa.length; j++) { xa += br.wa[j] * x[br.oa + j] / br.ma; va += br.wa[j] * x[n + br.oa + j] / br.ma; }
+      for (let j = 0; j < br.wb.length; j++) { xb += br.wb[j] * x[br.ob + j] / br.mb; vb += br.wb[j] * x[n + br.ob + j] / br.mb; }
+      // Trapezoid quadrature of the endpoint powers between consecutive sample instants (second order); strain is evaluated at the sample instant.
+      const F = br.kc * (xa - xb), pa = -F * va, pb = F * vb;
+      if (br.prevPa !== null) { br.workOnA += (br.prevPa + pa) / (2 * sr); br.workOnB += (br.prevPb + pb) / (2 * sr); br.activity += (Math.abs(br.prevPa) + Math.abs(pa) + Math.abs(br.prevPb) + Math.abs(pb)) / (2 * sr); }
+      br.prevPa = pa; br.prevPb = pb; br.peakForce = Math.max(br.peakForce, Math.abs(F)); br.lastStrain = 0.5 * br.kc * (xa - xb) ** 2;
+    }
+    engine.step();
+  }
+  const total = bridges.reduce((s, br) => s + br.activity, 0);
+  return { frames, grove: canonicalGrove(g), bridges: bridges.map(br => ({ a: br.a, b: br.b, coupling: br.coupling, workOnA: br.workOnA, workOnB: br.workOnB, storageChange: -(br.workOnA + br.workOnB), finalStoredEnergy: br.lastStrain, transferAtoB: (br.workOnB - br.workOnA) / 2, activity: br.activity, share: total > 0 ? br.activity / total : 0, peakForce: br.peakForce })), total,
+    measure: 'per bridge: work done on each body by the bridge (signed), the spring storage change, the symmetric transfer estimate a → b, and activity = energy moved in or out of the two bodies through the bridge including storage cycling (mass-normalized model units); integrals by trapezoid quadrature between sample instants, ending at the last sampled instant (frame frames − 1), where finalStoredEnergy is also evaluated; sampled quadrature error is not zero and is reported by tests, not assumed; a measurement of the passage, not of the listener' };
+}
+
+/** A declared, bounded adaptation of a grove from one passage's bridge shares: coupling_e ← clamp(coupling_e · (1 + k · share_e)), within the
+ *  generator's bounds; nothing else changes; the result is an ordinary valid grove (records carry it canonically, so verifiers are unchanged).
+ *  Session-local by contract, applied only between passages, never during one; a rule, not learning, memory or life. */
+export function adaptGroveByExchange(grove, exchange, { k = 0.5 } = {}) {
+  if (!Number.isFinite(k) || k < 0 || k > 2) throw new Error('k must be a finite number in 0..2.');
+  const g = JSON.parse(canonicalGrove(grove)), [lo, hi] = GROVE_BOUNDS.coupling;
+  if (!exchange || !Array.isArray(exchange.bridges) || exchange.bridges.length !== g.bridges.length) throw new Error('exchange must describe exactly this grove\'s bridges.');
+  let sum = 0;
+  for (const br of g.bridges) { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); if (!e) throw new Error('exchange does not describe this grove\'s bridges.'); if (!Number.isFinite(e.share) || e.share < 0 || e.share > 1) throw new Error('shares must be finite in 0..1.'); if (e.coupling !== br.coupling) throw new Error('exchange was measured on a grove with different couplings.'); sum += e.share; }
+  if (sum > 1 + 1e-9) throw new Error('shares must sum to at most 1.');
+  if (typeof exchange.grove === 'string' && exchange.grove !== canonicalGrove(g)) throw new Error('exchange was measured on a different grove (canonical identity differs).');
+  if (k === 0 || sum === 0) return validateGrove(g);   // no change, full precision preserved
+  const bridges = g.bridges.map(br => { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); return { ...br, coupling: +Math.min(hi, Math.max(lo, br.coupling * (1 + k * e.share))).toFixed(4) }; });
+  return validateGrove({ ...g, bridges });
 }
