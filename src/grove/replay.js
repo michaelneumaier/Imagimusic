@@ -9,9 +9,10 @@ export function createGroveReplay({createContext=()=>new AudioContext(),onChange
   state='idle';emit();
  }
  async function play(pcm){
-  stop();const own=token;state='preparing';emit();
+  stop();const own=token,prepared=Promise.resolve(pcm);prepared.catch(()=>{});state='preparing';emit();
   try{
    if(!context){context=createContext();context.onstatechange=()=>{if(!source)return;if(context.state!=='running'){state='suspended';emit();}else if(state==='suspended'){state='playing';emit();}};}await context.resume();if(own!==token)return;
+   pcm=await prepared;if(own!==token)return;
    if(context.state!=='running')throw new Error('Audio is interrupted. Try listening again.');
    const buffer=context.createBuffer(pcm.channels.length,pcm.channels[0].length,pcm.sampleRate);pcm.channels.forEach((samples,i)=>buffer.copyToChannel(samples,i));
    const node=context.createBufferSource(),gain=context.createGain();node.buffer=buffer;node.connect(gain);gain.connect(context.destination);

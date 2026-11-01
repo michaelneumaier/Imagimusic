@@ -87,3 +87,5 @@ Rest capture adapter: src/grove/contact-capture.js and tests/grove-contact-captu
 Rest live host: src/grove/contact-host.js, contact-job.js, contact-render-worker.js, worklet state snapshots and tests/grove-contact-host.test.js. Context/worker lifecycle, acknowledged picture/capture, offline saved audio, then UI integration.
 
 Rest playable route: rest.html, rest.css, src/grove/rest-main.js and grove.html link. Explicit optional study with immediate strikes, held damping contacts, shared invitation and local recording downloads.
+
+Rest replay: src/grove/rest-replay-picture.js, contact-picture-worker.js, rest-main UI, shared replay deferred PCM support and related tests. Worker-derived 60fps sampled model picture paired with exact saved PCM; no capture mutation.

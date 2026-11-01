@@ -8,3 +8,6 @@ test('replay copies the finished stereo mix without modifying it and uses audio-
 test('Quiet supersedes a pending resume and stale ended callbacks cannot end a newer replay',async()=>{
  const {context,sources,pcm}=fixture();let resume;context.resume=()=>new Promise(r=>{resume=r;});const player=createGroveReplay({createContext:()=>context});const pending=player.play(pcm);player.stop();resume();await pending;assert.equal(sources.length,0);context.resume=async()=>{};await player.play(pcm);const old=sources[0];await player.play(pcm);old.onended();assert.equal(player.state,'playing');context.state='interrupted';context.onstatechange();assert.equal(player.state,'suspended');player.stop();assert.equal(player.state,'idle');assert.ok(sources[1].stopTime>context.currentTime);
 });
+test('deferred audio resumes inside the gesture and Quiet cancels preparation without starting sound',async()=>{
+ const {context,sources,pcm}=fixture();let resolve,resumed=false;context.resume=async()=>{resumed=true;};const player=createGroveReplay({createContext:()=>context});const prepared=new Promise(r=>resolve=r),playing=player.play(prepared);assert.equal(resumed,true);await Promise.resolve();player.stop();resolve(pcm);await playing;assert.equal(sources.length,0);await player.play(Promise.resolve(pcm));assert.equal(sources.length,1);
+});
