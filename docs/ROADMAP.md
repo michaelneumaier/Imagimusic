@@ -63,14 +63,14 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.
 
-## M2.5: One stage, one state bus (status: in-progress; agreed in collab/decisions/002-shared-stage.md; slice A owner Fable, slices B/C Astra + Fable)
+## M2.5: One stage, one state bus (status: done 2026-11-01; agreed in collab/decisions/002-shared-stage.md; evidence summarized in collab/notes/movie-export-validation.md)
 
 - [x] Slice A (done 2026-11-01, Astra commit 3a46cc3): `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); lab 2D canvases rewired to collectState frames via `src/snapshots.js` with energy-parity and finite-coordinate tests (Astra; Fable review collab/reviews/20261101T0057Z-fable-reviews-lab-migration.md approve; Safari choir smoke by Astra). No canvas reads an engine object.
-- [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
+- [x] Slice B (done 2026-11-01): vendored pinned Three.js with provenance, import map, stage islands on layout.js, same bindings, scene parity 324/324
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
   - [x] per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS (stageInputsFor, incl. performer/pump sections); lab 2D migrated to the bus (slice A)
-  - [ ] live == score equivalence gate: (a) audio side proven (render-audio tests); (b) engine-side plan test in tests/stage.test.js (Astra); (c) planned score == synthesized engine voices on the state bus: src/stage/equivalence.js + tests/equivalence.test.js drive the real engine classes (mocked Web Audio nodes) through the stage scheduler and compare raw and projected frames at every 30 fps timestamp, identical over 1007 frames with explicit id/order/timeline normalization (Fable); (d) browser-clock vs offline picture parity 324/324 in Safari via tests/stage-parity.html (Astra); remaining before closing: run tests/stage-engine-parity.html once in Safari with the real audio engines (muted) and record the report
-- [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
+  - [x] live == score equivalence gate (closed 2026-11-01): (a) audio side proven by render-audio tests; (b) engine-side plan test in tests/stage.test.js (Astra); (c) planned score == synthesized engine voices on the state bus, src/stage/equivalence.js, identical over 1007 frames in node with explicit id/order/timeline normalization (Fable); (d) browser-clock vs offline picture parity 324/324 in Safari via tests/stage-parity.html (Astra); (e) real-engine browser run tests/stage-engine-parity.html in Safari: raw and projected frames identical for all 2011 sampled frames, 48 kHz, seed 731 (Astra, renders/engine-parity-731-20261101T014804.json)
+- [x] Slice C (done 2026-11-01): Keepers and pump operators, procedural camera director, route-overlay inspector with per-actor bindings, deterministic MP4 export with canonical manifest and verifier, repeatable audio (decision 004)
   - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
   - [x] deterministic video export prototype (Astra): vendored Mediabunny (decision 003), /stage.html "Render movie" → MP4 H.264 720p30 + AAC 48 kHz; full passage verified with ffprobe (1007 frames, 33.567 s video, 33.561 s audio, first note at 0.35 s) and all 1007 state hashes regenerated in Node with 0 mismatches
   - [x] audio repeatability (decision 004, 2026-11-01): repeated offline renders of the full passage and the air choir are bit-identical float32 on Safari 26.6.2 / 48 kHz / seed 731 (harness v6 candidate, v7 shipping default 12/12, full movie 1007/1007 on the default path); default lifecycle outlive-render with engine gains zeroed at cutoff; as-live kept as an explicit negative control; controlled finding: differences observed after source finish, never-stopped controls identical (max-difference location is not the first difference); no cross-browser or codec byte-identity promised
@@ -79,12 +79,12 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
   - [x] procedural camera director (Astra 0b83583; Fable review approve)
   - [x] inspector route overlay with note-local LFO settings (Astra 5dea2c5 + fix; Fable review approve-with-fixes, fixes applied)
   - [x] manifest consolidation on src/stage/manifest.js; export/inspector review fixes applied (Astra 3a46cc3)
-  - [ ] full-movie regression on the adopted default lifecycle (Astra, in progress: 113 bindings, 12 Keepers, follow camera, seed 731)
-  - [ ] M2.5 close-out: remaining evidence above, then mark slices B and C done; do not close early
+  - [x] full-movie regression on the adopted default lifecycle (Astra: renders/conservatory-repeatable-731.mp4, 1007 frames, verifier 1007/1007, 113 bindings, 12 Keepers, 0 unassigned, 0 unreachable)
+  - [x] M2.5 close-out: all evidence above in place (scene parity, engine parity, full movie, repeatable audio)
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 
-## M3: Tension Loom, coupling and FM (status: proposed; contract drafted in docs/proposals/003-tension-loom.md; lands after M2.5 slice B as the first family born in 3D)
+## M3: Tension Loom, coupling and FM (status: in-progress; proposal 003 revised; reciprocal pair model, study 01, scored passage, shared scene adapter, composition v1 with live and offline adapters done; next: composed exports verifiable (composition in manifest + verifier), UI enablement, harness rows for the composed passage; FM tensioner (B) after)
 
 - Shared bridge/soundboard leaking energy between resonators; FM as a bridge that stretches strings while ringing.
 - LFO pendulum visibly linked to what it modulates.
