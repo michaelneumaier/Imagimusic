@@ -65,14 +65,17 @@ $('perform').onclick=async()=>{
 };
 $('quiet').onclick=stop;
 $('passage').value=score?'conversation':'seeded';
+$('score-seed').value=performance.patch.seed;
 $('score-tempo').value=performance.patch.tempo;$('score-tempo-value').textContent=performance.patch.tempo+' BPM';
 $('character').value=score?.controls.character??'calm';$('density').value=score?.controls.density??.7;$('density-value').textContent=Math.round(Number($('density').value)*100)+'%';
-$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;
+$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;$('score-seed').disabled=!score;$('score-variation').disabled=!score;
 function changeScore(){
- stop();const next=$('passage').value==='seeded'?null:composeConversation({seed:performance.patch.seed,tempo:Number($('score-tempo').value),density:Number($('density').value),character:$('character').value});
+ if($('passage').value!=='seeded'&&!$('score-seed').reportValidity())return;
+ stop();const next=$('passage').value==='seeded'?null:composeConversation({seed:Number($('score-seed').value),tempo:Number($('score-tempo').value),density:Number($('density').value),character:$('character').value});
  location.href=scoreURL(location.href,next);
 }
-$('passage').onchange=changeScore;$('character').onchange=changeScore;$('density').onchange=changeScore;$('score-tempo').onchange=changeScore;
+$('passage').onchange=changeScore;$('character').onchange=changeScore;$('density').onchange=changeScore;$('score-tempo').onchange=changeScore;$('score-seed').onchange=changeScore;
+$('score-variation').onclick=()=>{$('score-seed').value=(performance.patch.seed+1)>>>0;changeScore();};
 $('density').oninput=()=>{$('density-value').textContent=Math.round(Number($('density').value)*100)+'%';};
 $('score-tempo').oninput=()=>{$('score-tempo-value').textContent=$('score-tempo').value+' BPM';};
 $('loom-enabled').checked=composition.loom.enabled;
@@ -113,7 +116,7 @@ $('cancel-render').onclick=()=>{renderAbort?.abort();$('error').textContent='Can
 $('render-manifest').onclick=()=>{if(lastManifest)downloadArtifact(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),`imagimusic-render-${lastManifest.instrument.seed}.json`);};
 $('movie').onclick=async()=>{
   if(renderAbort||!world)return;stop();renderAbort=new AbortController();
-  for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo'])$(id).disabled=true;
+  for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo','score-seed','score-variation'])$(id).disabled=true;
   $('cancel-render').hidden=false;$('render-manifest').disabled=true;lastManifest=null;
   try{
     const {exportMovie}=await import('./export.js');
@@ -123,5 +126,5 @@ $('movie').onclick=async()=>{
     lastManifest=result.manifest;$('render-manifest').disabled=false;
     $('error').textContent=`Movie ready · ${result.manifest.frames} frames · 720p / 30 fps · synthesized soundtrack`;
   }catch(error){$('error').textContent=error.message;}
-  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo'])$(id).disabled=false;$('cancel-render').hidden=true;$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;}
+  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo','score-seed','score-variation'])$(id).disabled=false;$('cancel-render').hidden=true;$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;$('score-seed').disabled=!score;$('score-variation').disabled=!score;}
 };
