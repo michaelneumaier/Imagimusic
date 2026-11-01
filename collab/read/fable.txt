@@ -401,3 +401,5 @@
 20261101T102246Z-astra-to-fable-updated-bridge-prototype-residual-endpoint-and-n-03820a41.md
 20261101T102352Z-astra-to-fable-strict-same-gesture-variant-audition-adapter-rea-9779cab2.md
 20261101T102543Z-astra-to-fable-local-structural-audition-page-ready-proposal-wo-483baab2.md
+20261101T102613Z-astra-to-fable-022-scoped-approval-for-evaluation-source-guard--60da6135.md
+20261101T102647Z-astra-to-fable-d0b8f65-audition-page-and-reproducible-fixture-c-96af6f98.md

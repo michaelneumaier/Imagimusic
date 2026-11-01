@@ -433,26 +433,29 @@ export function bridgeEnergyExchange(record, recipe) {
   validateRestAdmission(record, recipe);
   const g = recipe.grove, { system, family } = voiceSystem(g, recipe.voice), n = system.n, sr = recipe.sampleRate, engine = createRestEngine(recipe), frames = restRecordLength(record, recipe), u = recipe.voice.attachU;
   const bridges = g.bridges.map(br => ({ a: br.a, b: br.b, coupling: br.coupling, kc: br.coupling * g.bodies[br.a].mass * (2 * Math.PI * g.bodies[br.a].hz) ** 2 / (family.attachFundamental * family.attachFundamental),
-    wa: system.snapshot[br.a].shape(u), wb: system.snapshot[br.b].shape(u), oa: system.offsets[br.a], ob: system.offsets[br.b], ma: Math.sqrt(g.bodies[br.a].mass), mb: Math.sqrt(g.bodies[br.b].mass), workOnA: 0, workOnB: 0, activity: 0, peakForce: 0, lastStrain: 0, prevPa: null, prevPb: null }));
+    wa: system.snapshot[br.a].shape(u), wb: system.snapshot[br.b].shape(u), oa: system.offsets[br.a], ob: system.offsets[br.b], ma: Math.sqrt(g.bodies[br.a].mass), mb: Math.sqrt(g.bodies[br.b].mass), workOnA: 0, workOnB: 0, activity: 0, peakForce: 0, lastStrain: 0 }));
   const byFrame = new Map(); for (const k of record.events) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
   const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  // Event-boundary convention (Astra's review): a strike is a velocity jump, so power jumps at the strike frame. Each continuous interval [i, i+1) is
+  // integrated by the trapezoid rule from the POST-event state at frame i to the PRE-event state at frame i+1 (sampled before that frame's strikes are
+  // applied); the impulse itself does no bridge work (zero duration). Contact switches change damping only, so power is continuous across them.
+  const powers = x => bridges.map(br => { let xa = 0, xb = 0, va = 0, vb = 0;
+    for (let j = 0; j < br.wa.length; j++) { xa += br.wa[j] * x[br.oa + j] / br.ma; va += br.wa[j] * x[n + br.oa + j] / br.ma; }
+    for (let j = 0; j < br.wb.length; j++) { xb += br.wb[j] * x[br.ob + j] / br.mb; vb += br.wb[j] * x[n + br.ob + j] / br.mb; }
+    const F = br.kc * (xa - xb); return { pa: -F * va, pb: F * vb, F, strain: 0.5 * br.kc * (xa - xb) ** 2 }; });
+  let left = null;
   for (let i = 0; i < frames; i++) {
+    const pre = powers(engine.state);                                   // pre-event state at frame i: right endpoint of [i−1, i)
+    if (left) for (const [k, br] of bridges.entries()) { br.workOnA += (left[k].pa + pre[k].pa) / (2 * sr); br.workOnB += (left[k].pb + pre[k].pb) / (2 * sr); br.activity += (Math.abs(left[k].pa) + Math.abs(pre[k].pa) + Math.abs(left[k].pb) + Math.abs(pre[k].pb)) / (2 * sr); }
     const due = byFrame.get(i); if (due) for (const k of due) engine.strike(k.position, k.body, k.velocity);
-    engine.setContacts(keyAt(i)); const x = engine.state;
-    for (const br of bridges) {
-      let xa = 0, xb = 0, va = 0, vb = 0;
-      for (let j = 0; j < br.wa.length; j++) { xa += br.wa[j] * x[br.oa + j] / br.ma; va += br.wa[j] * x[n + br.oa + j] / br.ma; }
-      for (let j = 0; j < br.wb.length; j++) { xb += br.wb[j] * x[br.ob + j] / br.mb; vb += br.wb[j] * x[n + br.ob + j] / br.mb; }
-      // Trapezoid quadrature of the endpoint powers between consecutive sample instants (second order); strain is evaluated at the sample instant.
-      const F = br.kc * (xa - xb), pa = -F * va, pb = F * vb;
-      if (br.prevPa !== null) { br.workOnA += (br.prevPa + pa) / (2 * sr); br.workOnB += (br.prevPb + pb) / (2 * sr); br.activity += (Math.abs(br.prevPa) + Math.abs(pa) + Math.abs(br.prevPb) + Math.abs(pb)) / (2 * sr); }
-      br.prevPa = pa; br.prevPb = pb; br.peakForce = Math.max(br.peakForce, Math.abs(F)); br.lastStrain = 0.5 * br.kc * (xa - xb) ** 2;
-    }
+    engine.setContacts(keyAt(i));
+    left = powers(engine.state);                                         // post-event state at frame i: left endpoint of [i, i+1)
+    for (const [k, br] of bridges.entries()) { br.peakForce = Math.max(br.peakForce, Math.abs(left[k].F)); br.lastStrain = left[k].strain; }
     engine.step();
   }
   const total = bridges.reduce((s, br) => s + br.activity, 0);
   return { frames, grove: canonicalGrove(g), bridges: bridges.map(br => ({ a: br.a, b: br.b, coupling: br.coupling, workOnA: br.workOnA, workOnB: br.workOnB, storageChange: -(br.workOnA + br.workOnB), finalStoredEnergy: br.lastStrain, transferAtoB: (br.workOnB - br.workOnA) / 2, activity: br.activity, share: total > 0 ? br.activity / total : 0, peakForce: br.peakForce })), total,
-    measure: 'per bridge: work done on each body by the bridge (signed), the spring storage change, the symmetric transfer estimate a → b, and activity = energy moved in or out of the two bodies through the bridge including storage cycling (mass-normalized model units); integrals by trapezoid quadrature between sample instants, ending at the last sampled instant (frame frames − 1), where finalStoredEnergy is also evaluated; sampled quadrature error is not zero and is reported by tests, not assumed; a measurement of the passage, not of the listener' };
+    measure: 'per bridge: work done on each body by the bridge (signed), the spring storage change, the symmetric transfer estimate a → b, and activity = energy moved in or out of the two bodies through the bridge including storage cycling (mass-normalized model units); integrals by trapezoid quadrature over each continuous interval from the post-event state at frame i to the pre-event state at frame i + 1 (strikes are velocity jumps of zero duration and do no bridge work), ending at the last sampled instant (frame frames − 1) where finalStoredEnergy is evaluated; second order between events, first-order error at event boundaries only in the sense that the impulse instant is excluded exactly; the quadrature residual is measured by tests, not assumed; a measurement of the passage, not of the listener' };
 }
 
 /** A declared, bounded adaptation of a grove from one passage's bridge shares: coupling_e ← clamp(coupling_e · (1 + k · share_e)), within the
@@ -465,7 +468,7 @@ export function adaptGroveByExchange(grove, exchange, { k = 0.5 } = {}) {
   let sum = 0;
   for (const br of g.bridges) { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); if (!e) throw new Error('exchange does not describe this grove\'s bridges.'); if (!Number.isFinite(e.share) || e.share < 0 || e.share > 1) throw new Error('shares must be finite in 0..1.'); if (e.coupling !== br.coupling) throw new Error('exchange was measured on a grove with different couplings.'); sum += e.share; }
   if (sum > 1 + 1e-9) throw new Error('shares must sum to at most 1.');
-  if (typeof exchange.grove === 'string' && exchange.grove !== canonicalGrove(g)) throw new Error('exchange was measured on a different grove (canonical identity differs).');
+  if (typeof exchange.grove !== 'string') throw new Error('exchange must carry the canonical grove it was measured on.'); if (exchange.grove !== canonicalGrove(g)) throw new Error('exchange was measured on a different grove (canonical identity differs).');
   if (k === 0 || sum === 0) return validateGrove(g);   // no change, full precision preserved
   const bridges = g.bridges.map(br => { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); return { ...br, coupling: +Math.min(hi, Math.max(lo, br.coupling * (1 + k * e.share))).toFixed(4) }; });
   return validateGrove({ ...g, bridges });
