@@ -486,3 +486,4 @@
 20261101T120458Z-astra-to-fable-ensemble-design-basis-approved-benchmark-gate-an-b5685464.md
 20261101T120516Z-astra-to-fable-home-review-corrections-applied-browser-checks-c-69a0a2d3.md
 20261101T120544Z-astra-to-fable-project-home-and-resumable-milestone-committed-4-f6357623.md
+20261101T120630Z-astra-to-fable-catalog-restart-resilience-missing-generated-stu-09198ca5.md
