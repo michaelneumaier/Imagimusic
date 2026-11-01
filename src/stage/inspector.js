@@ -1,8 +1,9 @@
+import {inspectScoreEvents} from './score-inspection.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import { createRouteOverlay } from './route-overlay.js';
 import { explainBinding } from '../bindings.js';
 
-export function mountInspector({world,canvas,bindings,getPatch}) {
+export function mountInspector({world,canvas,bindings,getPatch,getPerformance=()=>null}) {
   const select=document.getElementById('inspect-binding'),heading=document.getElementById('inspect-title'),note=document.getElementById('inspect-note'),value=document.getElementById('inspect-value'),inputs=document.getElementById('inspect-inputs');
   const route=createRouteOverlay(world),routeNote=document.getElementById('inspect-route');
   let current=null,lastFrame=null,down=null;
@@ -43,7 +44,8 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     note.textContent=`${detail.label.toUpperCase()} · ${detail.note}`;
     const result=Array.isArray(detail.value)&&detail.value.length>8?`[${detail.value.length} sampled deflections]`:format(detail.value);
     value.textContent=current.target.startsWith('performer/')&&detail.value?`Gesture: ${detail.value.phase} · Event: ${detail.value.eventId??'none active'} · Contact: ${format(detail.value.contact)}${detail.value.unreachable?' · Unreachable: arm folded; original mallet remains':''}`:`${detail.field} → ${detail.param}: ${result}`;
-    inputs.textContent=detail.inputs.map(input=>input.path+' = '+format(input.value)).join('\n');
+    const passage=getPerformance(),events=passage?inspectScoreEvents(passage,current.target,lastFrame.t,detail.value):[];
+    inputs.textContent=[...detail.inputs.map(input=>input.path+' = '+format(input.value)),...events.map(event=>'Score event: '+JSON.stringify(event))].join('\n');
   }
   return {update(frame){lastFrame=frame;render();route.update(frame);}};
 }

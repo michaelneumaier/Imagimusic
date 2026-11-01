@@ -92,7 +92,7 @@ try{
   const color=MATERIALS[activePatch.material].color;
   for(const body of world.garden)for(const shell of body.layers){shell.material.color.setRGB(...color.map(c=>c/255));shell.material.emissive.copy(shell.material.color);}
   stop();$('error').textContent=importError;
-  const inspector=mountInspector({world,canvas:$('world'),bindings,getPatch:()=>({...activePatch,loom:{...composition.loom.settings,score:performance.loom?.events},fm:composition.fm?.settings})});
+  const inspector=mountInspector({world,canvas:$('world'),bindings,getPerformance:()=>performance,getPatch:()=>({...activePatch,loom:{...composition.loom.settings,score:performance.loom?.events},fm:composition.fm?.settings})});
   function draw(){
     const t=playing?live.time:study.time,frame=frames.sample(t,{mode:$('direction').value,position:world.camera.position.toArray(),target:world.controls.target.toArray()});
     const applied=applyStage(frame,frames.bindings,world);inspector.update(frame);world.render();
