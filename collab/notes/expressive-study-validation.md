@@ -32,3 +32,9 @@ Fable's 7062f93 moves the first voice's return to 16–17.5 s, while it is still
 The earlier saved WAV/report v2 describe the pre-7062f93 composition; report v3 describes the current composition. No claim that the old WAV captures the revised return.
 
 Final full suite after the compaction and Fable evaluator refactor: 265/265 passed. Scene selection was also exercised in Safari: choosing detach+reset resets time to zero, clears the old prepared buffer/Save action, and creates four voice cards. Compaction source review remains requested separately; browser evidence is recorded above. `compileExpression` is not yet used by this adapter pending input/output isolation fixes identified in Astra's review.
+
+## Compiled evaluator integration
+
+After source review of Fable c31019f, the adapter now caches a compiled expression evaluator privately per performance. The canonical score is recursively frozen; the performance's score pointer cannot be replaced. Serializable performance copies retain a plain-replay fallback. New adapter test compares both paths at each message boundary ±1 ns and 10 ms, and rejects score mutation. Source review: `collab/reviews/20261101T0552Z-astra-reviews-compiled-expression.md`.
+
+Safari rerun `renders/expressive-audio-report-v4.json`: 5/5 repeated render checks pass with identical Float32 samples per pair, same peaks and dense/compact/control-rate residuals as v3. Musical study pair took304ms here versus3468ms in v3; short pairs61–200ms. These are observed render/schedule timings, not device-latency claims. This supersedes the earlier preparation-latency limitation for the tested machine, while retaining the interpolation and engine-specific scope notes.

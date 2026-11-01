@@ -37,3 +37,10 @@ test('visible bodies return to the same pose after reverse seeking and retire in
  const tail=expressionSceneFrame(p,4.5);assert.equal(tail.bodies[0].active,false);assert.equal(tail.bodies[3].active,true);
  assert.ok(expressionSceneFrame(p,p.duration).bodies.every(b=>!b.active&&b.level===0&&b.aperture===0));
 });
+
+test('compiled instrument evaluation matches plain score replay at boundaries and prevents score mutation',()=>{
+ const performance=createExpressionPerformance(composeExpressiveChord()),plain=JSON.parse(JSON.stringify(performance));
+ for(const event of performance.score.events)for(const delta of [-1e-9,0,1e-9,.01]){const t=Math.max(0,event.time+delta);assert.deepEqual(expressionFrame(performance,t),expressionFrame(plain,t));}
+ assert.throws(()=>{performance.score.mapping.smoothingSeconds=.1;},TypeError);
+ assert.throws(()=>{performance.score={};},TypeError);
+});
