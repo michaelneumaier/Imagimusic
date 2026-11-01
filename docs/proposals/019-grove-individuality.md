@@ -28,3 +28,9 @@ The same record transposed to the other two groves (`transposeRestRecord`) is th
 ## Not proposed
 
 No new control, no automatic selection, no claim that beating or a long ring is beautiful.
+
+## Addendum: monitoring level (Astra's measurement, 2026-11-01)
+
+Astra's listening study of the 20 s invitation at natural model level measured peaks of −28.9 / −31.0 / −32.1 dBFS and whole-passage RMS of −46.4 / −50.5 / −51.8 dBFS on seeds 3 / 7 / 11, a 5.35 dB spread. Two honest statements follow. First, the Rest route plays about 30 dB below full scale: the output gain is fixed so that the rigorous energy bound of dense playing stays under the 0.9 ceiling, and ordinary playing sits far below that bound. Second, the groves differ in natural level, and a grove may feel weaker or stronger for that reason alone; the RMS-matched copies (attenuation only, to the quietest) exist to separate that from timbre, and are expressly not perceptual loudness matching. Neither of us can hear the files; both sets go to Michael.
+
+If level turns out to matter, the remedy must not be a silent gain change (it would alter admission and every saved capture's meaning). The honest form is an **explicit, recorded listening level**: one scalar applied identically to the live output and to Keep the sound, written into the record and the film manifest as a presentation field, so that heard, saved and verified stay one thing and the model's gain stays what it is. That is a decision for after listening, not before.
