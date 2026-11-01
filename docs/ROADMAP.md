@@ -97,7 +97,7 @@ Deterministic phrase score (opening / exchange / release) over the existing mech
 ## M4: MIDI import onto the score contract (status: in progress; proposal docs/proposals/010-midi-import.md rev. 3)
 
 - M4a SMF 1.0 parser built from the RP-001 text (src/midi/smf.js, Fable 5c0b4ef; Astra review 20261101T0440Z with fixes in progress).
-- M4b mapping / compile / report built (src/midi/mapping.js, Fable; Astra review 0453Z fixes landed). M4c MIDI desk intake and source overview shipped (Astra bd9afae); mapping controls and stage playback next (Astra). M4d imported adapter, export and verifier built (Astra; Fable review approve); imported movie and audio evidence pending.
+- M4b mapping / compile / report built (src/midi/mapping.js, Fable; Astra review 0453Z fixes landed). M4c MIDI desk: intake, source overview (bd9afae), mapping preview with the real compiler, explicit Use to the stage via a keyed session transfer, stage playback at the audio rate and export (Astra; Fable review approve 0503Z); Safari: example → bellows → 3 entrances → PLAYING. M4d imported adapter, export and verifier built (Astra; Fable review approve). Pending: the imported movie Astra is rendering, and the harness v16 imported-MIDI audio row at both rates.
 
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
