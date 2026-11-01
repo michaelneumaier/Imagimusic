@@ -166,3 +166,4 @@
 - 2026-11-01 fable: canonical comparison in validateRestRecord (round-trip test), Quiet closure validation and length rule aligned with the worklet; review of worklet admission and Quiet (approve).
 - 2026-11-01 fable: restRecordVisual (picture at any time with contacts, cues and the Quiet fade) and the verifier rebuild for Rest records; proposal 017 status; roadmap M8 progress.
 - 2026-11-01 astra: Rest capture adapter (acknowledgements → v2 record, strict sequence, Quiet closes hands). Fable review approve; limits plan agreed with an origin note.
+- 2026-11-01 fable: the Rest invitation (ring, rest on it, rest on the neighbour, together with a light hand, Quiet) as worklet commands and the record it produces; admissible on every curated seed; rested tail under 0.3 of the free ring.

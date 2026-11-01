@@ -162,3 +162,23 @@ test('a Rest record rebuilds in the verifier path and its picture reports contac
   assert.ok(at(0.65).envelope.every(v => v === 0), 'Quiet fade reaches zero at ended + fade (frame 5200 = 0.65 s)'); assert.ok(at(0.64).envelope.some(v => v > 0), 'still fading just before');
   const first = at(0.3).envelope, again = at(0.3).envelope; assert.deepEqual(first, again);
 });
+
+test('the Rest invitation is admissible on every curated seed, teaches by contrast, and yields a valid record', async () => {
+  const { composeRestInvitation, restInvitationRecord, renderRestRecord, REST_INVITATION_BOUNDS } = await import('../src/score/grove-rest.js');
+  const { createVoiceInstrument } = await import('../src/grove/voice-performance.js');
+  for (const seed of GROVE_SEEDS) {
+    const grove = composeGrove({ seed }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr }), inv = composeRestInvitation(recipe);
+    assert.deepEqual(composeRestInvitation(recipe), inv); assert.ok(inv.seconds >= REST_INVITATION_BOUNDS.minSeconds && inv.seconds <= REST_INVITATION_BOUNDS.maxSeconds);
+    assert.ok(inv.commands.every((c, i) => i === 0 || c.frame >= inv.commands[i - 1].frame), 'commands in frame order');
+    // Every strike is admissible under the energy rule when played exactly as written, through the same engine the worklet uses.
+    const e = createRestEngine(recipe); let frame = 0; const active = [null, null, null];
+    for (const c of inv.commands) { for (; frame < c.frame; frame++) e.step(); if (c.kind === 'strike') { assert.ok(e.candidateBound(c.position, c.body, c.velocity) <= recipe.admissionCeiling, `seed ${seed}: strike at frame ${c.frame} admissible`); e.strike(c.position, c.body, c.velocity); } else if (c.kind === 'contact') { active[c.body] = c.zone === null ? null : { zone: c.zone, strength: c.strength }; e.setContacts(contactStateKey(active)); } }
+    const record = restInvitationRecord(recipe, inv), pcm = renderRestRecord(record, recipe);
+    assert.equal(record.contacts.length, 3); assert.equal(record.events.length, 6); assert.ok(record.ended);
+    // Contrast: the rested repeat (section rest) is quieter in its second half than the free ring was at the same age.
+    const rms = (x, a, b) => Math.sqrt(x.slice(a, b).reduce((s, v) => s + v * v, 0) / (b - a)), beat = b => Math.round(b * 60 / inv.tempo * sr);
+    const freeTail = rms(pcm.channels[0], beat(2), beat(4)), restedTail = rms(pcm.channels[0], beat(6), beat(8));
+    assert.ok(restedTail < 0.3 * freeTail, `seed ${seed}: under the hand ${restedTail / freeTail} of the free ring`);
+    assert.ok(pcm.channels.every(ch => ch.every(v => Number.isFinite(v) && Math.abs(v) <= recipe.admissionCeiling)), 'never above the ceiling');
+  }
+});

@@ -151,3 +151,41 @@ export function restRecordVisual(record, recipe, { every = 1024 } = {}) {
     return { time, envelope: v.envelope.map(x => x * fade), lowBand: true, contacts: v.contacts, strikes: fade ? record.events.filter(e => frame >= e.frame && frame < e.frame + 0.3 * sr).map(e => ({ ...e, strikeU: recipe.positions[e.position], age: (frame - e.frame) / sr })) : [] };
   } };
 }
+
+// ---- the Rest invitation: a short authored passage that teaches the gesture by listening ----
+// Strike a shell and let it ring. Strike it again and rest a hand on it: the ring dies under the hand. Lift. Strike it again and rest on
+// the neighbour instead: the bridge carries the change. Then all three at the middle, and Quiet. Commands in the worklet's shape.
+export const REST_INVITATION_BOUNDS = Object.freeze({ minSeconds: 12, maxSeconds: 30 });
+export function composeRestInvitation(recipe, { tempo = 72 } = {}) {
+  if (!Number.isInteger(tempo) || tempo < 40 || tempo > 160) throw new Error('tempo must be an integer in 40..160.');
+  const sr = recipe.sampleRate, beat = b => Math.round(b * 60 / tempo * sr), firm = recipe.strengths.findIndex(s => s.name === 'firm'), light = recipe.strengths.findIndex(s => s.name === 'light');
+  if (firm < 0 || light < 0 || recipe.zones.length < 3) throw new Error('the invitation is written for three zones and the light and firm strengths.');
+  const tip = recipe.zones.length - 1, middle = 1, g = recipe.grove, neighbor = g.bridges.find(e => e.a === 0 || e.b === 0), other = neighbor.a === 0 ? neighbor.b : neighbor.a, third = [0, 1, 2].find(b => b !== 0 && b !== other);
+  const id = (() => { let n = 0; return () => `invite-${n++}`; })();
+  const strike = (b, body, position, velocity) => ({ id: id(), kind: 'strike', frame: beat(b), body, position, velocity });
+  const rest = (b, body, zone, strength) => ({ id: id(), kind: 'contact', frame: beat(b), body, zone, strength });
+  const lift = (b, body) => ({ id: id(), kind: 'contact', frame: beat(b), body, zone: null });
+  const commands = [
+    strike(0, 0, middle, 0.6),                                       // ring
+    strike(4, 0, middle, 0.6), rest(5, 0, tip, firm), lift(8, 0),    // rest on it: the ring dies under the hand
+    strike(10, 0, middle, 0.6), rest(11, other, tip, firm), lift(14, other),   // rest on the neighbour: the bridge carries the change
+    strike(16, 0, middle, 0.5), strike(16, other, middle, 0.5), strike(16, third, middle, 0.5), rest(17.5, 0, middle, light), lift(20, 0),   // all three, a light hand
+    { id: id(), kind: 'quiet', frame: beat(24), fadeFrames: Math.round(0.025 * sr) },
+  ];
+  const sections = [{ id: 'ring', beats: [0, 4] }, { id: 'rest', beats: [4, 10] }, { id: 'across', beats: [10, 16] }, { id: 'together', beats: [16, 24] }, { id: 'quiet', beats: [24, 24] }];
+  const seconds = commands.at(-1).frame / sr + 0.025;
+  if (seconds < REST_INVITATION_BOUNDS.minSeconds || seconds > REST_INVITATION_BOUNDS.maxSeconds) throw new Error(`invitation lasts ${seconds.toFixed(1)} s; bound is ${REST_INVITATION_BOUNDS.minSeconds}..${REST_INVITATION_BOUNDS.maxSeconds} s.`);
+  return { version: 1, tempo, seconds, neighbor: other, third, sections, commands };
+}
+
+/** The record the invitation produces if every command is accepted exactly when requested (for tests, the picture and offline rendering). */
+export function restInvitationRecord(recipe, invitation) {
+  const events = [], contacts = [], active = new Map(); let ended = null;
+  invitation.commands.forEach((c, order) => {
+    if (c.kind === 'strike') events.push({ frame: c.frame, order, body: c.body, position: c.position, velocity: c.velocity });
+    else if (c.kind === 'contact') { const a = active.get(c.body); if (a) { if (c.frame > a.start) contacts.push({ ...a, end: c.frame }); active.delete(c.body); } if (c.zone !== null) active.set(c.body, { body: c.body, zone: c.zone, strength: c.strength, start: c.frame, order }); }
+    else { for (const [body, a] of active) if (c.frame > a.start) contacts.push({ ...a, end: c.frame }); active.clear(); ended = { frame: c.frame, fadeFrames: c.fadeFrames }; }
+  });
+  return validateRestRecord({ version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: recipe.sampleRate, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+    events, contacts: contacts.sort((a, b) => a.start - b.start || a.order - b.order), ended }, recipe);
+}
