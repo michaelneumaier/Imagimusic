@@ -58,9 +58,13 @@ test('capture v2: a Rest record validates, renders exactly, equals the bank rout
   const { createGroveVoiceSession } = await import('../src/grove/voice-session.js');
   const { mixImpulseRecording } = await import('../src/touch/session.js');
   const grove = composeGrove({ seed: 3 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
-  const record = { version: 2, kind: REST_RECORD_KIND, seed: 3, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
     events: [{ frame: 0, order: 0, body: 0, position: 1, velocity: 0.4 }, { frame: 2401, order: 1, body: 2, position: 2, velocity: 0.6 }], contacts: [], ended: { frame: 3601, fadeFrames: 200 } };
   validateRestRecord(record, recipe); assert.equal(JSON.parse(canonicalRestRecord(record, recipe)).kind, REST_RECORD_KIND);
+  // Round trip: the canonical JSON (keys sorted at every level) validates again and is canonical again, whatever the key order of the input.
+  const shuffled = { ended: record.ended, contacts: [], events: record.events.map(e => ({ velocity: e.velocity, position: e.position, body: e.body, order: e.order, frame: e.frame })), strengths: record.strengths, zones: record.zones, outputGain: record.outputGain, sampleRate: sr, voice: Object.fromEntries(Object.entries(record.voice).reverse()), grove: Object.fromEntries(Object.entries(record.grove).reverse()), kind: record.kind, version: 2 };
+  const canon = canonicalRestRecord(shuffled, recipe), again = JSON.parse(canon); validateRestRecord(again, recipe);
+  assert.equal(canonicalRestRecord(again, recipe), canon); assert.equal(canon, canonicalRestRecord(record, recipe));
   // Same strikes through the bank route (voice session + unit bank mix).
   const session = createGroveVoiceSession({ grove, voice: DEFAULT_VOICE_CONFIG }, sr); session.strike({ frame: 0, body: 0, position: 1, velocity: 0.4 }); session.strike({ frame: 2401, body: 2, position: 2, velocity: 0.6 }); session.finish(3601, 200);
   const bank = renderVoiceBank(createVoiceInstrument(grove, DEFAULT_VOICE_CONFIG, sr)), viaBank = mixImpulseRecording(session.snapshot(), bank), exact = renderRestRecord(record, recipe);
@@ -78,12 +82,24 @@ test('capture v2: a Rest record validates, renders exactly, equals the bank rout
   rejects(r => { r.events.reverse(); }, /sorted by applied frame/);
   rejects(r => { r.contacts[0].zone = 3; }, /index the recipe zones/);
   rejects(r => { r.outputGain += 0.01; }, /does not belong/);
+  rejects(r => { r.grove.bodies[0].mass *= 1.01; }, /grove differs/);
+  rejects(r => { r.grove = { ...r.grove, seed: 3 }; r.grove.layout[0].x += 1e-6; }, /grove differs/);
   rejects(r => { r.events[0].requestedFrame = 0; }, /unexpected keys/);
+  rejects(r => { r.events[1].frame = 3602; r.events[1].order = 9; }, /after Quiet/);
+  rejects(r => { r.contacts[1].end = 3700; }, /after Quiet/);
   // Any frame in any order from checkpoints equals a straight run.
   const states = restRecordStates(rested, recipe, { every: 512 }), straight = createRestEngine(recipe), seen = [];
   const keyAt = i => contactStateKey([0, 1, 2].map(b => { const c = rested.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
   for (let i = 0; i < states.frames; i++) { if ([0, 1, 700, 2401, 2402, 3000, 3700].includes(i)) seen.push([i, straight.state]); for (const k of rested.events) if (k.frame === i) straight.strike(k.position, k.body, k.velocity); straight.setContacts(keyAt(i)); straight.step(); }
   for (const [i, s] of seen.reverse()) { const r = states.stateAt(i); assert.ok(r.every((v, k) => v === s[k]), `frame ${i} from a checkpoint equals the straight run exactly`); }
+  // Endpoint: a record whose length is an exact multiple of `every`, asked for its final frame; and an empty record.
+  const multiple = structuredClone(record); multiple.ended = { frame: 3000, fadeFrames: 1096 }; assert.equal(restRecordLength(multiple, recipe) % 512, 0);
+  const st = restRecordStates(multiple, recipe, { every: 512 }); const atEnd = st.stateAt(st.frames); assert.ok(atEnd.length === recipe.dim && atEnd.every(Number.isFinite));
+  const tail = createRestEngine(recipe); for (let i = 0; i < st.frames; i++) { for (const k of multiple.events) if (k.frame === i) tail.strike(k.position, k.body, k.velocity); tail.setContacts('-|-|-'); tail.step(); }
+  assert.ok(atEnd.every((v, k) => v === tail.state[k]), 'the final frame replays from the last checkpoint exactly');
+  const empty = { ...structuredClone(record), events: [], contacts: [], ended: null }; validateRestRecord(empty, recipe);
+  assert.equal(restRecordLength(empty, recipe), 0);
+  const late = structuredClone(record); late.ended = { frame: 400000, fadeFrames: 1200 }; assert.equal(restRecordLength(late, recipe), 401200, 'Quiet long after every ring: the render ends where the worklet stops'); assert.ok(restRecordStates(empty, recipe).stateAt(0).every(v => v === 0)); assert.equal(renderRestRecord(empty, recipe).channels[0].length, 0);
 });
 
 test('admission: the energy pickup bound holds at every sample under rests, strikes during holds and overlaps; the free bank bound does not', async () => {

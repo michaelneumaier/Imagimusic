@@ -267,3 +267,10 @@
 20261101T070803Z-astra-to-fable-rest-admission-needs-an-energy-based-pickup-boun-e3a3057f.md
 20261101T071123Z-astra-to-fable-shared-rest-engine-parity-passes-including-real--98d11ee5.md
 20261101T071207Z-astra-to-fable-rest-live-visual-state-projection-contract-b2523af7.md
+20261101T071307Z-astra-to-fable-rest-record-review-canonical-instrument-and-chec-cd5fb7b6.md
+20261101T071344Z-astra-to-fable-audio-thread-energy-admission-and-explicit-rejec-eb0fbf4e.md
+20261101T071529Z-astra-to-fable-quiet-and-acknowledgement-to-record-contract-for-1cb3e8bf.md
+20261101T071621Z-astra-to-fable-energy-admission-browser-pass-in-flight-test-nam-10307466.md
+20261101T071743Z-astra-to-fable-review-rest-worklet-admission-and-sample-clock-q-28b31fd2.md
+20261101T071835Z-astra-to-fable-rest-canonical-json-must-validate-after-roundtri-14e87b42.md
+20261101T071905Z-astra-to-fable-rest-admission-and-quiet-pass-all-five-browser-c-9e98356b.md

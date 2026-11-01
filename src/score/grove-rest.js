@@ -48,10 +48,11 @@ export function createGroveRestRecipe(grove, config = DEFAULT_VOICE_CONFIG, { sa
     snapshot: 'a state snapshot posted after a block describes the start of frame currentFrame + blockLength (after the last step of the block)' };
   return {
     version: REST_RECIPE_VERSION, kind: 'imagimusic-grove-rest-recipe', visual, sampleRate, n, dim, bodies, channels: 2, energyFactors, admissionCeiling: REST_ADMISSION_CEILING,
-    seed: g.seed, voice: c, positions: c.positions.slice(), zones: restZones.slice(), strengths: strengthNames.map((name, i) => ({ name, c: strengthValues[i] })),
+    seed: g.seed, grove: g, voice: c, positions: c.positions.slice(), zones: restZones.slice(), strengths: strengthNames.map((name, i) => ({ name, c: strengthValues[i] })),
     contactStates, strikeVectors, pickupVectors, outputGain: voice.outputGain, pickupScale: voice.pickupScale, ring: voice.ring, fade: voice.fade,
     stiffness: Array.from({ length: n * n }, (_, i) => system.A[Math.floor(i / n)][i % n]),
     order: 'at frame i: apply strikes due at i to velocity; select the contact state active at i ([start, end)); read pickups as output i; step to i + 1',
+    quiet: 'Quiet at frame F with fadeFrames N: contacts in force end at F, no gesture is accepted after F (same frame, later order included), output continues for N frames with the linear fade (1 − (i − F)/N) applied to the Float32-rounded sample, exactly as renderRestRecord does: round to Float32 first, then multiply by the fade',
     admission: 'a strike is admitted iff outputGain · √(2·E_after) · max(energyFactors) ≤ admissionCeiling, where E_after = E + ẏ·Δ + ½|Δ|² for the velocity impulse Δ; this bounds every later output sample while only damping (free or any contact) acts; the free bank bound is not valid under contacts (measured violation up to 1.25× on seed 11) and is not used',
     exactness: 'exact linear evolution between gesture boundaries at the sample instants, up to matrix-exponential truncation and floating-point roundoff; no time-stepping approximation; classical damping as in the modal sums; viscous point contact only',
     realism: 'a rest is a viscous damper at one point of one shell with two stated coefficients; no hand mass or stiffness, no nonlinear contact, no pressure sensing; not a measurement of any real hand on any real shell',
@@ -64,14 +65,18 @@ export { contactDamping };
 // never the requested time); contacts are half-open frame intervals per body that never overlap on one body.
 export const REST_RECORD_KIND = 'imagimusic-grove-rest', REST_RECORD_VERSION = 2, REST_MAX_EVENTS = 128, REST_MAX_CONTACTS = 256, REST_MAX_SECONDS = 120;
 const keysExactly = (o, keys, name) => { if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error(`${name} must be an object.`); const extra = Object.keys(o).filter(k => !keys.includes(k)), missing = keys.filter(k => !(k in o)); if (extra.length || missing.length) throw new Error(`${name}: unexpected keys ${JSON.stringify(extra)}, missing ${JSON.stringify(missing)}.`); };
+/** Key-sorted JSON so that comparisons do not depend on key order (a canonical record round-trips through its own JSON). */
+const stable = v => JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, x[k]])) : x);
 const frameValue = (v, name) => { if (!Number.isSafeInteger(v) || v < 0) throw new Error(`${name} must be a non-negative integer frame.`); return v; };
 
 /** Validate a Rest record against its recipe (same seed, voice, sample rate, zones and strengths). Returns the record. */
 export function validateRestRecord(record, recipe) {
-  keysExactly(record, ['version', 'kind', 'seed', 'voice', 'sampleRate', 'outputGain', 'zones', 'strengths', 'events', 'contacts', 'ended'], 'RestRecord');
+  keysExactly(record, ['version', 'kind', 'grove', 'voice', 'sampleRate', 'outputGain', 'zones', 'strengths', 'events', 'contacts', 'ended'], 'RestRecord');
   if (record.version !== REST_RECORD_VERSION || record.kind !== REST_RECORD_KIND) throw new Error('not a Rest record (version 2).');
-  if (record.seed !== recipe.seed || record.sampleRate !== recipe.sampleRate || record.outputGain !== recipe.outputGain) throw new Error('record does not belong to this recipe (seed, sample rate or gain).');
-  if (JSON.stringify(record.voice) !== JSON.stringify(recipe.voice) || JSON.stringify(record.zones) !== JSON.stringify(recipe.zones) || JSON.stringify(record.strengths) !== JSON.stringify(recipe.strengths.map(s => s.name))) throw new Error('record voice, zones or strengths differ from the recipe.');
+  if (record.sampleRate !== recipe.sampleRate || record.outputGain !== recipe.outputGain) throw new Error('record does not belong to this recipe (sample rate or gain).');
+  // The full canonical grove, not just its seed: the same seed under a changed generator or a custom grove is a different instrument.
+  if (stable(record.grove) !== stable(recipe.grove)) throw new Error('record grove differs from the recipe grove (compare canonical groves, not seeds).');
+  if (stable(record.voice) !== stable(recipe.voice) || stable(record.zones) !== stable(recipe.zones) || stable(record.strengths) !== stable(recipe.strengths.map(s => s.name))) throw new Error('record voice, zones or strengths differ from the recipe.');
   if (!Array.isArray(record.events) || record.events.length > REST_MAX_EVENTS || !Array.isArray(record.contacts) || record.contacts.length > REST_MAX_CONTACTS) throw new Error('events or contacts out of range.');
   const limit = REST_MAX_SECONDS * recipe.sampleRate; let lastFrame = -1, lastOrder = -1; const orders = new Set();
   for (const [i, e] of record.events.entries()) {
@@ -93,16 +98,22 @@ export function validateRestRecord(record, recipe) {
     if (!Number.isSafeInteger(c.order) || c.order < 0 || orders.has(c.order)) throw new Error(`contacts[${i}].order must be unique across events and contacts.`); orders.add(c.order);
     if (c.start < perBodyEnd[c.body]) throw new Error(`contacts[${i}] overlaps an earlier rest on body ${c.body} (sort contacts by start per body).`); perBodyEnd[c.body] = c.end;
   }
-  if (record.ended !== null) { keysExactly(record.ended, ['frame', 'fadeFrames'], 'ended'); frameValue(record.ended.frame, 'ended.frame'); if (!Number.isInteger(record.ended.fadeFrames) || record.ended.fadeFrames < 1) throw new Error('ended.fadeFrames must be a positive integer.'); }
+  if (record.ended !== null) {
+    keysExactly(record.ended, ['frame', 'fadeFrames'], 'ended'); frameValue(record.ended.frame, 'ended.frame'); if (!Number.isInteger(record.ended.fadeFrames) || record.ended.fadeFrames < 1) throw new Error('ended.fadeFrames must be a positive integer.');
+    // Quiet closes the passage: nothing is accepted after it, and every rest ends at or before the Quiet frame (the hands are released there).
+    if (record.events.some(e => e.frame > record.ended.frame) || record.contacts.some(c => c.end > record.ended.frame)) throw new Error('no gesture after Quiet: events must be at or before ended.frame and contacts must end by it.');
+  }
   return record;
 }
-export const canonicalRestRecord = (record, recipe) => JSON.stringify(validateRestRecord(record, recipe), (_, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map(k => [k, v[k]])) : v);
+export const canonicalRestRecord = (record, recipe) => stable(validateRestRecord(record, recipe));
 
-/** Length of the rendered passage in frames: every strike rings for `ring` seconds; the recorded Quiet cuts it, as the bank route does. */
+/** Length of the rendered passage in frames. With Quiet it is exactly ended.frame + fadeFrames, where the worklet stops (the exact model
+ *  has no per-unit truncation, so nothing else defines an end). Without Quiet, an unfinished record renders until the last strike has
+ *  rung for `ring` seconds or the last rest has ended. */
 export function restRecordLength(record, recipe) {
+  if (record.ended) return record.ended.frame + record.ended.fadeFrames;
   const unit = Math.ceil(recipe.ring * recipe.sampleRate);
-  const full = Math.max(0, ...record.events.map(e => e.frame + unit), ...record.contacts.map(c => c.end));
-  return record.ended ? Math.min(full, record.ended.frame + record.ended.fadeFrames) : full;
+  return Math.max(0, ...record.events.map(e => e.frame + unit), ...record.contacts.map(c => c.end));
 }
 
 /** Exact render of a Rest record through the engine: the model itself, no per-unit truncation; the recorded Quiet fade applied as the bank route applies it. */
@@ -121,7 +132,8 @@ export function restRecordStates(record, recipe, { every = 1024 } = {}) {
   const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
   const advance = (eng, i) => { const due = byFrame.get(i); if (due) for (const k of due) eng.strike(k.position, k.body, k.velocity); eng.setContacts(keyAt(i)); eng.step(); };
   for (let i = 0; i < frames; i++) { if (i % every === 0) checkpoints.push({ frame: i, state: engine.state, key: engine.key }); advance(engine, i); }
-  const replay = (frame) => { const c = checkpoints[Math.floor(frame / every)], eng = createRestEngine(recipe); eng.load(c.state, c.key); for (let i = c.frame; i < frame; i++) advance(eng, i); return eng; };
+  // A frame at or past the last checkpoint (including frame === frames when frames is a multiple of `every`) replays from the last one.
+  const replay = (frame) => { const eng = createRestEngine(recipe); if (!checkpoints.length) return eng; const c = checkpoints[Math.min(checkpoints.length - 1, Math.floor(frame / every))]; eng.load(c.state, c.key); for (let i = c.frame; i < frame; i++) advance(eng, i); return eng; };
   return { frames, every, checkpoints: checkpoints.length,
     /** Mass-normalized state at the start of `frame` (after all events before it; before the events of `frame` itself). */
     stateAt: frame => { if (!Number.isInteger(frame) || frame < 0 || frame > frames) throw new Error('frame out of range.'); return replay(frame).state; } };
