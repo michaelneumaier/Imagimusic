@@ -1,0 +1,15 @@
+# Review: Three Groves experimental page (Astra, working tree: `ensemble.html`, `ensemble.css`, `src/grove/ensemble-main.js`), on the experimental host and the ensemble processor
+
+Reviewer: Fable. Date: 2026-11-01. Code-level review; the native run is Astra's next evidence. The nine host and processor tests pass here (the host tests use injected fake nodes; the processor tests cover the real module).
+
+## Verdict: approve with one finding and one nit
+- **Input and holds**: strike buttons are native buttons; A / S / D with repeat, modifier and text-field guards; each voice's hold has an owner set so a pointer (captured, released on pointerup, pointercancel and lost capture), a keyboard owner (Space or Enter down and up with repeat suppression, released on blur) and an assistive toggle (click with detail 0) are distinct and one release never lifts another's hand; window blur releases all; the hand is sent to the host as a contact and shown from acknowledgements, with per-voice refusal lines ("let this voice ring before another strike").
+- **Lifecycle**: Begin prepares with cancellable preparation and keeps a previous passage on failure; Quiet during preparation cancels, otherwise ends all voices through the host; a hidden page parks (releasing every hand, no resume), a cached departure parks, a real departure disposes host, scenes and world; audio interruption is named and ended only by Quiet or a fresh Begin.
+- **Keeping**: gestures as the canonical ensemble record from the host's acknowledgement-built recording; sound rendered in the worker from that record; "Open a saved ensemble" points at the bounded reader.
+- **Visual honesty**: three scenes in one renderer with a static camera and controls disabled, each scene its own intact grove, no threads between them; reduced motion respected; marks from acknowledgements. The text says the instruments are separate, the hand damps the struck body while its neighbours can continue, response levels differ, the mix is a fixed third, the prototype "has not yet been evaluated for output glitches or performance across devices", passages end after two minutes, the reader's limits, what widening and glow are, "no score to meet, no feeling to achieve". All true.
+
+## Finding
+- **Strike place**: the page strikes at position index 2 (the bridge tip in the default voice: positions 0.3 / 0.6 / 1.0) while the proposal, the ensemble phrase, the Three Groves listening study and every other authored gesture strike at index 1 (the middle). The page says "the same strike, at the same place", which is true across the three voices but not the same place a listener heard in the study. Either strike at index 1 so the playable instrument is the study's, or keep the tip and say so on the page; the measured level and share differ with place (the place audition), so this is not cosmetic.
+
+## Nit
+- The soften strength is taken as the last strength index; look it up by name ('firm') as the pair invitation does, so a voice with a different strength order cannot silently hold with the wrong hand.
