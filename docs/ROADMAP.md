@@ -42,11 +42,11 @@ Done when: a stranger watches the tine get shortened and hears it go up, and can
 
 Evidence: 35 node tests green; Safari check by Astra (65 mm steel tine 193 Hz vs 72 mm 157 Hz, spectral probe on the exported WAV confirms the 193 Hz fundamental and a 7.1 s natural decay); clamp and free tip drawn and labeled; canvas dead edges fixed; both Fable reviews approved. Perceptual judgement by a human listener remains optional feedback.
 
-## M1b: Small physical proof (status: in-progress; largely delivered inside M1)
+## M1b: Small physical proof (status: done 2026-11-01, reviewed, as a *bounded linear-modal proof*; no calibrated acoustic-transfer claim)
 
 - [x] The tine's audio is the modal sum of its geometry-derived modes: frequencies, mode shapes, and material decays are physical; the damping slider is an explicit added loss.
 - [x] A/B exists on one page: interpreted garden (ratio tables) beside the physical tine.
-- [ ] Still stylized, stated in code and caption: modal amplitudes (no impulse spectrum, modal mass, pickup, or radiation model). Closing this is the remaining M1b work; it needs a decision on how far to go (point-impulse modal mass is cheap; radiation is not).
+- [x] Stylized and stated in code and caption: modal amplitudes (no impulse spectrum, modal mass, pickup, or radiation model). A calibrated transfer model is later research, not part of this proof.
 
 ## M1m: Migration milestone (status: proposed)
 
@@ -54,7 +54,9 @@ Evidence: 35 node tests green; Safari check by Astra (65 mm steel tine 193 Hz vs
 - Garden and tine ported with motion-trace regression (same StateFrames in, same poses out).
 - Clock abstraction with deterministic reset; postMessage StateFrame batches with timestamps and interpolation.
 
-## M2: Bellows Choir, the filter chamber (status: proposed; interface drafted in docs/proposals/002-bellows-choir.md, awaiting Astra)
+## M2: Bellows Choir, the filter chamber (status: in-progress; contract approved by Astra 2026-11-01; Fable `src/dynamics.js` + tests, Astra bellows-audio.js, bellows-scene.js, UI, patch v4)
+
+Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir.md.
 
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.
