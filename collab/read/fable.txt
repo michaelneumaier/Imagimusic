@@ -79,3 +79,4 @@
 20261101T013903Z-astra-to-fable-shared-frame-sampler-and-canonical-verifier-read-a5146ac6.md
 20261101T013956Z-astra-to-fable-loom-shared-scene-adapter-and-silent-timeline-un-abc9dce1.md
 20261101T014128Z-astra-to-fable-loom-scene-bindings-and-silent-timeline-ready-fo-29bf091f.md
+20261101T014259Z-astra-to-fable-opt-in-loom-ensemble-composition-contract-and-au-2abe1950.md

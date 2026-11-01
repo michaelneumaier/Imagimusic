@@ -46,6 +46,24 @@ test('dense passage: stolen garden voices keep the outlive stop (retire cannot r
   assert.ok(asLive.scheduled.filter(s => s.voice.fadeAt !== undefined).every(s => s.voice.nodes.every(n => n.stopTime === s.voice.end)));
 });
 
+test('an attached Loom duet plays its deterministic stereo PCM through the same master and obeys the stop policy', async () => {
+  const { createLoomPerformance, renderLoomPerformance } = await import('../src/loom/performance.js');
+  const base = createPerformance(DEFAULT_PATCH);
+  assert.equal(buildPerformanceGraph(new Context(), base).loom, null);                       // no duet attached: nothing added
+  const loom = createLoomPerformance({}, [{ time: 0.35, body: 0, velocity: 0.8 }, { time: 1.6, body: 1, velocity: 0.6 }]);
+  const duet = { ...base, loom, composition: { loomMixGain: 0.7 }, duration: Math.max(base.duration, loom.duration) };
+  const ctx = new Context(), graph = buildPerformanceGraph(ctx, duet, { sourceLifetime: 'outlive-render', renderEnd: duet.duration });
+  assert.ok(graph.loom); assert.equal(graph.loom.mixGain, 0.7); assert.equal(graph.loom.buffer.numberOfChannels, 2);
+  const expected = renderLoomPerformance(loom, 48000);
+  assert.deepEqual(graph.loom.buffer.getChannelData(0), expected.channels[0]); assert.deepEqual(graph.loom.buffer.getChannelData(1), expected.channels[1]);
+  assert.equal(graph.loom.source.startTime, 0); assert.equal(graph.loom.source.stopTime, duet.duration + 1);       // outlive policy
+  assert.ok(graph.loom.gain.connections.includes(graph.master) && graph.loom.source.connections.includes(graph.loom.gain));
+  assert.equal(graph.loom.source.onended, null);
+  const asLive = buildPerformanceGraph(new Context(), duet);
+  assert.ok(Math.abs(asLive.loom.source.stopTime - (loom.duration + 0.01)) < 1e-12); assert.equal(asLive.loom.mixGain, 0.7);
+  assert.equal(buildPerformanceGraph(new Context(), { ...duet, composition: undefined }).loom.mixGain, 1);
+});
+
 test('renderPerformanceAudio defaults to outlive-render with the passage duration as renderEnd; as-live stays an explicit control', async () => {
   const performance = createPerformance(DEFAULT_PATCH);
   let seen = null;
@@ -112,7 +130,7 @@ class Context {
   createGain() { return this.make('gain'); } createDynamicsCompressor() { return this.make('compressor'); }
   createStereoPanner() { return this.make('panner'); } createOscillator() { return this.make('osc'); }
   createBiquadFilter() { return this.make('filter'); } createBufferSource() { return this.make('buffer'); }
-  createBuffer(ch, length) { const data = new Float32Array(length); return { getChannelData: () => data }; }
+  createBuffer(ch, length) { const chans = Array.from({ length: ch }, () => new Float32Array(length)); return { numberOfChannels: ch, length, getChannelData: c => chans[c], copyToChannel: (src, c) => chans[c].set(src) }; }
 }
 class FakeOffline extends Context {
   constructor(channels, length, sampleRate) { super(sampleRate); this.length = length; FakeOffline.last = this; }

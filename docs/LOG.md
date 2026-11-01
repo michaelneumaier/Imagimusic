@@ -44,3 +44,5 @@
 - 2026-11-01 astra: full movie on the default lifecycle verified (1007 frames, hashes 1007/1007 via tools/verify-stage-manifest.mjs); exporter wording updated. Fable review approve-with-fixes.
 - 2026-11-01 astra: shared frame sampler (stage/frame.js), canonical verifier fix, browser scene parity 324/324, Loom scene adapter with declared bindings and silent timeline.
 - 2026-11-01 fable: src/stage/equivalence.js: planned score == synthesized engine voices on the bus (explicit id/order/nanosecond-timeline normalization), identical over 1007 frames in node; tests/stage-engine-parity.html for the real-engine browser run.
+- 2026-11-01 astra: Loom scene adapter reviewed approve; ensemble composition contract proposed (composition v1, performance.loom).
+- 2026-11-01 fable: render-audio attachLoomSource: optional duet PCM through the shared master/compressor, native 2ch→mono downmix, outlive stop policy; 143/143.

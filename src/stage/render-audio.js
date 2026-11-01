@@ -15,6 +15,27 @@
 import { InstrumentAudio } from '../audio.js';
 import { createBellowsGraph, applyBellowsSchedule } from '../bellows-audio.js';
 import { voiceDynamics } from '../dynamics.js';
+import { renderLoomPerformance } from '../loom/performance.js';
+
+// Optional Loom duet (Astra's composition contract, 2026-11-01). When `performance.loom` is attached, its
+// deterministic stereo PCM (renderLoomPerformance at the context's sample rate, the same function the live page's
+// worker runs) plays from a 2-channel AudioBufferSource through a mix gain into the SAME master → compressor path.
+// The mono offline context downmixes the two channels natively, exactly as the live mono/stereo destination does;
+// nothing is summed by hand. Mix gain comes from the attached performance (composition.js's LOOM_MIX_GAIN); default 1.
+export function attachLoomSource(context, master, performance, { stopAt = null, mixGain } = {}) {
+  const loom = performance.loom;
+  if (!loom) return null;
+  const pcm = renderLoomPerformance(loom, context.sampleRate);
+  const length = pcm.channels[0].length;
+  const buffer = context.createBuffer(2, length, context.sampleRate);
+  pcm.channels.forEach((samples, c) => buffer.copyToChannel(samples, c));
+  const source = context.createBufferSource(); source.buffer = buffer;
+  const gain = context.createGain(); gain.gain.value = mixGain ?? loom.mixGain ?? performance.composition?.loomMixGain ?? 1;
+  source.connect(gain).connect(master);
+  source.start(0);
+  source.stop(stopAt ?? loom.duration + 0.01);
+  return { source, gain, buffer, samples: length, duration: loom.duration, mixGain: gain.gain.value };
+}
 
 export const MASTER_GAIN = 0.24;
 export const SCHEDULE_LOOKAHEAD = 0.24;
@@ -92,7 +113,10 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
     if (s.family === 'bellows') s.graph.source.stop(stopAt);
     else if (s.voice) for (const node of s.voice.nodes) node.stop(stopAt);
   }
-  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
+  // Optional Loom duet: its PCM is already deterministic; it joins the same master and obeys the same stop policy.
+  const loom = attachLoomSource(context, master, performance, { stopAt: outlive ? stopAt : null });
+  if (loom && keepNodes) loom.source.onended = null;
+  return { master, limiter, garden, scheduled, loom, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
 }
 
 // Default lifecycle for renders is 'outlive-render' (decision 004, 2026-11-01): verified bit-identical repeated
