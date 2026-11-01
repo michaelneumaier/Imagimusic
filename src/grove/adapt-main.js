@@ -11,7 +11,7 @@ async function readSource(source,{signal}){
  if(source!==preparedExample)return readRestFile(source,{signal});
  const response=await fetch(new URL('../../assets/examples/rest-pair-gesture.json',import.meta.url),{signal});
  if(!response.ok)throw new Error('The prepared gesture could not be opened. Try again, or choose your own file.');
- const file=new File([await response.blob()],'Prepared gesture.json',{type:'application/json'});
+ const file=new File([await response.blob()],'Prepared gesture',{type:'application/json'});
  return readRestFile(file,{signal});
 }
 const session=createRestImportSession({read:readSource,prepare:(data,options)=>restWorkerJob(new URL('./rest-adaptation-worker.js',import.meta.url),data,options),onChange:sync});
@@ -25,7 +25,7 @@ function show(result){
  for(const [key,label] of [['original','Original'],['changed','Changed']]){const figure=document.createElement('figure'),caption=document.createElement('figcaption');figure.style.margin='20px 0';caption.textContent=label;figure.append(caption,createStructureDiagram(result[key].record.grove,r.grove,label));$('structures').append(figure);}
  sync();
 }
-async function open(source){const own=++operation;stop();status('Preparing your original and one changed structure…');try{const result=await session.open(source);if(own!==operation)return;result.preparedExample=source===preparedExample;show(result);status('Both versions are ready. Choose one when you’re ready.');}catch(error){if(own===operation)status(`${error.message}${session.result?' Your previous comparison is still here.':''}`);}};
+async function open(source){const own=++operation;stop();status('Preparing your original and one changed structure…');try{const result=await session.open(source);if(own!==operation)return;result.preparedExample=source===preparedExample;show(result);status('Both versions are ready. Choose one when you’re ready.');if(!document.hidden){$('name').focus({preventScroll:true});$('comparison').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}}catch(error){if(own===operation)status(`${error.message}${session.result?' Your previous comparison is still here.':''}`);}};
 $('file').onchange=()=>{const file=$('file').files[0];$('file').value='';if(file)open(file);};
 $('example').onclick=()=>open(preparedExample);
 $('cancel').onclick=()=>{operation++;session.cancel();status(session.result?'Preparation cancelled. Your previous comparison is still here.':'Preparation cancelled. Your file is unchanged.');};
