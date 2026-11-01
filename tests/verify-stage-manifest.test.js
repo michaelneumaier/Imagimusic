@@ -1,0 +1,19 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {verifyStageManifest} from '../tools/verify-stage-manifest.mjs';
+import {DEFAULT_PATCH} from '../src/model.js';
+import {createPerformance} from '../src/stage/performance.js';
+import {createProjection} from '../src/stage/projection.js';
+import {createDirector} from '../src/stage/director.js';
+import {createTraceManifest} from '../src/stage/manifest.js';
+test('artifact verifier checks camera frames and metadata, including truncated exports',()=>{
+ const p=createPerformance(DEFAULT_PATCH),base=createProjection(DEFAULT_PATCH,{performance:p}),direct=createDirector(p);
+ const camera={mode:'follow',position:[9,6.5,12],target:[0,1,0]};
+ const project=f=>{const out=base(f);out.stage.camera=direct(f.t,camera.mode,camera);return out;};
+ const m={...createTraceManifest({...p,duration:1},{project}),instrument:DEFAULT_PATCH,camera,width:1280,height:720,videoDuration:1,codecs:{video:'avc',audio:'aac'}};
+ assert.equal(verifyStageManifest(m).valid,true);
+ for(const [key,value] of [['frames',12],['audioSamples',12],['videoDuration',2],['width',42]])assert.equal(verifyStageManifest({...m,[key]:value}).valid,false);
+ const corrupt=structuredClone(m);corrupt.hashes[9]='bad';assert.equal(verifyStageManifest(corrupt).firstDifference,9);
+ const changed=structuredClone(m);changed.camera.mode='detail';assert.equal(verifyStageManifest(changed).valid,false);
+ assert.throws(()=>verifyStageManifest({...m,duration:Infinity}));
+});
