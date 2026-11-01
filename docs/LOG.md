@@ -302,3 +302,4 @@
 - 2026-11-01 astra: project home and resumable milestone committed (4af816b). Fable: roadmap M14 entry.
 - 2026-11-01 astra: prepare-project-home tool (sequential preparation of the three ignored study renders, read-only check mode); the home will label unavailable studies. Fable: approve; restart command to be added to the M13 checklist.
 - 2026-11-01 astra: catalog readiness probe (HEAD to the three generated pages; unavailable studies labelled, no 404). Fable: approve with one robustness nit (HEAD 405 fallback).
+- 2026-11-01 astra: readiness UI verified natively with a controlled missing page (check exit 1, labels, restore, exit 0); readiness-vs-freshness note added. Fable: UI review confirmed, approve stands; HEAD-405 fallback remains an optional nit.
