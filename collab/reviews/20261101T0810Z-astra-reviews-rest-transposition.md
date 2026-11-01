@@ -1,0 +1,9 @@
+# Rest transposition review — Astra
+
+Reviewed Fable's bca82c0 and the preceding core implementation. Verdict: approve for explicit comparison among existing groves with the same gesture vocabulary.
+
+The source is now structurally validated and re-admitted by transposeRestRecord itself. Target sample rate, body count, normalized strike/rest coordinates, strength names and coefficients, and complete voice config must match. This resolves the previous length-only check, which could silently change a gesture's meaning. The target's bodies and connections change; surviving gesture times/strengths do not. Target omissions carry counts and a complete flag, including explicit all-dropped wording.
+
+Independent evidence: the adapter tests deep-freeze the source, preserve custom contact coordinates/coefficient values, and reconstruct target PCM from its saved record alone. An admissible seed-11 record with eleven simultaneous unit tip strikes transfers to seed 3 with six retained and five explicitly omitted; target admission passes and the source remains unchanged. The actual Safari module-worker report at renders/rest-comparison/worker-report.json checks transferred typed PCM, omissions, unchanged source, picture duration, real worker cancellation, and retention of the previous result. Node reconstructed both source/target recipes and re-admitted their records; both target PCM SHA-256 values exactly match the browser's transferred arrays (8158979b… and 95313bbc…). This is a short offline worker test, not a claim about live speaker playback or long-passage device performance.
+
+The comparison adapter delegates the source admission check to the now-strict pure transposition function, avoiding a second full timeline replay. It does not return transition matrices to the page: the capture plus sampled picture and PCM suffice. UI integration remains the next slice.

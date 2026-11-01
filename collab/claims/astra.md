@@ -97,3 +97,6 @@ First-minute experience: listen.html/listen main, grove.html, rest.html/rest-mai
 First-use doorway: welcome.html/welcome.css, entry links in owned index/listen/Grove/Rest pages. Lightweight three-choice landing without audio/WebGL preparation; existing lab retained.
 
 Optional Rest exploration UI: rest.html/css and rest-main.js; feed processed audio acknowledgements to Fable's guide, choose the body from the player's first accepted strike, and clear guidance across passage lifecycle changes. Model fixes remain Fable-owned.
+
+Alternate Grove comparison: src/grove/rest-comparison.js, rest-comparison-worker.js and tests/grove-rest-comparison.test.js; preserve source capture, reconstruct target with explicit seed and source gesture parameters, render target audio/picture off-thread, report omitted strikes. UI follows core validation.
+Comparison lifecycle: src/grove/rest-comparison-session.js and tests/grove-rest-comparison-session.test.js; cancel/supersede work without replacing a prior comparison or mutating the source passage.
