@@ -1,6 +1,7 @@
+import {mountStudyInspector} from '../study-inspector.js';
 import {createWorld} from '../stage/world.js';
 import {encodeWav} from '../model.js';
-import {createTensionerScene,tensionerSceneFrame,applyTensionerScene} from './scene.js';
+import {createTensionerScene,tensionerSceneFrame,applyTensionerScene,TENSIONER_BINDINGS} from './scene.js';
 import {createTensionerRenderJob} from './render-job.js';
 const $=id=>document.getElementById(id),keys=['carrierHz','ratio','index','indexDecayS','ampDecayS'];
 for(const key of [...keys,'preset','seek'])$(key).disabled=true;
@@ -9,6 +10,11 @@ for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=
 const scene=createTensionerScene();world.scene.add(scene.root);
 world.camera.position.set(5,3.5,8);world.controls.target.set(.3,.8,0);world.controls.update();
 let api,model,settings,context,source,gain,job,pcm,origin=0,token=0,playing=false,studying=false,studyTime=0,endS=0;
+const inspector=mountStudyInspector({world,canvas:$('world'),bindings:TENSIONER_BINDINGS,getPatch:()=>({fm:settings??{}}),parts:[
+ {object:scene.carriage,id:'fm/pull'},{object:scene.rod,id:'fm/pull'},
+ {object:scene.halo,id:'fm/width'},{object:scene.carrier,id:'fm/glow'},
+ {object:scene.wheel,id:'fm/angle'},{object:scene.arm,id:'fm/slow'},{object:scene.disc,id:'fm/fast'},
+]});
 function quiet(){
  token++;job?.cancel();job=null;
  if(source){const now=context.currentTime;gain.gain.cancelScheduledValues(now);gain.gain.setValueAtTime(1,now);gain.gain.linearRampToValueAtTime(0,now+.025);source.stop(now+.03);source=null;}
@@ -54,7 +60,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)quiet();});
 function draw(){
  const t=playing?Math.max(0,context.currentTime-origin):studyTime;
  const state=model?api.tensionerState(t,model,endS):{amplitude:0,tension01:0,bandwidthEstimateHz:0};
- const applied=applyTensionerScene(tensionerSceneFrame(state,{active:playing||studying}),scene);
+ const frame=tensionerSceneFrame(state,{active:playing||studying}),applied=applyTensionerScene(frame,scene);inspector.update(frame);
  $('state').textContent=job?'PREPARING AUDIO':playing?'PLAYING · LINEAR FM':studying?'SILENT STUDY':'READY';
  $('seek').value=t;$('time').textContent=t.toFixed(2)+' s';
  if(model)$('readout').textContent=`Carrier ${settings.carrierHz} Hz · Modulator ${(settings.carrierHz*settings.ratio).toFixed(2)} Hz · Deviation ±${state.deviationHz.toFixed(2)} Hz · Estimated occupied bandwidth ${state.bandwidthEstimateHz.toFixed(1)} Hz · ${state.positiveInstantaneousFrequency?'Positive instantaneous frequency':'Signed instantaneous frequency; digital FM'}`;

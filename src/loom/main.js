@@ -1,6 +1,7 @@
+import {mountStudyInspector} from '../study-inspector.js';
 import {readCompositionSearch,compositionURL} from '../stage/composition-link.js';
 import {createWorld} from '../stage/world.js';
-import {loomSceneFrame,applyLoomScene} from './scene.js';
+import {loomSceneFrame,applyLoomScene,LOOM_BINDINGS} from './scene.js';
 import {DEFAULT_LOOM,makeLoom,loomVisualEnvelope,stereoWav} from './model.js';
 import {createLoomPerformance,loomPerformanceFrame} from './performance.js';
 import {createLoomRenderJob} from './render-job.js';
@@ -11,6 +12,10 @@ let settings=initialSettings,study=makeLoom(settings),context,source,gain,origin
 const world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
 world.rail.visible=false;world.camera.position.set(6,4.5,9);world.controls.target.set(0,1.1,1);world.controls.update();
 const loom=world.loom;loom.root.position.set(0,0,1);loom.root.scale.setScalar(1);loom.root.visible=true;
+const inspector=mountStudyInspector({world,canvas:$('world'),bindings:LOOM_BINDINGS,getPatch:()=>({loom:{...settings,score:passage?.events??[{time:0,body:study.body,velocity:1}]}}),parts:[
+ ...loom.bodies.flatMap((body,i)=>[{object:body.body,id:`loom/${i}/width`},{object:body.body,id:`loom/${i}/glow`},{object:body.striker,id:`loom/${i}/striker`}]),
+ {object:loom.bridge,id:'loom/bridge/opacity'},
+]});
 function quiet(){studyTime=0;studying=false;request++;renderJob?.cancel();renderJob=null;if(source){const now=context.currentTime;gain.gain.cancelScheduledValues(now);gain.gain.setValueAtTime(1,now);gain.gain.linearRampToValueAtTime(0,now+.025);source.stop(now+.03);source=null;}playing=false;$('status').textContent='Settled. Choose a strike or conversation.';}
 async function strike(body){
  quiet();const token=request;pcm=null;$('save').disabled=true;$('status').textContent='Preparing the coupled response…';
@@ -40,7 +45,7 @@ $('seek').oninput=()=>{const time=Number($('seek').value);quiet();studyTime=time
 document.addEventListener('visibilitychange',()=>{if(document.hidden)quiet();});
 function draw(){
  const t=playing?Math.max(0,context.currentTime-origin):studyTime,frame=passage?loomPerformanceFrame(passage,t):{time:t,envelope:loomVisualEnvelope(study,t).values,averaged:loomVisualEnvelope(study,t).averaged,strikes:t>=0&&t<.28?[{id:'single',body:study.body,age:t}]:[]};
- applyLoomScene(loomSceneFrame(frame,settings,{active:playing||studying}),loom);
+ const sceneFrame=loomSceneFrame(frame,settings,{active:playing||studying});applyLoomScene(sceneFrame,loom);inspector.update(sceneFrame);
  $('seek').value=t;$('seek-value').textContent=t.toFixed(2)+' s';
  $('state').textContent=renderJob?'PREPARING AUDIO…':playing?`${passage?'CONVERSATION':study.body===0?'STRIKE LEFT':'STRIKE RIGHT'} · ${t.toFixed(2)} s`:studying?`SILENT STUDY · ${t.toFixed(2)} s`:'READY · STRIKE EITHER BODY';
  $('readout').textContent=`Normal modes ${study.system.normalFreqsHz.map(f=>f.toFixed(2)).join(' / ')} Hz · Coupling spring ${study.system.kc.toFixed(1)} N/m${frame.averaged?' · Exchange too fast to draw; mean level shown (mode split > 8 Hz)':''}`;
