@@ -20,6 +20,10 @@ export const POWERED_RECORD_KIND = 'imagimusic-grove-powered', POWERED_RECORD_VE
 // two minutes); that drift is part of the declared input, not an error; the budget below sums the actual declared samples, so it is exact for the
 // declared input. The scalar recurrence uses specified IEEE arithmetic; equality of a whole render across runtimes is a matter of measurement, not
 // of this declaration (the model operators are computed per runtime).
+// Measured limit (Astra, 2026-11-01, renders/powered-v2-audio-check): a Safari worklet capture rebuilt in Node differed in 2 of 241200 left-channel
+// samples by at most 1.46e-11 (float32) on seed 3 at 48 kHz, right channel exact; seed 7 at 44.1 kHz exact in both channels. Within one runtime
+// the worklet, the capture replay and the exported WAV are exact. Policy: the raw source PCM hash is the exact provenance; a cross-runtime
+// reconstruction is described separately with its measured differences when actual samples exist; a failed hash is never silently passed.
 
 /** Add the declared force direction and per-state Γ to a Rest recipe (one augmented exponential per contact state, off the audio thread). */
 export function createPoweredRecipe(recipe, { body = 0, position = 1 } = {}) {
