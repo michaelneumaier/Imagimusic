@@ -15,7 +15,7 @@ const entries=[
  ['Grove voices','grove-voices.html','Instruments','Study','Inspect the voice configurations behind the Grove.'],
  ['The Conservatory','stage.html','Composition & keeping','Playable','A shared score, mechanical performers, causal inspection, and local performance rendering.'],
  ['Bring a score','midi.html','Composition & keeping','In progress','Map a local MIDI file to available instruments and inspect the mapping.'],
- ['Reopen a passage','reopen.html','Composition & keeping','Tool','Return to supported saved Grove and Rest records. The planned ensemble file is not supported yet.'],
+ ['Reopen a passage','reopen.html','Composition & keeping','Tool','Return to supported saved Grove and Rest records. Ensemble records are not supported here yet.'],
  ['Listening room','audition.html','Listening studies','Study','Compare prepared examples from the earlier instrument work.'],
  ['A changed structure','variant-audition.html','Listening studies','Study','Compare the same gesture on a fixed one-connection variant at equal output gain.'],
  ['Repeated adaptation','adaptation-audition.html','Listening studies','Study','Explore the bounded adaptation comparison and its declared conditions.'],

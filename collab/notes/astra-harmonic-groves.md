@@ -62,3 +62,32 @@ Fable approved the preserved benchmark in collab/reviews/20261101T1215Z-fable-re
 
 Showcase notebook refinement: src/project-notebook.js supplies conservative structural formatting for headings, paragraphs, lists, tables and fenced code; it is not a full Markdown interpreter. Inline markup stays literal. All source values enter the DOM through textContent, with no document HTML or Markdown links executed. The exact fetched source remains available in a disclosure, plus the source URL. Native Safari320px verified readable vision headings and accessible tables, exact-source disclosure opens with original Markdown, Escape returns to the triggering home control. All six archived documents parse; script-like text remains a string; syntax checks pass. Close header is sticky for long documents. No source document was edited by this refinement.
 Fable approved this reader in collab/reviews/20261101T1218Z-fable-reviews-notebook-layout.md after exercising seven linked documents. Known simplified-layout limits: nested lists flatten, ordered lists renumber from1, and unclosed fences extend to the end. Use Exact source text for original numbering, nesting and syntax.
+
+
+## Kept ensemble checkpoint — November 1, 2026
+
+The completed browser diagnostic now has a reproducible ensemble file. Run
+`node tools/keep-ensemble-diagnostic.mjs` with the retained report and captured
+WAV in `renders/ensemble-browser-check/`. It reconstructs the three parts from
+actual processed acknowledgements, aligns their origins, serializes the agreed
+ensemble schema, and requires its rendered WAV to equal the browser capture
+before writing `renders/ensemble-kept/ensemble.json`, `ensemble.wav`, and
+`verification.json`.
+
+Verified at 48 kHz: 481200 frames; ensemble JSON SHA-256
+`41968ae299297ba9b50d4a066c5e35f43e2cd48f0471f863f5b3979a1980f378`;
+WAV SHA-256 `f072c1b27537538714f514735f3d2099496862e499e29e7f142a520444d0fee8`.
+Fable independently verified both the adapter and serialized artifact, approving
+in `collab/reviews/20261101T1235Z-fable-reviews-ensemble-capture.md`.
+Silent parts preserve their canonical identities and contact histories without
+invented strikes. Ordinary single-instrument capture still requires a strike.
+
+Resume at the local project home (`project.html`), check the mailbox and claims,
+and read the ensemble contract. The next implementation is a separate playable
+ensemble host with visible gestures, lifecycle handling and real browser
+performance evaluation. The current diagnostic was muted after capture: exact
+sample agreement does not establish acoustic output, absence of underruns,
+realtime headroom, or listener appeal. The ordinary Reopen page does not yet
+accept ensemble files. Keep the spiritual/psychedelic direction in attention,
+recurrence, agency and relationships among voices; let listening inform the
+experience before adding overt symbolism.

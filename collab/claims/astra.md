@@ -157,3 +157,5 @@ Project home return path: index.html brand destination and accessible label only
 Reproducible preliminary benchmark: tools/measure-ensemble-engine-cost.mjs, Node-only evidence with explicit excluded browser overhead.
 Notebook readability: src/project-notebook.js, project.html/project.css and project-catalog.js dialog integration; conservative structural formatting plus exact raw-source disclosure.
 Isolated ensemble browser diagnostic: tests/ensemble-diagnostic.html, tests/ensemble-diagnostic-main.js, tests/ensemble-diagnostic-prepare-worker.js. Silent live-worklet computation equivalence, no production host or realtime-output claim.
+Ensemble capture support: src/grove/contact-capture.js and tests/grove-contact-capture.test.js opt-in silent snapshots (ordinary default unchanged); future src/grove/ensemble-capture.js, tools/keep-ensemble-diagnostic.mjs once model API agreed.
+tests/grove-ensemble-capture.test.js: late-origin alignment, silent-contact preservation, contradictory completion refusal.

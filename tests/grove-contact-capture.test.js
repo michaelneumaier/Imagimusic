@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {composeGrove} from '../src/score/grove.js';
 import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
-import {createGroveRestRecipe,canonicalRestRecord} from '../src/score/grove-rest.js';
+import {createGroveRestRecipe,canonicalRestRecord,renderRestRecord} from '../src/score/grove-rest.js';
 import {createRestCapture} from '../src/grove/contact-capture.js';
 const recipe=createGroveRestRecipe(composeGrove({seed:3}),{...DEFAULT_VOICE_CONFIG,partials:1},{sampleRate:8000,zones:[.6]});
 const ack=(order,appliedFrame,event,accepted=true)=>({id:String(order),order,requestedFrame:event.frame??appliedFrame,appliedFrame,lateByFrames:appliedFrame-(event.frame??appliedFrame),event:{id:String(order),frame:appliedFrame,...event},accepted});
@@ -21,4 +21,26 @@ test('a contact before a strike starts the timeline; a redundant release does no
 test('missing, duplicated or contradictory acknowledgements cannot yield a valid capture',()=>{
  for(const broken of [ack(1,0,{kind:'strike',body:0,position:1,velocity:.5}),{...ack(0,0,{kind:'strike',body:0,position:1,velocity:.5}),lateByFrames:1}]){const capture=createRestCapture(recipe,{generation:'one'});assert.throws(()=>send(capture,[broken]),/acknowledgement/);assert.equal(capture.state,'error');assert.throws(()=>capture.snapshot());}
  const capture=createRestCapture(recipe,{generation:'one'}),first=ack(0,0,{kind:'strike',body:0,position:1,velocity:.5});send(capture,[first]);assert.throws(()=>send(capture,[first]),/acknowledgement/);
+});
+
+test('ensemble opt-in keeps silent contact parts without inventing strikes; ordinary saving still refuses them',()=>{
+ const capture=createRestCapture(recipe,{generation:'one'});
+ send(capture,[ack(0,100,{kind:'contact',body:0,zone:0,strength:1}),ack(1,200,{kind:'quiet',fadeFrames:8})]);
+ assert.throws(()=>capture.snapshot({allowSilent:true}),/Finish/);
+ capture.consume({type:'finished',generation:'one',frame:208,ended:{frame:200,fadeFrames:8}});
+ assert.throws(()=>capture.snapshot(),/strike/);
+ const record=capture.snapshot({allowSilent:true});
+ assert.deepEqual(record.events,[]);
+ assert.deepEqual(record.contacts,[{body:0,zone:0,strength:1,start:0,end:100,order:0}]);
+ assert.equal(capture.originFrame,100);
+ canonicalRestRecord(record,recipe);
+ assert.ok(renderRestRecord(record,recipe).channels.every(channel=>channel.every(value=>value===0)));
+ assert.throws(()=>capture.snapshot({allowSilent:'yes'}),/boolean/);
+ const unused=createRestCapture(recipe,{generation:'one'});
+ send(unused,[ack(0,300,{kind:'quiet',fadeFrames:8})]);
+ unused.consume({type:'finished',generation:'one',frame:308,ended:{frame:300,fadeFrames:8}});
+ assert.equal(unused.originFrame,300);
+ assert.deepEqual(unused.snapshot({allowSilent:true}).contacts,[]);
+ assert.deepEqual(unused.snapshot({allowSilent:true}).events,[]);
+ assert.throws(()=>unused.snapshot(),/strike/);
 });

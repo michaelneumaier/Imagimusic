@@ -1,0 +1,28 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import {recipeForRecord} from '../src/score/grove-rest.js';
+import {ensemblePartsFromAcknowledgements} from '../src/grove/ensemble-capture.js';
+import {ensembleRecordFromParts,canonicalEnsembleRecord,renderEnsembleRecord} from '../src/score/grove-ensemble-record.js';
+import {stereoWav} from '../src/loom/model.js';
+const [reportPath='renders/ensemble-browser-check/report.json',capturePath='renders/ensemble-browser-check/captured.wav',out='renders/ensemble-kept',...extra]=process.argv.slice(2);
+if(extra.length)throw new Error('Usage: node tools/keep-ensemble-diagnostic.mjs [report.json] [captured.wav] [output-directory]');
+const destinations=['ensemble.json','ensemble.wav','verification.json'].map(name=>path.resolve(out,name));
+if([reportPath,capturePath].some(input=>destinations.includes(path.resolve(input))))throw new Error('Output must not overwrite an input');
+async function readBounded(file,maxBytes){const stat=await fs.stat(file);if(!stat.isFile()||stat.size>maxBytes)throw new Error('Input is not a bounded file: '+file);return fs.readFile(file);}
+const reportBytes=await readBounded(reportPath,8*1024*1024),captureBytes=await readBounded(capturePath,100*1024*1024),report=JSON.parse(reportBytes);
+const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+if(report.kind!=='imagimusic-ensemble-computation-check'||report.version!==1||!Array.isArray(report.records)||report.records.length!==3)throw new Error('Expected a three-part browser diagnostic report');
+assert.equal(sha(captureBytes),report.capturedWavSha256,'captured WAV differs from diagnostic evidence');
+const recipes=report.records.map(recipeForRecord),proof=report.processor;
+const capture=ensemblePartsFromAcknowledgements(recipes,{generation:proof.finished.generation,acknowledgements:proof.acknowledgements,finished:proof.finished});
+const record=ensembleRecordFromParts(capture.parts),json=canonicalEnsembleRecord(record)+String.fromCharCode(10);
+const fromSerialized=JSON.parse(json),pcm=renderEnsembleRecord(fromSerialized),wav=Buffer.from(stereoWav(pcm));
+assert.equal(pcm.sampleRate,report.sampleRate);assert.equal(pcm.channels[0].length,report.frames);
+assert.deepEqual(wav,captureBytes,'kept actual acknowledgements do not reproduce captured browser output');
+const verification={kind:'imagimusic-kept-ensemble-verification',version:1,sourceReportSha256:sha(reportBytes),ensembleSha256:sha(json),wavSha256:sha(wav),sampleRate:pcm.sampleRate,frames:pcm.channels[0].length,originFrame:capture.originFrame,silentParts:fromSerialized.parts.map(part=>part.silent),byteExactToBrowserCapture:true,limits:'One kept ensemble reconstructed from actual processed acknowledgements. Browser output was captured before a mute node. No acoustic-output, underrun or realtime-performance claim.'};
+await fs.mkdir(out,{recursive:true});
+await fs.writeFile(destinations[0],json);await fs.writeFile(destinations[1],wav);await fs.writeFile(destinations[2],JSON.stringify(verification,null,2)+String.fromCharCode(10));
+assert.equal(await fs.readFile(destinations[0],'utf8'),json);
+console.log(JSON.stringify(verification,null,2));

@@ -42,8 +42,9 @@ export function createRestCapture(recipe,{generation}={}){
   }catch(error){failure=error;throw error;}
  }
  function state(){return failure?'error':complete?'complete':ended?'ending':origin===null?'empty':'recording';}
- function snapshot(){
-  if(failure)throw failure;if(!complete)throw new Error('Finish the passage with Quiet before saving');if(!events.length)throw new Error('Play a strike before saving');
+ function snapshot({allowSilent=false}={}){
+  if(typeof allowSilent!=='boolean')throw new Error('allowSilent must be boolean');
+  if(failure)throw failure;if(!complete)throw new Error('Finish the passage with Quiet before saving');if(!events.length&&!allowSilent)throw new Error('Play a strike before saving');
   const record=structuredClone({...metadata,events,contacts:contacts.slice().sort((a,b)=>a.start-b.start||a.order-b.order),ended});validateRestRecord(record,recipe);return record;
  }
  return {consume,snapshot,get state(){return state();},get originFrame(){return origin;},get stats(){return {strikes:events.length,contacts:contacts.length,activeContacts:active.size,rejected};}};
