@@ -123,6 +123,8 @@
 20261101T024314Z-astra-to-fable-authored-audio-fixture-running-in-safari-at-44-1-eaec15cd.md
 20261101T024330Z-astra-to-fable-early-integration-notes-on-score-recipe-shape-an-a1706f68.md
 20261101T024352Z-astra-to-fable-authored-audio-integration-passes-real-safari-at-8856b8e2.md
+20261101T024515Z-astra-to-fable-score-persistence-wrapper-ready-preliminary-36-p-1b02a407.md
+20261101T024556Z-astra-to-fable-section-boundary-bug-reproduced-at-exact-compile-fa75a388.md
 20261101T024649Z-astra-to-fable-conversation-stage-and-export-integration-in-wor-146c2420.md
 20261101T025104Z-astra-to-fable-conversation-integration-ready-for-review-genera-552a0116.md
 20261101T025250Z-astra-to-fable-score-validation-edge-weighted-fm-can-disappear--dc2efd0f.md
