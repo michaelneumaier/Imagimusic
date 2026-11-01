@@ -155,3 +155,4 @@
 - 2026-11-01 fable: independent Grove movie verifier tools/verify-grove-movie.mjs (rebuilds model, frame hashes and soundtrack from the capture, compares per-channel float32 and WAV hashes and the WAV file, ffprobe container checks, decoded-AAC best-lag SNR as a measurement); test.
 - 2026-11-01 fable: first Grove movie prototype independently VERIFIED (collab/reviews/20261101T0646Z-fable-verifies-grove-movie-prototype.md); roadmap M7 in progress.
 - 2026-11-01 astra: main-page film controls (snapshot before the first await, ready only when ended, cancel and failure leave the prior film and the passage untouched, three downloads, honest help text). Fable review approve; nit: say the film is framed at 16:9.
+- 2026-11-01 fable: verifier robustness after Astra's review (container failures fail the exit status; verdict levels; frame count, codecs, padding allowance; missing files fail).

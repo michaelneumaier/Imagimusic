@@ -53,13 +53,44 @@ export function compareDecodedAudio(decoded, source, maxLag = 4096) {
   return {lag: best.lag, snrDb: 10 * Math.log10(pow / Math.max(err, 1e-30)), peakDifference: peak};
 }
 
+/** AAC may pad the end of the stream; the allowance is stated here, in samples, not hidden in a tolerance. */
+export const AAC_PADDING_ALLOWANCE_SAMPLES = 4096;
+
+/** Pure decision on an ffprobe result: every expectation the manifest states about the container. */
+export function evaluateProbe(info, manifest) {
+  const checks = [], check = (name, ok, detail = '') => { checks.push({name, ok, detail}); };
+  const v = info?.streams?.find(s => s.codec_type === 'video'), a = info?.streams?.find(s => s.codec_type === 'audio');
+  check('container has one video and one audio stream', !!v && !!a && info.streams.length === 2, `${info?.streams?.length ?? 0} streams`);
+  check('video codec is h264', v?.codec_name === 'h264', String(v?.codec_name));
+  check('video dimensions match the manifest', !!v && Number(v.width) === manifest.width && Number(v.height) === manifest.height, `${v?.width}x${v?.height}`);
+  check('video frame rate matches the manifest', v?.r_frame_rate === `${manifest.fps}/1`, String(v?.r_frame_rate));
+  check('video frame count equals the manifest', v?.nb_frames !== undefined && Number(v.nb_frames) === manifest.frames, `${v?.nb_frames} vs ${manifest.frames}`);
+  check('video duration within one frame of the manifest', !!v && Math.abs(Number(v.duration) - manifest.videoDuration) < 1 / manifest.fps, `${v?.duration} vs ${manifest.videoDuration}`);
+  check('audio codec is aac', a?.codec_name === 'aac', String(a?.codec_name));
+  check('audio stream is stereo at the capture rate', !!a && Number(a.sample_rate) === manifest.sampleRate && Number(a.channels) === 2, `${a?.sample_rate} Hz ${a?.channels} ch`);
+  const padding = AAC_PADDING_ALLOWANCE_SAMPLES / manifest.sampleRate;
+  check(`audio duration within [source, source + ${AAC_PADDING_ALLOWANCE_SAMPLES} samples]`, !!a && Number(a.duration) >= manifest.duration - 1e-6 && Number(a.duration) <= manifest.duration + padding, `${a?.duration} vs ${manifest.duration}`);
+  return checks;
+}
+
+/** Verdict from the checks: which level of evidence passed. */
+export function summarize({manifestChecks, containerChecks, containerStatus}) {
+  const manifestOk = manifestChecks.every(c => c.ok), containerOk = containerChecks ? containerChecks.every(c => c.ok) : null;
+  const ok = manifestOk && containerOk !== false;
+  const level = !manifestOk ? 'NOT VERIFIED: the manifest does not rebuild from its capture'
+    : containerOk === true ? 'VERIFIED (manifest, soundtrack and container)'
+    : containerOk === false ? 'NOT VERIFIED: the manifest rebuilds but the container does not match it'
+    : `VERIFIED (manifest and soundtrack only; container ${containerStatus})`;
+  return {ok, level};
+}
+
 function probe(mp4) {
   const r = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', mp4], {encoding: 'utf8'});
-  if (r.status !== 0) return null; return JSON.parse(r.stdout);
+  if (r.error || r.status !== 0) return null; return JSON.parse(r.stdout);
 }
 function decode(mp4, sampleRate) {
   const r = spawnSync('ffmpeg', ['-v', 'error', '-i', mp4, '-vn', '-f', 'f32le', '-ac', '2', '-ar', String(sampleRate), '-'], {maxBuffer: 1 << 30});
-  if (r.status !== 0) return null;
+  if (r.error || r.status !== 0) return null;
   const inter = new Float32Array(r.stdout.buffer, r.stdout.byteOffset, r.stdout.length >> 2), frames = inter.length >> 1;
   const out = [new Float32Array(frames), new Float32Array(frames)];
   for (let i = 0; i < frames; i++) { out[0][i] = inter[2 * i]; out[1][i] = inter[2 * i + 1]; }
@@ -69,25 +100,31 @@ function decode(mp4, sampleRate) {
 if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop())) {
   const [manifestPath, mp4Path, wavArg] = process.argv.slice(2);
   if (!manifestPath) { console.error('usage: node tools/verify-grove-movie.mjs <manifest.json> [movie.mp4] [movie.wav]'); process.exit(2); }
+  const print = c => console.log(`${c.ok ? 'ok  ' : 'FAIL'} ${c.name}${c.detail ? `  (${c.detail})` : ''}`);
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const wavPath = wavArg ?? (manifest.audio?.wav?.file ? join(dirname(manifestPath), manifest.audio.wav.file) : null);
-  const wavBytes = wavPath && existsSync(wavPath) ? readFileSync(wavPath) : null;
-  const result = verifyGroveMovieManifest(manifest, {wavBytes});
-  for (const c of result.checks) console.log(`${c.ok ? 'ok  ' : 'FAIL'} ${c.name}${c.detail ? `  (${c.detail})` : ''}`);
-  if (!wavBytes) console.log('note  no WAV file found beside the manifest; file hash not compared');
+  const wavExists = !!wavPath && existsSync(wavPath);
+  const result = verifyGroveMovieManifest(manifest, {wavBytes: wavExists ? readFileSync(wavPath) : null});
+  const manifestChecks = [...result.checks];
+  if (wavArg && !wavExists) manifestChecks.push({name: 'WAV file supplied on the command line exists', ok: false, detail: wavArg});
+  manifestChecks.forEach(print);
+  if (!wavExists && !wavArg) console.log('note  no WAV file found beside the manifest; file hash not compared');
+  let containerChecks = null, containerStatus = 'not supplied';
   if (mp4Path) {
-    const info = probe(mp4Path);
-    if (!info) console.log('note  ffprobe unavailable or failed; container not inspected');
+    if (!existsSync(mp4Path)) { containerChecks = [{name: 'MP4 file supplied on the command line exists', ok: false, detail: mp4Path}]; }
     else {
-      const v = info.streams.find(s => s.codec_type === 'video'), a = info.streams.find(s => s.codec_type === 'audio');
-      console.log(`mp4   video ${v?.codec_name} ${v?.width}x${v?.height} ${v?.r_frame_rate} fps, ${v?.nb_frames ?? '?'} frames, ${v?.duration ?? '?'} s; audio ${a?.codec_name} ${a?.sample_rate} Hz ${a?.channels} ch ${a?.duration ?? '?'} s`);
-      console.log(`${v && Number(v.width) === manifest.width && Number(v.height) === manifest.height && v.r_frame_rate === `${manifest.fps}/1` ? 'ok  ' : 'FAIL'} container dimensions and frame rate match the manifest`);
-      console.log(`${v && Math.abs(Number(v.duration) - manifest.videoDuration) < 1 / manifest.fps ? 'ok  ' : 'FAIL'} video duration within one frame of ${manifest.videoDuration} s`);
-      console.log(`${a && Number(a.sample_rate) === manifest.sampleRate && Number(a.channels) === 2 ? 'ok  ' : 'FAIL'} audio stream is stereo at the capture rate`);
-      const decoded = decode(mp4Path, manifest.sampleRate);
-      if (decoded) { const cmp = compareDecodedAudio(decoded, result.pcm.channels); console.log(`aac   decoded vs source at best lag ${cmp.lag} samples: SNR ${cmp.snrDb.toFixed(1)} dB, peak difference ${cmp.peakDifference.toExponential(2)} (lossy codec; a measurement, not identity)`); }
+      const info = probe(mp4Path);
+      if (!info) containerStatus = 'unverified: ffprobe unavailable or failed';
+      else {
+        containerChecks = evaluateProbe(info, manifest); containerChecks.forEach(print);
+        const decoded = decode(mp4Path, manifest.sampleRate);
+        if (decoded) { const cmp = compareDecodedAudio(decoded, result.pcm.channels); console.log(`aac   decoded vs source at best lag ${cmp.lag} samples: SNR ${cmp.snrDb.toFixed(1)} dB, peak difference ${cmp.peakDifference.toExponential(2)} (lossy codec; a measurement, not identity)`); }
+        else console.log('note  ffmpeg decode unavailable; decoded-AAC measurement skipped');
+      }
     }
+    if (containerChecks) containerChecks.forEach(c => { if (!c.ok && c.name.startsWith('MP4 file')) print(c); });
   }
-  console.log(result.ok ? 'VERIFIED: model, frame hashes and soundtrack rebuild from the capture' : 'NOT VERIFIED');
-  process.exit(result.ok ? 0 : 1);
+  const verdict = summarize({manifestChecks, containerChecks, containerStatus});
+  console.log(verdict.level);
+  process.exit(verdict.ok ? 0 : 1);
 }

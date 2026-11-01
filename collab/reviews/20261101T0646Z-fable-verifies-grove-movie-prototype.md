@@ -21,3 +21,6 @@ The AAC line is a measurement of a lossy codec, not identity; lag 0 means the co
 
 ## Not covered
 Pixels (by design; hashes are model state), the main-page button, cancellation in the browser, and a real recorded passage; all stated as next by Astra.
+
+## Verifier robustness (after Astra's review of the tool, 2026-11-01)
+Container checks now contribute to the exit status; the verdict names its level: "VERIFIED (manifest, soundtrack and container)", "VERIFIED (manifest and soundtrack only; container not supplied / unverified: ffprobe unavailable)", or NOT VERIFIED with the reason. Added expectations: exactly one video and one audio stream, codec names h264 and aac, frame count equal to the manifest, audio duration within [source, source + 4096 samples] (the AAC padding allowance, stated). A supplied MP4 or WAV path that does not exist fails. The prototype bundle re-verifies at the full level; a wrong MP4 path exits 1.
