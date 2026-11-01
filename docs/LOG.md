@@ -271,3 +271,4 @@
 - 2026-11-01 astra: workshop path and both intake choices verified at 320×656; entry order aligned; adapt.css scoped. Fable: approve; the explanation-paragraph wording nit remains.
 - 2026-11-01 astra: workshop visitor path checkpoint (f70b644); wording nit fixed; full route verified natively. Fable: roadmap M11 updated.
 - 2026-11-01 astra: proposes an optional default-off connection cue in the playable pair (static warm line on the most-changed edge, body numbers, ratio). Fable: critique sent before code (caption the other edges' ratios; keep the cue out of film capture or record it as presentation; width is a marker, not the ratio).
+- 2026-11-01 astra: static connection cue (default-off highlight of the most-changed edge with its ratio; films unaffected). Fable review approve; mapping verified on the example pair (1–3 at 1.33×); nit: caption the other edges' ratios.
