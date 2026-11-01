@@ -58,7 +58,7 @@ test('capture v2: a Rest record validates, renders exactly, equals the bank rout
   const { createGroveVoiceSession } = await import('../src/grove/voice-session.js');
   const { mixImpulseRecording } = await import('../src/touch/session.js');
   const grove = composeGrove({ seed: 3 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
-  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })),
     events: [{ frame: 0, order: 0, body: 0, position: 1, velocity: 0.4 }, { frame: 2401, order: 1, body: 2, position: 2, velocity: 0.6 }], contacts: [], ended: { frame: 3601, fadeFrames: 200 } };
   validateRestRecord(record, recipe); assert.equal(JSON.parse(canonicalRestRecord(record, recipe)).kind, REST_RECORD_KIND);
   // Round trip: the canonical JSON (keys sorted at every level) validates again and is canonical again, whatever the key order of the input.
@@ -149,7 +149,7 @@ test('a Rest record rebuilds in the verifier path and its picture reports contac
   const { rebuildGrovePcm } = await import('../tools/verify-grove-movie.mjs');
   const { renderRestRecord, restRecordVisual, REST_RECORD_KIND } = await import('../src/score/grove-rest.js');
   const grove = composeGrove({ seed: 11 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
-  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })),
     events: [{ frame: 0, order: 0, body: 1, position: 2, velocity: 0.7 }, { frame: 3000, order: 2, body: 0, position: 0, velocity: 0.5 }], contacts: [{ body: 1, zone: 2, strength: 1, start: 1200, end: 4000, order: 1 }], ended: { frame: 5000, fadeFrames: 200 } };
   const a = rebuildGrovePcm(record), b = renderRestRecord(record, recipe);
   assert.equal(a.channels[0].length, 5200); assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])), 'the verifier rebuild is the record renderer');
@@ -201,4 +201,21 @@ test('the movie source of a Rest record gives the exact sample count, canonical 
   assert.ok(pcm.channels.every((c, ch) => c.every((v, i) => v === ref.channels[ch][i])));
   for (const t of [1.5, 0.2, src.duration, 0.7]) assert.deepEqual(src.sample(t), pic.visual(t));
   assert.equal(src.capture.kind, 'imagimusic-grove-rest'); assert.equal(src.voiceLabel, 'Rest · exploration');
+});
+
+test('admission replay and reproducible strengths: an over-loud public record is rejected; custom coefficients round-trip through the record alone', async () => {
+  const { validateRestAdmission, recipeForRecord, restInvitationRecord, composeRestInvitation, validateRestRecord, renderRestRecord } = await import('../src/score/grove-rest.js');
+  const { rebuildGrovePcm } = await import('../tools/verify-grove-movie.mjs');
+  const sr = 8000, recipe = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), record = restInvitationRecord(recipe, composeRestInvitation(recipe, { tempo: 120 }));
+  const { bounds } = validateRestAdmission(record, recipe); assert.equal(bounds.length, record.events.length); assert.ok(bounds.every(b => b <= recipe.admissionCeiling));
+  const loud = structuredClone(record); loud.events = Array.from({ length: 40 }, (_, i) => ({ frame: 0, order: i, body: i % 3, position: 2, velocity: 1 })); loud.contacts = []; loud.ended = { frame: 4000, fadeFrames: 200 };
+  validateRestRecord(loud, recipe); assert.throws(() => validateRestAdmission(loud, recipe), /would have been rejected/);
+  assert.throws(() => rebuildGrovePcm(loud), /would have been rejected/);
+  const names = structuredClone(record); names.strengths = ['light', 'firm']; validateRestRecord(names, recipe); assert.deepEqual(recipeForRecord(names).strengths, recipe.strengths, 'bare default names mean the default coefficients');
+  // Custom coefficients under the default names are recorded and rebuilt from the record alone.
+  const custom = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, strengths: { light: 5, firm: 90 } }), cr = restInvitationRecord(custom, composeRestInvitation(custom, { tempo: 120 }));
+  assert.throws(() => validateRestRecord(cr, recipe), /strengths differ/);
+  const customNames = structuredClone(cr); customNames.strengths = ['light', 'firm']; assert.throws(() => validateRestRecord(customNames, custom), /default strengths with the default coefficients/);
+  const rebuilt = recipeForRecord(JSON.parse(JSON.stringify(cr))); assert.deepEqual(rebuilt.strengths, custom.strengths);
+  const a = renderRestRecord(cr, rebuilt), b = renderRestRecord(cr, custom); assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])));
 });

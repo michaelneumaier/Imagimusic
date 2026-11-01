@@ -78,7 +78,13 @@ export function validateRestRecord(record, recipe) {
   if (record.sampleRate !== recipe.sampleRate || record.outputGain !== recipe.outputGain) throw new Error('record does not belong to this recipe (sample rate or gain).');
   // The full canonical grove, not just its seed: the same seed under a changed generator or a custom grove is a different instrument.
   if (stable(record.grove) !== stable(recipe.grove)) throw new Error('record grove differs from the recipe grove (compare canonical groves, not seeds).');
-  if (stable(record.voice) !== stable(recipe.voice) || stable(record.zones) !== stable(recipe.zones) || stable(record.strengths) !== stable(recipe.strengths.map(s => s.name))) throw new Error('record voice, zones or strengths differ from the recipe.');
+  // Strengths: either [{ name, c }] (names and coefficients, required for any non-default coefficient) or the bare default names, which by
+  // contract mean exactly REST_STRENGTHS; a custom coefficient under a default name is therefore never silently accepted.
+  if (!Array.isArray(record.strengths) || !record.strengths.length) throw new Error('record strengths must be a non-empty list.');
+  const namesOnly = record.strengths.every(st => typeof st === 'string');
+  if (namesOnly) { if (stable(record.strengths) !== stable(recipe.strengths.map(st => st.name)) || recipe.strengths.some(st => REST_STRENGTHS[st.name] !== st.c)) throw new Error('record strengths given by name only must be the default strengths with the default coefficients; record [{ name, c }] for custom coefficients.'); }
+  else { if (record.strengths.some(st => !st || typeof st.name !== 'string' || !(Number.isFinite(st.c) && st.c > 0))) throw new Error('record strengths must be [{ name, c }] with positive coefficients.'); if (stable(record.strengths) !== stable(recipe.strengths)) throw new Error('record strengths differ from the recipe.'); }
+  if (stable(record.voice) !== stable(recipe.voice) || stable(record.zones) !== stable(recipe.zones)) throw new Error('record voice or zones differ from the recipe.');
   if (!Array.isArray(record.events) || record.events.length > REST_MAX_EVENTS || !Array.isArray(record.contacts) || record.contacts.length > REST_MAX_CONTACTS) throw new Error('events or contacts out of range.');
   const limit = REST_MAX_SECONDS * recipe.sampleRate; let lastFrame = -1, lastOrder = -1; const orders = new Set();
   for (const [i, e] of record.events.entries()) {
@@ -188,7 +194,7 @@ export function restInvitationRecord(recipe, invitation) {
     else if (c.kind === 'contact') { const a = active.get(c.body); if (a) { if (c.frame > a.start) contacts.push({ ...a, end: c.frame }); active.delete(c.body); } if (c.zone !== null) active.set(c.body, { body: c.body, zone: c.zone, strength: c.strength, start: c.frame, order }); }
     else { for (const [body, a] of active) if (c.frame > a.start) contacts.push({ ...a, end: c.frame }); active.clear(); ended = { frame: c.frame, fadeFrames: c.fadeFrames }; }
   });
-  return validateRestRecord({ version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: recipe.sampleRate, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+  return validateRestRecord({ version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: recipe.sampleRate, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })),
     events, contacts: contacts.sort((a, b) => a.start - b.start || a.order - b.order), ended }, recipe);
 }
 
@@ -215,8 +221,35 @@ export function restRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
 
 /** What a movie plan needs from a Rest record, in the shape the Grove plan reads: exact PCM, sample count and the picture at any time. */
 export function restMovieSource(record, recipe, { every = 1024 } = {}) {
-  validateRestRecord(record, recipe);
+  validateRestAdmission(record, recipe);
   const audioSamples = restRecordLength(record, recipe), picture = restRecordVisual(record, recipe, { every });
   return { kind: REST_RECORD_KIND, sampleRate: recipe.sampleRate, audioSamples, duration: audioSamples / recipe.sampleRate, capture: JSON.parse(canonicalRestRecord(record, recipe)),
     sample: time => picture.visual(time), pcm: () => renderRestRecord(record, recipe), voiceLabel: 'Rest · exploration' };
+}
+
+/** The recipe a record was made with, rebuilt from the record alone (grove, voice, rate, zones, strengths with coefficients), then validated against it. */
+export function recipeForRecord(record) {
+  if (!record || record.kind !== REST_RECORD_KIND) throw new Error('not a Rest record.');
+  if (!Array.isArray(record.strengths) || !record.strengths.length) throw new Error('record strengths must be a non-empty [{ name, c }] list.');
+  const strengths = record.strengths.every(st => typeof st === 'string') ? Object.fromEntries(record.strengths.map(name => { if (!(name in REST_STRENGTHS)) throw new Error(`unknown default strength ${name}.`); return [name, REST_STRENGTHS[name]]; })) : Object.fromEntries(record.strengths.map(st => [st.name, st.c]));
+  const recipe = createGroveRestRecipe(record.grove, record.voice, { sampleRate: record.sampleRate, zones: record.zones, strengths });
+  validateRestRecord(record, recipe);
+  return recipe;
+}
+
+/** Admission replayed: every strike must satisfy the energy rule at its actual frame, through the same engine and contact evolution the
+ *  audio thread used; a public record that would have been rejected live is rejected here. Returns { bounds } per strike. */
+export function validateRestAdmission(record, recipe) {
+  validateRestRecord(record, recipe);
+  const engine = createRestEngine(recipe), bounds = [];
+  const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  let frame = 0;
+  for (const [index, k] of record.events.entries()) {
+    for (; frame < k.frame; frame++) { engine.setContacts(keyAt(frame)); engine.step(); }
+    engine.setContacts(keyAt(frame));
+    const bound = engine.candidateBound(k.position, k.body, k.velocity);
+    if (!(bound <= recipe.admissionCeiling)) throw new Error(`events[${index}] (frame ${k.frame}) would have been rejected: bound ${bound.toFixed(4)} exceeds the admission ceiling ${recipe.admissionCeiling}.`);
+    bounds.push(bound); engine.strike(k.position, k.body, k.velocity);
+  }
+  return { bounds };
 }

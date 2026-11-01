@@ -11,7 +11,7 @@ import {createGroveVoiceSession} from '../src/grove/voice-session.js';
 import {renderGroveBank} from '../src/grove/performance.js';
 import {renderVoiceBank} from '../src/grove/voice-performance.js';
 import {mixImpulseRecording} from '../src/touch/session.js';
-import {createGroveRestRecipe, renderRestRecord} from '../src/score/grove-rest.js';
+import {recipeForRecord, validateRestAdmission, renderRestRecord} from '../src/score/grove-rest.js';
 import {createGroveMoviePlan} from '../src/grove/movie-plan.js';
 import {stereoWav} from '../src/loom/model.js';
 
@@ -22,7 +22,7 @@ const floatBytes = channel => { const b = Buffer.alloc(channel.length * 4); for 
 export function rebuildGrovePcm(capture) {
   if (capture.kind === 'imagimusic-grove-rest') {
     // A Rest record: the exact model through the shared engine, from a recipe prepared for the record's grove, voice and rate.
-    const recipe = createGroveRestRecipe(capture.grove, capture.voice, { sampleRate: capture.sampleRate });
+    const recipe = recipeForRecord(capture); validateRestAdmission(capture, recipe);
     return renderRestRecord(capture, recipe);
   }
   const rich = capture.kind === 'imagimusic-grove-voice';
