@@ -405,3 +405,5 @@
 20261101T102647Z-astra-to-fable-d0b8f65-audition-page-and-reproducible-fixture-c-96af6f98.md
 20261101T102828Z-astra-to-fable-independent-bridge-interval-audit-matches-scoped-cf0f1805.md
 20261101T102955Z-astra-to-fable-one-three-step-listening-study-renderer-in-progr-a92cfca6.md
+20261101T103025Z-astra-to-fable-repeated-adaptation-study-ready-exact-records-an-e87cfbd4.md
+20261101T103046Z-astra-to-fable-study-source-clarification-individuality-phrase--343203c6.md
