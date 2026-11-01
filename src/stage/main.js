@@ -1,3 +1,4 @@
+import {readCompositionSearch,compositionURL} from './composition-link.js';
 import {attachLoomPerformance,DEFAULT_COMPOSITION} from './composition.js';
 import {prepareLoomAudio} from './loom-audio.js';
 import { createStageFrames } from './frame.js';
@@ -15,7 +16,8 @@ const $=id=>document.getElementById(id);
 const audio=new InstrumentAudio();let choir=null,world=null,playing=false,origin=0,cursor=0,request=0;
 let activePatch=structuredClone(DEFAULT_PATCH), importError='';
 if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
-const composition=structuredClone(DEFAULT_COMPOSITION);composition.loom.enabled=new URLSearchParams(location.search).get('loom')==='1';
+let composition=structuredClone(DEFAULT_COMPOSITION);
+try{composition=readCompositionSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the default ensemble.';}
 let preparation=null,loomVoice=null;
 let performance=attachLoomPerformance(createPerformance(activePatch),composition),frames=createStageFrames(performance);
 const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=frames.bindings;
@@ -47,7 +49,8 @@ $('perform').onclick=async()=>{
 };
 $('quiet').onclick=stop;
 $('loom-enabled').checked=composition.loom.enabled;
-$('loom-enabled').onchange=()=>{stop();const url=new URL(location.href);if($('loom-enabled').checked)url.searchParams.set('loom','1');else url.searchParams.delete('loom');location.href=url.href;};
+$('loom-study').href=compositionURL(new URL('loom.html',location.href),composition);
+$('loom-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,{...composition,loom:{...composition.loom,enabled:$('loom-enabled').checked}});};
 $('seek').max=performance.duration;
 $('seek').oninput=()=>{stop();study.seek(Number($('seek').value));};
 $('view').onchange=()=>{ $('direction').value='manual'; if(world){world.controls.enabled=true;world.view($('view').value);$('camera-hint').textContent='DRAG TO ORBIT · SCROLL TO EXPLORE';} };

@@ -16,7 +16,7 @@ Open http://127.0.0.1:8080. Click **Begin sequence**, click a garden resonator, 
 
 Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passage on one 3D floor. Drag to orbit, choose a close view, or scrub the silent timeline. Use **Play this instrument in 3D** in the laboratory to transfer its current patch and seed into the stage. The transfer stays in this browser session; the direct stage link uses the default patch. Its plain score snapshots feed both live scheduling and the shared state bus. Stateless scene bindings permit reproducible seeking. Three.js 0.187.0 is vendored locally with license and verified package integrity; no installation or CDN is needed. WebGL2 is required for this preview; the 2D laboratory remains available.
 
-Enable **Include Tension Loom** on the stage to add its coupled pair to the ensemble. Eight alternating strikes follow the shared tempo and seed. Sound preparation is cancellable, and playback starts every instrument on the same audio clock. The movie manifest saves the separate composition settings; the artifact verifier rebuilds the composed scene from them.
+Enable **Include Tension Loom** on the stage to add its coupled pair to the ensemble. Eight alternating strikes follow the shared tempo and seed. In the study, **Play this Loom in the ensemble** carries your frequency, coupling, detuning and loss into a reproducible URL; the stage’s study link carries those settings back for editing. Sound preparation is cancellable, and playback starts every instrument on the same audio clock. The movie manifest saves the separate composition settings; the artifact verifier rebuilds the composed scene from them.
 
 ## Tension Loom study
 

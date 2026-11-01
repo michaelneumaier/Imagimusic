@@ -1,10 +1,13 @@
+import {readCompositionSearch,compositionURL} from '../stage/composition-link.js';
 import {createWorld} from '../stage/world.js';
 import {loomSceneFrame,applyLoomScene} from './scene.js';
 import {DEFAULT_LOOM,makeLoom,loomVisualEnvelope,stereoWav} from './model.js';
 import {createLoomPerformance,loomPerformanceFrame} from './performance.js';
 import {createLoomRenderJob} from './render-job.js';
 const $=id=>document.getElementById(id);
-let settings={...DEFAULT_LOOM},study=makeLoom(settings),context,source,gain,origin=0,playing=false,pcm=null,request=0,passage=null,renderJob=null,studyTime=0,studying=false;
+let initialSettings={...DEFAULT_LOOM};
+try{initialSettings=readCompositionSearch(location.search).loom.settings;}catch(error){$('status').textContent=error.message+'. Using the default Loom.';}
+let settings=initialSettings,study=makeLoom(settings),context,source,gain,origin=0,playing=false,pcm=null,request=0,passage=null,renderJob=null,studyTime=0,studying=false;
 const world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
 world.rail.visible=false;world.camera.position.set(6,4.5,9);world.controls.target.set(0,1.1,1);world.controls.update();
 const loom=world.loom;loom.root.position.set(0,0,1);loom.root.scale.setScalar(1);loom.root.visible=true;
@@ -24,7 +27,13 @@ async function strike(body){
  }catch(error){if(token!==request)return;quiet();$('status').textContent=error.message;}
 }
 $('conversation').onclick=()=>strike(null);$('left').onclick=()=>strike(0);$('right').onclick=()=>strike(1);$('quiet').onclick=quiet;
-for(const key of ['coupling','detune','loss'])$(key).oninput=()=>{quiet();settings[key]=Number($(key).value);study=makeLoom(settings);$('seek').max=study.duration;passage=null;pcm=null;$('save').disabled=true;$(key+'-value').textContent=$(key).value+(key==='detune'?' cents':key==='loss'?' /s':'');};
+for(const key of ['frequency','coupling','detune','loss']){
+ $(key).value=settings[key];
+ const suffix=key==='frequency'?' Hz':key==='detune'?' cents':key==='loss'?' /s':'';
+ $(key+'-value').textContent=settings[key]+suffix;
+ $(key).oninput=()=>{quiet();settings[key]=Number($(key).value);study=makeLoom(settings);$('seek').max=study.duration;passage=null;pcm=null;$('save').disabled=true;$(key+'-value').textContent=$(key).value+suffix;};
+}
+$('ensemble').onclick=()=>{quiet();location.href=compositionURL(new URL('stage.html',location.href),{version:1,loom:{enabled:true,settings}});};
 $('save').onclick=()=>{if(!pcm)return;const url=URL.createObjectURL(new Blob([stereoWav(pcm)],{type:'audio/wav'})),a=document.createElement('a');a.href=url;a.download=`imagimusic-loom-${passage?'conversation':study.body===0?'left':'right'}.wav`;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 $('seek').max=study.duration;
 $('seek').oninput=()=>{const time=Number($('seek').value);quiet();studyTime=time;studying=true;$('status').textContent='Silent study. The picture samples the selected performance at this exact time.';};
