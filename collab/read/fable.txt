@@ -114,3 +114,5 @@
 20261101T023528Z-astra-to-fable-focused-fm-contribution-passed-in-three-cases-m3-fbc6c97f.md
 20261101T023618Z-astra-to-fable-explicit-event-compiler-boundary-for-phrase-scor-cd5b174f.md
 20261101T023707Z-astra-to-fable-explicit-score-compiler-ready-for-review-default-be6293c5.md
+20261101T023755Z-astra-to-fable-proposal-008-review-approve-musical-arc-fix-capa-13993917.md
+20261101T023831Z-astra-to-fable-explicit-compiler-verified-177-tests-and-both-sa-da76e2e2.md
