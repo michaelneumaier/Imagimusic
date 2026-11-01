@@ -27,3 +27,8 @@ test('audio failure prevents saving, and changing passage aborts an in-flight re
  let pending;const {host,nodes}=fixture({renderRecord:(_,options)=>new Promise(resolve=>{pending={resolve,signal:options.signal};})});await host.enable(grove);finish(nodes[0]);const render=host.saveAudio();host.newPassage();assert.equal(pending.signal.aborted,true);pending.resolve({pcm:{channels:[]}});await assert.rejects(render,/Passage changed/);
  const node=nodes[1];node.port.onmessage({data:{type:'error',generation:node.options.processorOptions.generation,message:'fatal'}});assert.equal(host.state,'error');assert.throws(()=>host.recording(),/fatal/);host.dispose();
 });
+test('invitation reserves a fresh passage and interruption still permits release commands',async()=>{
+ const {host,nodes,context}=fixture();await host.enable(grove);host.schedule([{id:'authored',frame:0,kind:'strike',body:0,position:0,velocity:.5},{id:'end',frame:1000,kind:'quiet',fadeFrames:8}]);
+ assert.equal(nodes[0].sent[0].events[0].frame,880);assert.equal(nodes[0].sent[0].events[1].frame,1880);assert.throws(()=>host.schedule([]),/fresh passage/);
+ context.state='suspended';context.onstatechange();assert.equal(host.send({kind:'contact',body:0,zone:null}).queued,true);assert.equal(host.quiet().queued,true);assert.equal(host.send({kind:'strike',body:0}).queued,false);host.dispose();
+});

@@ -43,8 +43,14 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
   }catch(error){if(own!==token)return;fail(error);throw error;}
  }
  function send(command){
-  if(!node||!['ready','playing'].includes(state))return {queued:false,reason:state};
+  const release=command.kind==='quiet'||(command.kind==='contact'&&command.zone===null);
+  if(!node||(!['ready','playing'].includes(state)&&!(state==='suspended'&&release)))return {queued:false,reason:state};
   const event={...command,id:`gesture-${sequence++}`,frame:Math.ceil(context.currentTime*context.sampleRate)};node.port.postMessage({type:'events',events:[event]});return {queued:true,id:event.id};
+ }
+ function schedule(commands){
+  if(state!=='ready'||sequence!==0||capture.stats.strikes||capture.stats.activeContacts)throw new Error('Begin a fresh passage for the invitation');
+  if(!Array.isArray(commands)||!commands.length||commands.some(c=>!Number.isSafeInteger(c.frame)||c.frame<0))throw new Error('Invalid invitation timing');
+  const origin=Math.ceil((context.currentTime+.1)*context.sampleRate),events=commands.map(command=>({...command,id:`gesture-${sequence++}`,frame:origin+command.frame}));node.port.postMessage({type:'events',events});return origin;
  }
  function quiet(){if(!context)return {queued:false,reason:state};return send({kind:'quiet',fadeFrames:Math.max(1,Math.round(context.sampleRate*REST_QUIET_FADE_SECONDS))});}
  async function resume(){if(!context)throw new Error('Enter the grove first');await context.resume();if(context.state!=='running')throw new Error('Audio remains interrupted');}
@@ -61,5 +67,5 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
   return {...visual,envelope:visual.envelope.map(value=>value*fade),time:capture.originFrame===null?0:(frame-capture.originFrame)/recipe.sampleRate,strikes:strikes.filter(s=>frame>=s.frame&&frame-s.frame<recipe.sampleRate*.3).map(s=>({...s,age:(frame-s.frame)/recipe.sampleRate}))};
  }
  function dispose(){token++;abort?.abort();detach();if(context){context.onstatechange=null;context.close();context=null;}state='disposed';}
- return {enable,send,quiet,resume,newPassage,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
+ return {enable,send,schedule,quiet,resume,newPassage,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
 }
