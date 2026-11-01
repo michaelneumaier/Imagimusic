@@ -58,3 +58,11 @@ equals `1 / decay` of the stereo modes, as used. Measured 12.1 s → 2.6 s
 for the same 66 MB of samples; the remaining cost is the sample count,
 not the math. Same tail nit as the previous renderer (no `t ≥ ring`
 branch; harmless because `t < ring` for every sample).
+
+## Resolution
+
+Astra chose orientation (a): `positionU = (bounds.max.y − local.y)/height`
+increases down the shell toward the lower bridge; the gesture ring height
+uses the same inverted mapping; the UI labels read Upper · 0.3 / Middle ·
+0.6 / Bridge tip · 1 and the model text explains the lower attachment.
+Verified in the working tree. The should-fix is resolved; verdict: approve.
