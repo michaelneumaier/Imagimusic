@@ -1,8 +1,9 @@
-# Proposal 015: A richer voice for the Grove, bodies with partials coupled through their bridges
+# Proposal 015 (rev. 2): A richer voice for the Grove, bodies with partials coupled through their bridges
 
-*Fable, 2026-11-01, at Astra's request after the Grove checkpoint: the
-three near-unison lumped modes demonstrate relationship but are timbrally
-sparse. This proposes a restrained family of higher modes per body with
+*Fable, 2026-11-01, at Astra's request after the Grove checkpoint; rev. 2
+applies Astra's six corrections (060748Z) and records the 015a evidence.
+The three near-unison lumped modes demonstrate relationship but are
+timbrally sparse. This proposes a restrained family of higher modes per body with
 strike position and material response, with real coupling, keeping the
 intimate first gesture. Acoustic interpretation and a small measurable
 listening comparison before any implementation.*
@@ -37,29 +38,42 @@ attachment point**:
   downstream (closed-form response, pickup modes, envelopes, bounds) is
   unchanged in kind.
 
-**Damping, stated honestly.** The pair and the grove use one proportional
-damping `2γM`, which keeps the modes real. Material loss factors differ
-per partial (higher partials die faster), and that is much of what makes
-a voice "material". Per-mode damping is not proportional in general, so
-the proposal uses the standard classical-damping approximation: assign
-each **coupled** normal mode a decay from the material loss factors of
-the body partials it is made of (participation-weighted), after
-diagonalizing the undamped system. This is an approximation, named as
-such in the docs and the caption ("partials fade at material rates,
-assigned per mode"), and its error is measurable: the undamped eigen
-problem is exact; only the decay assignment is approximate.
+**Damping, stated honestly and measured.** The pair and the grove use one
+proportional damping `2γM`, which keeps the modes real. Per-partial decay
+rates (constant loss factor ⇒ rate ∝ frequency, anchored to the grove's
+loss for the fundamental) are not proportional in general, so 015a uses
+the classical-damping approximation exactly as Astra specified: with
+`D = diag(partial rates)` in mass-normalized coordinates, each coupled
+mode gets `γ_r = v_rᵀ D v_r` and `ω_dr = √(λ_r − γ_r²)`, and the system
+reports what it discards, `‖offdiag(V D Vᵀ)‖_F / ‖D‖_F`. Evidence
+(tests/modal-network.test.js, a representative three-body voice with
+three partials each, struck at u = 0.6): discarded damping 7.9e-5
+relative; the closed form against a direct RK4 integration of
+`M q̈ + C q̇ + K q = 0` with `C = diag(2 m γ)` over 0.6 s differs by at most
+1.3e-3 of the peak displacement. The undamped eigenproblem is exact.
 
 ## What stays intimate
 
-- `M = 1` with the attachment at the beam tip reproduces today's grove
-  **exactly** (same stiffness matrix, same modes); a test asserts it. The
-  first gesture, one body alone and the others swelling, is the same
-  gesture; it now has partials.
-- Restraint: M ≤ 4, partial amplitudes falling with mode number by the
-  beam's own shapes (no boosting), the network-wide pickup scale, the
-  fixed gain, the same admission bound. Default strike position near the
-  middle of the body (fundamental dominant); a page may later expose
-  position as a second gesture axis.
+- `M = 1` reproduces today's grove **exactly** under identical conventions
+  (same modal mass, unit shape at attachment, strike and pickup, same
+  loss): the test compares normal frequencies, displacement and velocity
+  at ~180 sampled times and the pickup modes against `coupledNetwork`, to
+  1e-12 relative. The first gesture, one body alone and the others
+  swelling, is the same gesture; it may now have partials.
+- Restraint: M ≤ 4, no boosting, the network-wide pickup scale, the fixed
+  gain, the same admission bound. Which partials a middle strike actually
+  favors is **measured** from the displacement pickup (mode shapes alone
+  promise nothing about amplitude ordering); the A/B decides. Striking at
+  a node of a partial leaves it almost silent (tested), which is what
+  "strike position selects partials" means here.
+- **Picture:** the all-band envelope beats at audio rates with partials
+  present and must not drive the shell animation. The relationship
+  readout for the scene stays separately defined on the low band (the
+  fundamental-dominated modes), or a bounded temporal RMS with a stated
+  window; Astra maps it after the contract.
+- **Records:** `composeGrove`'s v1 canonical schema is unchanged; the
+  comparison wraps a grove with a separate voice configuration. Any
+  schema evolution follows the audition, never a silent change to v1.
 
 ## Acoustic interpretation (what we claim and what we do not)
 
@@ -80,22 +94,27 @@ curated seed, body 0 struck alone at the default position:
 1. the current grove (M = 1), and
 2. the proposed voice (M = 3, beam ratios, classical damping),
 
-and reports, from the rendered PCM and the modal data: number of partials
-above −40 dB at 50 ms, spectral centroid over the first 0.5 s, each
-partial's decay time, and the far bodies' first swell time and ratio (to
-show the relationship is unchanged in kind). It writes both WAVs under
-`renders/` for an A/B listen. The audition question is then concrete:
+at **equal reference force and pickup scale**, and reports from the
+rendered PCM and the modal data: peak and RMS (so the comparison is not
+louder vs quieter), number of partials above −40 dB at 50 ms, spectral
+centroid over the first 0.5 s, each partial's decay time, and the far
+bodies' first swell time and ratio on the low band (to show the
+relationship unchanged in kind). It writes both WAVs under `renders/` for
+an A/B listen. Reports quantify; no claim that the audition succeeded
+unless someone has actually listened. The audition question is then concrete:
 does the body sound like a thing with a material, and is the swell of the
 others still the first thing you notice? Only if both are yes does the
 page change.
 
 ## Scope and ownership
 
-- 015a (Fable): `modalNetwork` in `src/coupling.js` (N bodies × M
+- 015a (Fable), landed: `modalNetwork` in `src/coupling.js` (N bodies × M
   partials, attachment-point coupling, strike-position excitation,
-  classical-damping decay assignment) with tests: M = 1 reproduces
-  `coupledNetwork` exactly; EOM residual for the undamped part; symmetry;
-  energy-free statements only; the beam family from `geometry.js`.
+  classical-damping decay with the discarded part reported) with tests:
+  M = 1 reproduces `coupledNetwork` on x, v and pickup modes; undamped
+  EOM residual; node-strike silences a partial; assigned decays within the
+  partial range; direct damped ODE comparison; validation. The beam family
+  comes from `geometry.js` (clamped-free ratios and shapes).
 - 015b (Fable): the comparison tool and its report; `composeGrove` gains
   an optional `voice: { partials: M, strikeU, attachU }` block (default
   M = 1, so every existing grove, record and test is unchanged).

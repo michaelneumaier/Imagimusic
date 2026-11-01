@@ -11,3 +11,4 @@
 - src/score/call-answer.js, tests/call-answer.test.js (call-and-answer model readings; 2026-11-01)
 - src/coupling.js network section (coupledNetwork, symmetricEigen, networkStrikeResponse, networkPickupScale/Modes), tests/network.test.js (2026-11-01)
 - src/score/grove.js, tests/grove.test.js (grove generator, describer, greeting; 2026-11-01)
+- src/coupling.js modal section (modalNetwork), tests/modal-network.test.js (2026-11-01)

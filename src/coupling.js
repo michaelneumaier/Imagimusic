@@ -236,3 +236,83 @@ export function networkPickupModes(system, impulse, body, { scale = networkPicku
   if (!Number.isFinite(scale) || scale < 0) throw new Error('scale must be a finite non-negative number.');
   return networkStrikeResponse(system, impulse).bodyModes(body).map(m => ({ frequency: m.frequency, amplitude: scale * m.amplitude, phase: 0, decay: m.decay }));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// MODAL network (proposal 015, a richer voice for the Grove): each body has M partial coordinates q_aj with shapes
+// φ_aj(u) along its normalized length, natural frequencies ω_aj and a per-partial decay rate γ_aj; a bridge attached
+// at u_a on body a and u_b on body b adds the potential ½ kc (w_a(u_a) − w_b(u_b))², w_a(u) = Σ_j φ_aj(u) q_aj, which
+// couples EVERY partial that moves at the attachment point. A strike at s on body a gives q̇_aj(0) = J φ_aj(s)/m_aj.
+// Conventions, stated: equal modal mass m_a for every partial of body a (uniform-body approximation with shapes as
+// dimensionless weights, the garden's convention); the undamped eigenproblem is exact (symmetricEigen); the decay of
+// each COUPLED normal mode is assigned as the participation-weighted mean of the partial decay rates it is made of
+// (classical-damping approximation, named in every caption); each mode then follows the pair's form
+// q_r(t) = (q̇_r(0)/ω_dr) e^{−γ_r t} sin(ω_dr t), ω_dr = √(λ_r − γ_r²). With M = 1 and shapes ≡ 1 the system is
+// exactly `coupledNetwork` (tested).
+
+export const MODAL_MAX_COORDINATES = 24;
+
+/** bodies: [{ mass, frequencies: [Hz], decayRates: [1/s], shape: (u01) => [φ_1(u), …, φ_M(u)] }]; edges: [{ a, b, kc, ua, ub }]. */
+export function modalNetwork({ bodies, edges = [] } = {}) {
+  if (!Array.isArray(bodies) || bodies.length < 1) throw new Error('bodies must be a non-empty array.');
+  const offsets = [], sizes = [];
+  bodies.forEach((b, a) => {
+    if (!b || typeof b !== 'object') throw new Error(`bodies[${a}] must be an object.`);
+    positive(b.mass, `bodies[${a}].mass`);
+    if (!Array.isArray(b.frequencies) || !b.frequencies.length || !Array.isArray(b.decayRates) || b.decayRates.length !== b.frequencies.length) throw new Error(`bodies[${a}]: frequencies and decayRates must be non-empty arrays of equal length.`);
+    b.frequencies.forEach((f, j) => positive(f, `bodies[${a}].frequencies[${j}]`)); b.decayRates.forEach((g, j) => nonNegative(g, `bodies[${a}].decayRates[${j}]`));
+    if (typeof b.shape !== 'function') throw new Error(`bodies[${a}].shape must be a function of u01 returning one weight per partial.`);
+    offsets.push(sizes.reduce((s, x) => s + x, 0)); sizes.push(b.frequencies.length);
+  });
+  const n = sizes.reduce((s, x) => s + x, 0);
+  if (n > MODAL_MAX_COORDINATES) throw new Error(`at most ${MODAL_MAX_COORDINATES} modal coordinates.`);
+  const shapeAt = (a, u) => { const w = bodies[a].shape(u); if (!Array.isArray(w) || w.length !== sizes[a] || !w.every(Number.isFinite)) throw new Error(`bodies[${a}].shape(${u}) must return ${sizes[a]} finite weights.`); return w; };
+  const seen = new Set();
+  for (const [i, e] of edges.entries()) {
+    if (!e || !Number.isInteger(e.a) || !Number.isInteger(e.b) || e.a < 0 || e.b < 0 || e.a >= bodies.length || e.b >= bodies.length) throw new Error(`edges[${i}]: a and b must be body indices.`);
+    if (e.a === e.b) throw new Error(`edges[${i}]: a body cannot be bridged to itself.`);
+    const key = `${Math.min(e.a, e.b)}-${Math.max(e.a, e.b)}`; if (seen.has(key)) throw new Error(`edges[${i}]: duplicate bridge ${key}.`); seen.add(key);
+    nonNegative(e.kc, `edges[${i}].kc`); finite(e.ua, `edges[${i}].ua`); finite(e.ub, `edges[${i}].ub`);
+  }
+  // Mass vector and stiffness matrix over all coordinates.
+  const m = [], K = Array.from({ length: n }, () => new Array(n).fill(0));
+  bodies.forEach((b, a) => b.frequencies.forEach((f, j) => { const k = offsets[a] + j; m[k] = b.mass; K[k][k] = b.mass * (2 * Math.PI * f) ** 2; }));
+  for (const e of edges) {
+    const pa = shapeAt(e.a, e.ua), pb = shapeAt(e.b, e.ub);
+    for (let j = 0; j < sizes[e.a]; j++) for (let k = 0; k < sizes[e.a]; k++) K[offsets[e.a] + j][offsets[e.a] + k] += e.kc * pa[j] * pa[k];
+    for (let j = 0; j < sizes[e.b]; j++) for (let k = 0; k < sizes[e.b]; k++) K[offsets[e.b] + j][offsets[e.b] + k] += e.kc * pb[j] * pb[k];
+    for (let j = 0; j < sizes[e.a]; j++) for (let k = 0; k < sizes[e.b]; k++) { K[offsets[e.a] + j][offsets[e.b] + k] -= e.kc * pa[j] * pb[k]; K[offsets[e.b] + k][offsets[e.a] + j] -= e.kc * pa[j] * pb[k]; }
+  }
+  const A = K.map((row, i) => row.map((k, j) => k / Math.sqrt(m[i] * m[j])));
+  for (const row of A) for (const value of row) if (!Number.isFinite(value)) throw new RangeError('derived stiffness is not finite; inputs are outside the representable range.');
+  const { lambda, vectors, residual, orthogonality } = symmetricEigen(A);
+  if (!(residual <= 1e-10) || !(orthogonality <= 1e-10)) throw new Error(`eigen-decomposition did not meet the quality bound (residual ${residual}, orthogonality ${orthogonality}).`);
+  // Classical-damping approximation: each normal mode's decay rate is the participation-weighted mean of the partial decay rates.
+  const partialRates = []; bodies.forEach((b, a) => b.decayRates.forEach((g, j) => { partialRates[offsets[a] + j] = g; }));
+  const gammas = vectors.map(v => v.reduce((s, vi, k) => s + vi * vi * partialRates[k], 0));     // γ_r = v_rᵀ D v_r, D = diag(partial rates) in mass-normalized coordinates
+  // What the approximation discards: the off-diagonal part of V D Vᵀ, reported relative to ‖D‖ so the caller can bound it.
+  let discarded = 0, dNorm = 0; for (let r = 0; r < n; r++) for (let s2 = 0; s2 < n; s2++) { let d = 0; for (let k = 0; k < n; k++) d += vectors[r][k] * partialRates[k] * vectors[s2][k]; if (r !== s2) discarded += d * d; } for (const g of partialRates) dNorm += g * g;
+  const dampingResidual = dNorm > 0 ? Math.sqrt(discarded) / Math.sqrt(dNorm) : 0;
+  lambda.forEach((l, r) => { if (!Number.isFinite(l)) throw new RangeError('eigenvalues are not finite.'); if (l <= gammas[r] * gammas[r]) throw new Error(`mode ${r} is not underdamped: λ ${l} ≤ γ² ${gammas[r] * gammas[r]}.`); });
+  const omegaD = lambda.map((l, r) => Math.sqrt(l - gammas[r] * gammas[r]));
+  const participationByBody = vectors.map(v => bodies.map((_, a) => { let s = 0; for (let j = 0; j < sizes[a]; j++) s += v[offsets[a] + j] ** 2; return s; }));
+  const system = { n, bodies: bodies.length, sizes, offsets, m, K, A, lambda, omegaD, gammas, vectors, normalFreqsHz: omegaD.map(w => w / (2 * Math.PI)), participationByBody, eigen: { residual, orthogonality }, dampingResidual,
+    damping: 'classical-damping approximation: each coupled normal mode decays at the participation-weighted mean of its partials\' decay rates; the undamped eigenproblem is exact' };
+  /** Closed-form response to a strike of impulse J at position s on body a (bodies at rest). */
+  system.strike = (a, s, J = 1) => {
+    if (!Number.isInteger(a) || a < 0 || a >= bodies.length) throw new Error('strike body out of range.'); finite(s, 's'); finite(J, 'J');
+    const w = shapeAt(a, s), ydot0 = new Array(n).fill(0);
+    for (let j = 0; j < sizes[a]; j++) ydot0[offsets[a] + j] = (J * w[j] / bodies[a].mass) * Math.sqrt(bodies[a].mass);   // ẏ = √m · q̇
+    const qdot0 = vectors.map(v => v.reduce((sum, vi, k) => sum + vi * ydot0[k], 0)), coeff = qdot0.map((qd, r) => qd / omegaD[r]);
+    const combine = fn => t => { if (t < 0) return new Array(n).fill(0); const y = new Array(n).fill(0); for (let r = 0; r < n; r++) { const qr = fn(r, t); for (let k = 0; k < n; k++) y[k] += qr * vectors[r][k]; } return y.map((yk, k) => yk / Math.sqrt(m[k])); };
+    const q = combine((r, t) => coeff[r] * Math.exp(-gammas[r] * t) * Math.sin(omegaD[r] * t));
+    const qdot = combine((r, t) => coeff[r] * Math.exp(-gammas[r] * t) * (omegaD[r] * Math.cos(omegaD[r] * t) - gammas[r] * Math.sin(omegaD[r] * t)));
+    const qdot0Coordinates = ydot0.map((yd, k) => yd / Math.sqrt(m[k]));                     // initial velocity in physical coordinates
+    /** Displacement and velocity of body b at pickup position p: w_b(p) = Σ_j φ_bj(p) q_bj(t). */
+    const displacement = (b, p, t) => { const qt = q(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
+    const velocity = (b, p, t) => { const qt = qdot(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
+    /** Body b's pickup at p as signed additive modes at the normal frequencies: amplitude_r = Σ_j φ_bj(p) coeff_r v_r[(b,j)] / √m_b. */
+    const bodyModes = (b, p) => { const wb = shapeAt(b, p); return coeff.map((c, r) => ({ frequency: omegaD[r] / (2 * Math.PI), amplitude: c * wb.reduce((s, wj, j) => s + wj * vectors[r][offsets[b] + j], 0) / Math.sqrt(bodies[b].mass), decay: gammas[r] > 0 ? 1 / gammas[r] : Infinity })); };
+    return { q, qdot, qdot0Coordinates, displacement, velocity, bodyModes, coeff, qdot0 };
+  };
+  return system;
+}

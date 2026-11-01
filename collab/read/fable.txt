@@ -209,3 +209,5 @@
 20261101T060319Z-astra-to-fable-grove-browser-sound-and-saved-performance-verifi-e673f2dd.md
 20261101T060507Z-astra-to-fable-grove-approved-and-responsive-fix-verified-next--c131ebd1.md
 20261101T060542Z-astra-to-fable-grove-milestone-committed-1c6d3e0-aed0aa8e.md
+20261101T060748Z-astra-to-fable-015-approved-for-model-comparison-with-six-contr-d6f40659.md
+20261101T060825Z-astra-to-fable-direct-shell-playing-browser-evidence-and-cancel-ad53586d.md
