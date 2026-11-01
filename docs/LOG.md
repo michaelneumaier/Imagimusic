@@ -185,3 +185,4 @@
 - 2026-11-01 astra: guide UI committed (080ee96), exploration model approved; proposal 018 accepted with explicit target and truthful drops. Fable: transposeRestRecord reports kept/total/complete and names the all-dropped case; proposal and roadmap M9 updated.
 - 2026-11-01 astra: guide UI committed 080ee96 (card above the pads). Fable: final lifecycle reviewed, approve.
 - 2026-11-01 astra: alternate-grove comparison core (explicit target, source re-admitted, transposition result verbatim, unavailable when no strike survives, one worker). Fable review approve.
+- 2026-11-01 astra: comparison session (preparation owner with generations, cancel, clear, dispose). Fable review approve; transposeRestRecord now re-admits the source and requires an identical gesture vocabulary (Astra's should-fix).

@@ -307,8 +307,12 @@ export function createRestExploration(recipe, { body = 0 } = {}) {
  *  The target is the caller's explicit choice (never chosen here); `complete` is false whenever anything was dropped, and the page must
  *  not call an incomplete transposition the same passage. */
 export function transposeRestRecord(record, source, target) {
-  validateRestRecord(record, source);
-  if (target.sampleRate !== source.sampleRate || target.bodies !== source.bodies || target.positions.length !== source.positions.length || target.zones.length !== source.zones.length || target.strengths.length !== source.strengths.length) throw new Error('target recipe must match the source in rate, bodies, positions, zones and strengths.');
+  // The source must be a passage that could have been played: structurally valid and admissible; the transposition is only as honest as its source.
+  validateRestAdmission(record, source);
+  // The gesture vocabulary must be identical, not merely the same size: the same strike coordinates, the same rest coordinates, the same
+  // strength names with the same coefficients, the same rate and body count. Otherwise "every gesture carried over" would be false.
+  if (target.sampleRate !== source.sampleRate || target.bodies !== source.bodies) throw new Error('target recipe must match the source in sample rate and body count.');
+  if (stable(target.positions) !== stable(source.positions) || stable(target.zones) !== stable(source.zones) || stable(target.strengths) !== stable(source.strengths) || stable(target.voice) !== stable(source.voice)) throw new Error('target recipe must use the same strike positions, rest zones, strength names and coefficients and voice config as the source; no remapping is defined.');
   const engine = createRestEngine(target), kept = [], dropped = [];
   const keyAt = i => contactStateKey(Array.from({ length: target.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
   let frame = 0;

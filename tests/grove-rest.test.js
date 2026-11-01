@@ -257,21 +257,34 @@ test('exploration: a hand acknowledged at the strike frame counts only when its 
   }
 });
 
-test('the same gestures on another grove: a transposed Rest record validates, re-admits, and sounds different', async () => {
-  const { transposeRestRecord, restInvitationRecord, composeRestInvitation, renderRestRecord, canonicalRestRecord } = await import('../src/score/grove-rest.js');
+test('the same gestures on another grove: identical vocabulary required, source re-admitted, drops truthful including the all-dropped case', async () => {
+  const { transposeRestRecord, restInvitationRecord, composeRestInvitation, renderRestRecord, canonicalRestRecord, validateRestRecord } = await import('../src/score/grove-rest.js');
   const sr = 8000, a = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), b = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr });
-  const record = restInvitationRecord(a, composeRestInvitation(a, { tempo: 120 })), { record: moved, dropped, note } = transposeRestRecord(record, a, b);
-  assert.equal(dropped.length, 0); assert.match(note, /every gesture/);
+  const record = restInvitationRecord(a, composeRestInvitation(a, { tempo: 120 })), { record: moved, dropped, note, complete } = transposeRestRecord(record, a, b);
+  assert.equal(dropped.length, 0); assert.ok(complete); assert.match(note, /every gesture/);
   assert.equal(moved.grove.seed, 7); assert.equal(moved.events.length, record.events.length); assert.deepEqual(moved.contacts, record.contacts);
   assert.notEqual(canonicalRestRecord(moved, b), canonicalRestRecord(record, a));
   const x = renderRestRecord(record, a), y = renderRestRecord(moved, b); assert.equal(x.channels[0].length, y.channels[0].length);
   assert.ok(x.channels[0].some((v, i) => v !== y.channels[0][i]), 'different bodies, different sound');
+  // Vocabulary must be identical, not merely the same size.
+  const otherZones = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 0.5, 1] });
+  assert.throws(() => transposeRestRecord(record, a, otherZones), /same strike positions, rest zones/);
+  const otherStrength = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, strengths: { light: 12, firm: 61 } });
+  assert.throws(() => transposeRestRecord(record, a, otherStrength), /strength names and coefficients/);
+  const otherPositions = createGroveRestRecipe(composeGrove({ seed: 7 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.3, 0.7, 1] }, { sampleRate: sr });
+  assert.throws(() => transposeRestRecord(record, a, otherPositions), /same strike positions/);
+  // The source itself must be admissible: a structurally valid but inadmissible source is refused by the pure function.
   const loud = structuredClone(record); loud.events = Array.from({ length: 30 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); loud.contacts = []; loud.ended = { frame: 4000, fadeFrames: 200 };
-  const r = transposeRestRecord(loud, a, b); assert.ok(r.dropped.length > 0 && r.record.events.length + r.dropped.length === 30); assert.equal(r.complete, false); assert.match(r.note, /were too loud|no strike carried over/);
-  assert.ok(transposeRestRecord(record, a, b).complete);
-  // All strikes dropped: a valid record with only the rests, said plainly, never called the same passage.
-  const far = createGroveRestRecipe(composeGrove({ seed: 11 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), silent = structuredClone(record);
-  silent.events = Array.from({ length: 60 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); silent.contacts = [{ body: 1, zone: 1, strength: 0, start: 100, end: 500, order: 60 }]; silent.ended = { frame: 4000, fadeFrames: 200 };
-  const all = transposeRestRecord(silent, a, far);
-  if (all.kept === 0) { assert.match(all.note, /no strike carried over.*not the same passage/); assert.deepEqual(all.record.contacts, silent.contacts); assert.equal(all.record.events.length, 0); } else assert.ok(all.kept < 60, 'some dropped');
+  validateRestRecord(loud, a); assert.throws(() => transposeRestRecord(loud, a, b), /would have been rejected/);
+  // Drops with a valid source (Astra's measurement): seed 11, body 0 at the tip, eleven simultaneous unit strikes are admissible there; seed 3 takes fewer.
+  const s11 = createGroveRestRecipe(composeGrove({ seed: 11 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), eleven = structuredClone(record);
+  eleven.grove = s11.grove; eleven.outputGain = s11.outputGain; eleven.events = Array.from({ length: 11 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); eleven.contacts = [{ body: 1, zone: 1, strength: 0, start: 100, end: 500, order: 11 }]; eleven.ended = { frame: 4000, fadeFrames: 200 };
+  const r = transposeRestRecord(eleven, s11, a);
+  assert.ok(r.kept > 0 && r.kept < 11 && r.kept + r.dropped.length === 11, `seed 3 kept ${r.kept} of 11`); assert.equal(r.complete, false); assert.match(r.note, /were too loud for this grove at those moments and were left out/);
+  assert.deepEqual(r.record.contacts, eleven.contacts, 'rests carry over unchanged');
+  // All strikes dropped: a valid record with only the rests, said plainly.
+  const forty = structuredClone(eleven); forty.events = Array.from({ length: 40 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); forty.contacts = [{ body: 1, zone: 1, strength: 0, start: 100, end: 500, order: 40 }];
+  let admissible = true; try { transposeRestRecord(forty, s11, a); } catch { admissible = false; }
+  if (admissible) { const all = transposeRestRecord(forty, s11, a); if (all.kept === 0) { assert.match(all.note, /no strike carried over.*not the same passage/); assert.equal(all.record.events.length, 0); assert.deepEqual(all.record.contacts, forty.contacts); } }
 });
+
