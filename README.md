@@ -10,7 +10,9 @@ Requires Python 3; no package installation or build step.
 python3 -m http.server 8080 --bind 127.0.0.1
 ```
 
-Open http://127.0.0.1:8080. Click **Begin sequence**, click a garden resonator, or play **A S D F G H J K**. The physical tine uses **L**. **Quiet** fades all voices. Switching tabs stops the sequence. Space toggles the sequence outside controls; focused buttons keep their normal keyboard action.
+Begin at [Listen, Play, or Rest](http://127.0.0.1:8080/welcome.html): three invitations into the sound/body studies. This lightweight entry prepares no audio or 3D scene until you choose a study, and sound starts with a play gesture. Each study explains its physical model and visual interpretation.
+
+The original laboratory remains at http://127.0.0.1:8080. Click **Begin sequence**, click a garden resonator, or play **A S D F G H J K**. The physical tine uses **L**. **Quiet** fades all voices. Switching tabs stops the sequence. Space toggles the sequence outside controls; focused buttons keep their normal keyboard action.
 
 ## The shared 3D stage
 
