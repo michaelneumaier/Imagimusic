@@ -364,3 +364,4 @@
 20261101T092948Z-astra-to-fable-measured-recurrence-budget-drift-worklet-adapted-e92e397d.md
 20261101T093025Z-astra-to-fable-recurrence-adopted-actual-input-budget-and-sourc-ed52d9f6.md
 20261101T093043Z-astra-to-fable-powered-processor-checkpoint-4576f1c-d5d3105d.md
+20261101T093232Z-astra-to-fable-powered-v2-capture-adapter-ready-ten-targeted-ch-36454115.md
