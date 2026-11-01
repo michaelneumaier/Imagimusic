@@ -12,7 +12,8 @@ import { voiceSystem } from './grove-voice.js';
 import { forcedStepper } from '../coupling.js';
 import { createGroveRestRecipe, recipeForRecord, validateRestRecord, REST_RECORD_KIND, REST_RECORD_VERSION } from './grove-rest.js';
 import { REST_MAX_SECONDS, REST_QUIET_FADE_SECONDS } from '../rest/limits.js';
-import { POWERED_RECIPE_VERSION, createPoweredEngine, renderPoweredPassage, poweredForceAt, contactStateKey } from '../rest/powered-engine.js';
+import { POWERED_RECIPE_VERSION, createPoweredEngine, renderPoweredPassage, poweredForceAt, forceRotation, createForceSequence, contactStateKey } from '../rest/powered-engine.js';
+import { visualFromState } from '../rest/engine.js';
 export const POWERED_RECORD_KIND = 'imagimusic-grove-powered', POWERED_RECORD_VERSION = 1, POWERED_CEILING_SHARE = 0.5;
 
 /** Add the declared force direction and per-state Γ to a Rest recipe (one augmented exponential per contact state, off the audio thread). */
@@ -32,7 +33,8 @@ export function createPoweredRecipe(recipe, { body = 0, position = 1 } = {}) {
 /** The largest amplitude the declared driver may have: its full budget at (1 − share) of the ceiling, from the exact held-force integral. */
 export function poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames }) {
   const sr = recipe.sampleRate; let integral = 0; for (let n = 0; n < forcedFrames; n++) integral += Math.abs(Math.sin(2 * Math.PI * frequencyHz * n / sr)) / sr;
-  if (!(integral > 0)) throw new Error('the driver integrates to zero.');
+  // A drive whose declared samples are all zero (for example forcedFrames = 1, where f₀ = sin 0 = 0) injects nothing, so any amplitude is within budget.
+  if (!(integral > 0)) return Infinity;
   return (1 - POWERED_CEILING_SHARE) * recipe.admissionCeiling / (recipe.outputGain * recipe.driver.energyFactorMax * recipe.driver.directionNorm * integral);
 }
 
@@ -43,7 +45,10 @@ export function validatePoweredRecord(record, recipe) {
   const { driver, ...rest } = record, restRecord = { ...rest, kind: REST_RECORD_KIND, version: REST_RECORD_VERSION };
   validateRestRecord(restRecord, recipe);   // schema, canonical grove/voice/zones/strengths, chronology, contacts, Quiet closure, bounds
   if (!driver || typeof driver !== 'object') throw new Error('driver is required.');
-  const keys = Object.keys(driver).sort().join(); if (keys !== 'amplitude,body,forcedFrames,frequencyHz,position,startFrame') throw new Error('driver must have exactly amplitude, body, forcedFrames, frequencyHz, position, startFrame.');
+  const keys = Object.keys(driver).sort().join(); if (keys !== 'amplitude,body,forcedFrames,frequencyHz,position,rotation,startFrame') throw new Error('driver must have exactly amplitude, body, forcedFrames, frequencyHz, position, rotation, startFrame.');
+  // The declared input is the recurrence from the stored rotation constants (bit-exact in every runtime); they must agree with the frequency to 1e-12.
+  const rot = forceRotation(driver.frequencyHz, recipe.sampleRate);
+  if (!driver.rotation || typeof driver.rotation !== 'object' || Object.keys(driver.rotation).sort().join() !== 'cos,sin' || !Number.isFinite(driver.rotation.cos) || !Number.isFinite(driver.rotation.sin) || Math.abs(driver.rotation.cos - rot.cos) > 1e-12 || Math.abs(driver.rotation.sin - rot.sin) > 1e-12) throw new Error('driver.rotation must be { cos, sin } of 2π·frequencyHz/sampleRate (stored, so every runtime renders the same declared force).');
   if (driver.body !== recipe.driver.body || driver.position !== recipe.driver.position) throw new Error('driver body and position must match the powered recipe.');
   const sr = recipe.sampleRate, limit = REST_MAX_SECONDS * sr;
   if (!Number.isFinite(driver.frequencyHz) || driver.frequencyHz <= 0 || driver.frequencyHz >= sr / 2) throw new Error('driver frequency must be positive and below Nyquist.');
@@ -95,9 +100,31 @@ export function poweredRecipeForRecord(record) {
 /** The bounded first encounter as a record: the declared driver (2 s on, 3 s release), the player's c = 1 contacts at u = 0.3 or u = 1 on the driven body, then Quiet. */
 export function composeEncounterRecord(recipe, { contacts = [], frequencyHz = recipe.grove.bodies[recipe.driver.body].hz, forceSeconds = 2, ringSeconds = 3, startFrame = 0 } = {}) {
   const sr = recipe.sampleRate, forcedFrames = Math.round(forceSeconds * sr), amplitude = poweredAmplitudeLimit(recipe, { frequencyHz, forcedFrames });
+  if (!Number.isFinite(amplitude)) throw new Error('the planned drive integrates to zero; choose a longer forceSeconds.');
   const ended = { frame: startFrame + forcedFrames + Math.round(ringSeconds * sr), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
   const record = { version: POWERED_RECORD_VERSION, kind: POWERED_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(st => ({ name: st.name, c: st.c })),
-    driver: { body: recipe.driver.body, position: recipe.driver.position, frequencyHz, amplitude, startFrame, forcedFrames }, events: [], contacts: contacts.map((c, i) => ({ ...c, order: i })), ended };
+    driver: { body: recipe.driver.body, position: recipe.driver.position, frequencyHz, amplitude, startFrame, forcedFrames, rotation: forceRotation(frequencyHz, sr) }, events: [], contacts: contacts.map((c, i) => ({ ...c, order: i })), ended };
   return validatePoweredRecord(record, recipe);
 }
-export { createGroveRestRecipe, poweredForceAt };
+export { createGroveRestRecipe, poweredForceAt, forceRotation, createForceSequence };
+
+/** Every picture frame of a powered record at a fixed rate in one sequential pass through the powered engine (the force shapes the state), with
+ *  the exact terminal frame appended; the same fields as the Rest picture plus `driverActive` for the frame's interval. */
+export function poweredRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
+  if (!Number.isInteger(fps) || fps < 1 || fps > 240) throw new Error('fps must be an integer in 1..240.');
+  validatePoweredAdmission(record, recipe);
+  const sr = recipe.sampleRate, frames = poweredRecordLength(record, recipe), engine = createPoweredEngine(recipe), out = [], d = record.driver, force = createForceSequence(d);
+  const byFrame = new Map(); for (const k of record.events) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
+  const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  const snapshot = (frame, time) => { const v = visualFromState(recipe, engine.state, keyAt(frame)); const fade = record.ended ? Math.max(0, Math.min(1, 1 - (frame - record.ended.frame) / record.ended.fadeFrames)) : 1;
+    return { time, envelope: v.envelope.map(x => x * fade), lowBand: true, contacts: v.contacts, driverActive: frame >= d.startFrame && frame < d.startFrame + d.forcedFrames, strikes: fade ? record.events.filter(e => frame >= e.frame && frame < e.frame + 0.3 * sr).map(e => ({ ...e, strikeU: recipe.positions[e.position], age: (frame - e.frame) / sr })) : [] }; };
+  const count = Math.ceil(frames / sr * fps); let next = 0;
+  for (let i = 0; i <= frames; i++) {
+    while (next < count && Math.min(frames, Math.floor(next / fps * sr)) === i) { out.push(snapshot(i, next / fps)); next++; }
+    if (i === frames) break;
+    const due = byFrame.get(i); if (due) for (const k of due) engine.strike(k.position, k.body, k.velocity);
+    engine.setContacts(keyAt(i)); engine.step(force.next());
+  }
+  out.push(snapshot(frames, frames / sr));
+  return { fps, duration: frames / sr, frames: out };
+}

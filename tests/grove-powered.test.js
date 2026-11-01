@@ -5,7 +5,7 @@ import { DEFAULT_VOICE_CONFIG } from '../src/score/grove-voice.js';
 import { createGroveRestRecipe, renderRestRecord, restInvitationRecord, composeRestInvitation } from '../src/score/grove-rest.js';
 import { composeForcedStudy, renderForcedStudy } from '../src/score/forced-study.js';
 import { createPoweredRecipe, composeEncounterRecord, renderPoweredRecord, validatePoweredRecord, validatePoweredAdmission, poweredRecipeForRecord, canonicalPoweredRecord, POWERED_RECORD_KIND } from '../src/score/grove-powered.js';
-import { createPoweredEngine, poweredForceAt, contactStateKey } from '../src/rest/powered-engine.js';
+import { createPoweredEngine, poweredForceAt, createForceSequence, forceRotation, contactStateKey } from '../src/rest/powered-engine.js';
 
 test('powered engine parity: constant contacts equal the audited forced study; zero force equals the Rest route; switches are continuous and within budget', () => {
   const sr = 8000;
@@ -26,14 +26,14 @@ test('powered engine parity: constant contacts equal the audited forced study; z
     // (b) Zero amplitude with strikes and contacts equals the Rest route (the invitation needs the default three zones and strengths).
     const full = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), fullPowered = createPoweredRecipe(full);
     const inv = restInvitationRecord(full, composeRestInvitation(full, { tempo: 120 }));
-    const powered = { ...inv, kind: POWERED_RECORD_KIND, version: 1, driver: { body: 0, position: 1, frequencyHz: full.grove.bodies[0].hz, amplitude: 0, startFrame: 0, forcedFrames: 1 } };
+    const powered = { ...inv, kind: POWERED_RECORD_KIND, version: 1, driver: { body: 0, position: 1, frequencyHz: full.grove.bodies[0].hz, amplitude: 0, startFrame: 0, forcedFrames: 1, rotation: forceRotation(full.grove.bodies[0].hz, sr) } };
     const a = renderPoweredRecord(powered, fullPowered), b = renderRestRecord(inv, full); let worst = 0, peak = 0;
     for (let i = 0; i < a.channels[0].length; i++) { worst = Math.max(worst, Math.abs(a.channels[0][i] - b.channels[0][i])); peak = Math.max(peak, Math.abs(b.channels[0][i])); }
     assert.ok(worst / peak < 1e-7, `${seed}: zero force equals the Rest route (${worst / peak})`);
     // (c) A contact switch during the drive: continuous state, no reset, budget holds at every sample.
     const e = createPoweredEngine(recipe), d = rec.driver, norm = recipe.driver.directionNorm; let integral = 0; const sw = Math.floor(0.4 * sr), key1 = contactStateKey([{ zone: 0, strength: 0 }, null, null]);
-    let before = null, after = null;
-    for (let i = 0; i < 1.2 * sr; i++) { if (i === sw) { before = e.state; e.setContacts(key1); after = e.state; } const f = poweredForceAt(d, sr, i); e.step(f); integral += Math.abs(f) / sr; assert.ok(Math.sqrt(2 * e.energy()) <= norm * integral + 1e-12, `budget at ${i}`); }
+    let before = null, after = null; const seq = createForceSequence(d);
+    for (let i = 0; i < 1.2 * sr; i++) { if (i === sw) { before = e.state; e.setContacts(key1); after = e.state; } const f = seq.next(); e.step(f); integral += Math.abs(f) / sr; assert.ok(Math.sqrt(2 * e.energy()) <= norm * integral + 1e-12, `budget at ${i}`); }
     assert.ok(before.every((v, k) => v === after[k]), 'switching contacts leaves the state untouched');
   }
 });
@@ -67,4 +67,38 @@ test('early Quiet truncates the force at the applied frame, contacts end there, 
   const empty = { ...planned, driver: { ...planned.driver, forcedFrames: 0 }, contacts: [], ended: { frame: 0, fadeFrames: planned.ended.fadeFrames } };
   validatePoweredRecord(empty, recipe); const silent = renderPoweredRecord(empty, recipe); assert.equal(silent.channels[0].length, planned.ended.fadeFrames); assert.ok(silent.channels[0].every(v => v === 0), 'no sample fabricated');
   assert.equal(planned.ended.frame, planned.driver.startFrame + planned.driver.forcedFrames + Math.round(3 * sr), 'natural ending is start + forced + ring; the fade is appended');
+});
+
+test('powered records rebuild in the verifier path and have a sequential picture that marks the driver interval', async () => {
+  const { rebuildGrovePcm } = await import('../tools/verify-grove-movie.mjs');
+  const { poweredRecordPictureFrames } = await import('../src/score/grove-powered.js');
+  const sr = 8000, base = createGroveRestRecipe(composeGrove({ seed: 11 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1 } }), recipe = createPoweredRecipe(base);
+  const rec = composeEncounterRecord(recipe, { contacts: [{ body: 0, zone: 1, strength: 0, start: 3000, end: 9000 }], forceSeconds: 1, ringSeconds: 1 });
+  const a = rebuildGrovePcm(JSON.parse(JSON.stringify(rec))), b = renderPoweredRecord(rec, recipe);
+  assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])), 'the verifier rebuild is the record renderer');
+  const pic = poweredRecordPictureFrames(rec, recipe, { fps: 30 });
+  assert.equal(pic.frames.length, Math.ceil(pic.duration * 30) + 1);
+  assert.ok(pic.frames[3].driverActive && !pic.frames.at(-1).driverActive, 'driver active early, released at the end');
+  assert.deepEqual(pic.frames[Math.round(0.5 * 30)].contacts, [{ zone: 1, strength: 0 }, null, null], 'the contact in force is reported');
+  assert.ok(pic.frames.at(-1).envelope.every(v => v === 0), 'terminal frame silent after the fade');
+  assert.ok(pic.frames.slice(1, 20).some(f => f.envelope[0] > 0), 'the driven shell moves under the driver');
+});
+
+test('the declared force sequence is a bit-exact recurrence that tracks the closed form; tampered rotation constants are rejected', () => {
+  const sr = 8000, base = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1 } }), recipe = createPoweredRecipe(base);
+  const rec = composeEncounterRecord(recipe), d = rec.driver, seq = createForceSequence(d); let worst = 0;
+  for (let i = 0; i < rec.ended.frame; i++) { const f = seq.next(), g = poweredForceAt(d, sr, i); worst = Math.max(worst, Math.abs(f - g)); }
+  assert.equal(createForceSequence(d).next(), 0, 'the first force sample is exactly zero (sin 0)');
+  assert.ok(worst < 1e-9 * d.amplitude, `recurrence vs closed form over the drive: ${worst / d.amplitude} of amplitude`);
+  assert.equal(seq.next(), 0, 'exactly zero after the drive');
+  const again = createForceSequence(d); const a = Array.from({ length: 100 }, () => again.next()), b = createForceSequence(d); assert.ok(a.every(v => v === b.next()), 'deterministic: identical sequences from the same declared constants');
+  const bad = structuredClone(rec); bad.driver.rotation.sin += 1e-9; assert.throws(() => validatePoweredRecord(bad, recipe), /rotation/);
+  const missing = structuredClone(rec); delete missing.driver.rotation; assert.throws(() => validatePoweredRecord(missing, recipe), /exactly/);
+});
+
+test('early Quiet at frame 1 with one forced frame: the only applied force is zero, the record is valid, and no sample is fabricated', () => {
+  const sr = 8000, base = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1 } }), recipe = createPoweredRecipe(base);
+  const planned = composeEncounterRecord(recipe), early = { ...planned, driver: { ...planned.driver, forcedFrames: 1 }, contacts: [], ended: { frame: 1, fadeFrames: planned.ended.fadeFrames } };
+  validatePoweredRecord(early, recipe);
+  const pcm = renderPoweredRecord(early, recipe); assert.equal(pcm.channels[0].length, 1 + early.ended.fadeFrames); assert.ok(pcm.channels.every(c => c.every(v => v === 0)), 'f0 = 0, so silence throughout');
 });

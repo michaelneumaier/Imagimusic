@@ -12,6 +12,7 @@ import {renderGroveBank} from '../src/grove/performance.js';
 import {renderVoiceBank} from '../src/grove/voice-performance.js';
 import {mixImpulseRecording} from '../src/touch/session.js';
 import {recipeForRecord, validateRestAdmission, renderRestRecord} from '../src/score/grove-rest.js';
+import {poweredRecipeForRecord, validatePoweredAdmission, renderPoweredRecord} from '../src/score/grove-powered.js';
 import {createGroveMoviePlan} from '../src/grove/movie-plan.js';
 import {stereoWav} from '../src/loom/model.js';
 
@@ -20,6 +21,11 @@ const floatBytes = channel => { const b = Buffer.alloc(channel.length * 4); for 
 
 /** Rebuild the soundtrack from a capture exactly as the page does: session → bank → mix. */
 export function rebuildGrovePcm(capture) {
+  if (capture.kind === 'imagimusic-grove-powered') {
+    // A powered record: the declared external force plus contacts, through the powered engine, from a recipe rebuilt from the record alone.
+    const recipe = poweredRecipeForRecord(capture); validatePoweredAdmission(capture, recipe);
+    return renderPoweredRecord(capture, recipe);
+  }
   if (capture.kind === 'imagimusic-grove-rest') {
     // A Rest record: the exact model through the shared engine, from a recipe prepared for the record's grove, voice and rate.
     const recipe = recipeForRecord(capture); validateRestAdmission(capture, recipe);

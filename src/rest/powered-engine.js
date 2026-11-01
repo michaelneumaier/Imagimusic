@@ -30,8 +30,22 @@ export function createPoweredEngine(recipe) {
   };
 }
 
-/** The declared force of an encounter at frame i: a sample-held sinusoid over [startFrame, startFrame + forcedFrames), else 0; phase from the encounter frame only. */
+/** The declared force of an encounter at frame i, closed form: a sample-held sinusoid over [startFrame, startFrame + forcedFrames), else 0; phase from the
+ *  encounter frame only. Math.sin is not bit-identical across JavaScript engines, so this is the reference definition for validation and random access;
+ *  the bit-exact declared sequence that every runtime must use for rendering is createForceSequence below. */
 export const poweredForceAt = (driver, sampleRate, i) => (i >= driver.startFrame && i < driver.startFrame + driver.forcedFrames ? driver.amplitude * Math.sin(2 * Math.PI * driver.frequencyHz * (i - driver.startFrame) / sampleRate) : 0);
+
+/** The rotation constants of a driver at a sample rate (computed once, at composition, and stored in the record as the declared input). */
+export const forceRotation = (frequencyHz, sampleRate) => ({ cos: Math.cos(2 * Math.PI * frequencyHz / sampleRate), sin: Math.sin(2 * Math.PI * frequencyHz / sampleRate) });
+
+/** Bit-exact declared force sequence: (c, s) ← (c·cos − s·sin, s·cos + c·sin) from (1, 0) using only IEEE double multiply and add (no fused
+ *  multiply-add in JavaScript), so every engine produces identical samples from the stored rotation constants. next() returns the force for the
+ *  coming interval; frames before startFrame and from startFrame + forcedFrames on are exactly 0. Sequential only. */
+export function createForceSequence(driver) {
+  const { cos, sin } = driver.rotation, start = driver.startFrame, end = driver.startFrame + driver.forcedFrames, A = driver.amplitude;
+  let i = 0, c = 1, s = 0;
+  return { get frame() { return i; }, next() { const inside = i >= start && i < end; let f = 0; if (inside) { f = A * s; const c2 = c * cos - s * sin, s2 = s * cos + c * sin; c = c2; s = s2; } i++; return f; } };
+}
 
 /** Offline rendering through the engine: strikes [{frame, position, body, velocity}], contacts [{body, zone, strength, start, end}], the driver, frames. */
 export function renderPoweredPassage(recipe, { strikes = [], contacts = [], driver, frames }) {
@@ -40,11 +54,12 @@ export function renderPoweredPassage(recipe, { strikes = [], contacts = [], driv
   const byFrame = new Map(); for (const k of strikes) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
   const edges = new Set(); for (const c of contacts) { edges.add(c.start); edges.add(c.end); }
   const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  const force = driver ? createForceSequence(driver) : null;
   for (let i = 0; i < frames; i++) {
     const due = byFrame.get(i); if (due) for (const k of due) engine.strike(k.position, k.body, k.velocity);
     if (i === 0 || edges.has(i)) engine.setContacts(keyAt(i));
     engine.read(sample); for (let ch = 0; ch < recipe.channels; ch++) out[ch][i] = sample[ch];
-    engine.step(driver ? poweredForceAt(driver, sr, i) : 0);
+    engine.step(force ? force.next() : 0);
   }
   return out;
 }
