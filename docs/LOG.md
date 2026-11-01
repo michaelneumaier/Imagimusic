@@ -24,3 +24,5 @@
 - 2026-11-01 fable: src/stage/render-audio.js (offline passage audio through the live graph, mirrored garden steals, planned choir steals/seeds) + 5 node tests + browser harness; suite 81/81.
 - 2026-11-01 astra: Mediabunny vendored; real MP4 export verified with ffprobe; inspector + export UI; Safari repeatability report (full passage 2.3e-5 drift, choir-only identical).
 - 2026-11-01 fable: trace manifest; decision 003 (export dependency); render-audio diagnostic options (families, compressor bypass, keepNodes default offline) + repeatability matrix harness; explainBinding resolves projected fields; export/inspector review.
+- 2026-11-01 astra: lab 2D canvases migrated to StateFrame via src/snapshots.js (slice A, in review).
+- 2026-11-01 fable: lab migration review (approve); proposal 005 wording corrected (envelope dips); slice A marked review.

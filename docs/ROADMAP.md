@@ -65,7 +65,7 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 ## M2.5: One stage, one state bus (status: in-progress; agreed in collab/decisions/002-shared-stage.md; slice A owner Fable, slices B/C Astra + Fable)
 
-- [ ] Slice A: `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable, done); the lab's 2D canvases still draw from engine objects and must be rewired to the bus before A is complete (Astra)
+- [ ] Slice A (status: review 2026-11-01): `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); lab 2D canvases rewired to collectState frames via `src/snapshots.js` with energy-parity and finite-coordinate tests (Astra, in working tree; Fable review collab/reviews/20261101T0057Z-fable-reviews-lab-migration.md). Done when committed and smoke-checked in Safari.
 - [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
   - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
