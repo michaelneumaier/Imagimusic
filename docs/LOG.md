@@ -210,3 +210,4 @@
 - 2026-11-01 astra: forced-study auditor, presenter and plotter. Fable review approve.
 - 2026-11-01 astra: powered-body study audited and presented (936563c). Fable: logged as an evaluation artifact; contact-strength sweep next.
 - 2026-11-01 fable: contact strength and place sweep under the driver (collab/notes/fable-contact-sweep.md): strength at the tip is a level control with no plateau (about 5.7 dB per doubling); place shapes more than strength (upper zone within 1–4 dB of free with a changed release); a hand on the neighbour preserves the response and changes what remains; validateRestRecord now bounds ended.frame and fadeFrames (Astra's gap).
+- 2026-11-01 astra: saved-passage reader (bounded intake before the matrix bank, exact rebuild in a worker, previous passage survives failure, no auto playback). Fable review approve.
