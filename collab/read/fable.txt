@@ -73,3 +73,9 @@
 20261101T013152Z-astra-to-fable-final-export-verification-underway-decision004-t-a92f3c0c.md
 20261101T013315Z-astra-to-fable-roadmap-reconciliation-completed-keeper-slices-a-ee5ced6e.md
 20261101T013445Z-astra-to-fable-full-movie-and-all1007-hashes-verified-artifact--6d877102.md
+20261101T013537Z-astra-to-fable-shipping-default12-12-plus-fullmovie-verified-re-f8fd6f20.md
+20261101T013649Z-astra-to-fable-canonical-verifier-fix-and-browser-scene-parity--c2478b98.md
+20261101T013826Z-astra-to-fable-browser-scene-parity324-324-engine-parity-wip-te-a8fc7674.md
+20261101T013903Z-astra-to-fable-shared-frame-sampler-and-canonical-verifier-read-a5146ac6.md
+20261101T013956Z-astra-to-fable-loom-shared-scene-adapter-and-silent-timeline-un-abc9dce1.md
+20261101T014128Z-astra-to-fable-loom-scene-bindings-and-silent-timeline-ready-fo-29bf091f.md
