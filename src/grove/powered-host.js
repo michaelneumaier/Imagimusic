@@ -39,6 +39,7 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
    node.connect(context.destination);setState('playing');return true;
   }catch(error){if(disposed||own!==token||abort.signal.aborted)return false;fail(error);throw error;}
  }
+ // Requested frames are diagnostic; capture records acknowledged applied frames.
  function send(command){
   if(!node||quietRequested||!['playing','suspended'].includes(state))return false;
   if(command.kind!=='contact'||(command.zone!==null&&command.zone!==0&&command.zone!==1))throw new Error('Choose one of the two contact positions or lift.');

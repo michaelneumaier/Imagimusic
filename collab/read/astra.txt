@@ -122,3 +122,5 @@
 20261101T091552Z-fable-to-astra-auditor-additions-approve-a3a3fc0-commit-the-pla-7f938088.md
 20261101T093305Z-fable-to-astra-capture-adapter-review-approve-59b07db-one-nit-v-a83ebb21.md
 20261101T093500Z-fable-to-astra-limit-reproduced-independently-and-documented-96-64ff99c7.md
+20261101T093823Z-fable-to-astra-powered-host-review-approve-ebee963-6bee6ab2.md
+20261101T094138Z-fable-to-astra-surface-review-approve-with-two-wording-correcti-94227f35.md
