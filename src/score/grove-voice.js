@@ -90,3 +90,73 @@ export function groveVoiceEnvelope(voice, strikes, t) {
   }
   return re.map((x, i) => Math.hypot(x, im[i]));
 }
+
+// ---- a position-aware greeting for the richer voice (proposal 015, "teach positional contrast by listening") ----
+// Shape: one body, three places (upper → middle → bridge tip, each heard twice so the ear can compare) → the neighbor answers at the
+// bridge tip and the first body replies at the same place (one color across the bridge) → the third body enters at the upper
+// position (the other color, late) → one shared middle touch → silence. No words are needed: the contrast is the lesson.
+import { groveNeighbors, groveRingSeconds as ringOf } from './grove.js';
+export const VOICE_GREETING_BOUNDS = Object.freeze({ minSeconds: 15, maxSeconds: 35 });
+const VOICE_ROLES = Object.freeze({ place: 0.6, answer: 0.55, reply: 0.5, late: 0.5, shared: 0.6 });
+
+/** Compose the greeting for a grove under a voice configuration (positions are indices into config.positions; needs ≥ 3 positions). */
+export function composeGroveVoiceGreeting(grove, config = DEFAULT_VOICE_CONFIG, { tempo = 84, lead = 0.35 } = {}) {
+  const voice = createGroveVoice(grove, config), g = voice.grove;
+  if (voice.positions.length < 3) throw new Error('the position-aware greeting needs at least three strike positions.');
+  const upper = 0, middle = 1, tip = voice.positions.length - 1, { neighbor, third } = groveNeighbors(g);
+  const s = (id, beat, body, position, role) => ({ id, beat, body, position, velocity: VOICE_ROLES[role], role });
+  const strikes = [
+    // Places [0, 9): the same body, each place twice.
+    s('places:1', 0, 0, upper, 'place'), s('places:2', 1.5, 0, upper, 'place'), s('places:3', 3, 0, middle, 'place'), s('places:4', 4.5, 0, middle, 'place'), s('places:5', 6, 0, tip, 'place'), s('places:6', 7.5, 0, tip, 'place'),
+    // Answer [9, 15): the neighbor answers at the bridge tip; the first body replies at the same place.
+    s('answer:1', 10.5, neighbor, tip, 'answer'), s('answer:2', 12, 0, tip, 'reply'), s('answer:3', 13.5, neighbor, tip, 'answer'),
+    // Late [15, 20): the third body arrives at the upper place, the other color; a reply at the middle.
+    s('late:1', 16.5, third, upper, 'late'), s('late:2', 18, 0, middle, 'reply'), s('late:3', 19, third, upper, 'late'),
+    // Shared [20, 21): all three at the middle. Silence after.
+    s('shared:1', 20, 0, middle, 'shared'), s('shared:2', 20, neighbor, middle, 'shared'), s('shared:3', 20, third, middle, 'shared'),
+  ];
+  const ringBeats = Math.ceil(ringOf(g) * tempo / 60);
+  return validateGroveVoiceGreeting({ version: 1, seed: g.seed, voice: JSON.parse(canonicalVoiceConfig(voice.config)), tempo, lead, neighbor, third,
+    sections: [{ id: 'places', beats: [0, 9] }, { id: 'answer', beats: [9, 15] }, { id: 'late', beats: [15, 20] }, { id: 'shared', beats: [20, 21] }, { id: 'silence', beats: [21, 21 + ringBeats] }], strikes }, grove);
+}
+export const voiceGreetingBeatSeconds = (greeting, beat) => greeting.lead + beat * 60 / greeting.tempo;
+export const voiceGreetingDuration = (greeting, grove) => voiceGreetingBeatSeconds(greeting, Math.max(...greeting.strikes.map(k => k.beat))) + ringOf(JSON.parse(canonicalGrove(grove)));
+/** The runtime's sequence: [{ time, body, position, velocity }] with position as an index into the voice positions. */
+export const voiceGreetingStrikes = greeting => greeting.strikes.map(k => ({ time: voiceGreetingBeatSeconds(greeting, k.beat), body: k.body, position: k.position, velocity: k.velocity }));
+
+/** The promise, checked: the places section uses body 0 only and visits every position in ascending order before any other body sounds;
+ *  the neighbor answers before the third body; the shared touch strikes all three; nothing in the silence; 15–35 s. */
+export function validateGroveVoiceGreeting(greeting, grove) {
+  const g = JSON.parse(canonicalGrove(grove));
+  keysExactly(greeting, ['version', 'seed', 'voice', 'tempo', 'lead', 'neighbor', 'third', 'sections', 'strikes'], 'GroveVoiceGreeting');
+  if (greeting.version !== 1 || greeting.seed !== g.seed) throw new Error('greeting must belong to this grove.');
+  const config = validateVoiceConfig(greeting.voice);
+  if (!Number.isInteger(greeting.tempo) || greeting.tempo < 40 || greeting.tempo > 160) throw new Error('tempo must be an integer in 40..160.');
+  finite(greeting.lead, 'lead'); if (greeting.lead < 0 || greeting.lead > 5) throw new Error('lead must be within 0..5 s.');
+  const { neighbor, third } = groveNeighbors(g);
+  if (greeting.neighbor !== neighbor || greeting.third !== third) throw new Error('neighbor and third must follow the grove\'s bridges.');
+  let cursor = 0; const ids = ['places', 'answer', 'late', 'shared', 'silence'];
+  if (!Array.isArray(greeting.sections) || greeting.sections.map(s => s.id).join() !== ids.join()) throw new Error('sections must be places, answer, late, shared, silence.');
+  for (const s of greeting.sections) { keysExactly(s, ['id', 'beats'], `section ${s.id}`); if (!Array.isArray(s.beats) || s.beats.length !== 2 || s.beats[0] !== cursor || !(finite(s.beats[1], 'end') > cursor)) throw new Error(`section ${s.id}: beats must be exactly [start, end), contiguous.`); cursor = s.beats[1]; }
+  const section = beat => greeting.sections.find(s => beat >= s.beats[0] && beat < s.beats[1]);
+  const seen = new Set(); let last = -Infinity; const placesVisited = [];
+  for (const k of greeting.strikes) {
+    keysExactly(k, ['id', 'beat', 'body', 'position', 'velocity', 'role'], `strike ${k.id}`);
+    if (typeof k.id !== 'string' || seen.has(k.id)) throw new Error('strike ids must be unique strings.'); seen.add(k.id);
+    if (!(finite(k.beat, 'beat') >= 0) || k.beat < last) throw new Error('strikes must be sorted by beat.'); last = k.beat;
+    if (!Number.isInteger(k.body) || k.body < 0 || k.body >= g.bodies.length) throw new Error('body out of range.');
+    if (!Number.isInteger(k.position) || k.position < 0 || k.position >= config.positions.length) throw new Error('position must index the voice positions.');
+    if (!(finite(k.velocity, 'velocity') > 0 && k.velocity <= 1) || !Object.hasOwn(VOICE_ROLES, k.role)) throw new Error('velocity in (0, 1] and a known role.');
+    const sec = section(k.beat); if (!sec) throw new Error(`strike ${k.id} outside the sections.`);
+    if (sec.id === 'places') { if (k.body !== 0) throw new Error('the places section touches body 0 only.'); if (placesVisited.length && k.position < placesVisited.at(-1)) throw new Error('the places section visits positions in ascending order.'); placesVisited.push(k.position); }
+    if (sec.id === 'silence') throw new Error('nothing is touched in the silence.');
+  }
+  if (new Set(placesVisited).size !== config.positions.length) throw new Error('the places section must visit every strike position on body 0 before another body sounds.');
+  const firstNeighbor = greeting.strikes.find(k => k.body === neighbor), firstThird = greeting.strikes.find(k => k.body === third);
+  if (!firstNeighbor || !firstThird || !(firstThird.beat > firstNeighbor.beat)) throw new Error('the neighbor answers before the third body arrives.');
+  const sharedBeat = greeting.sections[3].beats[0], shared = greeting.strikes.filter(k => k.beat === sharedBeat);
+  if (new Set(shared.map(k => k.body)).size !== g.bodies.length) throw new Error('the shared touch strikes all three bodies at once.');
+  const d = voiceGreetingDuration(greeting, g);
+  if (d < VOICE_GREETING_BOUNDS.minSeconds || d > VOICE_GREETING_BOUNDS.maxSeconds) throw new Error(`greeting lasts ${d.toFixed(1)} s; bound is ${VOICE_GREETING_BOUNDS.minSeconds}..${VOICE_GREETING_BOUNDS.maxSeconds} s.`);
+  return greeting;
+}

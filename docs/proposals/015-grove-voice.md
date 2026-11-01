@@ -184,6 +184,24 @@ study beside the default Grove, never a silent replacement:
   semantic change to it (Astra's contract). The optional voice is an
   audition route, not a promotion; the original remains the default.
 
+## The position-aware greeting (landed in `src/score/grove-voice.js`)
+
+`composeGroveVoiceGreeting(grove, config, { tempo = 84, lead = 0.35 })` teaches
+positional contrast by listening, with no explanatory UI: **places** [0, 9)
+beats, one body (body 0) at each strike position twice, ascending (upper,
+upper, middle, middle, bridge tip, bridge tip), so the ear compares the
+same body at three places; **answer** [9, 15), the neighbor answers at the
+bridge tip and body 0 replies at the same place (one color across the
+bridge); **late** [15, 20), the third body arrives at the upper position
+(the other color), a middle reply; **shared** [20, 21), all three at the
+middle; **silence** for the ring. `validateGroveVoiceGreeting` checks the
+promise (places on body 0 only, every position visited in ascending order
+before another body sounds, neighbor before third, shared on all, nothing
+in the silence, 15–35 s); `voiceGreetingStrikes` gives the runtime
+`[{ time, body, position, velocity }]` with position as an index into the
+voice positions, the same shape the session's `strike` takes. Durations on
+the curated seeds: 33.7 / 27.9 / 30.1 s.
+
 ## Scope and ownership
 
 - 015a (Fable), landed: `modalNetwork` in `src/coupling.js` (N bodies × M

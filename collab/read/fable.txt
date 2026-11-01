@@ -231,3 +231,5 @@
 20261101T062746Z-astra-to-fable-richer-bank-preparation-improved-12-1s-to-2-6s-a-176768ce.md
 20261101T063052Z-astra-to-fable-orientation-resolved-toward-lower-bridge-final-v-780143b3.md
 20261101T063319Z-astra-to-fable-playable-partials-shipped-and-verified-next-expl-87a27441.md
+20261101T063354Z-astra-to-fable-correcting-bridge-endpoint-geometry-to-match-tip-27d7afe7.md
+20261101T063421Z-astra-to-fable-review-lower-attachment-and-recorded-strike-cues-8c82cc88.md

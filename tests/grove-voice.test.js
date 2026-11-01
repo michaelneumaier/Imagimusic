@@ -51,3 +51,28 @@ test('voice configuration validation and canonical form', () => {
   assert.throws(() => { VOICE_BOUNDS.positionRange[0] = 0; }, TypeError, 'bounds are deep-frozen');
   assert.throws(() => { VOICE_BOUNDS.partials.push(9); }, TypeError);
 });
+
+test('the position-aware greeting keeps its promise on every curated seed and compiles to runtime strikes', async () => {
+  const { composeGroveVoiceGreeting, validateGroveVoiceGreeting, voiceGreetingStrikes, voiceGreetingDuration, VOICE_GREETING_BOUNDS } = await import('../src/score/grove-voice.js');
+  const { groveNeighbors } = await import('../src/score/grove.js');
+  for (const seed of GROVE_SEEDS) {
+    const g = composeGrove({ seed }), greeting = composeGroveVoiceGreeting(g), { neighbor, third } = groveNeighbors(g);
+    assert.deepEqual(composeGroveVoiceGreeting(g), greeting);
+    const places = greeting.strikes.filter(k => k.beat < 9);
+    assert.ok(places.every(k => k.body === 0) && places.map(k => k.position).join() === '0,0,1,1,2,2', 'one body, each place twice, ascending');
+    assert.ok(greeting.strikes.find(k => k.body === third).beat > greeting.strikes.find(k => k.body === neighbor).beat);
+    const strikes = voiceGreetingStrikes(greeting);
+    assert.ok(strikes.every(s => s.time >= 0.35 && [0, 1, 2].includes(s.position) && s.velocity > 0 && s.velocity <= 1));
+    const d = voiceGreetingDuration(greeting, g); assert.ok(d >= VOICE_GREETING_BOUNDS.minSeconds && d <= VOICE_GREETING_BOUNDS.maxSeconds, `${seed}: ${d}`);
+    assert.ok(d - strikes.at(-1).time >= 5, 'at least five seconds of untouched ring');
+    const rejects = (f, re) => { const c = structuredClone(greeting); f(c); assert.throws(() => validateGroveVoiceGreeting(c, g), re); };
+    rejects(c => { c.strikes[0].body = 1; }, /touches body 0 only/);
+    rejects(c => { c.strikes[2].position = 0; c.strikes[3].position = 0; }, /visit every strike position/);
+    rejects(c => { [c.strikes[0].position, c.strikes[4].position] = [2, 0]; }, /ascending order/);
+    rejects(c => { c.strikes.push({ id: 'late', beat: 22, body: 0, position: 0, velocity: 0.5, role: 'place' }); }, /nothing is touched in the silence/);
+    rejects(c => { c.strikes.find(k => k.id === 'shared:3').body = 0; }, /all three bodies/);
+    rejects(c => { c.strikes[0].position = 5; }, /index the voice positions/);
+    rejects(c => { c.tempo = 40; }, /greeting lasts/);
+  }
+  assert.throws(() => composeGroveVoiceGreeting(composeGrove({ seed: 3 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.6] }), /at least three strike positions/);
+});
