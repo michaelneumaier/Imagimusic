@@ -63,6 +63,7 @@ test('validator rejects a journey that breaks the promise', () => {
   rejects(c => { c.tempo = 40; }, /journey lasts/);   // a valid tempo that stretches the strikes past the 35 s bound
   rejects(c => { c.tempo = 30; }, /tempo/);
   rejects(c => { c.sections[1].beats = [7, 12]; }, /contiguous/);
+  rejects(c => { c.sections[1].beats = [6, 12, 13]; }, /exactly/);
   rejects(c => { c.strikes[1].role = 'shout'; }, /unknown strike role/);
   rejects(c => { c.extra = 1; }, /unsupported field/);
 });
@@ -81,5 +82,10 @@ test('doorway API: LOOM_JOURNEYS and getLoomJourney give fresh canonical definit
     assert.equal(a.measured.ringSeconds, describeLoomSetting(a.settings).ringSeconds);
   }
   assert.throws(() => getLoomJourney('nope'), /unknown Loom journey/);
+  assert.throws(() => getLoomJourney('close-kin', { setting: 'tight-weave' }), /tempo and lead only/);
+  assert.equal(getLoomJourney('close-kin', { tempo: 90 }).journey.tempo, 90);
   assert.throws(() => { LOOM_JOURNEYS[0].title = 'x'; }, TypeError);
+  assert.throws(() => { LOOM_JOURNEYS[0].settings.coupling = 0; }, TypeError);
+  assert.throws(() => { LOOM_JOURNEYS[0].score[0].time = 9; }, TypeError);
+  assert.ok(!/as strongly/.test(LOOM_JOURNEYS[0].description));
 });

@@ -4,7 +4,7 @@
 // shared strike) → silence (nothing after the last strike; the coupled ring finishes on its own).
 // Everything uses the existing static coupling model (makeLoom / coupledPair): three named settings differ only in
 // the physical parameters the model already has (coupling, detune, loss), and `describeLoomSetting` computes what
-// each setting actually does (normal-mode split, exchange fraction, ring length) so the docs state measured facts.
+// each setting actually does (normal-mode split, modal amplitude ratio at the unstruck body, ring length) so the docs state measured facts.
 // No time-varying coupling, no decorative energy claims.
 
 import { makeLoom, DEFAULT_LOOM } from '../loom/model.js';
@@ -74,7 +74,7 @@ export function validateLoomJourney(j) {
   if (!(finite(j.lead, 'lead') >= 0 && j.lead <= 5)) throw new Error('lead must be within 0..5 s.');
   if (!Array.isArray(j.sections) || j.sections.length !== 4 || j.sections.map(s => s.id).join() !== 'solo,response,intertwining,silence') throw new Error('sections must be solo, response, intertwining, silence.');
   let cursor = 0;
-  for (const s of j.sections) { keysExactly(s, ['id', 'beats', 'cadence'], `section ${s.id}`); if (!Array.isArray(s.beats) || s.beats[0] !== cursor || !(finite(s.beats[1], 'section end') > cursor)) throw new Error(`section ${s.id}: beats must be contiguous and half-open.`); if (typeof s.cadence !== 'string') throw new Error('cadence must be a string.'); cursor = s.beats[1]; }
+  for (const s of j.sections) { keysExactly(s, ['id', 'beats', 'cadence'], `section ${s.id}`); if (!Array.isArray(s.beats) || s.beats.length !== 2 || s.beats[0] !== cursor || !(finite(s.beats[1], 'section end') > cursor)) throw new Error(`section ${s.id}: beats must be exactly [start, end), contiguous and half-open.`); if (typeof s.cadence !== 'string') throw new Error('cadence must be a string.'); cursor = s.beats[1]; }
   if (!Array.isArray(j.strikes) || j.strikes.length < 1 || j.strikes.length > 256) throw new Error('strikes must hold 1..256 entries.');
   const ids = new Set(); let last = -Infinity;
   const section = beat => j.sections.find(s => beat >= s.beats[0] && beat < s.beats[1]);
@@ -123,7 +123,7 @@ export function canonicalLoomJourney(journey) {
 
 // ---- integration API for the listening doorway (Astra's shape, 2026-11-01) ----
 const TITLES = Object.freeze({
-  'close-kin':       { title: 'Close kin',       description: 'Two identical bodies on one bridge. Strike one and the other moves as strongly as the first; the motion passes back and forth between them a little under once a second.' },
+  'close-kin':       { title: 'Close kin',       description: 'Two identical bodies on one bridge. Strike one and the other is set moving through the bridge; the motion passes back and forth between them a little under once a second while both fade.' },
   'distant-cousins': { title: 'Distant cousins', description: 'The same bridge, but the second body is tuned forty cents away. The unstruck body moves far less, and what does cross the bridge is heard as a beat between two close pitches.' },
   'tight-weave':     { title: 'Tight weave',     description: 'A stiffer bridge and a quicker fade. The motion passes between the bodies more than twice a second and the ring is shorter, so the answers come fast and the room empties sooner.' },
 });
@@ -138,9 +138,11 @@ const CHAPTERS = Object.freeze([
 /** A fresh, canonical definition for the doorway: id, title, description, settings, score (seconds), chapters (seconds), plus the journey and the measured facts. */
 export function getLoomJourney(id, options = {}) {
   if (!Object.hasOwn(LOOM_JOURNEY_SETTINGS, id)) throw new Error(`unknown Loom journey "${id}"; known: ${Object.keys(LOOM_JOURNEY_SETTINGS).join(', ')}.`);
-  const journey = composeLoomJourney({ setting: id, ...options }), measured = describeLoomSetting(journey.settings);
+  for (const k of Object.keys(options)) if (!['tempo', 'lead'].includes(k)) throw new Error(`getLoomJourney options allow tempo and lead only (got "${k}"); the setting is the id.`);
+  const journey = composeLoomJourney({ ...options, setting: id }), measured = describeLoomSetting(journey.settings);
   const chapters = journey.sections.map(s => { const c = CHAPTERS.find(c => c.id === s.id); return { id: s.id, time: beatSeconds(journey, s.beats[0]), title: c.title, description: c.description }; });
   return { id, ...TITLES[id], settings: { ...journey.settings }, score: loomScoreFrom(journey), chapters, durationSeconds: journeyDuration(journey), measured, journey };
 }
 export const LOOM_JOURNEY_IDS = Object.freeze(Object.keys(LOOM_JOURNEY_SETTINGS));
-export const LOOM_JOURNEYS = Object.freeze(LOOM_JOURNEY_IDS.map(id => Object.freeze(getLoomJourney(id))));
+const deepFreeze = v => { if (v && typeof v === 'object' && !Object.isFrozen(v)) { Object.freeze(v); for (const k of Object.keys(v)) deepFreeze(v[k]); } return v; };
+export const LOOM_JOURNEYS = deepFreeze(LOOM_JOURNEY_IDS.map(id => getLoomJourney(id)));
