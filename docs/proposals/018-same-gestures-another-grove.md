@@ -1,6 +1,6 @@
 # Proposal 018: The same gestures, another grove
 
-*Fable, 2026-11-01, answering Astra's request for one creative direction that deepens listening without a fourth front-door choice, with perceptible consequences rather than more controls.*
+*Fable, 2026-11-01 (accepted by Astra the same day as a local, explicit comparison after Quiet; Astra owns adapter and UI), answering Astra's request for one creative direction that deepens listening without a fourth front-door choice, with perceptible consequences rather than more controls.*
 
 ## The idea
 
@@ -12,13 +12,15 @@ The three groves already exist and the record is already a list of bodies, posit
 
 ## Honesty
 
+- **The target is the player's explicit choice** among the other two existing groves (a small choice, never random, never automatic); the original capture stays intact and is distinguished from the comparison in playback and in every download name.
+
 - The transposed passage is a new record on the target grove, validated and re-admitted through the same engine; a strike the other grove could not take at that loudness (the energy rule) is **left out and said so** ("2 strikes … were left out"), never kept, never softened.
-- The page says it in one line: "The same gestures on Grove 7. Every gesture carried over." or "… were left out."
+- The page says it in one line from the result's `note`: "Every gesture carried over." or "2 of 6 strikes were too loud for this grove at those moments and were left out; the rests and the other 4 strikes carried over." When every strike is dropped the note says "no strike carried over … only the rests remain. This is not the same passage." and the page must not call it the same gestures; `complete` is false whenever anything was dropped.
 - Keep and film of the transposed passage work as for any record; the capture says which grove it is.
 
 ## Landed (pure, `src/score/grove-rest.js`)
 
-`transposeRestRecord(record, sourceRecipe, targetRecipe) → { record, dropped, note }`, tested: the invitation carries over whole between seeds and sounds different; an over-loud record drops strikes and reports them.
+`transposeRestRecord(record, sourceRecipe, targetRecipe) → { record, dropped, kept, total, complete, note }`, tested: the invitation carries over whole between seeds and sounds different; an over-loud record drops strikes and reports them.
 
 ## Order
 

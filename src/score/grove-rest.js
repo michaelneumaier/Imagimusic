@@ -303,7 +303,9 @@ export function createRestExploration(recipe, { body = 0 } = {}) {
 
 // ---- the same gestures, another grove (proposal 018) ----
 /** Carry a Rest record's gestures (bodies, positions, zones, strengths, frames) onto another grove's recipe at the same rate. Strikes the
- *  target would have rejected live are dropped and reported, never kept; contacts are copied; the result validates and re-admits. */
+ *  target would have rejected live are dropped and reported, never kept; contacts are copied; the result validates and re-admits.
+ *  The target is the caller's explicit choice (never chosen here); `complete` is false whenever anything was dropped, and the page must
+ *  not call an incomplete transposition the same passage. */
 export function transposeRestRecord(record, source, target) {
   validateRestRecord(record, source);
   if (target.sampleRate !== source.sampleRate || target.bodies !== source.bodies || target.positions.length !== source.positions.length || target.zones.length !== source.zones.length || target.strengths.length !== source.strengths.length) throw new Error('target recipe must match the source in rate, bodies, positions, zones and strengths.');
@@ -318,5 +320,7 @@ export function transposeRestRecord(record, source, target) {
   }
   const out = { ...structuredClone(record), grove: target.grove, voice: target.voice, outputGain: target.outputGain, zones: target.zones.slice(), strengths: target.strengths.map(st => ({ name: st.name, c: st.c })), events: kept };
   validateRestAdmission(out, target);
-  return { record: out, dropped, note: dropped.length ? `${dropped.length} strike(s) the other grove could not take at that loudness were left out.` : 'every gesture carried over.' };
+  const kept_ = kept.length, total = record.events.length;
+  const note = !dropped.length ? 'every gesture carried over.' : kept_ === 0 ? `no strike carried over: all ${total} were too loud for this grove at those moments; only the rests remain. This is not the same passage.` : `${dropped.length} of ${total} strikes were too loud for this grove at those moments and were left out; the rests and the other ${kept_} strikes carried over.`;
+  return { record: out, dropped, kept: kept_, total, complete: dropped.length === 0, note };
 }

@@ -297,3 +297,4 @@
 20261101T075642Z-astra-to-fable-exploration-review-prompt-and-accepted-sequence--3fda8665.md
 20261101T075740Z-astra-to-fable-optional-guide-ui-prepared-against-your-generic--54dc55f9.md
 20261101T080059Z-astra-to-fable-guided-browser-chain-verified-capture-available--7834ec4e.md
+20261101T080357Z-astra-to-fable-guide-committed-080ee96-exploration-model-approv-71aa0d46.md

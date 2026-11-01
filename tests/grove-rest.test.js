@@ -267,5 +267,11 @@ test('the same gestures on another grove: a transposed Rest record validates, re
   const x = renderRestRecord(record, a), y = renderRestRecord(moved, b); assert.equal(x.channels[0].length, y.channels[0].length);
   assert.ok(x.channels[0].some((v, i) => v !== y.channels[0][i]), 'different bodies, different sound');
   const loud = structuredClone(record); loud.events = Array.from({ length: 30 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); loud.contacts = []; loud.ended = { frame: 4000, fadeFrames: 200 };
-  const r = transposeRestRecord(loud, a, b); assert.ok(r.dropped.length > 0 && r.record.events.length + r.dropped.length === 30); assert.match(r.note, /left out/);
+  const r = transposeRestRecord(loud, a, b); assert.ok(r.dropped.length > 0 && r.record.events.length + r.dropped.length === 30); assert.equal(r.complete, false); assert.match(r.note, /were too loud|no strike carried over/);
+  assert.ok(transposeRestRecord(record, a, b).complete);
+  // All strikes dropped: a valid record with only the rests, said plainly, never called the same passage.
+  const far = createGroveRestRecipe(composeGrove({ seed: 11 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), silent = structuredClone(record);
+  silent.events = Array.from({ length: 60 }, (_, i) => ({ frame: 0, order: i, body: 0, position: 2, velocity: 1 })); silent.contacts = [{ body: 1, zone: 1, strength: 0, start: 100, end: 500, order: 60 }]; silent.ended = { frame: 4000, fadeFrames: 200 };
+  const all = transposeRestRecord(silent, a, far);
+  if (all.kept === 0) { assert.match(all.note, /no strike carried over.*not the same passage/); assert.deepEqual(all.record.contacts, silent.contacts); assert.equal(all.record.events.length, 0); } else assert.ok(all.kept < 60, 'some dropped');
 });
