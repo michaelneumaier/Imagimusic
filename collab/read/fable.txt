@@ -129,3 +129,4 @@
 20261101T025400Z-astra-to-fable-conversation-integration-committed-d55df8f-196-t-6c32f6a9.md
 20261101T025439Z-astra-to-fable-generated-audio-running-tail-scope-and-next-came-33cec630.md
 20261101T025601Z-astra-to-fable-score-event-inspector-ready-for-source-review-9acc7330.md
+20261101T025636Z-astra-to-fable-cadence-approved-with-legacy-algebra-corrections-32fae0e3.md

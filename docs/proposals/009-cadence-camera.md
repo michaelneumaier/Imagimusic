@@ -1,4 +1,4 @@
-# Proposal 009: cadence-weighted camera for the conversation (source-level, for Astra's `director.js`)
+# Proposal 009 (rev. 2): cadence-weighted camera for the conversation (source-level, for Astra's `director.js`)
 
 *Fable, 2026-11-01. Astra owns `src/stage/director.js`; this is the concrete
 behavior and the maths, not code to merge. Follow mode only. Legacy
@@ -8,12 +8,18 @@ passages (no `score`) must produce the identical pose they do today.*
 
 | Cadence | Feel | Attention lead (s) | Gesture width (s) | Ensemble prior | Offset from target (x, y, z) |
 | --- | --- | --- | --- | --- | --- |
-| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 0.9 | (8.5, 7.2, 11) |
-| answer (exchange) | today's follow: leans to each attack, settles to the ensemble | 0.18 | 0.7 | 0.25 | (7, 6.1, 9) |
-| settling (release) | a slow pull-back to the whole stage as excitations thin | 0.10 | 1.2 | 1.0 → 2.0 with section progress | (7, 6.1, 9) → (10, 7.6, 13) with section progress |
+| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 0.9 | (8.5, h = 7.2, 11) |
+| answer (exchange) | today's follow: leans to each attack, settles to the ensemble | 0.18 | 0.7 | 0.25 | (7, h = 6.1, 9) |
+| settling (release) | a slow pull-back to the whole stage as excitations thin | 0.10 | 1.2 | 1.0 → 2.0 with section progress | (7, h = 6.1, 9) → (10, h = 7.6, 13) with section progress |
 
-"Ensemble prior" is the weight of the fixed stage center `[0, .25, 0]`
-in the attention average (today's `total = .25`). A larger prior means
+The offset's middle entry `h` is an **absolute camera height** (today's
+position y is the constant 6.1, not target.y + 6.1); x and z are offsets
+from the target.
+
+"Ensemble prior" is the weight of the fixed stage center `[0, 1, 0]` in
+the attention average. (Today's code initializes the numerator to
+`[0, .25, 0]` and the denominator to `.25`, which is the center `[0, 1, 0]`
+with weight 0.25; rev. 2 writes it that way.) A larger prior means
 the camera stays with the ensemble; a smaller one means it follows
 strikes. "Lead" is today's `t + .18`; "width" is today's `.7`.
 
@@ -41,9 +47,9 @@ P(t) = Σ_k ŵ_k(t) · P_{cadence(k)}(t)                   // convex blend of bo
 Then today's follow computation with the blended parameters:
 
 ```
-target = prior·[0, .25, 0] + Σ_g weight_g · point_g,   weight_g = velocity_g · exp(−½ ((t + lead − time_g) / width)²)
+target = prior·[0, 1, 0] + Σ_g weight_g · point_g,   weight_g = velocity_g · exp(−½ ((t + lead − time_g) / width)²)
 target /= prior + Σ_g weight_g
-pose = { target, position: target + (ox, oy, oz) }
+pose = { target, position: [target.x + ox, h, target.z + oz] }
 ```
 
 Every term is a smooth function of `t` alone (tanh, Gaussian, cosine):
@@ -51,10 +57,15 @@ no frame history, easing accumulators or wall clock, so seeking in any
 direction gives the same pose, and the pose is bounded by the gesture
 points' hull plus the largest offset.
 
-**Legacy identity:** when `passage.score` is absent, set `ŵ = {answer: 1}`
-and `P = P_answer = (0.18, 0.7, 0.25, 7, 6.1, 9)`, which is today's code
-exactly. Suggested test: for the seeded passage, the new director equals
-the old one at 240 sampled times, bit for bit.
+**Legacy identity:** when `passage.score` is absent, the director keeps
+today's branch **literally** (same statements, same constants, same
+evaluation order), so no bit-identity claim rests on an algebraically
+equal but differently evaluated formula. The scored branch is a separate
+path with the blend above. Suggested test: for the seeded passage, the
+director's output at 240 sampled times equals a frozen copy of today's
+function, bit for bit; for a scored passage the answer-cadence region
+agrees with that copy to within floating-point of the blend (reported,
+not asserted bit-identical).
 
 ## Evidence (tests Astra can add; all pure)
 
