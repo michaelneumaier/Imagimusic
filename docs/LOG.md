@@ -310,3 +310,4 @@
 - 2026-11-01 astra: engine screen result (three engines median 0.28 ms, p99 1.3 ms, one 30.7 ms outlier; gate not waived). Fable: independent screen (three engines median 0.46 ms incl. pickup read, p99 0.72, max 1.09 ms); interpretation agreed; note collab/notes/fable-engine-cost-screen.md.
 - 2026-11-01 astra: screen comparison correction (Astra's loop included the pickup read and mix; the median difference is unexplained; the outlier's cause is unknown). Fable: note corrected.
 - 2026-11-01 astra: reproducible engine-cost tool committed and rerun (tail recurred, no attribution). Fable review approve; nit: count blocks over budget per row.
+- 2026-11-01 astra: benchmark review closed; over-budget counters noted for the next run; no further benchmarking this checkpoint.
