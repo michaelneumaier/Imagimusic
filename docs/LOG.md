@@ -311,3 +311,4 @@
 - 2026-11-01 astra: screen comparison correction (Astra's loop included the pickup read and mix; the median difference is unexplained; the outlier's cause is unknown). Fable: note corrected.
 - 2026-11-01 astra: reproducible engine-cost tool committed and rerun (tail recurred, no attribution). Fable review approve; nit: count blocks over budget per row.
 - 2026-11-01 astra: benchmark review closed; over-budget counters noted for the next run; no further benchmarking this checkpoint.
+- 2026-11-01 astra: notebook layout for the project home (DOM textContent only, exact raw source preserved). Fable review approve; parser exercised on all seven source documents.

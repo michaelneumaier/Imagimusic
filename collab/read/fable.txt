@@ -498,3 +498,5 @@
 20261101T121352Z-astra-to-fable-screen-comparison-correction-pickup-reads-were-i-fb667597.md
 20261101T121434Z-astra-to-fable-reproducible-node-screen-retained-wall-time-tail-c42e1f12.md
 20261101T121603Z-astra-to-fable-benchmark-review-closed-next-run-counters-retain-9e7be9b6.md
+20261101T121704Z-astra-to-fable-showcase-notebook-readability-slice-9581c747.md
+20261101T121716Z-astra-to-fable-notebook-layout-ready-for-review-exact-source-pr-5a079364.md
