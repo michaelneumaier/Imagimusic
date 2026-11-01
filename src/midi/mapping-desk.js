@@ -1,3 +1,4 @@
+import {saveMidiStage} from './stage-transfer.js';
 import {compileImportedScore} from './mapping.js';
 import {summarizeMidi} from './preview.js';
 import {DEFAULT_PATCH} from '../model.js';
@@ -21,7 +22,7 @@ export function mountMappingDesk(host,intake){
  host.replaceChildren(element('h2','Choose instruments'));
  if(!intake.notes.notes.length||intake.notes.durationSeconds<=0){host.append(element('p','This file has no positive-duration passage to map.'));return;}
  const groups=summarizeMidi(intake.notes).groups,assignments=new Map();
- host.append(element('p','Assign each channel, choose an excerpt, then preview every note’s destination. This preview uses the default laboratory instrument at 48 kHz. Stage playback is the next integration step.'));
+ host.append(element('p','Assign each channel, choose an excerpt, then preview every note’s destination. This preview uses the default laboratory instrument at 48 kHz. Use the reviewed mapping on the stage to play or render it. Loom and FM are enabled when assigned. The mechanisms interpret the notes; this does not reconstruct the original instruments.'));
  const form=element('form'),controls=element('div');controls.className='mapping-controls';
  const start=number(0,0,intake.notes.durationSeconds),end=number(Math.min(intake.notes.durationSeconds,119.65),0,intake.notes.durationSeconds);
  const lead=number(.35,0,5),tail=number(4,0,30),curve=select([['linear','Original dynamics'],['quiet','Quieter (70%)'],['lift','Lift softer notes']]);
@@ -72,6 +73,9 @@ export function mountMappingDesk(host,intake){
    const rows=element('div'),warnings=element('div');reportHost.append(rows,element('h3','Mapping notes'),warnings);
    table(rows,['Event','Track / channel','Source pitch','Instrument','Result','Destination','Pitch change','Reason'],report.rows.map(r=>[r.noteId,`${r.track+1} / ${r.channel+1}`,r.pitch,r.family??'Unassigned',r.class,destination(r),r.cents===null?'—':`${r.cents} cents`,r.reason??'—']));
    table(warnings,['Kind','Detail'],report.warnings.map(w=>[w.kind,w.detail]));
+   const use=element('button','Use this mapping on stage');use.type='button';use.className='primary';use.disabled=!!report.counts.unassigned||!report.onsets;
+   use.onclick=()=>{try{const id=saveMidiStage(sessionStorage,imported);location.href=`stage.html?midi=${encodeURIComponent(id)}`;}catch(error){status.dataset.error='true';status.textContent=error.message;}};
+   reportHost.append(use,element('p','The passage stays in this browser session. Reopen the file from the MIDI desk to share or restore it in another session.'));
   }catch(error){status.dataset.error='true';status.textContent=error.message;}
  };
  restore();assignmentSummary.textContent=`All ${groups.length} note-bearing channels start unassigned.`;

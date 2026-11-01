@@ -1,3 +1,5 @@
+import {readMidiStage,midiComposition} from '../midi/stage-transfer.js';
+import {createImportedPerformance} from './imported-performance.js';
 import {composeConversation} from '../score/conversation.js';
 import {readCameraSearch,cameraURL} from './camera-link.js';
 import {createScorePerformance,readScoreSearch,scoreURL} from './score-performance.js';
@@ -26,13 +28,18 @@ let composition=structuredClone(DEFAULT_COMPOSITION);
 try{composition=readCompositionSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the default ensemble.';}
 let score=null;
 try{score=readScoreSearch(location.search);}catch(error){importError+=(importError?' ':'')+error.message+'. Using the seeded passage.';}
-const buildPerformance=(sampleRate=48000)=>score?createScorePerformance(activePatch,score,composition,sampleRate):attachComposition(createPerformance(activePatch,sampleRate),composition);
+let imported=null,importFailure=false;
+const midiId=new URLSearchParams(location.search).get('midi');
+if(midiId!==null){try{imported=readMidiStage(sessionStorage,midiId);composition=midiComposition(imported);activePatch=structuredClone(DEFAULT_PATCH);score=null;}catch(error){importFailure=true;importError=error.message;}}
+const buildPerformance=(sampleRate=48000)=>imported?createImportedPerformance(activePatch,imported,composition,sampleRate):score?createScorePerformance(activePatch,score,composition,sampleRate):attachComposition(createPerformance(activePatch,sampleRate),composition);
 let preparation=null,loomVoice=null,fmVoice=null;
 let performance;
 try{performance=buildPerformance();}
 catch(error){
- if(!score)throw error;
- importError+=(importError?' ':'')+error.message+'. Using the seeded passage.';score=null;performance=buildPerformance();
+ if(!score&&!imported)throw error;
+ if(imported){importFailure=true;imported=null;importError=error.message+' Return to the MIDI desk and use the mapping again.';}
+ else importError+=(importError?' ':'')+error.message+'. Using the seeded passage.';
+ score=null;performance=buildPerformance();
 }
 let frames=createStageFrames(performance);
 const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=frames.bindings;
@@ -66,15 +73,17 @@ $('perform').onclick=async()=>{
   }catch(error){if(token!==request)return;stop();if(error.name!=='AbortError')$('error').textContent=error.message;}
 };
 $('quiet').onclick=stop;
-$('passage').value=score?'conversation':'seeded';
+if(imported){const option=document.createElement('option');option.value='imported';option.textContent='Imported MIDI';$('passage').append(option);}
+$('passage').value=imported?'imported':score?'conversation':'seeded';
 $('score-seed').value=performance.patch.seed;
 $('score-tempo').value=performance.patch.tempo;$('score-tempo-value').textContent=performance.patch.tempo+' BPM';
 $('character').value=score?.controls.character??'calm';$('density').value=score?.controls.density??.7;$('density-value').textContent=Math.round(Number($('density').value)*100)+'%';
 $('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;$('score-seed').disabled=!score;$('score-variation').disabled=!score;
 function changeScore(){
  if($('passage').value!=='seeded'&&!$('score-seed').reportValidity())return;
+ if($('passage').value==='imported')return;
  stop();const next=$('passage').value==='seeded'?null:composeConversation({seed:Number($('score-seed').value),tempo:Number($('score-tempo').value),density:Number($('density').value),character:$('character').value});
- location.href=scoreURL(location.href,next);
+ const nextURL=new URL(scoreURL(location.href,next));nextURL.searchParams.delete('midi');location.href=nextURL.href;
 }
 $('passage').onchange=changeScore;$('character').onchange=changeScore;$('density').onchange=changeScore;$('score-tempo').onchange=changeScore;$('score-seed').onchange=changeScore;
 $('score-variation').onclick=()=>{$('score-seed').value=(performance.patch.seed+1)>>>0;changeScore();};
@@ -128,10 +137,17 @@ $('movie').onclick=async()=>{
   try{
     const {exportMovie}=await import('./export.js');
     const pose={position:world.camera.position.toArray(),target:world.controls.target.toArray(),mode:$('direction').value};
-    const result=await exportMovie(structuredClone(activePatch),pose,{composition,score,signal:renderAbort.signal,onProgress:message=>$('error').textContent=message});
+    const result=await exportMovie(structuredClone(activePatch),pose,{composition,score,imported,signal:renderAbort.signal,onProgress:message=>$('error').textContent=message});
     downloadArtifact(result.blob,`imagimusic-conservatory-${performance.patch.seed}.mp4`);
     lastManifest=result.manifest;$('render-manifest').disabled=false;
     $('error').textContent=`Movie ready · ${result.manifest.frames} frames · 720p / 30 fps · synthesized soundtrack`;
   }catch(error){$('error').textContent=error.message;}
-  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo','score-seed','score-variation'])$(id).disabled=false;$('cancel-render').hidden=true;$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;$('score-seed').disabled=!score;$('score-variation').disabled=!score;}
+  finally{renderAbort=null;for(const id of ['perform','seek','view','direction','movie','loom-enabled','fm-enabled','passage','character','density','score-tempo','score-seed','score-variation'])$(id).disabled=false;$('cancel-render').hidden=true;$('character').disabled=!score;$('density').disabled=!score;$('score-tempo').disabled=!score;$('score-seed').disabled=!score;$('score-variation').disabled=!score;lockImportedControls();}
 };
+
+function lockImportedControls(){
+ if(imported||importFailure){$('loom-enabled').disabled=true;$('fm-enabled').disabled=true;}
+ if(importFailure){$('perform').disabled=true;$('movie').disabled=true;$('stage-state').textContent='MIDI PASSAGE UNAVAILABLE';}
+}
+lockImportedControls();
+if(imported){const note=document.createElement('p');note.textContent=`Imported MIDI: ${imported.source.name} · ${performance.mappingReport.onsets} entrances. Instrument assignments and timing come from the MIDI desk. This passage is stored only in this browser session. Return to the MIDI desk to change its mapping.`;const link=document.createElement('a');link.href='midi.html';link.textContent=' Open MIDI desk';note.append(link);$('captions').prepend(note);}
