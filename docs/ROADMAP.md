@@ -68,17 +68,19 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 - [x] Slice A (done 2026-11-01, Astra commit 3a46cc3): `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); lab 2D canvases rewired to collectState frames via `src/snapshots.js` with energy-parity and finite-coordinate tests (Astra; Fable review collab/reviews/20261101T0057Z-fable-reviews-lab-migration.md approve; Safari choir smoke by Astra). No canvas reads an engine object.
 - [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
-  - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
+  - [x] per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS (stageInputsFor, incl. performer/pump sections); lab 2D migrated to the bus (slice A)
+  - [x] live == score equivalence gate: audio side proven (render-audio tests: garden/tine modes, onset, end equal the snapshot; choir slot/end/steal/seed equal the plan) and engine-side test in tests/stage.test.js (live engine vs score at 44.1/48 kHz, Astra); still open: a browser-side check that live frames sampled at the score's timestamps hash identically to the offline frames
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
   - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
   - [x] deterministic video export prototype (Astra): vendored Mediabunny (decision 003), /stage.html "Render movie" → MP4 H.264 720p30 + AAC 48 kHz; full passage verified with ffprobe (1007 frames, 33.567 s video, 33.561 s audio, first note at 0.35 s) and all 1007 state hashes regenerated in Node with 0 mismatches
   - [x] audio repeatability (decision 004, 2026-11-01): repeated offline renders of the full passage and the air choir are bit-identical float32 on Safari 26.6.2 / 48 kHz / seed 731 (harness v6); default lifecycle outlive-render with engine gains zeroed at cutoff; as-live kept as an explicit negative control; controlled finding: differences observed after source finish, never-stopped controls identical (max-difference location is not the first difference); no cross-browser or codec byte-identity promised
   - [x] Tension Loom A: reciprocal two-body model (src/coupling.js, 11 tests incl. coherent superposition; proposal 003 revised, FM units corrected); loom.html study 01 and the scored eight-strike passage (Astra), both reviewed and approved
-  - [ ] performer planner: proposal docs/proposals/006-performer-planner.md, pure src/perform/planner.js (actors spawned by the score, poses as functions of t, unplanned events reported never hidden); Astra keeper rig + scene integration next
+  - [x] performer planner (Fable, proposal 006, src/perform/planner.js: actors spawned by the score, pre-positioned first notes, explicit truncated recovery, previousEventId for continuity, unplanned events reported never hidden) and Keepers (Astra 2eca102 → 89f5349, f9be89a): articulated arms with the per-slot strike endpoint as hand, bellows crosshead operators, 12 actors / 0 unassigned / 0 unreachable on the default passage, declared per-actor bindings, per-actor inspector; live and export integrated; Fable review approve (addendum in collab/reviews/20261101T0110Z-fable-reviews-keepers.md)
   - [x] procedural camera director (Astra 0b83583; Fable review approve)
-  - [x] inspector route overlay (Astra 5dea2c5; Fable review approve-with-fixes)
+  - [x] inspector route overlay with note-local LFO settings (Astra 5dea2c5 + fix; Fable review approve-with-fixes, fixes applied)
   - [x] manifest consolidation on src/stage/manifest.js; export/inspector review fixes applied (Astra 3a46cc3)
-  - [ ] performer actor, three procedural cameras, route highlight in the inspector
+  - [ ] full-movie regression on the adopted default lifecycle (Astra, in progress: 113 bindings, 12 Keepers, follow camera, seed 731)
+  - [ ] M2.5 close-out: remaining evidence above, then mark slices B and C done; do not close early
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 
@@ -104,7 +106,7 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 
 ## Track V (parallel): Voice Observatory (status: planning only, plan approved by Astra 2026-11-01 with measurement corrections; docs/proposals/005-voice-observatory.md)
 
-Michael's new direction (2026-11-01, relayed by Astra): live human voice → highly reactive, detailed visual feedback. Measured / estimated / inferred tiers; V0 normal voice → V1 resonances → V2 articulation and beatbox → V3 optional research. No microphone code until the plan is agreed. Does not displace the Conservatory track.
+Michael's new direction (2026-11-01, relayed by Astra): live human voice → highly reactive, detailed visual feedback. Measured / estimated / inferred tiers; V0 normal voice mirror → V1 resonance portrait → V2 articulation and beatbox atlas → V3 creative performance (features on the stage bus, recorded trajectories by explicit choice); anatomy inference is a separate research track off the main line, never the main visual truth. Planning only: no microphone code. Does not displace the Conservatory track.
 
 ## Later research (not scheduled)
 

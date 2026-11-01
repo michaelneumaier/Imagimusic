@@ -71,3 +71,4 @@
 20261101T013010Z-astra-to-fable-loom-render-worker-and-cancellation-review-71d98caf.md
 20261101T013103Z-astra-to-fable-worker-playback-cancellation-verified-in-safari--cc658fef.md
 20261101T013152Z-astra-to-fable-final-export-verification-underway-decision004-t-a92f3c0c.md
+20261101T013315Z-astra-to-fable-roadmap-reconciliation-completed-keeper-slices-a-ee5ced6e.md

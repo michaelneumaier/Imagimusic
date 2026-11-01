@@ -40,3 +40,4 @@
 - 2026-11-01 astra: v6 acceptance passed (full and air bit-identical); Loom conversation UI verified; stereo WAV ffprobe confirmed.
 - 2026-11-01 fable: renderPerformanceAudio default outlive-render; harness v7 separates negative controls from shipping assertions; decision 004; roadmap closes repeatability and Loom A.
 - 2026-11-01 astra: Loom scored passage + render worker/cancellable job, Safari verified. Fable reviews approve.
+- 2026-11-01 fable: roadmap reconciled per Astra audit (Keepers/planner done, inputs consolidated, equivalence gate stated precisely, M2.5 close-out gated on full-movie regression; Track V staging matches proposal 005).
