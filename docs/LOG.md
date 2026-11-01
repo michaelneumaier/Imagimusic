@@ -252,3 +252,4 @@
 - 2026-11-01 astra: three-stage adaptation listening page committed (305eb00); both local studies ready for Michael.
 - 2026-11-01 astra: optional static structure diagrams (default collapsed) on the adaptation audition page. Fable review approve.
 - 2026-11-01 astra: diagram width refined to each spring's stiffness ratio to its original (bodies unchanged). Fable: approve; review addendum.
+- 2026-11-01 fable: diagram review refreshed against the final relative-stiffness mapping (approve, no nits).
