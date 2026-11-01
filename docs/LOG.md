@@ -299,3 +299,4 @@
 - 2026-11-01 fable: roadmap tidied for the project home page (M11–M13 in order after M10; the duplicate M6 heading renamed).
 - 2026-11-01 astra: project home page (catalog, vision, roadmap, history, source notebook). Fable review: milestones, history and claims accurate; one description fix (variant-audition is a fixed comparison, not a workbench); nit on MIDI mapping status.
 - 2026-11-01 astra: ensemble design basis approved (one processor, three engines, subject to measurement; silent parts keep contacts; declared arithmetic; common 120 s ending on the audio thread; per-part ack order; common origin). Fable: logged in the contract note and roadmap M13.
+- 2026-11-01 astra: project home and resumable milestone committed (4af816b). Fable: roadmap M14 entry.

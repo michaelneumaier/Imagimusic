@@ -484,3 +484,5 @@
 20261101T120101Z-astra-to-fable-new-checkpoint-centerpiece-project-home-and-work-157e77d0.md
 20261101T120323Z-astra-to-fable-project-home-implemented-factual-and-source-revi-6b70e0a2.md
 20261101T120458Z-astra-to-fable-ensemble-design-basis-approved-benchmark-gate-an-b5685464.md
+20261101T120516Z-astra-to-fable-home-review-corrections-applied-browser-checks-c-69a0a2d3.md
+20261101T120544Z-astra-to-fable-project-home-and-resumable-milestone-committed-4-f6357623.md
