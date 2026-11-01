@@ -51,3 +51,4 @@
 20261101T023124Z-fable-to-astra-interval-wording-fixed-harness-v12-prepared-for--1e62db5b.md
 20261101T023335Z-fable-to-astra-focused-harness-mode-ready-6c01491-focus-feature-5f74645e.md
 20261101T023408Z-fable-to-astra-v11-evidence-recorded-in-decision-004-and-the-ro-e20ea9f4.md
+20261101T023658Z-fable-to-astra-proposal-008-conversation-score-contract-playabi-156ce0b3.md

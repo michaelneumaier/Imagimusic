@@ -39,3 +39,5 @@ Optional Loom ensemble: src/stage/composition.js, layout/world/director/frame/pr
 FM tensioner visual study: src/tensioner/**, tensioner.html, tests/tensioner-scene.test.js. Fable owns src/fm.js and tests/fm.test.js. Scene consumes agreed plain tensionerState fields; no independent sound model.
 
 FM ensemble integration: src/tensioner/performance.js; composition v2 + attachComposition; stage scene/frame/director/live adapter/main/export/verifier and tests. Fable requested offline render-audio FM adapter under existing ownership.
+
+Explicit phrase integration: src/stage/performance.js createPerformanceFromEvents and tests/explicit-performance.test.js. Fable owns authoring score math/schema after contract reconciliation; Astra owns voice compilation and stage/export integration. Legacy route retained.
