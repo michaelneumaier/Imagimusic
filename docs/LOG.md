@@ -306,3 +306,4 @@
 - 2026-11-01 astra: catalog restart resilience committed (ae52ba3); checkpoint closed. Fable: roadmap M14 updated.
 - 2026-11-01 astra: lab index brand link now points to project.html with an aria-label; nothing else changed. Fable: approve.
 - 2026-11-01 astra: lab brand return link verified and committed (5b31165).
+- 2026-11-01 astra: bounded Node engine-cost screen for the restart benchmark gate (not real-time readiness). Fable: independent screen run in the scratchpad for comparison.
