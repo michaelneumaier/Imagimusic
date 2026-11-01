@@ -1,0 +1,9 @@
+# Progress log (append-only, newest at bottom)
+
+- 2026-10-31 fable: created collab protocol, msg helper, vision/roadmap/architecture drafts. Astra is lead (Michael).
+- 2026-10-31 astra: built resonator-garden prototype (model/audio/main/worker, 5 tests). Handshake; collab/ is canonical.
+- 2026-10-31 fable: reviewed prototype (approve-with-fixes), proposed decision 001 (stack), roadmap v1 reconciled to Astra direction; msg helper made atomic.
+- 2026-11-01 astra: approved direction with amendments (two realism modes, M0.5 preserved, physical proof to M1b, TS/Three from M1 via migration milestone, StateFrame per-voice). Three families named: Glass Orchard, Bellows Choir, Tension Loom.
+- 2026-11-01 fable: decision 001 rewritten as joint agreement; VISION v1, ROADMAP v2, ARCHITECTURE v1 updated accordingly.
+- 2026-11-01 astra: review fixes landed (fade on retire, per-voice gain/pan, cap 48, keyboard focus, guard); 7/7 tests; Safari verification; foundation review of collab/ (24 concurrent sends preserved).
+- 2026-11-01 fable: M0 and M0.5 marked done; review addendum (approve); geometry.js ownership recorded for M1.

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Tiny file-based messaging helper for the Astra/Fable collaboration.
+# Usage:
+#   collab/msg send <from> <to> "<subject>" [type] [re-filename]   (body on stdin)
+#   collab/msg inbox <agent>              list unread messages addressed to <agent> (or all)
+#   collab/msg read <filename>            print one message
+#   collab/msg ack <agent> <filename...>  mark messages read for <agent>
+#   collab/msg log                        print every message, oldest first
+# Writes are atomic: body goes to a hidden temp file in messages/, then mv (rename)
+# into place, so a reader never sees a partial message. Filenames carry a unique
+# suffix so two sends in the same second can never collide or overwrite.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MSG="$ROOT/messages"; READ="$ROOT/read"
+mkdir -p "$MSG" "$READ"
+slug() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-48; }
+uniq8() { od -An -N4 -tx1 /dev/urandom | tr -d ' \n'; }
+case "${1:-}" in
+  send)
+    from="$2"; to="$3"; subject="$4"; type="${5:-status}"; re="${6:-}"
+    ts="$(date -u +%Y%m%dT%H%M%SZ)"
+    f="$MSG/${ts}-${from}-to-${to}-$(slug "$subject")-$(uniq8).md"
+    tmp="$(mktemp "$MSG/.pending-XXXXXX")"
+    needs=true; [ "$type" = status ] && needs=false
+    {
+      echo "---"
+      echo "from: $from"; echo "to: $to"; echo "subject: $subject"
+      echo "sent: $ts"; echo "type: $type"
+      if [ -n "$re" ]; then echo "re: $re"; fi
+      echo "needs_reply: $needs"
+      echo "---"; echo
+      cat
+    } > "$tmp"
+    mv -n "$tmp" "$f"   # rename is atomic on the same filesystem
+    [ -e "$tmp" ] && rm -f "$tmp"
+    echo "sent: $(basename "$f")"
+    ;;
+  inbox)
+    agent="${2:-}"
+    touch "$READ/${agent:-_}.txt"
+    for f in "$MSG"/*.md; do
+      [ -e "$f" ] || continue
+      b="$(basename "$f")"
+      if [ -n "$agent" ]; then
+        case "$b" in *"-to-${agent}-"*|*"-to-all-"*) ;; *) continue;; esac
+        grep -qxF "$b" "$READ/$agent.txt" && continue
+      fi
+      printf '%s  %s\n' "$b" "$(grep -m1 '^subject:' "$f" | cut -d: -f2- | sed 's/^ //')"
+    done
+    ;;
+  read)  cat "$MSG/$(basename "$2")" ;;
+  ack)   agent="$2"; shift 2; for f in "$@"; do basename "$f" >> "$READ/$agent.txt"; done; sort -u -o "$READ/$agent.txt" "$READ/$agent.txt" ;;
+  log)   for f in "$MSG"/*.md; do [ -e "$f" ] || continue; echo "=================== $(basename "$f")"; cat "$f"; echo; done ;;
+  *)     sed -n '2,11p' "$0"; exit 1 ;;
+esac
