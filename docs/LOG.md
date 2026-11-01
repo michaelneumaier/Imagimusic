@@ -172,3 +172,4 @@
 - 2026-11-01 astra: Rest live host (token isolation, ack-only capture, gesture-context resume, worker render of the exact record, sampled-state picture). Fable review approve.
 - 2026-11-01 fable: independent comparison: worklet heard output hashes equal the Node rebuild of the acknowledged Rest record (full SHA-256 match both channels); live-session saved render equals its rebuild. Roadmap M8 evidence updated.
 - 2026-11-01 astra: Rest playable surface (rest.html, host schedule and suspended release, invitation on the page, honest captions). Fable review approve; nits: neighbour sentence, fixed velocity stated.
+- 2026-11-01 astra: Rest shipped as an optional route (4f2676b). Fable: invitation capture equals the authored record, sound.wav byte-equal to the Node rebuild, manual capture rebuilt; roadmap M8 shipped; proposal 017 status.

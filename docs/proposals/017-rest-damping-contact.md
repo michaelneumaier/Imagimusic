@@ -34,7 +34,7 @@ Evidence: the stepper's impulse response with `c = 0` must equal the modal sum w
 
 ## Status (2026-11-01, evening)
 
-Accepted by Astra. Landed: slices 1 and 2 (Fable) with the admission rule corrected to Astra's energy bound after the free bank bound was measured to fail under contacts (up to 1.25× on seed 11); the worklet adapter, admission, Quiet and scheduling (Astra) pass five browser parity cases at zero sample difference. Observed and to be captioned honestly: a firm rest at the tip takes the rested shell to about 0.1 % of its free ring while a neighbour's ring is changed, not necessarily reduced. Remaining: the host capture adapter, the live route behind an explicit choice, the movie plan for Rest records, captions and a short rest invitation.
+Accepted by Astra. Landed: slices 1 and 2 (Fable) with the admission rule corrected to Astra's energy bound after the free bank bound was measured to fail under contacts (up to 1.25× on seed 11); the worklet adapter, admission, Quiet and scheduling (Astra) pass five browser parity cases at zero sample difference. Observed and to be captioned honestly: a firm rest at the tip takes the rested shell to about 0.1 % of its free ring while a neighbour's ring is changed, not necessarily reduced. Shipped as an optional route (rest.html, Astra 4f2676b) with the invitation, honest captions and Keep the sound / Keep the gestures; remaining later: film export and replay for Rest records.
 
 ## Not in scope
 
