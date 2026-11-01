@@ -4,6 +4,7 @@ import {createRestHost} from './contact-host.js';
 import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
 import {bindGrovePlaying,groveStrikeZone} from './interaction.js';
+import {bindGroveMovieControls} from './movie-controls.js';
 import {createGroveReplay} from './replay.js';
 import {restWorkerJob} from './contact-job.js';
 import {restReplayFrame} from './rest-replay-picture.js';
@@ -13,12 +14,14 @@ let grove=composeGrove({seed:3}),world,sculpture,picking,invitation=null,saving=
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const replay=createGroveReplay({onChange:({state})=>{if(!replayMode)return;sync();if(state==='ended')status('Your passage has settled. Listen again, keep it, or begin another.');if(state==='suspended')status('Listening was interrupted. Listen back restarts your saved passage.');}});
 function stopReplay(){playToken++;replayMode=false;pictureAbort?.abort();pictureAbort=null;replay.stop();sync();}
+const movie=bindGroveMovieControls({getSource:()=>{stopReplay();return {recording:host.recording(),pcm:host.saveAudio(),camera:{position:world.camera.position.toArray(),target:world.controls.target.toArray()}};}});
 const host=createRestHost({onChange:({state,error})=>{sync();if(state==='error')status(error.message,true);else if(state==='ended'){hands.clear();status('Quiet. Keep this passage, or begin your own.');}else if(state==='suspended')status('Audio paused. Resume keeps this passage; hands and Quiet can still be released.');},onDecision:ack=>{if(!ack.accepted&&ack.reason!=='ended')status(ack.reason==='headroom'?'Let this ring breathe before another strike.':'This passage is full of gestures. Choose Quiet, keep it, and begin another.');}});
 function open(){return !invitation&&['ready','playing'].includes(host.state);}
 function sync(){
  const state=host.state,active=['ready','playing'].includes(state),ended=state==='ended',has=!!host.stats?.strikes;
  $('begin').disabled=active||state==='preparing'||state==='ending';$('begin').textContent=state==='preparing'?'Opening Rest…':state==='suspended'?'Resume Rest ↗':ended?'Begin another ↗':active?'Rest is open':'Enter Rest ↗';
  $('invite').disabled=!active||!!invitation||has||!!host.stats?.activeContacts;$('quiet').disabled=replayMode?!['preparing','playing','suspended'].includes(replay.state):!['ready','playing','suspended'].includes(state);$('replay').disabled=!ended||!has||replay.state==='preparing';$('new').disabled=!ended;$('save').disabled=!ended||!has||saving;$('score').disabled=!ended||!has;$('seed').disabled=state==='preparing';
+ movie.setReady(ended&&has&&!!world);
  for(const {strike,rest} of buttons){strike.disabled=!open();rest.disabled=!open();}
 }
 function strike(body,position=Number($('position').value)){if(!open())return;host.send({kind:'strike',body,position,velocity:.55});status('Let the ring reveal its neighbors.');}
@@ -48,7 +51,7 @@ $('replay').onclick=async()=>{
  }catch(error){if(own===playToken){replayMode=false;status(error.message,true);}}finally{if(own===playToken)sync();}
 };
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();$('quiet').click();return;}if(e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,select,textarea'))return;const key=e.key.toLowerCase(),s=strikeKeys.indexOf(key),r=restKeys.indexOf(key);if(s>=0){e.preventDefault();strike(s);}if(r>=0){e.preventDefault();hand(r,`key-${r}`);}});
-window.addEventListener('keyup',e=>{const body=restKeys.indexOf(e.key.toLowerCase());if(body>=0)lift(body,`key-${body}`);});window.addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReplay();releaseAll();host.quiet();}});window.addEventListener('pagehide',()=>{viewToken++;stopReplay();replay.dispose();picking?.dispose();host.dispose();});
+window.addEventListener('keyup',e=>{const body=restKeys.indexOf(e.key.toLowerCase());if(body>=0)lift(body,`key-${body}`);});window.addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReplay();releaseAll();host.quiet();}});window.addEventListener('pagehide',()=>{viewToken++;movie.dispose();stopReplay();replay.dispose();picking?.dispose();host.dispose();});
 const initial=Number(new URLSearchParams(location.search).get('seed'));if([3,7,11].includes(initial)){$('seed').value=initial;grove=composeGrove({seed:initial});}
 try{world=createGroveWorld($('world'));}catch{status('The 3D view is unavailable; the body controls still work.');$('world').hidden=true;}build();
 if(world)picking=bindGrovePlaying({canvas:$('world'),controls:world.controls,getScene:()=>sculpture,camera:world.camera,canPlay:open,start(body,key,hit){const zone=groveStrikeZone(hit.positionU,host.recipe.positions);if($('gesture').value==='strike')strike(body,zone);else hand(body,key,zone);},finish:lift});

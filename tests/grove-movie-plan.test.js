@@ -32,3 +32,11 @@ test('movie evidence separately identifies source Float32 samples and saved PCM1
  for(let c=0;c<2;c++){const bytes=Buffer.alloc(12);pcm.channels[c].forEach((value,i)=>bytes.writeFloatLE(value,i*4));assert.equal(evidence.audio.sourcePcm.sha256[c],createHash('sha256').update(bytes).digest('hex'));}
  assert.equal(evidence.audio.wav.sha256,createHash('sha256').update(Buffer.from(evidence.wav)).digest('hex'));assert.equal(evidence.audio.wav.file,'passage.wav');
 });
+test('Rest film retains held contacts and exact Quiet length in an immutable model timeline',async()=>{
+ const {createGroveRestRecipe,composeRestInvitation,restInvitationRecord,renderRestRecord}=await import('../src/score/grove-rest.js');
+ const recipe=createGroveRestRecipe(composeGrove({seed:3}),{...DEFAULT_VOICE_CONFIG,partials:1},{sampleRate:8000}),record=restInvitationRecord(recipe,composeRestInvitation(recipe,{tempo:120})),plan=createGroveMoviePlan(record,camera),pcm=renderRestRecord(record,recipe);
+ validateGroveMovieAudio(pcm,plan.manifest);assert.equal(plan.manifest.audioSamples,record.ended.frame+record.ended.fadeFrames);assert.ok(plan.sample(2.7).contacts[0]);assert.equal(plan.sample(4.1).contacts[0],null);
+ for(const i of [0,100,20,plan.times.length-1])assert.equal(traceHash(plan.sample(plan.times[i])),plan.manifest.modelFrameHashes[i]);
+ const before=plan.sample(2.7);record.contacts[0].end=1;assert.deepEqual(plan.sample(2.7),before);
+ const corrupt=structuredClone(plan.manifest.capture);corrupt.outputGain+=.1;assert.throws(()=>createGroveMoviePlan(corrupt,camera),/gain/);
+});

@@ -10,8 +10,9 @@ export function bindGroveMovieControls({getSource}){
   try{
    // Capture before the first await so later playing/configuration cannot alter this film.
    const {recording,pcm,camera}=getSource();
-   const {exportGroveMovie}=await import('./export.js');
-   const result=await exportGroveMovie(recording,pcm,camera,{signal:own.signal,onProgress:text=>{if(controller===own)$('movie-status').textContent=text;}});
+   const [{exportGroveMovie},soundtrack]=await Promise.all([import('./export.js'),pcm]);
+   if(own.signal.aborted)throw new DOMException('Movie render cancelled.','AbortError');
+   const result=await exportGroveMovie(recording,soundtrack,camera,{signal:own.signal,onProgress:text=>{if(controller===own)$('movie-status').textContent=text;}});
    if(own.signal.aborted)return;clearResult();
    const url=link('movie-download',result.blob,'video/mp4',result.stem+'.mp4');link('movie-wav',result.wav,'audio/wav',result.stem+'.wav');link('movie-manifest',JSON.stringify(result.manifest,null,2),'application/json',result.stem+'-movie.json');
    $('movie-preview').src=url;$('movie-output').hidden=false;$('movie-caption').textContent=`Grove ${result.manifest.capture.grove.seed} · ${result.manifest.presentation.voice} · ${result.manifest.duration.toFixed(1)} seconds`;

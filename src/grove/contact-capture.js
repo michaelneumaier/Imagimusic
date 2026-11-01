@@ -3,7 +3,7 @@ import {validateRestRecord,REST_RECORD_KIND,REST_RECORD_VERSION} from '../score/
  * diagnostics; the saved passage uses actual frames and application order. */
 export function createRestCapture(recipe,{generation}={}){
  if(typeof generation!=='string'||!generation)throw new Error('Capture needs a passage generation');
- const metadata=structuredClone({version:REST_RECORD_VERSION,kind:REST_RECORD_KIND,grove:recipe.grove,voice:recipe.voice,sampleRate:recipe.sampleRate,outputGain:recipe.outputGain,zones:recipe.zones,strengths:recipe.strengths.map(s=>s.name)});
+ const metadata=structuredClone({version:REST_RECORD_VERSION,kind:REST_RECORD_KIND,grove:recipe.grove,voice:recipe.voice,sampleRate:recipe.sampleRate,outputGain:recipe.outputGain,zones:recipe.zones,strengths:recipe.strengths.map(s=>({name:s.name,c:s.c}))});
  const events=[],contacts=[],active=new Map(),ids=new Set();let origin=null,lastOrder=-1,lastFrame=-1,ended=null,complete=false,failure=null,rejected=0;
  function close(body,frame){const contact=active.get(body);if(!contact)return;if(frame>contact.start)contacts.push({...contact,end:frame});active.delete(body);}
  function process(ack){

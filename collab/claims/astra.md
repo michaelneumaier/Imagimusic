@@ -89,3 +89,5 @@ Rest live host: src/grove/contact-host.js, contact-job.js, contact-render-worker
 Rest playable route: rest.html, rest.css, src/grove/rest-main.js and grove.html link. Explicit optional study with immediate strikes, held damping contacts, shared invitation and local recording downloads.
 
 Rest replay: src/grove/rest-replay-picture.js, contact-picture-worker.js, rest-main UI, shared replay deferred PCM support and related tests. Worker-derived 60fps sampled model picture paired with exact saved PCM; no capture mutation.
+
+Rest movie extension: movie-plan/export/shared controls, movie-plan-worker.js and Rest UI. Reconstruct Rest v2 model and exact ending, worker preparation, actual held-contact rings in rendered film.

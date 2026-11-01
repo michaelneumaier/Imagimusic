@@ -25,3 +25,11 @@ A longer greeting render was cancelled through the main UI. The original capture
 Full Node suite: 318/318 before those two small cleanup changes. Independent prototype verification: Fable review 3c6f7a8. The verifier was strengthened at Astra's request so mismatched supplied container metadata affects its verdict/exit status, with separate manifest-only and full-artifact verdicts.
 
 Deterministic browser abort at rendered frame 9 passed after the cleanup fixes: “Cancelled; no movie saved,” Render movie enabled, no WAV/manifest links enabled, and no encoder warning in the observed console. Fable approved both cleanup changes (mailbox 20261101T065441Z) and independently verified the actual played-performance bundle at the full artifact level in review 450085f. Main-page integration is now verified and ready for local use.
+
+### Rest film integration in progress (2026-11-01 07:45 UTC)
+
+Rest v2 captures now enter the movie plan through recipeForRecord/restMovieSource (schema and energy admission reconstruction). A worker prepares the full model timeline before browser encoding. Contact rings use the recorded zone/strength, matching Rest's live picture; original/richer Grove paths remain supported. Controls accept deferred saved PCM while freezing capture/camera synchronously. Seven focused capture/replay/movie tests pass.
+
+Actual Safari Rest page: recorded two strikes and a held hand, then Make a film succeeded. Bundle: renders/rest-movie-first-play/{manifest.json,movie.mp4,sound.wav}; 30 video frames,47408 source samples at48kHz,0.9876667s audio. Extracted contact-frame.png at0.4s visibly shows the hand ring on body1. A second render cancelled in worker preparation, preserving the prior film and capture; capture-after-cancel.json equals manifest.capture.
+
+Independent verification initially FAILED because Fable concurrently changed strength serialization from names to coefficient objects in v2; the browser artifact used the already-shipped name format. Legacy compatibility requested, not yet verified at this checkpoint. New capture producer now writes explicit {name,c}; recipeForRecord must interpret older names using their historical default coefficients. Do not treat the rendered artifact alone as completed verification. Fable also owns the independent verifier update and review.
