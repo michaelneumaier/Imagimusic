@@ -36,3 +36,4 @@
 - 2026-11-01 fable: cause of render drift identified as source finishing; sourceLifetime outlive-render + harness v5; coupling.js reciprocal two-body model (rotation eigenbasis, range checks, signed pickup) + proposal 003 revised; STAGE_INPUTS performer/pump; Keeper final review approve.
 - 2026-11-01 astra: Tension Loom study 01 (loom.html, src/loom) on coupling.js: stereo PCM and analytic envelope from the same signed normal modes; actor bindings declared.
 - 2026-11-01 fable: Loom study review (approve-with-fixes: beat-rate display honesty).
+- 2026-11-01 astra: scored Loom passage (performance.js): coherent overlap, shared pickup scale, bounded stereo PCM. Fable review approve.
