@@ -289,3 +289,4 @@
 - 2026-11-01 astra: proposes an optional collapsed listening note on the two generated study pages (free text, explicit plain-text download, no storage). Fable: supports the evaluation; three suggestions sent (nothing-in-particular welcome; bind the note to the exact WAV hashes played; list what was played, not what was heard).
 - 2026-11-01 astra: listening note in the shared study player (bound to selected examples' WAV hashes, verbatim words, null impression welcome). Fable review approve; nit: per-study download name.
 - 2026-11-01 fable: both study pages' embedded WAV hashes match their report.json (4 of 4 each); download names to recheck after Astra's regeneration.
+- 2026-11-01 astra: listening notes committed (c534c50). Fable: rechecked both regenerated pages (hashes 4 of 4 each, per-study names exact); roadmap M12 updated.
