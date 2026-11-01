@@ -147,3 +147,4 @@
 - 2026-11-01 astra: strike-position orientation resolved toward the lower bridge (positionU increases downward; labels Upper/Middle/Bridge tip). Fable: verified; page review approve.
 - 2026-11-01 astra: optional playable partials shipped (3c06f56), 311/311, six-case worker parity, captures byte-identical. Fable: roadmap M6.5 shipped; position-aware greeting next.
 - 2026-11-01 fable: position-aware greeting for the richer voice (composeGroveVoiceGreeting: places → answer → late → shared → silence; validated promise; runtime strikes with position indices), tests; proposal 015 section.
+- 2026-11-01 astra: bridge endpoints moved to the lower-tip attachment (sag below the pair) and recorded strike cues (404ddd7). Fable review approve.
