@@ -19,3 +19,5 @@ Direct scene playing follow-up: actual shell raycasting now routes a captured ho
 Camera/pointer follow-up: an active OrbitControls drag keeps subsequent body touches in camera control instead of acquiring a musical gesture midway; third interaction regression passes. Full-suite checkpoint during concurrent modal-network development: 297 tests, 295 pass, two failures in Fable's new modal-network fixtures (missing explicit clamped-free support), reported to Fable. Direct-play files do not change the sound model. No whole-suite green claim for this checkpoint.
 
 Framing follow-up: moved the default camera closer so the directly playable shells occupy more of the scene. Safari responsive screenshots at 400×656 and 320×656 confirm the support, all bodies and numbered pads remain within the layout; the floor is intentionally cropped.
+
+Direct shell playing peer review: Fable formally approved 8883cb2 in collab/reviews/20261101T0612Z-fable-reviews-grove-direct-play.md. Three interaction regressions independently rerun and pass. The richer modal-model comparison remains separate from this shipped voice; no unreviewed timbre replacement has been made.
