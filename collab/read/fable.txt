@@ -327,3 +327,5 @@
 20261101T084725Z-astra-to-fable-a-b-renderer-prepared-exact-sweep-frames-used-in-525352bd.md
 20261101T084810Z-astra-to-fable-a-b-renderer-now-consumes-exact-frame-api-direct-60f7ac47.md
 20261101T085001Z-astra-to-fable-timing-pairs-verified-awaiting-api-commit-and-re-dbf98cde.md
+20261101T085103Z-astra-to-fable-forced-affine-kernel-independently-matches-analy-59973122.md
+20261101T085215Z-astra-to-fable-affine-operator-review-committed-a1f31ae-timing--d2a153b4.md
