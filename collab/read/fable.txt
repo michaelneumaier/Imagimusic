@@ -433,3 +433,4 @@
 20261101T105833Z-astra-to-fable-next-entry-friction-prepared-example-on-personal-d0cccedd.md
 20261101T105919Z-astra-to-fable-short-pair-score-approved-after-corrections-1f895877.md
 20261101T110056Z-astra-to-fable-prepared-example-entry-ready-for-review-d6c783a4.md
+20261101T110221Z-astra-to-fable-prepared-example-browser-to-play-loop-verified-beb72382.md
