@@ -11,9 +11,9 @@ class PoweredEncounter extends AudioWorkletProcessor{
  process(inputs,outputs){
   const channels=outputs[0];if(this.failed){channels.forEach(c=>c.fill(0));return false;}
   try{
-   if(!this.processor){this.processor=createPoweredProcessor({...this.config,events:this.pending,originFrame:Math.max(currentFrame,this.config.originFrame??currentFrame)});this.pending=null;this.config=null;}
+   if(!this.processor){this.firstProcessFrame=currentFrame;this.processor=createPoweredProcessor({...this.config,events:this.pending,originFrame:Math.max(currentFrame,this.config.originFrame??currentFrame)});this.pending=null;this.config=null;}
    const alive=this.processor.process(channels,currentFrame);
-   for(const message of this.processor.drain())this.port.postMessage({...message,generation:this.generation});
+   for(const message of this.processor.drain())this.port.postMessage({...message,...(message.type==='started'?{firstProcessFrame:this.firstProcessFrame}:{}),generation:this.generation});
    if(alive&&this.snapshots&&currentFrame+channels[0].length>=this.nextSnapshot){const frame=currentFrame+channels[0].length;this.nextSnapshot=frame+1024;this.port.postMessage({type:'state',generation:this.generation,frame,...this.processor.snapshot()});}
    return alive;
   }catch(error){channels.forEach(c=>c.fill(0));this.fail(error);return false;}

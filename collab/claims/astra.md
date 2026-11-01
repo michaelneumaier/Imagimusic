@@ -114,3 +114,4 @@ Powered live host: src/grove/powered-host.js, powered-render-worker.js, tests/gr
 Powered playable surface: powered.html, powered.css, src/grove/powered-main.js, powered-picture-worker.js; two-position held contact, driven/release phases, local replay and saves; optional link from Rest after browser review.
 Powered first-use: host and UI accept a currently held contact during preparation, drop released intent before audio starts, preserve acknowledged-only display; mark body01 visibly before playing.
 Powered body identification: optional bodyLabels in src/grove/scene.js, custom readable sprite above body01, existing scene labels unchanged by default.
+Powered startup timing: powered-worklet/host diagnostic fields and tests/grove-powered-startup.html/js; measure requested origin versus first process block and actual origin, separate from device-output latency.

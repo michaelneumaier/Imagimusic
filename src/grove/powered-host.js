@@ -5,7 +5,7 @@ const prepareDefault=(data,options)=>restWorkerJob(new URL('./powered-prepare-wo
 const renderDefault=(data,options)=>restWorkerJob(new URL('./powered-render-worker.js',import.meta.url),data,options);
 /** One bounded powered encounter per explicit Begin. No automatic restarts. */
 export function createPoweredHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-powered-encounter',options),prepare=prepareDefault,render=renderDefault,onChange=()=>{},onDecision=()=>{}}={}){
- let context=null,node=null,recipe=null,driver=null,capture=null,snapshot=null,pcm=null,rendering=null,prepareAbort=null,renderAbort=null,token=0,serial=0,state='idle',failure=null,quietRequested=false,disposed=false,finishedTime=0,pendingContact=null;
+ let context=null,node=null,recipe=null,driver=null,capture=null,snapshot=null,pcm=null,rendering=null,prepareAbort=null,renderAbort=null,token=0,serial=0,state='idle',failure=null,quietRequested=false,disposed=false,finishedTime=0,pendingContact=null,timing=null;
  const emit=()=>{if(!disposed)onChange({state,error:failure});};
  const setState=next=>{state=next;emit();};
  function detach(){if(node){node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();node=null;}}
@@ -22,14 +22,16 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
    const [,,prepared]=await Promise.all([resume,module,preparation]);
    if(disposed||own!==token||abort.signal.aborted)return false;
    if(context.state!=='running')throw new Error('Audio is interrupted. Begin again when audio is available.');
+   const mountedFrame=Math.ceil(context.currentTime*context.sampleRate);
    const generation=`powered-${own}`,originFrame=Math.ceil((context.currentTime+.035)*context.sampleRate);
    const nextCapture=createPoweredCapture(prepared.recipe,{generation,driver:prepared.driver,fadeFrames:prepared.fadeFrames});
    const nextNode=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{...prepared,originFrame,generation,snapshots:true,events:pendingContact?[{...pendingContact,id:'contact-0'}]:[]}});
-   detach();renderAbort?.abort();recipe=prepared.recipe;driver=prepared.driver;capture=nextCapture;node=nextNode;snapshot=null;pcm=null;rendering=null;finishedTime=0;quietRequested=false;serial=pendingContact?1:0;pendingContact=null;prepareAbort=null;
+   detach();renderAbort?.abort();recipe=prepared.recipe;driver=prepared.driver;capture=nextCapture;node=nextNode;timing={sampleRate:context.sampleRate,mountedFrame,requestedOriginFrame:originFrame,actualOriginFrame:null,firstProcessFrame:null};snapshot=null;pcm=null;rendering=null;finishedTime=0;quietRequested=false;serial=pendingContact?1:0;pendingContact=null;prepareAbort=null;
    node.port.onmessage=({data})=>{
     if(disposed||own!==token||data.generation!==generation)return;
     try{
      capture.consume(data);
+     if(data.type==='started'){timing.actualOriginFrame=data.originFrame;timing.firstProcessFrame=Number.isSafeInteger(data.firstProcessFrame)?data.firstProcessFrame:null;}
      if(data.type==='state')snapshot=data;
      if(data.type==='processed')onDecision(data);
      if(data.type==='finished'){finishedTime=(data.ended.frame+data.ended.fadeFrames)/recipe.sampleRate;detach();setState('ended');}
@@ -70,5 +72,5 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
   return {...v,envelope:v.envelope.map(x=>x*fade),time:frame/recipe.sampleRate,driverActive:relative>=0&&!snapshot.ended&&frame>=driver.startFrame&&frame<driver.startFrame+driver.forcedFrames};
  }
  function dispose(){if(disposed)return;disposed=true;token++;prepareAbort?.abort();renderAbort?.abort();detach();context?.close();state='disposed';pcm=null;}
- return {begin,send,quiet,resume,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get stats(){return capture?.stats??null;}};
+ return {begin,send,quiet,resume,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get timing(){return timing?{...timing}:null;},get stats(){return capture?.stats??null;}};
 }
