@@ -40,7 +40,7 @@ test('on-pulse record: the cumulative phrase is admitted as its own history, wit
     assert.equal(p.grove, JSON.parse(JSON.stringify(p.grove)) && p.grove, 'canonical grove carried'); assert.ok(p.grove.includes('"seed"')); assert.ok(typeof p.voice === 'string');
   }
   assert.throws(() => composeOnPulsePhrase(createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), { body: 7 }), /index the grove/);
-  // The period floor in measureSecondStrike is never used silently: a recipe whose two lowest modes coincide is refused.
+  // The frequency floor (period cap) in measureSecondStrike is never used silently: a recipe whose two lowest modes coincide is refused.
   const tight = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), v = tight.visual, [r0, r1] = v.lowBand; const saved = v.omegaD[r1]; v.omegaD[r1] = v.omegaD[r0] + 2 * Math.PI * (MIN_MODE_SPLIT_HZ / 2);
   assert.throws(() => composeOnPulsePhrase(tight), /closer than/); v.omegaD[r1] = saved;
 });

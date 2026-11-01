@@ -7,8 +7,9 @@ import { canonicalGrove } from './grove.js';
 import { canonicalVoiceConfig } from './grove-voice.js';
 
 export const PULSE_PHRASE_VERSION = 1;
-/** The physical period is 1/(f₂ − f₁) of the two lowest low-band modes, as measureSecondStrike reports it: rounded to 3 decimals, and floored there at
- *  1/0.05 s; this composer refuses a recipe whose two lowest modes are closer than MIN_MODE_SPLIT_HZ instead of using the floor silently. The authored
+/** The physical period is 1/(f₂ − f₁) of the two lowest low-band modes, as measureSecondStrike reports it: the frequency difference is floored at
+ *  0.05 Hz there, so the period is capped at 20 s, and it is rounded to 3 decimals; this composer refuses a recipe whose two lowest modes are closer
+ *  than MIN_MODE_SPLIT_HZ instead of letting that cap apply silently. The authored
  *  unit is that period, doubled once when it is shorter than minUnitSeconds (a 0.4 s count is fast), never more. The two are reported separately. */
 export const MIN_MODE_SPLIT_HZ = 0.05;
 export const PULSE_BOUNDS = Object.freeze({ minUnitSeconds: 0.6, maxOpeningSeconds: 12, minRingSeconds: 1, maxRingSeconds: 20 });

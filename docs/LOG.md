@@ -279,3 +279,4 @@
 - 2026-11-01 astra: 023 approved as an optional open-encounter prototype (reference delays named as isolated-trial references; no post-play feedback); go given. Fable: src/score/grove-pulse.js (composeOnPulsePhrase, onPulseRecord, onPulsePrompt) with cumulative admission on all curated groves; proposal corrected (period is between the two lowest modes: 0.41 / 2.46 / 0.44 s).
 - 2026-11-01 astra: early grove-pulse findings (bind the phrase to grove, voice, positions and rate; state the period floor and precision). Fable: fixed and tested; third continuity test noted.
 - 2026-11-01 astra: open-phrase surface (pulse.html, grove 3): native capture verified by Fable against the composer; review approve with nits (optional-chain the ack event, singular wording, grove hard-coded).
+- 2026-11-01 astra: open-phrase score approved (doc nit: frequency floor, period cap, not a period floor); second native WAV byte-equal to the Node rebuild. Fable: comment corrected.
