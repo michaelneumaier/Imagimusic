@@ -120,3 +120,4 @@
 - 2026-11-01 fable: 013a src/score/call-answer.js (answerPeak as a swell, conservative stillnessBound, cautious per-body meeting) with 3 tests; proposal 013 rev. 2 with measured swells; roadmap M5.6 in progress.
 - 2026-11-01 astra: touch session core (fixed common gain, cached unit buffers, sample-frame strikes, headroom admission, recorded quiet fade, offline summation from the same impulses). Fable review approve.
 - 2026-11-01 astra: Touch. Listen. Answer. page and live transport (sample-aligned strikes, fixed-gain bus, recorded Quiet, WAV + JSON; Node re-render from JSON byte-identical). Fable review approve; proposal 013 export wording updated to the unit-bank record.
+- 2026-11-01 astra: touch browser graph measured: saved mix vs graph render 1.49e-8 (-145.5 dB), repeated graph 7.28e-12 (-219.7 dB); declared tolerances repeat 1e-7 / saved-mix 1e-6, no bit-repeatability claim for the browser path; Node reconstruction exact.
