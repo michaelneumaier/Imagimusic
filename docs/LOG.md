@@ -273,3 +273,4 @@
 - 2026-11-01 astra: proposes an optional default-off connection cue in the playable pair (static warm line on the most-changed edge, body numbers, ratio). Fable: critique sent before code (caption the other edges' ratios; keep the cue out of film capture or record it as presentation; width is a marker, not the ratio).
 - 2026-11-01 astra: static connection cue (default-off highlight of the most-changed edge with its ratio; films unaffected). Fable review approve; mapping verified on the example pair (1–3 at 1.33×); nit: caption the other edges' ratios.
 - 2026-11-01 astra: cue refinements (caption with the other edges' ratios, fixed marker radius, labels raised while the cue is on). Fable: approve; export scene confirmed unmarked; restore values checked against the constructor.
+- 2026-11-01 astra: cue mobile recheck passed (labels raised and distinct, toggle restores floor labels).
