@@ -51,3 +51,4 @@
 - 2026-11-01 fable: roadmap: equivalence gate closed, slices B/C and M2.5 done, M3 in progress; harness v9 composed-passage shipping rows.
 - 2026-11-01 astra: Loom ensemble wired (opt-in ?loom=1, cancellable preparation, composed export + verifier). Fable review approve.
 - 2026-11-01 astra: composed full movie verified 1007/1007 with canonical composition; ensemble UI + caption live; 144 tests.
+- 2026-11-01 fable: proposal 007 FM tensioner contract (closed-form FM phase, alias policy, Bessel/Carson reference cases, PCM-from-model sound path) sent for agreement.

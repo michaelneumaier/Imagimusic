@@ -84,7 +84,7 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 
-## M3: Tension Loom, coupling and FM (status: in-progress; proposal 003 revised; reciprocal pair model, study 01, scored passage, shared scene adapter, composition v1 with live and offline adapters done; done 2026-11-01: opt-in ensemble UI (?loom=1), composed exports verifiable (composition saved canonically in the manifest, verifier rebuilds with it; renders/conservatory-loom-731.mp4 1007/1007); pending: harness v9 composed-passage audio identity report (Astra running); next: FM tensioner (B))
+## M3: Tension Loom, coupling and FM (status: in-progress; proposal 003 revised; reciprocal pair model, study 01, scored passage, shared scene adapter, composition v1 with live and offline adapters done; done 2026-11-01: opt-in ensemble UI (?loom=1), composed exports verifiable (composition saved canonically in the manifest, verifier rebuilds with it; renders/conservatory-loom-731.mp4 1007/1007); pending: harness v9 composed-passage audio identity report (Astra running); next: FM tensioner (B), contract in docs/proposals/007-fm-tensioner.md awaiting Astra)
 
 - Shared bridge/soundboard leaking energy between resonators; FM as a bridge that stretches strings while ringing.
 - LFO pendulum visibly linked to what it modulates.
