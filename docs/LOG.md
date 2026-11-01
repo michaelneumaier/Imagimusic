@@ -197,3 +197,4 @@
 - 2026-11-01 astra: listening studies committed (4b20924). Fable: logged as an evaluation checkpoint, not evidence of appeal; next: one concrete first-minute distraction.
 - 2026-11-01 astra: Rest film cleared at new passage and seed change; shared clear aborts, detaches and ignores stale errors. Fable review approve; note the Grove page still retains films across passages.
 - 2026-11-01 astra: Rest film lifecycle fix committed; the Grove page's retention and preview-versus-replay ownership to be aligned next, before the disclosure slice.
+- 2026-11-01 astra: Grove playback coordination aligned with Rest (preview/replay single source, Quiet for film-only, film cleared at new passage and configure). Fable review approve.
