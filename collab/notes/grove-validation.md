@@ -1,0 +1,15 @@
+# Grove encounter validation — 2026-11-01
+
+Local Safari 26.6.2 on macOS. grove.html opens a procedural three-body scene with numbered markers, curved modeled connections and authored support geometry. Enter prepares unit responses in a worker. Exercised greeting → Your turn → A/D held keyboard gestures → Quiet → both downloads. This validates UI execution, not subjective listening quality or physical mobile interaction.
+
+Captured 48 kHz passage: body 0 at frame 0, velocity .59; body 2 at frame 8064, velocity .4324999999999909; Quiet at frame 152528 with 1200-frame fade. Downloaded WAV was 614956 bytes and byte-identical to independent Node reconstruction from downloaded JSON, createGroveInstrument, renderGroveBank, mixImpulseRecording and stereoWav. Ignored local evidence: renders/grove-first-play.json and .wav.
+
+Browser tests/grove-audio.html uses actual shared impulse/fade scheduler functions in OfflineAudioContext and compares against the saved-buffer mix. All six cases passed: seeds 3 and 11 at 48 kHz, seed 7 at 44.1 kHz; full authored greeting and early Quiet for each. Maximum saved-mix difference 1.4901161193847656e-8, repeated browser render difference 1.1175870895385742e-8. Largest measured peak .0932743176817894. Thresholds fixed before run: mix 1e-6, repeat 1e-7, peak .9. Browser graph is numerically close, not claimed bit-exact. No speaker, device loopback or cross-browser claim. Evidence renders/grove-audio-report.json.
+
+Focused 18 network, generator, anatomy, performance and shared transport checks passed. Fable approved adapter/transport in collab/reviews/20261101T0558Z-fable-reviews-grove-adapter.md. Page/caption review requested separately; responsive layout still to verify.
+
+Startup on the first navigation retained old shared module state; normal reload loaded the complete page. Added a visible module-load failure message instead of leaving blank controls if a future import fails. Replaced removed PCFSoftShadowMap with supported PCFShadowMap in the new world.
+
+Realism: three linear lumped masses, three normal modes and common damping. Fixed layout-derived stereo displacement pickups, not acoustic radiation. Shell volume follows mass and tuning changes proportions at fixed volume; shell surfaces, support, materials and amplified envelope movement are design. Bridges follow real model topology but do not display edge energy flow.
+
+Follow-up: Fable page/caption review approved at collab/reviews/20261101T0604Z-fable-reviews-grove-page.md. Added a visible post-gesture explanation of New passage → greeting. Safari Responsive Design Mode at 400×656 exposed the inherited canvas height exceeding its scene frame; Grove now sizes its canvas to 100% of that frame. Reloaded screenshot confirms the full support and all three pads fit beneath the sticky toolbar, with no horizontal overflow. This is desktop responsive evidence, not physical iOS testing. Full Node suite: 291/291. Generator metadata regression rerun after 7f98d9e: 4/4.

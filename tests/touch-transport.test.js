@@ -30,3 +30,11 @@ test('an interrupted context resumes the existing capture rather than discarding
  await transport.resume();assert.equal(transport.state,'playing');assert.deepEqual(transport.recording().events,[first]);
  context.currentTime+=.5;transport.strike(1,.5);assert.equal(transport.recording().events[1].frame,4000);assert.equal(nodes.length,2);
 });
+
+test('a finite authored sequence is validated before playback and keeps its exact scheduled frames',async()=>{
+ const {context,bank,nodes}=fake();const transport=createTouchTransport({createContext:()=>context,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});
+ await transport.enable({});const record=transport.playSequence([{frame:280,body:0,velocity:.7},{frame:12000,body:1,velocity:.6}]);
+ assert.equal(record.events.length,2);assert.ok(Math.abs(nodes[1].started[0]-nodes[0].started[0]-(12000-280)/8000)<1e-12);
+ assert.throws(()=>transport.playSequence([{frame:0,body:9,velocity:1}]),/Invalid/);assert.equal(transport.recording().events.length,2);assert.equal(nodes.length,2);
+ context.currentTime=1.1;transport.quiet();assert.equal(transport.recording().ended.frame,520);
+});

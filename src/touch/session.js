@@ -57,3 +57,5 @@ export function renderTouchRecording(recording,bank){
  return {sampleRate,channels};
 }
 export const holdVelocity=milliseconds=>.25+.75*Math.max(0,Math.min(1,milliseconds/600));
+
+export {renderTouchRecording as mixImpulseRecording};

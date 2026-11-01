@@ -47,3 +47,27 @@ Authored performance assembly: src/stage/authored-performance.js and tests/autho
 Score-event inspection: src/stage/score-inspection.js, inspector.js, main.js, tests/score-inspection.test.js. Resolve actual compiled voice/event identities back to authored section and anchor/weight; no scene hash changes.
 
 Audition page: audition.html, src/audition/main.js, audition.css. Compare verified local legacy/conversation movies with single-source listening, selectable cadence/wide conversation view, and Fable's scoped analysis plots.
+
+MIDI2 numeric boundary: src/midi2/values.js and tests/midi2-values.test.js. Spec-backed integer/fixed-point conversion helpers only; Fable owns event model and parser. No runtime integration until expression contract review.
+
+Visual polish at Michael's request: src/stage/surface-lighting.js, world.js, bodies.js, director.js, stage.html, verifier camera mode allowlist, tests/director.test.js. Procedural studio reflections/material finish plus deterministic musical orbit camera.
+
+MIDI file intake: src/midi/read-file.js and tests/midi-read-file.test.js. Local File-to-validated-NoteList/provenance boundary with pre-read byte limit and AbortSignal; not connected to stage until parser/mapping review clears.
+
+MIDI desk: midi.html, midi.css, src/midi/desk.js, src/midi/preview.js and tests/midi-preview.test.js. Local intake UI with bounded note/track preview and parser warnings, progressing to mapping controls when Fable's compiler lands.
+
+Imported stage adapter: src/stage/imported-performance.js and tests/imported-performance.test.js. Canonical imported source/plan, explicit child disabling, refusal of unresolved assignments or assigned-but-disabled children; preserve chosen settings and return mapping report for export/inspection.
+
+Mapping UI: src/midi/mapping-desk.js, src/midi/desk-table.js and midi.html/css/desk.js. Per-channel instrument choices and excerpt/velocity controls, actual compiler report preview; stage transfer follows review.
+
+MIDI stage handoff: src/midi/stage-transfer.js, tests/midi-stage-transfer.test.js plus owned mapping desk/main UI. Per-import session keys; validated source transfer; imported playback and export.
+
+Experience direction: collab/notes/astra-spirituality-psychedelia.md — capture Michael's holistic intent and propose experiential design principles to Fable for vision integration; no runtime or roadmap displacement.
+
+Listening doorway active: listen.html, listen.css, src/listen/**, tests/listen-*.test.js; reusable Loom physics/worker/scene, inviting curated passages with quiet/seek/reduced-motion and optional interpretation, links from owned index/stage. Fable owns src/score/loom-journey.js + its tests/contract, requested by mailbox.
+
+Expressive bodies 011c: src/expressive/**, expressive.html, expressive.css, tests/expressive-*.test.js/html/js. Pure mapping/performance adapter, per-note scene, existing Bellows graph render and exact-buffer playback; Fable retains evaluator/fixture ownership.
+
+Call and answer 013: touch.html/css, src/touch/**, tests/touch-*; direct touch/keyboard Loom instrument, gentle cues, captured local performance, existing coupled-pair model. Fable owns src/score/call-answer.js/tests and proposal definitions.
+
+Grove 014: grove.html/css, src/grove/**, tests/grove-*; procedural network anatomy, playable encounter and recorded local performance. Fable owns network model in coupling layer and seeded generator/ritual in src/score/grove.js. Model topology drives visible connections; materials/layout are interpreted, no edge-energy flow claim.

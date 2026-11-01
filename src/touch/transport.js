@@ -11,7 +11,7 @@ export function scheduleTouchImpulse(context,buffer,master,{when,velocity,onende
 export function scheduleTouchFade(context,master,when,fadeFrames){master.gain.setValueAtTime(1,when);master.gain.linearRampToValueAtTime(0,when+fadeFrames/context.sampleRate);}
 
 /** Each scheduled buffer is one impulse; all share a fixed-gain output bus. */
-export function createTouchTransport({createContext=()=>new AudioContext(),prepare=prepareBank,onChange=()=>{}}={}){
+export function createTouchTransport({createContext=()=>new AudioContext(),prepare=prepareBank,onChange=()=>{},createSession=createTouchSession}={}){
  let context,session,bank,buffers,master,origin=null,state='idle',token=0,job,settings,suspendedFrom=null;
  const sources=new Map();
  const emit=()=>onChange({state,recording:session?.snapshot()??null});
@@ -21,7 +21,7 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
  function quiet(){
   if(!context||!master||!session)return;
   if(origin!==null&&!session.snapshot().ended){
-   const frame=Math.max(0,Math.ceil((context.currentTime-origin)*context.sampleRate));session.finish(frame);
+   const frame=Math.max(0,Math.ceil(context.currentTime*context.sampleRate)-Math.round(origin*context.sampleRate));session.finish(frame);
    const when=origin+frame/context.sampleRate;
    scheduleTouchFade(context,master,when,session.snapshot().ended.fadeFrames);
    for(const node of sources.keys())node.stop(when+.03);
@@ -30,7 +30,7 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
  }
  function cancel(){token++;job?.cancel();job=null;quiet();}
  function fresh(){
-  quiet();if(master&&![...sources.values()].includes(master))master.disconnect();session=createTouchSession(settings,context.sampleRate);origin=null;
+  quiet();if(master&&![...sources.values()].includes(master))master.disconnect();session=createSession(settings,context.sampleRate);origin=null;
   master=context.createGain();master.connect(context.destination);state='ready';suspendedFrom=null;contextChanged();emit();
  }
  async function enable(nextSettings){
@@ -48,12 +48,30 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
   origin??=scheduled;
   const frame=Math.max(0,Math.round((scheduled-origin)*context.sampleRate)),result=session.strike({frame,body,velocity});
   if(!result.accepted)return result;
-  const bus=master,node=scheduleTouchImpulse(context,buffers[body],bus,{when:origin+frame/context.sampleRate,velocity,onended(node){sources.delete(node);if((bus!==master||state==='ended')&&![...sources.values()].includes(bus))bus.disconnect();}});sources.set(node,bus);
+  schedule(result.event);
   state='playing';emit();return result;
+ }
+ function schedule(event){
+  const bus=master,node=scheduleTouchImpulse(context,buffers[event.body],bus,{when:origin+event.frame/context.sampleRate,velocity:event.velocity,onended(node){sources.delete(node);if((bus!==master||state==='ended')&&![...sources.values()].includes(bus))bus.disconnect();}});sources.set(node,bus);
+ }
+ // Events use integer sample frames; convert authored seconds with Math.round(time * sampleRate).
+ // An ended passage may also be replaced by a fresh sequence.
+ function playSequence(events){
+  if(!bank||!['ready','playing','ended'].includes(state)||context.state!=='running')throw new Error('Prepare the instrument before playing its greeting');
+  // Validate the entire finite score before changing the audible passage.
+  const candidate=createSession(settings,context.sampleRate);
+  for(const event of events){const result=candidate.strike(event);if(!result.accepted)throw new Error(`Greeting exceeds ${result.reason}`);}
+  if(!events.length)throw new Error('The greeting needs at least one gesture');
+  fresh();session=candidate;origin=Math.ceil((context.currentTime+.035)*context.sampleRate)/context.sampleRate;
+  for(const event of session.snapshot().events)schedule(event);
+  state='playing';emit();return session.snapshot();
  }
  function newPassage(){if(!bank||state==='preparing')return;fresh();}
  function recording(){return session?.snapshot()??null;}
  function saveAudio(){if(!bank||!session)throw new Error('Prepare the instrument first');return renderTouchRecording(session.snapshot(),bank);}
  function dispose(){cancel();context?.close();}
- return {enable,resume,strike,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
+ return {enable,resume,strike,playSequence,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
 }
+
+// The same clock, impulse scheduler and recorded ending serve other fixed linear instruments.
+export {createTouchTransport as createImpulseTransport};
