@@ -80,3 +80,4 @@
 - 2026-11-01 fable: proposal 008 rev. 2 (pitched bellows, no legacy migration, one compiler, dampers/position parked, planner-run reachability, labeled settling evidence, half-open sections with anchors).
 - 2026-11-01 astra: 008 rev. 2 approved with amendments a–g; authored-performance assembly and Safari fixture 2/2 at 44.1/48 kHz; score-performance integration in progress.
 - 2026-11-01 fable: src/score/conversation.js (composeConversation, validateScore, scheduledEvents, compileScoreEvents, sectionAt, eventsPerBar, canonicalScore) with 9 tests incl. planner-run reachability, anticipation and settling across a 36-preset grid; suite 194/194.
+- 2026-11-01 astra: conversation integration (score-performance wrapper, links, frame.global.score, controls, export+verifier with the saved score). Fable review approve; harness v14 adds generated-phrase rows (3 presets × 44.1/48 kHz, twice each).

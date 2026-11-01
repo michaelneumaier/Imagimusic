@@ -17,7 +17,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 13;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 14;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -216,6 +216,37 @@ await check('Shipping default: featured FM tensioner (composition v2), alone and
   }
   return out;
 });
+await check('Generated phrase: composeConversation presets through createScorePerformance at 44.1 and 48 kHz, twice each', async () => {
+  // GENERATED-PHRASE evidence (proposal 008), distinct from the compiler fixture in tests/authored-render-browser.*.
+  // Each preset is composed, compiled and assembled exactly as the stage does it, rendered twice per rate; asserted:
+  // bit-identical, finite, bounded, silent final 50 ms, exact assembled length, and no onset inside the final hold.
+  // No live/offline identity is claimed here.
+  const { composeConversation, lastOnsetSeconds } = await import('../src/score/conversation.js');
+  const { createScorePerformance } = await import('../src/stage/score-performance.js');
+  const { DEFAULT_COMPOSITION } = await import('../src/stage/composition.js');
+  const { DEFAULT_TENSIONER } = await import('../src/fm.js');
+  const composition = { ...structuredClone(DEFAULT_COMPOSITION), version: 2, loom: { ...DEFAULT_COMPOSITION.loom, enabled: true }, fm: { enabled: true, settings: { ...DEFAULT_TENSIONER } } };
+  const presets = [['calm 0.7 seed 731', { seed: 731, density: 0.7, character: 'calm' }], ['bright 1 seed 731', { seed: 731, density: 1, character: 'bright' }], ['restless anchors-only (density 0) seed 2', { seed: 2, density: 0, character: 'restless' }]];
+  const rates = focus ? [48000] : [44100, 48000];
+  const out = {};
+  for (const [name, controls] of presets) for (const rate of rates) {
+    const score = composeConversation(controls), passage = createScorePerformance(DEFAULT_PATCH, score, composition, rate);
+    const a = await renderPerformanceAudio(passage, rate), b = await renderPerformanceAudio(passage, rate);
+    const r = compareRenders(a, b, rate); let peak = 0, tail = 0; const tailStart = a.length - Math.round(rate * 0.05);
+    for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (!Number.isFinite(v)) throw new Error(`${name} @ ${rate}: non-finite PCM at ${i}`); peak = Math.max(peak, v); if (i >= tailStart) tail = Math.max(tail, v); }
+    const label = `generated phrase: ${name} @ ${rate} Hz`;
+    matrix[label] = r;
+    assert(r.identical, `${label}: not identical, max ${r.maxDiff} at ${r.atSeconds}s`);
+    assert(peak > .01 && peak < 1, `${label}: peak outside range ${peak}`);
+    assert(tail < 1e-3, `${label}: non-silent tail ${tail}`);
+    assert(Math.abs(a.length / rate - passage.duration) < 1 / rate + 1e-9, `${label}: length does not match assembled duration`);
+    const last = lastOnsetSeconds(score);
+    assert(passage.events.every(e => e.voice.noteOn <= last + 1e-9) && (passage.loom?.events ?? []).every(e => e.time <= last + 1e-9), `${label}: an onset inside the hold`);
+    out[label] = { peak, last50msPeak: tail, seconds: a.length / rate, assembledDuration: passage.duration, lastOnsetSeconds: last, scheduledEvents: passage.events.length, loomStrikes: (passage.loom?.events ?? []).length, fmEntranceSeconds: passage.fm?.time ?? null };
+  }
+  return out;
+});
+
 await check('WAV resolution: every SHIPPING row identical after 16-bit quantization (negative controls reported, not asserted)', async () => {
   const failing = Object.entries(matrix).filter(([k, r]) => !k.startsWith('negative control') && !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);
   assert(failing.length === 0, failing.join('; '));
