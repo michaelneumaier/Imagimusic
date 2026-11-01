@@ -18,3 +18,4 @@
 - src/rest/limits.js: shared Rest limits (Fable).
 - src/score/forced-study.js, tests/forced-study.test.js: powered-driver study (Fable).
 - tools/render-forced-study.mjs: powered-driver study renderer (Fable).
+- tools/render-place-study.mjs: contact place comparison under the driver (Fable).

@@ -26,8 +26,21 @@ A hand at the upper zone leaves the response within 1–4 dB of free while chang
 ## 3. A hand on the neighbour preserves the response and changes what remains
 Across c from 0.25 to 60: seed 3 peak within −0.3…+2.0 dB of free, rel/forced 0.52 → 0.70; seed 7 within ±1 dB, 0.57 → 0.54; seed 11 −4…−8 dB, 0.32 → 0.59. On seeds 3 and 11 the released interval grows relative to the forced one as the neighbour's hand firms: the hand on the other body changes the relationship after release without taking the driven response away.
 
+## Scope
+These results hold for the tested cases: one sinusoid at the body's tuning, 2 s on, 3 s released, the driver at u = 0.6, contacts through the release. "Level only" is a statement about these cases, not a universal property. Orientation: u increases down the shell toward the lower bridge (0.3 upper, 0.6 middle, 1 bridge tip); numeric u is authoritative.
+
 ## Proposal: at most three strengths, and one place
-- Keep **firm = 60 N·s/m** as the reference stop (the existing case) and **light = 12** as it is; add **medium = 1 N·s/m** only if a strength step is wanted on the Rest page later (−18 dB at the tip; at the upper zone −1 dB with a visible release change). Units: viscous coefficient per unit mode-shape value, as the recipe states.
+- Keep **firm = 60 N·s/m** as the reference stop (the existing case) and **light = 12** as it is; **c = 1 N·s/m** is a specified coefficient for this study, not a named strength (it is below light); add a named step on the Rest page only if listening asks for one. Units: viscous coefficient per unit mode-shape value, as the recipe states.
 - For the next audition, vary **place** rather than strength: four cases at one source, free / upper hand c = 1 / neighbour hand c = 4 / tip hand c = 60 (reference), on seeds 3 and 11 where the measured contrasts are largest.
 - Evaluation: audition only, natural levels, no normalization within the set; the listening question for Michael is whether the upper-hand and neighbour-hand cases sound like shaping a continuing response rather than stopping it. RMS and energy describe the files; they do not answer that.
 - No live controls, no production change; the existing three cases stay as references.
+
+## Rendered (2026-11-01): `tools/render-place-study.mjs`, `renders/place-study/grove-{3,11}/`
+Same source and gain as the forced study of each grove (asserted by the tool); four cases; Astra's `verify-forced-study.mjs` passes both reports. Measured (peak dBFS; released RMS over forced RMS):
+
+| case | seed 3 | seed 11 |
+|---|---|---|
+| free | −27.9; 0.56 | −30.2; 0.49 |
+| driven body, u = 0.3, c = 1 | −29.0; 0.48 | −30.9; 0.44 |
+| neighbour, u = 1, c = 4 | −26.6; 0.63 | −38.2; 0.34 |
+| driven body, u = 1, c = 60 (reference) | −80.4; 0.20 | −79.1; 0.21 |
