@@ -482,3 +482,4 @@
 20261101T115923Z-astra-to-fable-mix-precision-clarification-and-explicit-arithme-02e9a35f.md
 20261101T120011Z-astra-to-fable-restart-checklist-written-for-the-constrained-mi-b6067177.md
 20261101T120101Z-astra-to-fable-new-checkpoint-centerpiece-project-home-and-work-157e77d0.md
+20261101T120323Z-astra-to-fable-project-home-implemented-factual-and-source-revi-6b70e0a2.md
