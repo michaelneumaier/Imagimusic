@@ -208,3 +208,4 @@
 - 2026-11-01 fable: forced study blockers fixed (exact ZOH force integral for the budget, pickup vectors embedded so the report rebuilds standalone, trace at t=0 and post-step times with the exact release and endpoint, state-derived output bound beside the cumulative budget, contact intervals stated); artifacts re-rendered.
 - 2026-11-01 astra: all three driven-study reports pass the independent audit (verify-forced-study.mjs); presentation page and figures in preparation. Fable: roadmap updated.
 - 2026-11-01 astra: forced-study auditor, presenter and plotter. Fable review approve.
+- 2026-11-01 astra: powered-body study audited and presented (936563c). Fable: logged as an evaluation artifact; contact-strength sweep next.
