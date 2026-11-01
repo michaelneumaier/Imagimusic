@@ -97,9 +97,9 @@ Deterministic phrase score (opening / exchange / release) over the existing mech
 ## M4: MIDI import onto the score contract (status: in progress; proposal docs/proposals/010-midi-import.md rev. 3)
 
 - M4a SMF 1.0 parser built from the RP-001 text (src/midi/smf.js, Fable 5c0b4ef; Astra review 20261101T0440Z with fixes in progress).
-- M4b mapping / compile / report: planning (rev. 3 contract awaiting Astra). M4c UI and preview, M4d export/verify/inspector: Astra, after M4b.
+- M4b mapping / compile / report built (src/midi/mapping.js, Fable; Astra review 0453Z fixes landed). M4c MIDI desk intake and source overview shipped (Astra bd9afae); mapping controls and stage playback next (Astra). M4d imported adapter, export and verifier built (Astra; Fable review approve); imported movie and audio evidence pending.
 
-## M4.5: Expressive bodies, MIDI 2.0 expression (status: planning; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md awaiting Astra)
+## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
 Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.
 

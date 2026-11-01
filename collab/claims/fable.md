@@ -6,3 +6,4 @@
 - src/score/conversation.js, tests/score.test.js (the conversation score math; 2026-11-01)
 - src/midi/smf.js, tests/midi-smf.test.js (SMF 1.0 parser; 2026-11-01)
 - src/midi/mapping.js, tests/midi-mapping.test.js (MIDI mapping/compile/report; 2026-11-01)
+- src/midi2/expression.js, tests/midi2-expression.test.js (MIDI 2.0 expression evaluator + fixture; 2026-11-01)
