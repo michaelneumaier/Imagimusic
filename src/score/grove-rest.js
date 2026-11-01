@@ -260,3 +260,34 @@ export function restInvitationSettledLine(invitation) {
   if (ids !== 'ring,rest,across,together,quiet') throw new Error('not a Rest invitation.');
   return `A free ring. Then a firm hand on the struck body: its ring died under the hand. Then the same strike with the hand on body ${invitation.neighbor + 1} instead: the bridge carried the change and the ring was different, not simply quieter. All three with a light hand, then Quiet.`;
 }
+
+// ---- a compact guided exploration after the invitation: same strike, rest here, rest on the neighbour ----
+// Not an authored passage: the player plays, and the page shows one prompt at a time. Progress is decided only by acknowledged,
+// accepted gestures (the audio thread's decisions), never by requests. Pure state machine; the page feeds it acknowledgements.
+export const REST_EXPLORATION_STEPS = Object.freeze([
+  { id: 'ring', prompt: 'Strike the first body once and let it ring.' },
+  { id: 'here', prompt: 'Strike it again, and while it rings rest a hand on it. Lift when it is gone.' },
+  { id: 'neighbor', prompt: 'Strike it once more, and this time rest the hand on its neighbour instead.' },
+  { id: 'done', prompt: 'That is the whole gesture. Play on, or choose Quiet.' },
+]);
+export function createRestExploration(recipe, { body = 0 } = {}) {
+  const g = recipe.grove, bridge = g.bridges.find(e => e.a === body || e.b === body);
+  if (!bridge) throw new Error('the exploration needs a body with a bridge.');
+  const neighbor = bridge.a === body ? bridge.b : bridge.a;
+  let step = 0, struck = false, lastStrikeFrame = -1;
+  const current = () => ({ step: REST_EXPLORATION_STEPS[step].id, prompt: REST_EXPLORATION_STEPS[step].prompt, body, neighbor, done: step === REST_EXPLORATION_STEPS.length - 1 });
+  return {
+    get state() { return current(); },
+    /** Feed one acknowledgement { accepted, appliedFrame, event: { kind, body, zone } }. Returns the state after it. */
+    acknowledge(ack) {
+      if (!ack?.accepted || !ack.event) return current();
+      const e = ack.event, kind = e.kind;
+      if (kind === 'strike' && e.body === body) { struck = true; lastStrikeFrame = ack.appliedFrame; if (step === 0) step = 1; return current(); }
+      const restOn = kind === 'contact' && e.zone !== null && e.zone !== undefined, afterStrike = struck && ack.appliedFrame > lastStrikeFrame;
+      if (step === 1 && restOn && e.body === body && afterStrike) { step = 2; struck = false; return current(); }
+      if (step === 2 && restOn && e.body === neighbor && afterStrike) { step = 3; return current(); }
+      return current();
+    },
+    reset() { step = 0; struck = false; lastStrikeFrame = -1; return current(); },
+  };
+}

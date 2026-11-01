@@ -219,3 +219,21 @@ test('admission replay and reproducible strengths: an over-loud public record is
   const rebuilt = recipeForRecord(JSON.parse(JSON.stringify(cr))); assert.deepEqual(rebuilt.strengths, custom.strengths);
   const a = renderRestRecord(cr, rebuilt), b = renderRestRecord(cr, custom); assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])));
 });
+
+test('the guided exploration advances only on accepted gestures in the taught order: strike, rest here, rest on the neighbour', async () => {
+  const { createRestExploration, REST_EXPLORATION_STEPS } = await import('../src/score/grove-rest.js');
+  const recipe = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: 8000 }), x = createRestExploration(recipe), n = x.state.neighbor;
+  const ack = (frame, event, accepted = true) => x.acknowledge({ accepted, appliedFrame: frame, event });
+  assert.equal(x.state.step, 'ring');
+  assert.equal(ack(10, { kind: 'strike', body: 1 }).step, 'ring', 'another body does not count');
+  assert.equal(ack(20, { kind: 'strike', body: 0 }, false).step, 'ring', 'a rejected strike does not count');
+  assert.equal(ack(30, { kind: 'strike', body: 0 }).step, 'here');
+  assert.equal(ack(25, { kind: 'contact', body: 0, zone: 2, strength: 1 }).step, 'here', 'a hand before the strike is not the taught order');
+  assert.equal(ack(40, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'here', 'the neighbour is step three, not two');
+  assert.equal(ack(50, { kind: 'contact', body: 0, zone: 1, strength: 0 }).step, 'neighbor', 'a hand on the struck body after striking it');
+  assert.equal(ack(60, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'neighbor', 'needs a fresh strike first');
+  assert.equal(ack(70, { kind: 'strike', body: 0 }).step, 'neighbor');
+  assert.equal(ack(80, { kind: 'contact', body: n, zone: 2, strength: 1 }).step, 'done'); assert.ok(x.state.done);
+  assert.equal(x.reset().step, 'ring'); assert.equal(REST_EXPLORATION_STEPS.length, 4);
+  for (const s of REST_EXPLORATION_STEPS) assert.ok(!/feel|should|calm/i.test(s.prompt));
+});
