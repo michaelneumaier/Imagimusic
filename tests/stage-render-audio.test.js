@@ -32,6 +32,20 @@ test('diagnostic options isolate families, bypass the compressor, and keep nodes
   assert.throws(() => buildPerformanceGraph(new Context(), performance, { sourceLifetime: 'outlive-render' }), /renderEnd/);
 });
 
+test('dense passage: stolen garden voices keep the outlive stop (retire cannot re-finish a source mid-render)', () => {
+  const base = createPerformance(DEFAULT_PATCH), first = base.snapshots.garden.voices[0];
+  const many = Array.from({ length: MAX_VOICES + 6 }, (_, i) => ({ ...first, id: `d${i}`, slot: i % 8, noteOn: 1 + i * 0.01, end: first.end + i * 0.01 }));
+  const performance = { ...base, events: many.map(voice => ({ family: 'garden', voice })), duration: 40, snapshots: { garden: { voices: many, dampers: [] } } };
+  const { scheduled } = buildPerformanceGraph(new Context(), performance, { sourceLifetime: 'outlive-render', renderEnd: 40 });
+  const retired = scheduled.filter(s => s.voice.fadeAt !== undefined);
+  assert.equal(retired.length, 6);
+  assert.ok(scheduled.every(s => s.voice.nodes.every(n => n.stopTime === 41)), 'every garden source, retired or not, stops after the render');
+  // and the retired voices still fade to exactly zero at their fade end
+  assert.ok(retired.every(s => { const ev = s.voice.gain.gain.events; const last = ev[ev.length - 1]; return last.kind === 'ramp' && last.value === 0 && last.t === s.voice.end; }));
+  const asLive = buildPerformanceGraph(new Context(), performance);
+  assert.ok(asLive.scheduled.filter(s => s.voice.fadeAt !== undefined).every(s => s.voice.nodes.every(n => n.stopTime === s.voice.end)));
+});
+
 test('renderPerformanceAudio passes the passage duration as renderEnd for outlive-render', async () => {
   const performance = createPerformance(DEFAULT_PATCH);
   let seen = null;

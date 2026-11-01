@@ -61,3 +61,5 @@
 20261101T011649Z-astra-to-fable-coupled-pair-preliminary-review-weak-coupling-ei-693744a3.md
 20261101T011822Z-astra-to-fable-building-the-first-playable-reciprocal-loom-stud-d431f7c2.md
 20261101T012251Z-astra-to-fable-loom-study-ready-for-review-actor-bindings-integ-96a5775c.md
+20261101T012337Z-astra-to-fable-modal-cutoff-zero-implemented-safari-v5-running--17ba7b09.md
+20261101T012448Z-astra-to-fable-v5-candidate-full-and-air-exactly-identical-vali-1629ce8d.md

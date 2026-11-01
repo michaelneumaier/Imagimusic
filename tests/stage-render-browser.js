@@ -11,7 +11,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 5;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 6;   // bump on every change to the experiments so reports are comparable
 const environment = { harnessVersion: HARNESS_VERSION, userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
 let passage = null;
 
@@ -127,10 +127,29 @@ await check('Candidate lifecycle: full passage with sources outliving the render
   const full = await twiceFull(DEFAULT_PATCH, outlive);
   const air = structuredClone(DEFAULT_PATCH); air.bellows.source = 'air';
   const fullAir = await twiceFull(air, outlive);
-  const asLive = await render(DEFAULT_PATCH), candidate = await render(DEFAULT_PATCH, outlive);
-  const out = { fullOutlive: full, fullAirOutlive: fullAir, asLiveVsOutlive: compareRenders(asLive, candidate, 48000) };
+  const asLive = await render(DEFAULT_PATCH), candidate = await render(DEFAULT_PATCH, outlive), candidateAir = await render(air, outlive);
+  const passage = createPerformance(DEFAULT_PATCH, 48000);
+  const out = { fullOutlive: full, fullAirOutlive: fullAir, asLiveVsOutlive: compareRenders(asLive, candidate, 48000), candidateStats: stats(candidate), candidateAirStats: stats(candidateAir), candidateSeconds: candidate.length / 48000, passageDuration: passage.duration };
   Object.assign(matrix, { 'lifecycle: full passage, outlive-render': full, 'lifecycle: full passage air, outlive-render': fullAir, 'lifecycle: as-live vs outlive-render (same seed)': out.asLiveVsOutlive });
   return out;
+});
+// v6 assertions on the candidate (added once v5 reported maxDiff 0 for both rows). These must hold before the
+// default changes: bit-identical full and air renders, bounded finite audio, a silent last 50 ms, length == duration.
+await check('Candidate lifecycle assertions: full and air bit-identical, bounded, silent tail, exact length', async () => {
+  const outlive = { sourceLifetime: 'outlive-render' };
+  const air = structuredClone(DEFAULT_PATCH); air.bellows.source = 'air';
+  const full = matrix['lifecycle: full passage, outlive-render'], fullAir = matrix['lifecycle: full passage air, outlive-render'];
+  assert(full && fullAir, 'candidate rows did not run');
+  assert(full.identical, `full passage not identical: max ${full.maxDiff} at ${full.atSeconds}s`);
+  assert(fullAir.identical, `air passage not identical: max ${fullAir.maxDiff} at ${fullAir.atSeconds}s`);
+  const passage = createPerformance(DEFAULT_PATCH, 48000);
+  const c = await render(DEFAULT_PATCH, outlive), ca = await render(air, outlive), s = stats(c), sa = stats(ca);
+  for (const [name, st, pcm] of [['full', s, c], ['air', sa, ca]]) {
+    assert(st.peak > .01 && st.peak < 1, `${name} peak outside range: ${st.peak}`);
+    assert(st.last50msPeak < 1e-3, `${name} non-silent tail ${st.last50msPeak}`);
+    assert(Math.abs(pcm.length / 48000 - passage.duration) < 1 / 48000 + 1e-9, `${name} length does not match passage duration`);
+  }
+  return { full: s, air: sa };
 });
 await check('WAV resolution: every variant identical after 16-bit quantization (WAV path only; AAC takes float32 and is lossy)', async () => {
   const failing = Object.entries(matrix).filter(([, r]) => !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);

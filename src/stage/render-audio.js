@@ -80,9 +80,16 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: voice.end, seed, stolenAt: voice.stolenAt, graph });
     } else {
       const live = garden.strike(voice.slot, patch, voice.velocity, voice.noteOn, voice.position);
-      if (live) for (const node of live.nodes) { if (keepNodes) node.onended = null; if (outlive) node.stop(stopAt); }
+      if (live && keepNodes) for (const node of live.nodes) node.onended = null;
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: live ? live.end : null, voice: live, skipped: !live });
     }
+  }
+  // Apply the outlive stop AFTER all events are scheduled: a later steal (garden.retire) re-schedules the stolen
+  // voice's stop to its fade end, which would otherwise finish that source during the render. The voice gain has
+  // already ramped to exactly 0 at the fade end, so extending the stop keeps it silent and finish-free.
+  if (outlive) for (const s of scheduled) {
+    if (s.family === 'bellows') s.graph.source.stop(stopAt);
+    else if (s.voice) for (const node of s.voice.nodes) node.stop(stopAt);
   }
   return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
 }
