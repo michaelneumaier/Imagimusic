@@ -5,7 +5,7 @@ const prepareDefault=(data,options)=>restWorkerJob(new URL('./powered-prepare-wo
 const renderDefault=(data,options)=>restWorkerJob(new URL('./powered-render-worker.js',import.meta.url),data,options);
 /** One bounded powered encounter per explicit Begin. No automatic restarts. */
 export function createPoweredHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-powered-encounter',options),prepare=prepareDefault,render=renderDefault,onChange=()=>{},onDecision=()=>{}}={}){
- let context=null,node=null,recipe=null,driver=null,capture=null,snapshot=null,pcm=null,rendering=null,prepareAbort=null,renderAbort=null,token=0,serial=0,state='idle',failure=null,quietRequested=false,disposed=false,finishedTime=0;
+ let context=null,node=null,recipe=null,driver=null,capture=null,snapshot=null,pcm=null,rendering=null,prepareAbort=null,renderAbort=null,token=0,serial=0,state='idle',failure=null,quietRequested=false,disposed=false,finishedTime=0,pendingContact=null;
  const emit=()=>{if(!disposed)onChange({state,error:failure});};
  const setState=next=>{state=next;emit();};
  function detach(){if(node){node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();node=null;}}
@@ -14,7 +14,7 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
  async function begin(grove){
   if(disposed)throw new Error('Powered host is disposed');
   if(['preparing','playing','suspended','ending'].includes(state))return false;
-  const own=++token;prepareAbort?.abort();const abort=new AbortController();prepareAbort=abort;failure=null;setState('preparing');
+  pendingContact=null;quietRequested=false;const own=++token;prepareAbort?.abort();const abort=new AbortController();prepareAbort=abort;failure=null;setState('preparing');
   try{
    if(!context){context=createContext();context.onstatechange=contextChanged;}
    const resume=context.resume(),module=context.audioWorklet.addModule(new URL('./powered-worklet.js',import.meta.url));
@@ -24,8 +24,8 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
    if(context.state!=='running')throw new Error('Audio is interrupted. Begin again when audio is available.');
    const generation=`powered-${own}`,originFrame=Math.ceil((context.currentTime+.035)*context.sampleRate);
    const nextCapture=createPoweredCapture(prepared.recipe,{generation,driver:prepared.driver,fadeFrames:prepared.fadeFrames});
-   const nextNode=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{...prepared,originFrame,generation,snapshots:true}});
-   detach();renderAbort?.abort();recipe=prepared.recipe;driver=prepared.driver;capture=nextCapture;node=nextNode;snapshot=null;pcm=null;rendering=null;finishedTime=0;quietRequested=false;serial=0;prepareAbort=null;
+   const nextNode=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{...prepared,originFrame,generation,snapshots:true,events:pendingContact?[{...pendingContact,id:'contact-0'}]:[]}});
+   detach();renderAbort?.abort();recipe=prepared.recipe;driver=prepared.driver;capture=nextCapture;node=nextNode;snapshot=null;pcm=null;rendering=null;finishedTime=0;quietRequested=false;serial=pendingContact?1:0;pendingContact=null;prepareAbort=null;
    node.port.onmessage=({data})=>{
     if(disposed||own!==token||data.generation!==generation)return;
     try{
@@ -41,12 +41,14 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
  }
  // Requested frames are diagnostic; capture records acknowledged applied frames.
  function send(command){
-  if(!node||quietRequested||!['playing','suspended'].includes(state))return false;
+  if(!['preparing','playing','suspended'].includes(state)||quietRequested)return false;
   if(command.kind!=='contact'||(command.zone!==null&&command.zone!==0&&command.zone!==1))throw new Error('Choose one of the two contact positions or lift.');
+  if(state==='preparing'){pendingContact=command.zone===null?null:{kind:'contact',zone:command.zone,frame:Math.ceil(context.currentTime*context.sampleRate)};return true;}
+  if(!node)return false;
   node.port.postMessage({type:'events',events:[{id:`contact-${serial++}`,kind:'contact',zone:command.zone,frame:Math.ceil(context.currentTime*context.sampleRate)}]});return true;
  }
  function quiet(){
-  if(state==='preparing'){token++;prepareAbort?.abort();prepareAbort=null;setState(capture?.state==='complete'?'ended':'idle');return;}
+  if(state==='preparing'){pendingContact=null;token++;prepareAbort?.abort();prepareAbort=null;setState(capture?.state==='complete'?'ended':'idle');return;}
   if(!node||quietRequested)return;
   node.port.postMessage({type:'events',events:[{id:`quiet-${serial++}`,kind:'quiet',frame:Math.ceil(context.currentTime*context.sampleRate)}]});quietRequested=true;contextChanged();
  }

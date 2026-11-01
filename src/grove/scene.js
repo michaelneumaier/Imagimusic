@@ -5,7 +5,7 @@ const colors=[0xa4d0b8,0xd8b5d8,0x9fc7dc,0xe0c18f,0xbebee1];
 const metal=()=>new T.MeshStandardMaterial({color:0xbfa67d,metalness:.72,roughness:.3});
 function add(parent,geometry,material,position=[0,0,0]){const mesh=new T.Mesh(geometry,material);mesh.position.fromArray(position);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;}
 function tube(parent,points,radius,material){return add(parent,new T.TubeGeometry(new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p))),64,radius,8,false),material);}
-export function createGroveScene(grove,{vectors=[]}={}){
+export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
  const anatomy=groveAnatomy(grove),root=new T.Group(),brass=metal();
  const width=1.15*Math.max(2.2,...anatomy.bodies.map(b=>Math.abs(b.position[0])+1));
  const depth=1.15*Math.max(1.15,...anatomy.bodies.map(b=>Math.abs(b.position[2])+.7));
@@ -27,11 +27,11 @@ export function createGroveScene(grove,{vectors=[]}={}){
    const weight=(v[i]??0)**2,arc=Math.max(.04,Math.PI*2*weight),material=new T.MeshBasicMaterial({color:colors[j%colors.length],transparent:true,opacity:.45});
    const band=add(form,new T.TorusGeometry(.85,.012,6,48,arc),material,[0,(j-(vectors.length-1)/2)*.25,0]);band.rotation.x=Math.PI/2;band.rotation.z=j*Math.PI*.6;return band;
   });
-  const labelCanvas=document.createElement('canvas');labelCanvas.width=128;labelCanvas.height=64;const ink=labelCanvas.getContext('2d');ink.font='28px monospace';ink.fillStyle='#d8d5cf';ink.textAlign='center';ink.fillText(String(i+1).padStart(2,'0'),64,42);const labelTexture=new T.CanvasTexture(labelCanvas),label=new T.Sprite(new T.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false}));label.position.set(spec.position[0],.45,spec.position[2]);label.scale.set(.65,.325,1);root.add(label);
+  const labelCanvas=document.createElement('canvas');labelCanvas.width=bodyLabels[i]?256:128;labelCanvas.height=64;const ink=labelCanvas.getContext('2d');ink.font='28px monospace';ink.fillStyle='#d8d5cf';ink.textAlign='center';ink.fillText(bodyLabels[i]??String(i+1).padStart(2,'0'),labelCanvas.width/2,42);const labelTexture=new T.CanvasTexture(labelCanvas),label=new T.Sprite(new T.SpriteMaterial({map:labelTexture,transparent:true,depthWrite:false,sizeAttenuation:!bodyLabels[i]}));label.position.set(spec.position[0],.45,spec.position[2]);label.scale.set(bodyLabels[i]?.22:.65,bodyLabels[i]?.055:.325,1);if(bodyLabels[i])label.position.y=top+.32;root.add(label);
   const halo=add(root,new T.TorusGeometry(.6,.009,6,64),new T.MeshBasicMaterial({color:colors[i%colors.length],transparent:true,opacity:.15}),[spec.position[0],.025,spec.position[2]]);halo.rotation.x=Math.PI/2;
   const gesture=add(anchor,new T.TorusGeometry(.65,.012,8,64),new T.MeshBasicMaterial({color:0xf2e3ff,transparent:true,opacity:0,depthWrite:false}));gesture.rotation.x=Math.PI/2;
   const strike=add(anchor,new T.TorusGeometry(.65,.016,8,64),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false}));strike.rotation.x=Math.PI/2;strike.visible=false;
-  return {anchor,form,shell,core,bands,halo,gesture,strike,labelTexture,spec};
+  return {anchor,form,shell,core,bands,halo,gesture,strike,label,labelTexture,spec};
  });
  const bridges=anatomy.bridges.filter(b=>b.visible).map(spec=>{
   const a=anatomy.bodies[spec.a].attachment,b=anatomy.bodies[spec.b].attachment,sag=Math.min(a[1],b[1])-.35;

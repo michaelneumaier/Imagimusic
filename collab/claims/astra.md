@@ -112,3 +112,5 @@ Powered real-browser parity: tests/grove-powered-audio.html/js; OfflineAudioCont
 Powered capture adapter: src/grove/powered-capture.js and tests/grove-powered-capture.test.js; save only ordered processed acknowledgements, actual origin/Quiet and truncated source under new powered v2 record contract.
 Powered live host: src/grove/powered-host.js, powered-render-worker.js, tests/grove-powered-host.test.js; explicit begin/Quiet/resume lifecycle, capture snapshots, cancellable preparation, exact same-browser worker replay and acknowledged visual state. UI follows host checks.
 Powered playable surface: powered.html, powered.css, src/grove/powered-main.js, powered-picture-worker.js; two-position held contact, driven/release phases, local replay and saves; optional link from Rest after browser review.
+Powered first-use: host and UI accept a currently held contact during preparation, drop released intent before audio starts, preserve acknowledged-only display; mark body01 visibly before playing.
+Powered body identification: optional bodyLabels in src/grove/scene.js, custom readable sprite above body01, existing scene labels unchanged by default.

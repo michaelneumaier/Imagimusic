@@ -11,10 +11,10 @@ import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),pads=[$('upper'),$('tip')];
 let grove=composeGrove({seed:3}),world,scene,picking,picture=null,pictureAbort=null,replayMode=false,saving=false,revision=0;
 const status=text=>{$('status').textContent=text;};
-const host=createPoweredHost({onChange:({state,error})=>{sync();if(state==='ended'){hands.clear();status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){hands.clear();status(error.message);}},onDecision:ack=>{if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
+const host=createPoweredHost({onChange:({state,error})=>{sync();if(state==='idle')hands.clear();if(state==='ended'){hands.clear();status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){hands.clear();status(error.message);}},onDecision:ack=>{if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
 const hands=createPoweredGesture({send:command=>host.send(command)});
 const replay=createGroveReplay({onChange:({state})=>{sync();if(replayMode&&state==='ended')status('Your encounter has settled.');if(replayMode&&state==='suspended')status('Listening paused. Listen back starts your saved encounter again.');}});
-function active(){return ['playing','suspended'].includes(host.state)&&!replayMode;}
+function active(){return ['preparing','playing','suspended'].includes(host.state)&&!replayMode;}
 function sync(){
  const state=host.state,ended=state==='ended',busy=['preparing','playing','suspended','ending'].includes(state);
  $('begin').disabled=busy&&state!=='suspended';$('begin').textContent=state==='preparing'?'Preparing…':state==='suspended'?'Resume ↗':ended?'Begin again ↗':'Begin ↗';$('seed').disabled=busy||saving;
@@ -24,8 +24,8 @@ function sync(){
 function releaseAll(){hands.reset();picking?.reset();}
 function stopReplay(){revision++;replayMode=false;pictureAbort?.abort();pictureAbort=null;replay.stop();}
 function reveal(){if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:'instant'});}
-function showGrove(){if(world){if(scene){world.scene.remove(scene.root);scene.dispose();}scene=createGroveScene(grove);world.scene.add(scene.root);}$('identity').textContent=`GROVE ${grove.seed}`;}
-$('begin').onclick=async()=>{try{if(host.state==='suspended'){await host.resume();return;}stopReplay();hands.clear();picture=null;status('Preparing the connected bodies…');reveal();if(await host.begin(grove))status('Rest a hand on the first body. Move it, then lift.');}catch(error){status(error.message);}sync();};
+function showGrove(){if(world){if(scene){world.scene.remove(scene.root);scene.dispose();}scene=createGroveScene(grove,{bodyLabels:['TOUCH 01']});world.scene.add(scene.root);}$('identity').textContent=`GROVE ${grove.seed}`;}
+$('begin').onclick=async()=>{try{if(host.state==='suspended'){await host.resume();return;}stopReplay();hands.clear();picture=null;status('Preparing… You can rest a hand now, or wait and listen.');reveal();if(await host.begin(grove))status('Rest a hand on the first body. Move it, then lift.');}catch(error){status(error.message);}sync();};
 $('quiet').onclick=()=>{stopReplay();releaseAll();host.quiet();status(host.state==='ending'?'Letting the sound settle…':'Quiet.');sync();};
 $('seed').onchange=()=>{stopReplay();hands.clear();picture=null;grove=composeGrove({seed:Number($('seed').value)});showGrove();status('Begin to hear this Grove. Your previous encounter remains available until then.');sync();};
 for(const [zone,pad] of pads.entries()){
@@ -51,7 +51,7 @@ try{world=createGroveWorld($('world'));}catch{status('The 3D view is unavailable
 if(world)picking=bindGrovePlaying({canvas:$('world'),controls:world.controls,getScene:()=>scene,camera:world.camera,canPlay:active,acceptHit:hit=>hit.body===0,start(body,key,hit){hands.hold(key,groveStrikeZone(hit.positionU,[.3,1]));},change(body,key,hit){hit?hands.hold(key,groveStrikeZone(hit.positionU,[.3,1])):hands.release(key);},finish(body,key){hands.release(key);}});
 function draw(){
  const frame=replayMode&&picture&&replay.state!=='preparing'?restReplayFrame(picture,replay.time()):host.visual(),contacts=frame.contacts??[],showSource=!!frame.driverActive&&(replayMode?replay.state==='playing':host.state==='playing'||host.state==='ending');
- if(world){applyGroveScene(scene,frame,grove.bodies.map((_,i)=>contacts[i]?1:0),grove.bodies.map((_,i)=>contacts[i]?[.3,1][contacts[i].zone]:undefined));world.render();}
+ if(world){scene.bodies[0].label.scale.set(.3/world.camera.zoom,.075/world.camera.zoom,1);applyGroveScene(scene,frame,grove.bodies.map((_,i)=>contacts[i]?1:0),grove.bodies.map((_,i)=>contacts[i]?[.3,1][contacts[i].zone]:undefined));world.render();}
  pads.forEach((pad,z)=>pad.setAttribute('aria-pressed',String(contacts[0]?.zone===z)));
  $('source').dataset.active=String(showSource);$('source-label').textContent=showSource?'SOURCE ON':host.state==='idle'?'SOURCE WAITING':'SOURCE OFF';
  $('phase').textContent=replayMode?replay.state==='ended'?'SETTLED':'LISTENING BACK':host.state==='playing'?(showSource?'ENERGY ENTERING':'LISTEN TO THE RELEASE'):({idle:'BEFORE THE GESTURE',preparing:'PREPARING',suspended:'PAUSED',ending:'SETTLING',ended:'SETTLED',error:'AUDIO STOPPED'}[host.state]??'');requestAnimationFrame(draw);

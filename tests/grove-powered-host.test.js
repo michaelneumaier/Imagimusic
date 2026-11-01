@@ -31,3 +31,13 @@ test('late render cannot replace a new encounter; disposal closes audio and reje
 test('stale generations are ignored and processor errors prevent exporting',async()=>{
  const s=setup();await s.host.begin({});const n=s.nodes[0];n.port.onmessage({data:{type:'error',generation:'old',message:'obsolete'}});assert.equal(s.host.state,'playing');n.onprocessorerror();assert.equal(s.host.state,'error');assert.equal(n.closed,true);assert.throws(()=>s.host.recording(),/unexpectedly/);assert.equal(s.host.visual().driverActive,false);s.host.dispose();
 });
+test('a hand held through preparation applies at the actual origin and records its duration',async()=>{
+ const wait=deferred(),s=setup({prepare:()=>wait.promise}),begin=s.host.begin({});s.context.currentTime=.01;assert.equal(s.host.send({kind:'contact',zone:0}),true);s.context.currentTime=.02;assert.equal(s.host.send({kind:'contact',zone:1}),true);assert.equal(s.host.visual().driverActive,false);wait.resolve(prepared);await begin;
+ const config=s.nodes[0].options.processorOptions;assert.deepEqual(config.events,[{id:'contact-0',kind:'contact',zone:1,frame:160}]);assert.ok(config.originFrame>160);s.finish();const record=s.host.recording();assert.deepEqual(record.contacts.map(c=>[c.zone,c.start,c.end]),[[1,0,1600]]);s.host.dispose();
+});
+test('a hand released during preparation leaves no invented contact in the record',async()=>{
+ const wait=deferred(),s=setup({prepare:()=>wait.promise}),begin=s.host.begin({});s.host.send({kind:'contact',zone:0});s.host.send({kind:'contact',zone:null});wait.resolve(prepared);await begin;assert.deepEqual(s.nodes[0].options.processorOptions.events,[]);s.finish();assert.deepEqual(s.host.recording().contacts,[]);s.host.dispose();
+});
+test('cancelling preparation clears held intent before the next encounter',async()=>{
+ const wait=deferred();let calls=0;const s=setup({prepare:()=>++calls===1?wait.promise:Promise.resolve(prepared)}),first=s.host.begin({});s.host.send({kind:'contact',zone:1});s.host.quiet();assert.equal(s.host.send({kind:'contact',zone:0}),false);await s.host.begin({});wait.resolve(prepared);await first;assert.deepEqual(s.nodes[0].options.processorOptions.events,[]);s.finish();assert.deepEqual(s.host.recording().contacts,[]);s.host.dispose();
+});
