@@ -14,7 +14,7 @@ test('the powered-driver study: declared budget respected at every sample, ident
     const out = renderForcedStudy(study); assert.equal(out.cases.length, 3);
     for (const c of out.cases) {
       assert.ok(c.pcm.channels.every(ch => ch.every(Number.isFinite)));
-      assert.ok(c.boundRatioMax <= 1 + 1e-9, `${seed}/${c.id}: energy budget ratio ${c.boundRatioMax}`);
+      assert.ok(c.boundRatioMax <= 1 + 1e-9, `${seed}/${c.id}: energy budget ratio ${c.boundRatioMax}`); assert.ok(c.boundRatioAfter10ms <= c.boundRatioMax && c.boundRatioAtRelease <= c.boundRatioMax && c.boundRatioAtRelease > 0);
       assert.ok(c.observedPeak <= c.predictedOutputBound + 1e-12, `${seed}/${c.id}: observed ${c.observedPeak} within the predicted bound ${c.predictedOutputBound}`);
       assert.ok(c.observedPeak < 0.5 * recipe.admissionCeiling + 1e-12, 'ceilingFraction honoured');
       assert.ok(c.rmsForced > 0 && c.rmsRing > 0, `${seed}/${c.id}: sound under the driver and after release`);

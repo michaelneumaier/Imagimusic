@@ -50,7 +50,7 @@ export function renderForcedStudy(study, { traceHz = 60 } = {}) {
   for (const c of study.cases) {
     const contacts = c.contacts.map(k => ({ body: k.body, u: study.zones[k.zone], c: study.strengths[k.strength].c }));
     const st = forcedStepper(system, { contacts, sampleRate: sr, direction }), channels = [new Float32Array(total), new Float32Array(total)];
-    let x = new Float64Array(dim), next = new Float64Array(dim), integral = 0, peak = 0, peakBoundRatio = 0, maxEnergy = 0, eForced = 0, eRing = 0, lowAtRelease = 0;
+    let x = new Float64Array(dim), next = new Float64Array(dim), integral = 0, peak = 0, peakBoundRatio = 0, ratioAfter10ms = 0, ratioAtRelease = 0, maxEnergy = 0, eForced = 0, eRing = 0, lowAtRelease = 0;
     const traceEvery = Math.max(1, Math.round(sr / traceHz)), trace = { hz: sr / traceEvery, times: [], energy: [], sqrt2E: [], budgetSqrt2E: [], force: [] };
     for (let i = 0; i < total; i++) {
       let l = 0, r = 0; for (let k = 0; k < n; k++) { l += pickups[0][k] * x[k]; r += pickups[1][k] * x[k]; }
@@ -58,11 +58,13 @@ export function renderForcedStudy(study, { traceHz = 60 } = {}) {
       const a = Math.max(Math.abs(out0), Math.abs(out1)); peak = Math.max(peak, a); if (i < forcedFrames) eForced += out0 * out0 + out1 * out1; else eRing += out0 * out0 + out1 * out1;
       const f = forceAt(i); st.stepInto(x, f, next); const t = x; x = next; next = t; integral += Math.abs(f) / sr;
       const E = stateEnergy(system, x); maxEnergy = Math.max(maxEnergy, E);
-      const bound = study.outputGain * d.budget.energyFactorMax * st.directionNorm * integral; if (bound > 0) peakBoundRatio = Math.max(peakBoundRatio, Math.sqrt(2 * E) * study.outputGain * d.budget.energyFactorMax / bound);
+      // The budget is tight by construction at the very first forced samples (one zero-order-hold step from rest makes √(2E) = ‖b‖·h·|f| to first order), so the
+      // informative ratios are after the first 10 ms and at release; the overall maximum is kept for completeness.
+      const bound = study.outputGain * d.budget.energyFactorMax * st.directionNorm * integral; if (bound > 0) { const ratio = Math.sqrt(2 * E) * study.outputGain * d.budget.energyFactorMax / bound; peakBoundRatio = Math.max(peakBoundRatio, ratio); if (i >= 0.01 * sr && i < forcedFrames) ratioAfter10ms = Math.max(ratioAfter10ms, ratio); if (i === forcedFrames - 1) ratioAtRelease = ratio; }
       if (i === forcedFrames - 1) lowAtRelease = a;
       if (i % traceEvery === 0) { trace.times.push(i / sr); trace.energy.push(E); trace.sqrt2E.push(Math.sqrt(2 * E)); trace.budgetSqrt2E.push(st.directionNorm * integral); trace.force.push(f); }
     }
-    results.push({ id: c.id, contacts: c.contacts, observedPeak: peak, predictedOutputBound: d.budget.predictedOutputBound, boundRatioMax: peakBoundRatio, rmsForced: Math.sqrt(eForced / (2 * forcedFrames)), rmsRing: Math.sqrt(eRing / (2 * Math.max(1, total - forcedFrames))), maxEnergy, peakAtRelease: lowAtRelease, trace, pcm: { sampleRate: sr, channels } });
+    results.push({ id: c.id, contacts: c.contacts, observedPeak: peak, predictedOutputBound: d.budget.predictedOutputBound, boundRatioMax: peakBoundRatio, boundRatioAfter10ms: ratioAfter10ms, boundRatioAtRelease: ratioAtRelease, rmsForced: Math.sqrt(eForced / (2 * forcedFrames)), rmsRing: Math.sqrt(eRing / (2 * Math.max(1, total - forcedFrames))), maxEnergy, peakAtRelease: lowAtRelease, trace, pcm: { sampleRate: sr, channels } });
   }
   return { frames: total, forcedFrames, releaseFrame: forcedFrames, markers: { forceActive: [0, forcedFrames / sr], released: [forcedFrames / sr, total / sr] }, cases: results };
 }
