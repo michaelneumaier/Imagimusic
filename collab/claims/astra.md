@@ -119,3 +119,4 @@ Optional response history: src/grove/response-trace.js and tests/grove-response-
 Trace causes: src/grove/response-causes.js and response-cause-arcs.js plus tests/grove-response-causes.test.js; actual acknowledged source/contact intervals, clipped to playhead, retained across Quiet, deterministic record replay.
 Browser return lifecycle: powered-host/replay/page handling and tests; explicit park closes audio while retaining complete capture, persisted pagehide retains scene. Review analogous Rest/reopen owned lifecycle after powered evidence.
 Return/first-use follow-up: reopen-main.js persisted-page cancellation and replay parking; powered.html moves optional trace beside finished encounter tools, collection unchanged.
+Rest cached return: contact-host park/newPassage renewal, rest-main persisted lifecycle, focused host tests; retain only finished captures, completed comparisons/films and scene, cancel pending jobs.

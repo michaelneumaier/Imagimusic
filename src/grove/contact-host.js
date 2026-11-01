@@ -54,7 +54,7 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
  }
  function quiet(){if(!context)return {queued:false,reason:state};return send({kind:'quiet',fadeFrames:Math.max(1,Math.round(context.sampleRate*REST_QUIET_FADE_SECONDS))});}
  async function resume(){if(!context)throw new Error('Enter the grove first');await context.resume();if(context.state!=='running')throw new Error('Audio remains interrupted');}
- function newPassage(){if(!recipe||state!=='ended')throw new Error('Finish this passage before beginning another');token++;detach();abort?.abort();abort=new AbortController();failure=null;mount();}
+ function newPassage(){if(!recipe||state!=='ended')throw new Error('Finish this passage before beginning another');if(!context)return enable(recipe.grove,recipe.voice);token++;detach();abort?.abort();abort=new AbortController();failure=null;mount();}
  function recording(){if(state==='error')throw failure;return capture?.snapshot()??null;}
  async function saveAudio(){
   if(pcm)return pcm;if(rendering)return rendering;const record=recording();if(!record)throw new Error('No finished passage');const own=token;
@@ -66,6 +66,11 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
   // Picture uses the timestamped audio state, without inventing intervening motion.
   return {...visual,envelope:visual.envelope.map(value=>value*fade),time:capture.originFrame===null?0:(frame-capture.originFrame)/recipe.sampleRate,strikes:strikes.filter(s=>frame>=s.frame&&frame-s.frame<recipe.sampleRate*.3).map(s=>({...s,age:(frame-s.frame)/recipe.sampleRate}))};
  }
+ function park(){
+  const complete=state==='ended';token++;abort?.abort();abort=new AbortController();detach();rendering=null;failure=null;latest=ending=null;strikes=[];
+  const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
+  if(!complete)recipe=capture=pcm=null;state=complete?'ended':'idle';emit();
+ }
  function dispose(){token++;abort?.abort();detach();if(context){context.onstatechange=null;context.close();context=null;}state='disposed';}
- return {enable,send,schedule,quiet,resume,newPassage,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
+ return {enable,send,schedule,quiet,resume,newPassage,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
 }

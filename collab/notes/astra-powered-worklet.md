@@ -82,3 +82,9 @@ Fable approved 412b0b0 in collab/reviews/20261101T1013Z-fable-reviews-page-cache
 
 Accepted Fable's trace-first-use critique: collect silently, offer the optional trace after the first completed encounter. Its controls sit after keeping and remain available on later encounters so users can hide the layer at any time; toggle defaults off. Pending peer review of this follow-up.
 Final powered Safari check: trace absent before and during first encounter; available after settled after the keep controls; toggled on, then Begin again kept Hide the trace available while SOURCE ON. Both changed page scripts pass node --check.
+
+### Rest cached return (2026-11-01 10:19 UTC)
+
+Rest now parks on persisted pagehide: invalidates and aborts work, closes/forgets audio, retains only ended capture/recipe/PCM. Incomplete captures are discarded. A parked newPassage re-enables inside the explicit gesture and prepares the retained grove/voice at the fresh context's sample rate. UI awaits ready before inviting strikes. Replay/picture/comparison jobs and pending films cancel; completed comparison and film URLs remain. Real unload disposes resources, including world/sculpture.
+
+Validation: 10 contact-host/replay tests plus 3 comparison-session tests pass. Browser Safari 320×656: created short manual strike/hand/Quiet passage; rendered 0.5-second film; prepared Grove 7 comparison; brand->welcome->Back retained passage controls, identical three film blob URLs, and completed comparison facts/buttons. Original Listen back reached settled; Begin another reached Rest is open with enabled strike controls. Film links were verified retained, not independently downloaded/reverified in this pass. No subjective audio evaluation claimed. Fable approved in collab/reviews/20261101T1018Z-fable-reviews-rest-cached-return.md.

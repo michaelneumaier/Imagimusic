@@ -32,3 +32,13 @@ test('invitation reserves a fresh passage and interruption still permits release
  assert.equal(nodes[0].sent[0].events[0].frame,880);assert.equal(nodes[0].sent[0].events[1].frame,1880);assert.throws(()=>host.schedule([]),/fresh passage/);
  context.state='suspended';context.onstatechange();assert.equal(host.send({kind:'contact',body:0,zone:null}).queued,true);assert.equal(host.quiet().queued,true);assert.equal(host.send({kind:'strike',body:0}).queued,false);host.dispose();
 });
+test('park retains a finished passage and permits rendering and a fresh explicit start',async()=>{
+ const contexts=[];const {host,nodes}=fixture({createContext:()=>{const c={sampleRate:8000,currentTime:0,state:'suspended',destination:{},audioWorklet:{addModule:async()=>{}},async resume(){this.state='running';},async close(){this.state='closed';}};contexts.push(c);return c;}});
+ await host.enable(grove);finish(nodes[0]);const record=host.recording();host.park();assert.equal(contexts[0].state,'closed');assert.equal(host.state,'ended');assert.deepEqual(host.recording(),record);assert.equal((await host.saveAudio()).channels[0].length,28);
+ await host.newPassage();assert.equal(contexts.length,2);assert.equal(host.state,'ready');assert.equal(host.stats.strikes,0);host.dispose();
+});
+test('park discards incomplete passage and invalidates pending preparation',async()=>{
+ const pending=[];const {host,nodes}=fixture({prepareRecipe:(_,options)=>new Promise(resolve=>pending.push({resolve,signal:options.signal}))});
+ const opening=host.enable(grove);host.park();assert.equal(pending[0].signal.aborted,true);pending[0].resolve({recipe});await opening;assert.equal(nodes.length,0);assert.equal(host.state,'idle');assert.equal(host.recording(),null);
+ const next=host.enable(grove);pending[1].resolve({recipe});await next;const stale=nodes[0].port.onmessage;host.park();stale({data:{type:'error',generation:nodes[0].options.processorOptions.generation,message:'stale'}});assert.equal(host.state,'idle');assert.equal(host.recording(),null);assert.equal(host.recipe,null);host.dispose();
+});
