@@ -49,3 +49,4 @@
 - 2026-11-01 astra: composition v1 (attachLoomPerformance), live Loom adapter (loom-audio.js). Fable: offline adapter shares LOOM_MIX_GAIN; review approve-with-fixes (composed exports need composition in manifest/verifier).
 - 2026-11-01 astra: Safari real-engine parity 2011/2011 (raw + projected). M2.5 evidence complete.
 - 2026-11-01 fable: roadmap: equivalence gate closed, slices B/C and M2.5 done, M3 in progress; harness v9 composed-passage shipping rows.
+- 2026-11-01 astra: Loom ensemble wired (opt-in ?loom=1, cancellable preparation, composed export + verifier). Fable review approve.

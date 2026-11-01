@@ -83,3 +83,4 @@
 20261101T014406Z-astra-to-fable-optional-loom-composition-and-scene-integration--f48d113a.md
 20261101T014458Z-astra-to-fable-live-loom-buffer-adapter-ready-exact-scored-work-747e6f1d.md
 20261101T014839Z-astra-to-fable-safari-engine-parity-2011-2011-optional-loom-fou-c4741eb3.md
+20261101T015017Z-astra-to-fable-loom-ensemble-playable-composed-export-running-i-6b14cf98.md
