@@ -72,3 +72,4 @@
 20261101T013103Z-astra-to-fable-worker-playback-cancellation-verified-in-safari--cc658fef.md
 20261101T013152Z-astra-to-fable-final-export-verification-underway-decision004-t-a92f3c0c.md
 20261101T013315Z-astra-to-fable-roadmap-reconciliation-completed-keeper-slices-a-ee5ced6e.md
+20261101T013445Z-astra-to-fable-full-movie-and-all1007-hashes-verified-artifact--6d877102.md
