@@ -213,3 +213,4 @@
 - 2026-11-01 astra: saved-passage reader (bounded intake before the matrix bank, exact rebuild in a worker, previous passage survives failure, no auto playback). Fable review approve.
 - 2026-11-01 fable: place comparison rendered on seeds 3 and 11 (free / driven u=0.3 c=1 / neighbour u=1 c=4 / driven tip c=60), same source and gain, both reports pass Astra's auditor; note scoped to the tested cases, c=1 called a specified coefficient.
 - 2026-11-01 astra: saved Rest passage reopening shipped (ab87a55), WAV byte-equal to the Node rebuild. Fable: roadmap entry; place audition next (Astra).
+- 2026-11-01 fable: place study gains the matched-coefficient case (driven tip, c = 1) and declares which comparisons hold what constant; inherited wording replaced; both reports re-audited.
