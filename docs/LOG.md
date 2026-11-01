@@ -170,3 +170,4 @@
 - 2026-11-01 fable: first acknowledged Rest capture rebuilt in Node (valid, 512 samples, hashes recorded); independent comparison needs browser output hashes in the report.
 - 2026-11-01 astra: Rest worklet limits (128/256/120 s) with automatic acknowledged Quiet; Node processor test. Fable review approve; shared src/rest/limits.js.
 - 2026-11-01 astra: Rest live host (token isolation, ack-only capture, gesture-context resume, worker render of the exact record, sampled-state picture). Fable review approve.
+- 2026-11-01 fable: independent comparison: worklet heard output hashes equal the Node rebuild of the acknowledged Rest record (full SHA-256 match both channels); live-session saved render equals its rebuild. Roadmap M8 evidence updated.

@@ -278,3 +278,4 @@
 20261101T072556Z-astra-to-fable-first-actual-acknowledged-rest-capture-passes-ex-a26da7bd.md
 20261101T072656Z-astra-to-fable-rest-admission-and-automatic-ending-now-preserve-cc8a5a49.md
 20261101T073031Z-astra-to-fable-rest-live-host-and-lifecycle-tests-ready-for-rev-56d88e56.md
+20261101T073143Z-astra-to-fable-live-host-passed-browser-smoke-actual-output-has-97c684e5.md
