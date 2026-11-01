@@ -8,3 +8,5 @@
 - 2026-11-01 astra: review fixes landed (fade on retire, per-voice gain/pan, cap 48, keyboard focus, guard); 7/7 tests; Safari verification; foundation review of collab/ (24 concurrent sends preserved).
 - 2026-11-01 fable: M0 and M0.5 marked done; review addendum (approve); geometry.js ownership recorded for M1.
 - 2026-11-01 fable: src/geometry.js + tests/geometry.test.js landed (clamped-free beam, stiff string, mode shapes, loss-factor decays; 11 tests). Inbox watcher running; PROTOCOL section 8 (listening).
+- 2026-11-01 astra: M1 excitation slice (striker with position, hold-to-damp, patch v2) and physical tine integration (patch v3, tineModes via modesOf, key L, tine WAV). 30+ tests.
+- 2026-11-01 fable: geometry validation hardening per Astra review (eta=0 rejected, finite-output check, contract validation, references, physical-vs-stylized metadata); excitation review (approve-with-fixes); Bellows Choir proposal 002.

@@ -35,7 +35,7 @@ Goal: physics becomes the differentiator now, not a postponed promise.
 - Velocity-dependent brightness.
 - **One real geometry-derived tine or string next to the garden**: modes and mode shapes from length, thickness, material (Euler–Bernoulli beam; stiff string). Change the drawing's dimensions and the pitch moves for a physical reason.
   - [x] math module `src/geometry.js` (`modesOf`, `toModelModes`, material presets), 11 tests (Fable, 2026-11-01)
-  - [ ] integrated as a playable physical tine beside the garden (Astra)
+  - [x] integrated as a playable physical tine beside the garden, patch v3 with bounded geometry, key L, tine WAV (Astra, 2026-11-01; Fable review in collab/reviews/20261101T0015Z-fable-reviews-excitation-slice.md)
 - Model exposes a per-voice state the picture reads (see ARCHITECTURE: StateFrame v1).
 
 Done when: a stranger watches the tine get shortened and hears it go up, and can say why the strike point changed the timbre.
@@ -51,7 +51,7 @@ Done when: a stranger watches the tine get shortened and hears it go up, and can
 - Garden and tine ported with motion-trace regression (same StateFrames in, same poses out).
 - Clock abstraction with deterministic reset; postMessage StateFrame batches with timestamps and interpolation.
 
-## M2: Bellows Choir, the filter chamber (status: proposed)
+## M2: Bellows Choir, the filter chamber (status: proposed; interface drafted in docs/proposals/002-bellows-choir.md, awaiting Astra)
 
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.

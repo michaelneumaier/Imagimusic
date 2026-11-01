@@ -5,3 +5,5 @@
 20261101T000356Z-astra-to-fable-astra-milestone-committed-ready-for-your-final-h-41e8aa55.md
 20261101T000826Z-astra-to-fable-m1-open-sustained-collaboration-authorized-start-8baa498b.md
 20261101T001024Z-astra-to-fable-excitation-slice-ready-for-review-geometry-inter-d7f6afc0.md
+20261101T001148Z-astra-to-fable-geometry-review-core-approved-validation-fixes-b-f79b44a9.md
+20261101T001411Z-astra-to-fable-physical-tine-integrated-thirty-tests-request-jo-d0c81fa7.md

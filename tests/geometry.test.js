@@ -105,6 +105,42 @@ test('validation rejects unimplemented supports, unknown kinds, bad dimensions, 
   assert.throws(() => modesOf(null), /object/);
 });
 
+test('user physics is never silently changed: eta = 0 is rejected, not replaced', () => {
+  assert.throws(() => modesOf({ ...guitarA, eta: 0 }), /eta/);
+  assert.throws(() => modesOf({ ...guitarA, eta: -1e-3 }), /eta/);
+  assert.throws(() => modesOf({ ...steelTine, material: { ...GEOMETRY_MATERIALS.steel, eta: 0 } }), /eta/);
+  assert.ok(modesOf({ ...guitarA, eta: 5e-3 }).decaysS[0] < modesOf(guitarA).decaysS[0]);
+});
+
+test('extreme but finite inputs that overflow the formulas are rejected at the output', () => {
+  assert.throws(() => modesOf({ ...steelTine, lengthM: 1e-300 }), /not finite/);
+  assert.throws(() => modesOf({ ...steelTine, thicknessM: 1e-300 }), /not finite/);
+  assert.throws(() => modesOf({ ...guitarA, linearDensity: 1e-320 }), /not finite/);
+  // A tiny but representable tension is merely a very low, very slow string: finite, so accepted.
+  assert.ok(modesOf({ ...guitarA, tensionN: 1e-300 }).freqsHz[0] > 0);
+  const set = modesOf(steelTine);
+  assert.ok(set.freqsHz.every(f => Number.isFinite(f) && f > 0) && set.decaysS.every(d => Number.isFinite(d) && d > 0));
+});
+
+test('strike positions and levels are validated on the exported contract', () => {
+  const set = modesOf(steelTine, { count: 2 });
+  assert.throws(() => set.weightsAt(NaN), /\[0, 1\]/);
+  assert.throws(() => set.weightsAt(1.5), /\[0, 1\]/);
+  assert.throws(() => set.weightsAt('0.5'), /\[0, 1\]/);
+  assert.throws(() => toModelModes(set, { strikeX01: NaN }), /strikeX01/);
+  assert.throws(() => toModelModes(set, { strikeX01: -0.1 }), /strikeX01/);
+  assert.throws(() => toModelModes(set, { level: -1 }), /level/);
+  assert.throws(() => toModelModes(set, { level: Infinity }), /level/);
+  assert.equal(toModelModes(set, { level: 0 }).every(m => m.amplitude === 0), true);
+});
+
+test('metadata separates the physical claims from the stylized ones', () => {
+  const { meta } = modesOf(guitarA);
+  assert.ok(meta.physical.includes('frequencies') && meta.physical.includes('mode shapes'));
+  assert.ok(meta.stylized.some(s => /amplitude/.test(s)));
+  assert.ok(meta.assumptions.some(a => /loss factor/.test(a)));
+});
+
 test('toModelModes produces the garden shape (frequency, amplitude, decay) with weights from the strike point', () => {
   const set = modesOf(steelTine, { count: 3 });
   const modes = toModelModes(set, { strikeX01: 1 });

@@ -23,12 +23,25 @@
 //     f_n = (β_n L)² / (2π L²) · sqrt(E I / (ρ A)),  I = w t³ / 12,  A = w t
 //     β_n L roots of cos(βL)·cosh(βL) = -1: 1.875104, 4.694091, 7.854757, 10.995541, 14.137168, then ≈ (2n−1)π/2
 //     φ_n(x) = cosh(βx) − cos(βx) − σ_n (sinh(βx) − sin(βx)),  σ_n = (cosh βL + cos βL) / (sinh βL + sin βL)
-//     (Blevins, "Formulas for Natural Frequency and Mode Shape", Table 8-1; Rossing & Fletcher, "Physics of Musical Instruments", §2.)
+//     References: NPTEL "Vibration of continuous systems", cantilever roots and shapes:
+//       https://archive.nptel.ac.in/content/storage2/courses/112103022/module1/lec2/10.html
+//       Blevins, "Formulas for Natural Frequency and Mode Shape" (Krieger, 2001), Table 8-1.
+//       Rossing & Fletcher, "The Physics of Musical Instruments" (Springer, 2nd ed.), ch. 2.
 //   Pinned–pinned string with bending stiffness (Fletcher 1964):
 //     f_n = n f_0 sqrt(1 + B n²),  f_0 = (1 / 2L) sqrt(T / μ),  B = π² E I / (T L²)
 //     φ_n(x) = sin(n π x / L)
+//     References: J. O. Smith, "Physical Audio Signal Processing", Stiff Piano Strings:
+//       https://www.dsprelated.com/freebooks/pasp/Stiff_Piano_Strings.html
+//       H. Fletcher, "Normal Vibration Frequencies of a Stiff Piano String", JASA 36 (1964) 203.
 //   Decay: structural loss factor η gives Q = 1/η and amplitude time constant τ_n = Q / (π f_n) = 1 / (π f_n η).
 //     This is the explicit damping assumption: constant loss factor, so higher modes die faster. No air or support losses.
+//     η = 0 (undamped, infinite ring) is rejected: not appropriate for a live voice.
+//
+// What is physical and what is stylized (keep this honest in captions):
+//   PHYSICAL:  frequencies and mode shapes follow from dimensions and material; decays follow from η.
+//   STYLIZED:  modal amplitudes. weightsAt() returns normalized shape values at the strike point, and
+//              toModelModes() applies an arbitrary 1/(1+0.35 i) tilt. There is no impulse spectrum, modal mass,
+//              pickup, or radiation model, so this is a magnitude-weight proof, not an acoustic transfer function.
 //
 // Not implemented (rejected, not invented): free-free beams, clamped-clamped, plates, membranes, tubes.
 
@@ -37,8 +50,9 @@ export const MAX_MODES = 8;           // cosh(βL) overflows precision for highe
 export const NYQUIST_FRACTION = 0.45; // same guard as src/model.js modesFor
 
 // Material constants: E in Pa, rho in kg/m³, eta = structural loss factor (dimensionless).
-// E and rho are textbook values. eta values are order-of-magnitude assumptions for freely ringing
-// solid bars (Rossing & Fletcher list Q of 10³–10⁴ for metals, 10² for wood); tune by ear and record changes here.
+// E and rho are textbook values (CRC Handbook / Rossing & Fletcher Table 2.1 order). eta values are GUESSES:
+// order-of-magnitude assumptions for freely ringing solid bars (Rossing & Fletcher quote Q of 10³–10⁴ for metals,
+// 10² for wood). They are not measured. Tune by ear and record changes here.
 export const GEOMETRY_MATERIALS = {
   steel:    { E: 200e9, rho: 7850, eta: 2e-4 },
   aluminum: { E: 69e9,  rho: 2700, eta: 1e-4 },
@@ -54,6 +68,10 @@ const positive = (value, name) => {
 const nonNegative = (value, name, fallback) => {
   if (value === undefined) return fallback;
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error(`${name} must be a non-negative finite number.`);
+  return value;
+};
+const position01 = (value, name = 'x01') => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) throw new Error(`${name} must be a finite number in [0, 1].`);
   return value;
 };
 
@@ -90,7 +108,8 @@ function beamModes(g, count) {
 
 function stringModes(g, count) {
   const L = positive(g.lengthM, 'lengthM'), T = positive(g.tensionN, 'tensionN'), mu = positive(g.linearDensity, 'linearDensity');
-  const EI = nonNegative(g.stiffness, 'stiffness', 0), eta = nonNegative(g.eta, 'eta', 1e-3) || 1e-3;
+  const EI = nonNegative(g.stiffness, 'stiffness', 0);
+  const eta = positive(g.eta === undefined ? 1e-3 : g.eta, 'eta (0 would mean an undamped string; not supported for a live voice)');
   const f0 = Math.sqrt(T / mu) / (2 * L);
   const B = Math.PI ** 2 * EI / (T * L * L);
   const modes = [];
@@ -113,6 +132,11 @@ export function modesOf(geometry, { count = 5, sampleRate } = {}) {
   if (geometry.kind === 'beam') built = beamModes(geometry, count);
   else if (geometry.kind === 'string') built = stringModes(geometry, count);
   else throw new Error(`geometry kind '${geometry.kind}' is not implemented (beam, string).`);
+  for (const m of built.modes) {
+    if (!Number.isFinite(m.f) || m.f <= 0 || !Number.isFinite(m.decay) || m.decay <= 0) {
+      throw new Error(`derived modes are not finite and positive (f = ${m.f}, decay = ${m.decay}); dimensions or material are out of range.`);
+    }
+  }
   const kept = sampleRate ? built.modes.filter(m => m.f < sampleRate * NYQUIST_FRACTION) : built.modes;
   const shapes = kept.map(m => m.shape);
   return {
@@ -121,15 +145,24 @@ export function modesOf(geometry, { count = 5, sampleRate } = {}) {
     freqsHz: kept.map(m => m.f),
     shapes,
     decaysS: kept.map(m => m.decay),
-    weightsAt: x01 => shapes.map(shape => shape(x01)),
+    weightsAt: x01 => { position01(x01); return shapes.map(shape => shape(x01)); },
     dropped: built.modes.length - kept.length,
-    meta: { formula: built.formula, assumptions: built.assumptions },
+    meta: {
+      formula: built.formula,
+      assumptions: built.assumptions,
+      physical: ['frequencies', 'mode shapes', 'decay constants (given η)'],
+      stylized: ['modal amplitudes: normalized shape value at the strike point, no impulse/modal-mass/pickup/radiation model'],
+    },
   };
 }
 
 // Convenience: a ModeSet rendered in the shape src/model.js `modesFor` returns, so the garden can
-// play a geometry voice without knowing where the modes came from. amplitude scaling mirrors model.js.
+// play a geometry voice without knowing where the modes came from.
+// STYLIZED: amplitude = level · |shape_n(strike)| / (1 + 0.35 n). The 1/(1+0.35n) tilt mirrors model.js and is
+// an artistic choice, not a mechanical transfer function. Frequencies and decays pass through unchanged (physical).
 export function toModelModes(modeSet, { strikeX01 = 0.85, level = 0.19 } = {}) {
+  position01(strikeX01, 'strikeX01');
+  if (typeof level !== 'number' || !Number.isFinite(level) || level < 0) throw new Error('level must be a finite non-negative number.');
   const weights = modeSet.weightsAt(strikeX01);
   return modeSet.freqsHz.map((frequency, i) => ({
     frequency,
