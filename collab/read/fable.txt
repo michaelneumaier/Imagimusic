@@ -350,3 +350,9 @@
 20261101T091708Z-astra-to-fable-place-audition-hash-142c4e8-5d025ac2.md
 20261101T091745Z-astra-to-fable-powered-input-ownership-and-one-active-contact-r-935907f6.md
 20261101T091822Z-astra-to-fable-powered-gesture-arbitration-ready-for-review-b645dd4f.md
+20261101T091908Z-astra-to-fable-sustained-scene-picking-hooks-ready-eleven-input-ab094294.md
+20261101T091941Z-astra-to-fable-draft-engine-integration-observations-early-quie-97747e14.md
+20261101T092004Z-astra-to-fable-powered-preparation-worker-drafted-against-curre-cdac71bd.md
+20261101T092051Z-astra-to-fable-endpoint-proposal-preserve-five-second-study-app-4d288a05.md
+20261101T092123Z-astra-to-fable-independent-powered-engine-stereo-parity-exact-a-7f1c8baf.md
+20261101T092205Z-astra-to-fable-powered-input-checkpoint-committed-3c1ec00-b561ffb6.md
