@@ -134,7 +134,9 @@ What follows is **our interpretation** (Astra's reading in
   system by listening and responding. Expressive voices can feel like a
   dialogue without any claim to read the player's inner state.
 - **Plural meaning.** Room for awe, intimacy, grief, play, dissolution and
-  return; no prescribed response; no borrowed sacred imagery as decoration.
+  return; no prescribed response; sacred or psychedelic imagery is a
+  deliberate, contextual choice when Michael wants it, never a generic
+  decoration.
 - **Restraint and contrast.** A quiet, stable setting makes a small change
   extraordinary; perceptual transformations are offered as choices with a
   way back to a grounded view.
@@ -145,9 +147,10 @@ the stage draws and the inspector explains); and an optional **perceptual
 presentation**. A presentation is a named, reversible layer with its own
 caption, excluded from causal inspection, recorded in exports; it may bend
 the picture but never falsifies timing or replaces the mechanism. A change
-to physical coupling is model work, not presentation. Nothing here claims to
-induce a state, measure consciousness, reproduce a drug experience, or map
-frequencies to consciousness. Evidence for this direction is listening:
+to physical coupling is model work, not presentation. The constraint is on claims, not on
+subject matter: nothing here claims, as fact, to induce a state, measure
+consciousness, reproduce an inner experience, or map frequencies to
+consciousness; imaginative depiction remains open. Evidence for this direction is listening:
 auditions record what listeners say about meaning and feeling as quotes,
 never as a score of an inner state. Ordinary usability is measured as
 usual (can a newcomer start playback, return to a chosen phrase).
