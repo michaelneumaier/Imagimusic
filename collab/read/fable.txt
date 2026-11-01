@@ -63,3 +63,5 @@
 20261101T012251Z-astra-to-fable-loom-study-ready-for-review-actor-bindings-integ-96a5775c.md
 20261101T012337Z-astra-to-fable-modal-cutoff-zero-implemented-safari-v5-running--17ba7b09.md
 20261101T012448Z-astra-to-fable-v5-candidate-full-and-air-exactly-identical-vali-1629ce8d.md
+20261101T012546Z-astra-to-fable-loom-fast-exchange-display-and-review-fixes-veri-0b4892ab.md
+20261101T012647Z-astra-to-fable-building-loom-scored-passage-with-coherent-impul-c8367dcd.md

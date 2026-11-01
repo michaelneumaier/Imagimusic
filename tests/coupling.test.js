@@ -1,6 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { coupledPair, strikeResponse, pickupModes, peakDisplacement } from '../src/coupling.js';
+import { coupledPair, strikeResponse, pickupModes, peakDisplacement, superposeStrikes } from '../src/coupling.js';
+
+test('repeated strikes superpose coherently: sums of shifted responses, energy from the summed state, seek-safe', () => {
+  const sys = coupledPair({ f1: 220, f2: 231, kc: 1.5e4, gamma: 1.5 });
+  const a = strikeResponse(sys, [1, 0]), b = strikeResponse(sys, [0, 0.6]);
+  const both = superposeStrikes(sys, [{ t: 0.1, impulse: [1, 0] }, { t: 0.35, impulse: [0, 0.6] }]);
+  assert.deepEqual(both.x(0.05), [0, 0]);                                              // nothing has happened yet
+  for (const t of [0.2, 0.34]) { const xs = both.x(t), xa = a.x(t - 0.1); close(xs[0], xa[0]); close(xs[1], xa[1]); }
+  for (const t of [0.4, 1.2]) {
+    const xs = both.x(t), xa = a.x(t - 0.1), xb = b.x(t - 0.35);
+    close(xs[0], xa[0] + xb[0]); close(xs[1], xa[1] + xb[1]);
+    const vs = both.v(t), va = a.v(t - 0.1), vb = b.v(t - 0.35); close(vs[0], va[0] + vb[0]); close(vs[1], va[1] + vb[1]);
+  }
+  // Energy is not additive across strikes: a second identical strike half a period later nearly cancels.
+  const lossless = coupledPair({ f1: 200, f2: 200, kc: 0, gamma: 0 }), period = 1 / 200;
+  const inPhase = superposeStrikes(lossless, [{ t: 0, impulse: [1, 0] }, { t: period, impulse: [1, 0] }]);
+  const antiPhase = superposeStrikes(lossless, [{ t: 0, impulse: [1, 0] }, { t: period / 2, impulse: [1, 0] }]);
+  const single = strikeResponse(lossless, [1, 0]).energy0;
+  close(inPhase.energy(3 * period), 4 * single, 1e-6); assert.ok(antiPhase.energy(3 * period) < 1e-6 * single);
+  // Seek safety and per-strike modes for additive synthesis.
+  const times = [0.9, 0.12, 0.5]; const out = times.map(t => both.x(t)); times.forEach((t, i) => assert.deepEqual(both.x(t), out[i]));
+  assert.deepEqual(both.strikes, [0.1, 0.35]); assert.equal(both.modes(1).length, 2); assert.equal(both.modes(1)[1].onset, 0.35);
+  assert.throws(() => superposeStrikes(sys, 'x'), /array/); assert.throws(() => superposeStrikes(sys, [{ t: NaN, impulse: [1, 0] }]), /t/);
+});
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) <= eps * Math.max(1, Math.abs(b)), `${a} vs ${b}`);
 

@@ -97,6 +97,28 @@ export function pickupModes(system, impulse, body, { level = 0.19 } = {}) {
   return all[body].map(m => ({ frequency: m.frequency, amplitude: level * m.amplitude / peak, phase: 0, decay: m.decay }));
 }
 
+/**
+ * Coherent superposition of repeated strikes on ONE fixed system (the model is linear, so the response to several
+ * impulses is the sum of the time-shifted single-strike responses; a strike arriving while the bodies still move
+ * adds to their displacement and velocity, it does not reset them). strikes: [{ t, impulse: [J1, J2] }].
+ * Energy is computed from the SUMMED state through M and K, not as a sum of per-strike energies (cross terms are
+ * real: a second strike in phase adds energy, out of phase removes it).
+ */
+export function superposeStrikes(system, strikes) {
+  if (!Array.isArray(strikes)) throw new Error('strikes must be an array of { t, impulse }.');
+  const parts = strikes.map((s, i) => { finite(s?.t, `strikes[${i}].t`); return { t: s.t, r: strikeResponse(system, s.impulse) }; });
+  const { m, K } = system;
+  const sum = (fn, t) => { finite(t, 't'); const out = [0, 0]; for (const { t: t0, r } of parts) { if (t < t0) continue; const v = r[fn](t - t0); out[0] += v[0]; out[1] += v[1]; } return out; };
+  const x = t => sum('x', t), v = t => sum('v', t);
+  const energy = t => {
+    const xs = x(t), vs = v(t);
+    return 0.5 * (m[0] * vs[0] * vs[0] + m[1] * vs[1] * vs[1]) + 0.5 * (K[0][0] * xs[0] * xs[0] + 2 * K[0][1] * xs[0] * xs[1] + K[1][1] * xs[1] * xs[1]);
+  };
+  // Per-strike modes for additive synthesis: the same signed coefficients, each with its own onset.
+  const modes = body => parts.map(({ t: t0, r }) => ({ onset: t0, modes: r.bodyModes(body) }));
+  return { x, v, energy, strikes: parts.map(p => p.t), modes };
+}
+
 /** Peak |x_i| over [0, horizon] sampled finely: the transfer evidence for tests and captions. */
 export function peakDisplacement(response, body, horizon, samples = 4000) {
   let peak = 0;
