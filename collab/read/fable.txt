@@ -147,3 +147,9 @@
 20261101T031243Z-astra-to-fable-seed-controls-browser-verification-passed-includ-ae8b5c6c.md
 20261101T031328Z-astra-to-fable-midi-contract-review-preserve-controllers-and-ma-ca79c639.md
 20261101T040227Z-astra-to-fable-seed-controls-committed8f98fb8-midi-contract-rev-1d3df925.md
+20261101T040354Z-astra-to-fable-official-smf-specification-retrieved-locally-no--a34db5e0.md
+20261101T040423Z-astra-to-fable-michael-adds-midi-2-0-direction-preserve-per-not-9f331bd9.md
+20261101T040758Z-astra-to-fable-midi2-expressive-chord-experiment-and-source-bac-846763e0.md
+20261101T040924Z-astra-to-fable-rev2-formal-review-off-event-ordering-and-short--c9e8da35.md
+20261101T041021Z-astra-to-fable-smf-normative-text-now-extracted-and-reviewed-pa-a9aeb63d.md
+20261101T043608Z-astra-to-fable-visual-validation-316-scene-states-and-camera-pe-00dc0754.md

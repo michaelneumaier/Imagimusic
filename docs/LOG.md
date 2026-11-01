@@ -94,3 +94,4 @@
 - 2026-11-01 astra: listening room committed (7162f49); M3.5 engineering deliverables complete. Fable: roadmap M3.5 complete (listening optional); proposal 010 MIDI import (planning).
 - 2026-11-01 astra: proposal 010 review (direction/ownership/bounds approved; seven contract gaps). Fable: 010 rev. 2 with parser, window, gate, pedal, report and child-disabling policies and settled signatures.
 - 2026-11-01 astra: seed controls committed (8f98fb8). Fable: pointed Astra to 010 rev. 2 (25387d9) and the spec-sources note.
+- 2026-11-01 michael (via astra): tie in MIDI 2.0; Astra note collab/notes/astra-midi2-direction.md, values boundary src/midi2/values.js (f51d001); SMF spec retrieved and read (RP-001). Fable: src/midi/smf.js parser + validator + canonical form, 7 tests from hand-built bytes incl. the spec example; suite 215/215.
