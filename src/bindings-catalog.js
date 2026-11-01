@@ -18,7 +18,8 @@ export const STAGE_INPUTS = {
   tine: {
     length:     { inputs: ['geometry.lengthM'], note: 'beam length from the patch geometry; pitch falls with the square of length' },
     thickness:  { inputs: ['geometry.thicknessM'], note: 'beam thickness from the patch geometry; pitch rises with thickness' },
-    deflection: { inputs: ['geometry.lengthM', 'geometry.thicknessM', 'geometry.material', 'damping', 'strikePosition'], note: 'amplified, slowed mode-shape deflection; frequencies and shapes follow from geometry, amplitude weights are stylized' },
+    width:      { inputs: ['geometry.widthM'], note: 'beam width from the patch geometry; it changes mass and stiffness together, so pitch does not change' },
+    deflection: { inputs: ['geometry.lengthM', 'geometry.thicknessM', 'geometry.material', 'damping', 'strikePosition', 'voice.velocity'], note: 'amplified, slowed mode-shape deflection; frequencies and shapes follow from geometry, amplitude weights are stylized' },
     reach:      { inputs: ['strikePosition'], note: 'mallet on the clamped-free tine' },
     position:   { inputs: ['strikePosition'], note: '0 = clamp, 1 = free tip; the strike point weights each mode by its shape there' },
     visible:    { inputs: [], note: 'the mallet is shown only during approach, contact, and recovery' },
@@ -26,9 +27,13 @@ export const STAGE_INPUTS = {
   },
   bellows: {
     fill:      { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: 'bellows squeeze on attack, hold through sustain, relax on release (amp envelope)' },
-    aperture:  { inputs: ['bellows.cutoffHz', 'bellows.envAmount', 'bellows.keyTrack', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.noteHz'], note: 'iris opening = filter cutoff on a log scale (20 Hz closed, 20 kHz open)' },
-    level:     { inputs: ['bellows.adsr.s', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.velocity'], note: 'horn light follows modeled output level; no acoustic radiation is modeled' },
-    swing:     { inputs: ['bellows.lfo.rateHz', 'bellows.lfo.wave'], note: 'pendulum = LFO; above ~8 Hz only its swing range is drawn' },
+    // cutoff = cutoffHz · 2^(envAmount · env) · 2^(depth · lfo if target = cutoff) · (noteHz / C4)^keyTrack, so every ADSR
+    // stage and every LFO control is causal for the iris.
+    aperture:  { inputs: ['bellows.cutoffHz', 'bellows.envAmount', 'bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r', 'bellows.keyTrack', 'bellows.lfo.wave', 'bellows.lfo.rateHz', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.noteHz'], note: 'iris opening = filter cutoff on a log scale (20 Hz closed, 20 kHz open); the bellows sweeps it by envAmount octaves and the pendulum by depth octaves when aimed at cutoff' },
+    // amp = env · velocity · tremolo(lfo if target = amp)
+    level:     { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r', 'bellows.lfo.wave', 'bellows.lfo.rateHz', 'bellows.lfo.depthOct', 'bellows.lfo.target', 'voice.velocity'], note: 'horn light follows modeled output level (envelope × velocity × tremolo); no acoustic radiation is modeled' },
+    swing:     { inputs: ['bellows.lfo.rateHz', 'bellows.lfo.wave'], note: 'pendulum = LFO; above ~8 Hz the bob is not drawn and only its swing range is shown' },
+    fast:      { inputs: ['bellows.lfo.rateHz'], note: 'pendulum too fast to draw at 60 fps (above ~8 Hz): its swing range is shown as an arc instead of the bob' },
     resonance: { inputs: ['bellows.resonance'], note: 'membrane tautness = filter resonance' },
     source:    { inputs: ['bellows.source'], note: 'reed / toothed wheel / jet; air has no fundamental, its pitch target scales playback rate' },
     tautness:  { inputs: ['bellows.resonance'], note: 'membrane tautness = filter resonance' },

@@ -49,29 +49,39 @@ Two views, both driven by one feature frame, both inspectable:
      stable and unravel on vibrato. Confidence = opacity.
    - **Formant chambers**: two or three chambers (F1–F3) whose aperture tracks
      the estimate and whose wall thickness is the uncertainty. Labeled
-     "estimated". For closed-mouth hums, chambers dim and a visible dark band
-     marks spectral antiresonance regions without claiming "nasal."
+     "estimated". For closed-mouth hums, chambers dim and visible dark bands
+     mark **dips in the estimated spectral envelope**; a dip is not identified
+     as a nasal antiresonance unless a model supports that, so the label stays
+     "envelope dip."
    - **Noise mist**: unvoiced energy as fog; density from spectral flatness,
      color from centroid, drift from the envelope. Unvoiced is a valid state,
      not a failed pitch.
    - **Transient impulses**: onset strength spawns a ring or shock whose size
      is the measured energy jump; multi-resolution for beatbox (kick vs
      snare vs hi-hat textures emerge from band energies, not from labels).
-   - **Breath as pressure**: the amplitude envelope fills a bellows-like
-     vessel; breath noise alone shows as mist from the vessel.
+   - **Breath vessel** (artistic): the amplitude envelope fills a
+     bellows-like vessel; breath noise alone shows as mist from it. The vessel
+     is a level display, not measured breath pressure or airflow, and its
+     caption says so.
    - **Silence**: everything settles within ~150 ms; no lingering pitch.
    Every motion is a binding (`src/bindings.js`) from a feature field with a
    confidence input, so the inspector can answer "why did this move?" here
    too.
 
-## Staged roadmap (parallel track V)
+## Staged roadmap (parallel track V), consolidated with Astra's brief
+
+*Astra's product/evaluation brief lives at
+`collab/notes/astra-voice-observatory-brief.md`; its four milestones are the
+four stages below, so there is one roadmap. Its additional commitments are
+folded in here and marked (A).*
 
 | Stage | Scope | Features | Acceptance (targets, not results) |
 | --- | --- | --- | --- |
-| **V0 Normal voice** | sustained vowels, hum, breath; one speaker; wired/USB reference mic | amplitude envelope; spectrum; voicing + F0 candidate + confidence (YIN-class estimator); harmonic magnitudes only when voiced; centroid/flatness; onset strength | synthetic harmonic stacks and glides tracked within 1% with no octave flips on steady tones; counted octave errors on glides; silence/noise/voiced transitions produce no phantom notes; white noise and clicks never lock a stable pitch; onset-to-pixel latency measured, p95 ≤ 100 ms on the reference setup |
-| **V1 Resonances** | formant estimates and calibration | F1–F3 via short-time LPC (Burg) with an adjustable, calibrated ceiling and confidence; antiresonance bands for hums | known added filter peaks recovered separately from F0; vowel comparisons against Praat and manual review on consented clips; uncertainty shown, vowels never named as fact |
-| **V2 Articulation and beatbox** | transients, noise bursts, subharmonics | multi-resolution onset detection; band energies; subharmonic ratio with confidence; no forced single pitch | beatbox clips: kick/snare/hat textures distinguishable by band energy without labels; subharmonics shown when present; no stable-pitch lock on noise |
-| **V3 Research (optional)** | anatomy inference | only with grounded recordings or extra sensing; a separate research view | never shown in the main observatory |
+| **V0 Normal voice mirror** | sustained vowels, pitch slides, speech, hum, breath, silence; one speaker; wired/USB reference mic | amplitude envelope in digital full-scale units, not sound pressure (A); spectrum; voicing + F0 candidate + confidence (YIN-class estimator), never rendered as 0 Hz when confidence is low (A); harmonic magnitudes only when voiced; centroid/flatness; onset strength | synthetic harmonic stacks and glides tracked within 1% with no octave flips on steady tones; counted octave errors on glides; silence/noise/voiced transitions produce no phantom notes and invalid tracks clear fast; white noise and clicks never lock a stable pitch; hums get meaningful raw-spectrum feedback even with no higher-level estimate (A); onset-to-pixel latency measured, p95 ≤ 100 ms on the reference setup |
+| **V1 Resonance portrait** | formant estimates, calibration, dropout | F1–F3 via short-time LPC (Burg) with an adjustable, calibrated ceiling and confidence; antiresonance bands for hums and nasal sounds | known added filter peaks recovered separately from source harmonics; **changing pitch at a steady vowel and changing vowel at a steady pitch read as two different gestures** (A); vowel comparisons against Praat and manual review on consented clips; uncertainty shown, no spectral peak ever labeled a formant by default, vowels never named as fact |
+| **V2 Articulation and beatbox atlas** | transients, friction, noise bursts, subharmonics, mixed periodic/noisy sounds | multi-timescale onset detection; band energies; subharmonic ratio with confidence; multiple plausible pitch structures or none (A) | beatbox clips: kick/snare/hat textures distinguishable by band energy without labels; subharmonics shown when present; no stable-pitch lock on noise; no requirement that every sound belongs to a known class (A) |
+| **V3 Creative performance** | the observatory joins the Conservatory | verified features enter the state bus as a `voice` family and drive stage bindings; feature trajectories recorded only by explicit choice (A); repeatable FrameClock renders from recorded features | a recorded feature stream re-renders identically (trace hashes); visual persistence (trails, afterglow) is visibly distinct from current sound (A); every motion traceable to a feature and a confidence |
+| **Research track (off the main line)** | anatomy inference, physical-model inversion, extra sensors | only with grounded recordings or additional sensing; a separate research view | never shown as the main visual truth |
 
 ## Engineering plan
 
@@ -79,13 +89,24 @@ Two views, both driven by one feature frame, both inspectable:
   harmonics, and spectral envelope; a separate short envelope/transient path
   for immediate gesture. Low F0 needs enough cycles per window, so there is no
   zero-latency promise; the readout says what the window is.
-- **Threads**: capture → AudioWorklet feature extraction (audio thread) →
-  feature frames posted at the hop rate → main thread picture at 60 fps.
+- **Threads**: capture → AudioWorklet collects sample blocks (audio thread,
+  kept trivial) → bounded buffers handed to a Worker for the heavier analysis
+  (YIN, LPC, spectral envelope) → feature frames posted at the hop rate →
+  main thread picture at 60 fps. The worklet budget is benchmarked before
+  any analysis is allowed on the audio thread; an overrun there is an audible
+  glitch for everything else on the page, so the default is worker-side
+  analysis with a buffered handoff.
   Feature frames are plain data and enter the state bus as a `voice` family,
   so bindings, inspector, and trace hashing work unchanged.
-- **Latency measurement**: a self-test that plays a click through the
-  speakers, captures it, and measures capture, analysis, and render delays
-  separately; reported with hardware and browser. Bluetooth input is allowed
+- **Latency measurement**: software can measure some components (capture
+  block arrival to feature frame, feature frame to draw call, frame-time
+  distribution) and a click loopback self-test (speaker → room → mic) that
+  estimates a round trip including DAC, acoustics, and capture. It **cannot**
+  isolate true mouth-to-pixel latency: that needs external evidence (a camera
+  or photodiode on the screen with a reference microphone, or a hardware
+  loopback). We report the software-measurable components with their
+  definitions, label the loopback number as a round-trip estimate, and treat
+  the p95 ≤ 100 ms target as something to verify externally before claiming. Bluetooth input is allowed
   but shown as such; the AirPods can stay on output, input is chosen
   independently, and the actual track settings (sample rate, echo
   cancellation, noise suppression, auto gain) are read back and displayed,
@@ -98,11 +119,18 @@ Two views, both driven by one feature frame, both inspectable:
   drives opacity and a hysteresis gate (enter voiced above c₁, leave below
   c₂ < c₁) so filaments do not flicker; unvoiced sound becomes mist; silence
   clears confidence within a stated time.
-- **Privacy**: local only, session only. Explicit Start and Stop microphone
-  buttons, a visible indicator while live, tracks stopped on Stop and on
-  page navigation. No recording or upload by default. Saving a clip for
-  evaluation is a separate explicit action, stays on the user's machine, and
-  is labeled.
+- **Privacy and safety**: local only, session only. Explicit Start and Stop
+  microphone buttons, a visible indicator while live, tracks stopped on Stop,
+  on device change, and on page navigation, with capture errors shown rather
+  than swallowed (A). No microphone-to-speaker monitoring by default (A): the
+  observatory is silent, it only draws. No recording or upload by default.
+  Saving a clip for evaluation is a separate explicit action, stays on the
+  user's machine, and is labeled.
+- **Feature record contract** (A): every frame carries timestamp and window
+  span, level in dBFS, F0 candidate in Hz with confidence (or absent, never
+  0 Hz), harmonic magnitudes, spectral envelope, centroid, flatness, onset
+  strength, optional formant candidates with confidence. Units and validity
+  travel with the numbers.
 - **Determinism**: all feature extraction is pure math on sample blocks, so
   it runs in `node:test` on synthetic signals and on consented clips; the
   observatory can be driven from a recorded feature stream for the stage's

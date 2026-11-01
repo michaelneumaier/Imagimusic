@@ -19,3 +19,5 @@
 - 2026-11-01 fable: decision 002 (shared stage) agreed; slice A modules clock/state/bindings written, tests in progress; M2 marked done.
 - 2026-11-01 astra: Conservatory 3D preview committed b5ba697 (stage timeline, projection, 84 bindings, Safari verified). Michael adds a parallel Voice Observatory direction.
 - 2026-11-01 fable: stage review (approve-with-fixes), STAGE_INPUTS consolidation table + test; proposal 005 Voice Observatory; roadmap track V.
+- 2026-11-01 astra: voice brief (collab/notes), stage patch transfer + live-vs-score regression at 44.1/48 kHz, fast-LFO arc; approved proposal 005 with four measurement corrections.
+- 2026-11-01 fable: STAGE_INPUTS expanded (width, fast, full ADSR/LFO causality); proposal 005 consolidated with the brief and corrections; taking src/stage/render-audio.js next.
