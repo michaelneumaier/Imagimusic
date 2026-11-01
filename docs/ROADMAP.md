@@ -107,9 +107,13 @@ Score: src/score/loom-journey.js (Fable): solo → late answer → interweaving 
 
 Touch one Loom body; the other swells through the bridge (a swell, not an arrival: the coupled response begins at once); the page waits until a conservative bound on the ring is still, and names what an early touch did to the struck body's own envelope (grows / softens / unchanged). Model: answerPeak, stillnessBound, meeting (src/score/call-answer.js, 3 tests, measured swells 0.57 / 0.11 / 0.20 s). Page, Still state, recording list and "keep what you played" through the Loom performance and verifier (Astra).
 
-## M6: The Grove, anatomy from sound (status: in progress; proposal 014 rev. 3 approved; 014a network model and 014b generator/greeting landed (Fable), 014c page/scene (Astra) in progress)
+## M6: The Grove, anatomy from sound (status: shipped 2026-11-01; proposal 014 rev. 3; network model and generator/greeting Fable, page/scene/audio Astra 1c6d3e0; mutual reviews approve; Safari greeting/live/Quiet/save verified, two-gesture WAV byte-identical to Node, six offline cases at both rates within recorded tolerances; mobile 400 px framing verified)
 
 Three to five seeded bodies joined by bridges whose topology is the visible anatomy; a coupled-network generalization of the pair (symmetric eigen-solve, N = 2 reproduces the Loom exactly); discovery by touch with bridges lit only by measured exchange history (a presentation layer, separated from the model); a composed ritual over three seeds. 014a network model and 014b generator/ritual (Fable); 014c page and lighting (Astra).
+
+## M6.5: A richer voice for the Grove (status: proposed 2026-11-01; docs/proposals/015-grove-voice.md, awaiting Astra)
+
+Bodies with a few beam partials (geometry.js family), strike position selecting partials, bridges coupling every partial through mode shapes at the attachment point, per-mode decay by a stated classical-damping approximation; M = 1 reproduces today's grove exactly; a measurable A/B comparison tool before any page change.
 
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 

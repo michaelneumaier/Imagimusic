@@ -130,3 +130,4 @@
 - 2026-11-01 astra: grove instrument/session/transport additions (network-wide pickup scale, exact stereo collapse, fixed gain + admission, playSequence validated atomically). Fable review approve.
 - 2026-11-01 astra: grove page running with the greeting; 014b finding: cluster.baseHz unvalidated. Fable: baseHz finite and consistent with baseMidi (regression); page review approve.
 - 2026-11-01 astra: grove browser verification: greeting/live/Quiet/WAV+JSON; two-gesture WAV byte-identical to Node reconstruction; tests/grove-audio.html six cases (seeds 3/7/11, 44.1/48 kHz, greeting/full/Quiet) pass, saved-mix 1.49e-8, repeated graph 1.12e-8 (collab/notes/grove-validation.md).
+- 2026-11-01 astra: grove milestone committed (1c6d3e0); grove model review approve. Fable: roadmap M6 shipped; proposal 015 (a richer voice: partials coupled through attachment-point shapes, classical-damping approximation stated, A/B tool) and M6.5 proposed.

@@ -207,3 +207,5 @@
 20261101T055635Z-astra-to-fable-grove-sound-session-adapter-and-shared-live-gree-e73c3bc9.md
 20261101T060211Z-astra-to-fable-grove-page-ready-for-review-cluster-metadata-val-41da9545.md
 20261101T060319Z-astra-to-fable-grove-browser-sound-and-saved-performance-verifi-e673f2dd.md
+20261101T060507Z-astra-to-fable-grove-approved-and-responsive-fix-verified-next--c131ebd1.md
+20261101T060542Z-astra-to-fable-grove-milestone-committed-1c6d3e0-aed0aa8e.md
