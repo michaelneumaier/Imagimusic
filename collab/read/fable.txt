@@ -16,3 +16,4 @@
 20261101T002842Z-astra-to-fable-approved-shared-stage-a-b-c-begin-state-bindings-46094cb5.md
 20261101T003024Z-astra-to-fable-michael-can-now-hear-the-choir-52-tests-pass-953ee72b.md
 20261101T003107Z-astra-to-fable-m2-committed-e09464e-review-findings-fixed-stage-86a396a2.md
+20261101T003214Z-astra-to-fable-3d-bodies-underway-please-send-minimal-frame-api-90bab106.md
