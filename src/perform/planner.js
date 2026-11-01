@@ -64,23 +64,26 @@ export function actorPose(plan, actorId, t) {
   if (!actor) throw new Error(`unknown actor '${actorId}'.`);
   const { approach, speedSlotsPerSecond } = plan.meta;
   const travel = (from, to) => Math.abs(to - from) / speedSlotsPerSecond;
-  let from = actor.restSlot, freeAt = 0;
+  // previousEventId names the last event this actor served before the current phase, so a renderer can keep the
+  // hand where that strike left it while resting, blend toward the next strike during travel, and blend a truncated
+  // recovery into the next approach instead of snapping (continuity is the renderer's job; the data is here).
+  let from = actor.restSlot, freeAt = 0, previous = null;
   for (const a of actor.assignments) {
     const departAt = Math.max(freeAt, a.arriveBy - travel(from, a.slot));
-    if (t < departAt) return { slot: from, phase: 'rest', progress01: 0, eventId: null };
+    if (t < departAt) return { slot: from, phase: 'rest', progress01: 0, eventId: null, previousEventId: previous };
     if (t < a.arriveBy && from !== a.slot) {
       const p = (t - departAt) / Math.max(1e-9, a.arriveBy - departAt);
-      return { slot: from + (a.slot - from) * p, phase: 'travel', progress01: p, eventId: a.eventId };
+      return { slot: from + (a.slot - from) * p, phase: 'travel', progress01: p, eventId: a.eventId, previousEventId: previous };
     }
-    if (t < a.noteOn) return { slot: a.slot, phase: 'approach', progress01: Math.max(0, (t - (a.noteOn - approach)) / approach), eventId: a.eventId };
+    if (t < a.noteOn) return { slot: a.slot, phase: 'approach', progress01: Math.max(0, (t - (a.noteOn - approach)) / approach), eventId: a.eventId, previousEventId: previous };
     // Recovery runs until leaveAt, which a quick same-slot repeat may have truncated; the next approach then begins.
     if (t < a.leaveAt) {
       const span = a.leaveAt - a.noteOn, p = (t - a.noteOn) / span;
-      return { slot: a.slot, phase: t - a.noteOn < Math.min(0.035, span * 0.5) ? 'contact' : 'recover', progress01: p, eventId: a.eventId, truncated: !!a.truncated };
+      return { slot: a.slot, phase: t - a.noteOn < Math.min(0.035, span * 0.5) ? 'contact' : 'recover', progress01: p, eventId: a.eventId, previousEventId: previous, truncated: !!a.truncated };
     }
-    from = a.slot; freeAt = a.leaveAt;
+    from = a.slot; freeAt = a.leaveAt; previous = a.eventId;
   }
-  return { slot: from, phase: 'rest', progress01: 0, eventId: null };
+  return { slot: from, phase: 'rest', progress01: 0, eventId: null, previousEventId: previous };
 }
 
 /** StateFrame.global fragment: every actor of every plan at t. */

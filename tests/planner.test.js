@@ -30,14 +30,14 @@ test('an unreachable jump with one actor is reported, not faked; a first note to
   assert.deepEqual(plan.unplanned.map(u => [u.eventId, u.reason]), [['b', 'no-actor']]);
   const early = planPerformers([{ id: 'a', slot: 7, noteOn: 0.2 }], { slots: 8, speedSlotsPerSecond: 1 });
   assert.deepEqual(early.unplanned, []); assert.equal(early.actors.length, 1); assert.equal(early.actors[0].restSlot, 7);
-  assert.deepEqual(actorPose(early, early.actors[0].id, 0), { slot: 7, phase: 'rest', progress01: 0, eventId: null });
+  assert.deepEqual(actorPose(early, early.actors[0].id, 0), { slot: 7, phase: 'rest', progress01: 0, eventId: null, previousEventId: null });
   assert.equal(actorPose(early, early.actors[0].id, 0.2).phase, 'contact');
 });
 
 test('poses are pure functions of time: rest, travel at the configured speed, approach, contact at noteOn, recover', () => {
   const plan = planPerformers([{ id: 'a', slot: 6, noteOn: 2 }, { id: 'b', slot: 6, noteOn: 2.3 }], { slots: 8, speedSlotsPerSecond: 5 });
   const id = plan.actors[0].id;
-  assert.deepEqual(actorPose(plan, id, 0), { slot: 3.5, phase: 'rest', progress01: 0, eventId: null });
+  assert.deepEqual(actorPose(plan, id, 0), { slot: 3.5, phase: 'rest', progress01: 0, eventId: null, previousEventId: null });
   const a = plan.actors[0].assignments[0];
   const depart = a.arriveBy - 2.5 / 5;                       // 2.5 slots at 5 slots/s
   const mid = actorPose(plan, id, depart + 0.25);
@@ -57,7 +57,13 @@ test('poses are pure functions of time: rest, travel at the configured speed, ap
   const tooFast = planPerformers([{ id: 'a', slot: 6, noteOn: 2 }, { id: 'b', slot: 6, noteOn: 2.2 }], { slots: 8, speedSlotsPerSecond: 5 });
   assert.equal(tooFast.actors.length, 2);
   assert.throws(() => planPerformers([], { slots: 8, minRecover: 1 }), /minRecover/);
-  assert.deepEqual(actorPose(plan, id, 10), { slot: 6, phase: 'rest', progress01: 0, eventId: null });
+  assert.deepEqual(actorPose(plan, id, 10), { slot: 6, phase: 'rest', progress01: 0, eventId: null, previousEventId: 'b' });
+  // previousEventId lets a renderer keep continuity: rest after 'a' names 'a'; approaching 'b' after a truncated recovery names 'a'.
+  assert.equal(actorPose(plan, id, 2.13).previousEventId, 'a');
+  const walk = planPerformers([{ id: 'a', slot: 0, noteOn: 1 }, { id: 'b', slot: 7, noteOn: 4 }], { slots: 8, speedSlotsPerSecond: 5 });
+  const w = walk.actors[0].id, travelling = actorPose(walk, w, 4 - 0.18 - 0.7);
+  assert.equal(travelling.phase, 'travel'); assert.equal(travelling.eventId, 'b'); assert.equal(travelling.previousEventId, 'a');
+  assert.equal(actorPose(walk, w, 1.5).previousEventId, 'a'); assert.equal(actorPose(walk, w, 0.5).previousEventId, null);
   const times = [2.2, 0, 2, 1.9, 10, depart + 0.25];
   const shuffled = times.map(t => actorPose(plan, id, t)), ordered = [...times].sort((x, y) => x - y).map(t => actorPose(plan, id, t));
   times.forEach((t, i) => assert.deepEqual(shuffled[i], ordered[[...times].sort((x, y) => x - y).indexOf(t)]));
