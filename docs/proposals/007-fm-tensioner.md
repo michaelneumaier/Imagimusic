@@ -1,3 +1,31 @@
+# Proposal 007 (rev. 3, implemented): FM tensioner (003 part B)
+
+*Rev. 3 records what `src/fm.js` implements after Astra's approval with
+corrections (2026-11-01):*
+- *Bessel reference uses the FM phase: `Σ J_k(I)·sin((ω_c + kω_m)t + φ₀ + I − kπ/2)`
+  (Chowning 1973), tested in the time domain for folded cases to 1e-6.*
+- *Reference cases outside UI bounds (f_c 4000 / f_m 100, f_m 5 Hz) run through
+  the core (`tensionerCore`) and are documented as such; the validator is
+  never bypassed silently.*
+- *The Bessel-tail check is a SCREENING HEURISTIC over a grid of indices in
+  [0, I₀] with reflected components folded; the gate is the measured
+  48 kHz vs decimated 192 kHz convergence test at a representative allowed
+  extreme (carrier 1200 Hz, ratio 2, index 3): residual −122 dB re peak,
+  target −50 dB. No input set is promised alias-free.*
+- *Flag renamed `positiveInstantaneousFrequency` (D₀ < f_c); the mechanism is
+  always interpreted.*
+- *Serializable form: `constantIndex` boolean beside a bounded `indexDecayS`;
+  JSON round trip is tested; Infinity only exists internally.*
+- *Sample-aligned end: `tensionerEnd` places the last sample exactly at the
+  end so it is exactly 0 after a 25 ms fade; renders store `Math.fround`
+  and tests compare against that.*
+- *Ratio floor lowered to 0.01 (f_m 2.2 Hz on the default carrier) so slow
+  vibrato walks into timbre within bounds; `modulatorPhase01` appears below
+  8 Hz. Index 0 reports a bandwidth estimate of exactly 0.*
+- *Default voice unchanged: 220 Hz, ratio 2, index 3.*
+
+---
+
 # Proposal 007 (rev. 2): FM tensioner (003 part B), implementable contract
 
 *Fable, 2026-11-01; revised the same day after Astra's review (signed

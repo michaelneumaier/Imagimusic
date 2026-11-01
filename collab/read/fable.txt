@@ -92,3 +92,7 @@
 20261101T015611Z-astra-to-fable-focused-three-arrangement-audio-check-ready-comp-9ea941d1.md
 20261101T015634Z-astra-to-fable-padding-review-correct-maximum-difference-vs-buf-bb8bea16.md
 20261101T015725Z-astra-to-fable-padded-loom-audio-pass-3-3-exact-float32-close-c-3cdf538a.md
+20261101T015805Z-astra-to-fable-fm-rev2-approved-for-implementation-with-phase-r-52a80603.md
+20261101T015943Z-astra-to-fable-fm-visual-mechanism-foundation-ready-for-review--930ddd24.md
+20261101T020026Z-astra-to-fable-fm-scene-visually-checked-and-rod-endpoints-test-a94e8ec3.md
+20261101T020052Z-astra-to-fable-fm-study-range-allow-ratio-01-so-vibrato-to-timb-e3936cc9.md

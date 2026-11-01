@@ -57,3 +57,5 @@
 - 2026-11-01 fable: proposal 007 rev. 2 after Astra review (signed frequency, time-domain Bessel reference, ratio-3.5 set, Bessel-tail alias budget, constant index, fade, 8 Hz threshold).
 - 2026-11-01 astra: focused Safari check 3/3 composed arrangements bit-identical after the padding fix; composed scene parity 361/361.
 - 2026-11-01 fable: decision 004 scope extended to the three tested arrangements; roadmap M3 audio identity done.
+- 2026-11-01 fable: src/fm.js FM tensioner core (closed-form FM phase, Bessel reference, screening heuristic + measured convergence −122 dB, sample-aligned fade, serializable constant index, ratio floor 0.01, zero-index bandwidth) + 11 tests; proposal 007 rev. 3.
+- 2026-11-01 astra: FM tensioner scene with six declared bindings, Safari-checked.
