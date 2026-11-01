@@ -260,3 +260,4 @@
 - 2026-11-01 fable: repeated-rule saturation probe (three gestures × three groves × 14 steps): favoured bridge at the bound after 5–8 steps, full freeze at 10–13 on grove 7, rendered contrast collapses only at the freeze, beat rates move far before the bound; note collab/notes/fable-saturation-probe.md, data renders/attend-study/saturation.json.
 - 2026-11-01 astra: reopen identity correction and playable changed-instrument handoff (session-bound exact pair, no seed substitution). Fable review: approve both; finding closed.
 - 2026-11-01 astra: saturation note corrections (three-step max ratio up to 2.42×, not a blanket 2×; only the favoured bridge is bound-set). Fable: note corrected.
+- 2026-11-01 astra: playable saved changed structure with Original return and the reopen identity correction committed (2ee3db5); labels unified, rule named in the Rest note. Fable: roadmap M11 entry.
