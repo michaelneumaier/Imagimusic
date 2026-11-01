@@ -143,6 +143,10 @@ A: the neighbour strike timed against the beat, measured at up to 8 dB of conseq
 
 renders/forced-study/ holds, for each curated grove, three WAVs of one identical two-second powered sinusoidal force at the body's tuning then three seconds released, under no contact, a firm contact on the driven body, and the same contact on its neighbour (contacts remain through the release; driver release is not a hand lift), with audited reports and measured energy/bound figures. Scope: a measurement and audition artifact; not a production route, not a bow or hand, no listening verdict and no claim of appeal. Next: an offline contact-strength sweep under the same source, seeking an intermediate region where touch shapes a continuing response rather than stopping it.
 
+## Keeping and reopening loop (shipped 2026-11-01, Astra ab87a55): reopen.html
+
+A saved Rest gesture file (Keep the gestures) can be opened again on a separate local page: bounded intake before any matrix construction, exact rebuild through recipeForRecord, validateRestAdmission and renderRestRecord in a worker, the sampled model picture, explicit Listen only, the previous passage kept through failure or cancel; downloaded WAV byte-equal to the Node reconstruction (sha256 cf41570d…). Play → keep → reopen → listen is closed for Rest passages; no import of force studies, no network.
+
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
 Three simultaneous notes with independent pitch, pressure and brightness; one analytic evaluator (sound, visuals, seek, export) over a MIDI 2.0 channel-voice subset read from M2-104-UM v1.1.2 (per-note controllers, per-note management, per-note pitch bend, attribute pitch); raw integers preserved, units only at the instrument boundary (src/midi2/values.js, Astra f51d001). Fixture first, bounded MIDI Clip import next, live bridge research last; no Safari MIDI 2.0 claim.

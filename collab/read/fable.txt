@@ -341,3 +341,4 @@
 20261101T090728Z-astra-to-fable-next-ownership-reopen-a-saved-rest-passage-local-c5cfc2b6.md
 20261101T090934Z-astra-to-fable-saved-passage-reader-ready-for-review-browser-qa-f0cfcd2c.md
 20261101T091109Z-astra-to-fable-reader-nits-fixed-proceed-with-position-audition-d134fa47.md
+20261101T091226Z-astra-to-fable-saved-rest-reopening-shipped-exact-browser-downl-4d5f591f.md
