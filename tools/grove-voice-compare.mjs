@@ -4,9 +4,8 @@
 // the table. Reports quantify; no claim about the audition until someone has listened.
 //   node tools/grove-voice-compare.mjs [--seeds 3,7,11] [--partials 3] [--strikeU 0.6] [--attachU 1] [--pickupU 1] [--rate 48000]
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { composeGrove, groveSystem, groveRingSeconds, GROVE_SEEDS } from '../src/score/grove.js';
-import { modalNetwork, networkStrikeResponse, networkPickupScale } from '../src/coupling.js';
-import { modesOf, GEOMETRY_MATERIALS } from '../src/geometry.js';
+import { composeGrove, groveRingSeconds, GROVE_SEEDS } from '../src/score/grove.js';
+import { createGroveVoice } from '../src/score/grove-voice.js';
 import { stereoWav } from '../src/loom/model.js';
 
 const arg = (name, fallback) => { const i = process.argv.indexOf('--' + name); return i > 0 ? process.argv[i + 1] : fallback; };
@@ -15,38 +14,17 @@ const strikeU = Number(arg('strikeU', 0.6)), attachU = Number(arg('attachU', 1))
 const LEVEL = 0.19, GAIN_CEILING = 0.45, FADE = 0.25, J = 1;
 mkdirSync('renders', { recursive: true });
 
-/** Pans and tail exactly as src/grove/performance.js states them (equal-power from layout.x, 1/√N; Loom tail level). */
-const pansOf = grove => grove.layout.map(({ x }) => [Math.cos((x + 1) * Math.PI / 4) / Math.sqrt(grove.bodies.length), Math.sin((x + 1) * Math.PI / 4) / Math.sqrt(grove.bodies.length)]);
 const tail = (ring, t) => t < 0 || t >= ring ? 0 : Math.min(1, (ring - t) / FADE);
 
-/** The beam partial family: frequencies by clamped-free ratios from the body's tuning, decay rates ∝ frequency anchored to the grove's loss, shapes from geometry.js. */
-const beamSet = modesOf({ kind: 'beam', support: 'clamped-free', material: GEOMETRY_MATERIALS.steel, lengthM: 0.065, thicknessM: 0.001, widthM: 0.01 }, { count: M });
-const ratios = beamSet.freqsHz.map(f => f / beamSet.freqsHz[0]);
-const tipShape = beamSet.weightsAt(attachU);
 
-/** Voice A: today's grove. Stereo modes for a unit strike on body 0: Σ_bodies pan · pickup modes, one network-wide pickup scale. */
-function voiceM1(grove) {
-  const system = groveSystem(grove), scale = networkPickupScale(system, { level: LEVEL }), pans = pansOf(grove);
-  const unit = body => networkStrikeResponse(system, system.m.map((_, i) => (i === body ? J : 0)));
-  const stereo = body => [0, 1].map(ch => system.normalFreqsHz.map((frequency, r) => ({ frequency, amplitude: system.m.reduce((sum, _, i) => sum + scale * unit(body).bodyModes(i)[r].amplitude * pans[i][ch], 0), decay: system.decayS })));
-  const perBody = body => system.m.map((_, i) => unit(body).bodyModes(i).map(m => ({ ...m, amplitude: scale * m.amplitude })));
-  return { label: 'M = 1 (today)', system, pickupScale: scale, normalFreqsHz: system.normalFreqsHz, stereoUnit: stereo, pickupModes: perBody, lowBandIndex: system.normalFreqsHz.map((_, r) => r) };
+/** Both voices come from the shared factory (src/score/grove-voice.js): A is partials 1 at the tip (today's Grove, tested identical to
+ *  createGroveInstrument), B is the richer voice; for the comparison each voice uses ONE strike position (strikeU) so its pickup scale is
+ *  taken over that position only, exactly as reported in conventions. */
+function voiceOf(grove, partials) {
+  const voice = createGroveVoice(grove, { version: 1, family: 'clamped-free', partials, attachU, pickupU, positions: [partials === 1 ? 1 : strikeU] });
+  return { label: partials === 1 ? 'M = 1 (today)' : `M = ${partials} (partials)`, pickupScale: voice.pickupScale, normalFreqsHz: voice.normalFreqsHz, stereoUnit: body => voice.stereoModes[0][body], pickupModes: body => voice.pickupModes[0][body], lowBandIndex: voice.lowBandIndex, dampingResidual: voice.dampingResidual, voice };
 }
-
-/** Voice B: partials coupled through the bridges at attachU; strike at strikeU; pickup at pickupU; the same scale/pan/gain rules. */
-function voiceM3(grove) {
-  const n = grove.bodies.length, bodies = grove.bodies.map(b => ({ mass: b.mass, frequencies: ratios.map(r => b.hz * r), decayRates: ratios.map(r => grove.loss * r), shape: u => beamSet.weightsAt(u) }));
-  // Bridge stiffness exactly as groveSystem states it (coupling · m_a · ω_a²), with the attachment shape normalized so M = 1 at the tip is today's grove.
-  const edges = grove.bridges.map(e => ({ a: e.a, b: e.b, kc: e.coupling * grove.bodies[e.a].mass * (2 * Math.PI * grove.bodies[e.a].hz) ** 2 / (tipShape[0] * tipShape[0]), ua: attachU, ub: attachU }));
-  const system = modalNetwork({ bodies, edges }), pans = pansOf(grove);
-  const unit = body => system.strike(body, strikeU, J);
-  let peak = 1e-300; for (let b = 0; b < n; b++) for (let i = 0; i < n; i++) for (const m of unit(b).bodyModes(i, pickupU)) peak = Math.max(peak, Math.abs(m.amplitude));
-  const scale = LEVEL / peak;
-  const stereo = body => [0, 1].map(ch => system.normalFreqsHz.map((frequency, r) => ({ frequency, amplitude: grove.bodies.reduce((sum, _, i) => sum + scale * unit(body).bodyModes(i, pickupU)[r].amplitude * pans[i][ch], 0), decay: 1 / system.gammas[r] })));
-  const perBody = body => grove.bodies.map((_, i) => unit(body).bodyModes(i, pickupU).map(m => ({ ...m, amplitude: scale * m.amplitude })));
-  const fundamental = Math.min(...grove.bodies.map(b => b.hz));
-  return { label: `M = ${M} (partials)`, system, pickupScale: scale, normalFreqsHz: system.normalFreqsHz, stereoUnit: stereo, pickupModes: perBody, lowBandIndex: system.normalFreqsHz.map((f, r) => (f < 1.5 * fundamental ? r : -1)).filter(r => r >= 0), damping: system.damping, dampingResidual: system.dampingResidual };
-}
+const voiceM1 = grove => voiceOf(grove, 1), voiceM3 = grove => voiceOf(grove, M);
 
 function render(voice, grove, body = 0) {
   const ring = groveRingSeconds(grove), stereo = voice.stereoUnit(body);
@@ -79,7 +57,7 @@ const metrics = (voice, grove, pcm) => {
 
 const report = { version: 1, generated: new Date().toISOString(), conventions: { referenceForce: J, pickupLevel: LEVEL, pan: 'equal-power from layout.x, 1/√N (src/grove/performance.js convention)', gain: 'GAIN_CEILING / max(1, worst unit stereo modal bound over every struck body and both channels), per voice: the same RULE for both voices, so the two output gains can differ; both are reported', pickup: 'the 0.19 level is mapped to the largest |modal amplitude| over all unit strikes and pickups separately for each voice: the same normalization RULE, not an identical physical pickup gain; each voice\'s pickupScale is reported', strikeU, attachU, pickupU, partials: M, partialFamily: 'clamped-free beam ratios and shapes (geometry.js); decay rates ∝ frequency anchored to the grove loss', damping: 'M = 1: proportional; M = 3: classical-damping approximation (see src/coupling.js modalNetwork)', sampleRate: rate, metricsNote: 'modalCentroidEstimateHz is an envelope-energy-weighted estimate from the struck body\'s pickup modes over the first 0.5 s (cross terms ignored), not a PCM spectral centroid; partial counts from the same modes; peakFullRender over the whole render, rmsFirstSecond over the first second; swells on the low band (modes below 1.5× the lowest tuning) so the relationship readout stays comparable; no energy claims; no listening judgment' }, seeds: {} };
 for (const seed of seeds) {
-  const grove = composeGrove({ seed }), a = voiceM1(grove), b = voiceM3(grove), pa = render(a, grove), pb = render(b, grove);
+  const grove = composeGrove({ seed }), a = voiceM1(grove), b = voiceM3(grove), pa = render(a, grove), pb = render(b, grove);   // gain from the worst bound over all struck bodies for THIS voice's single position
   writeFileSync(`renders/grove-voice-${seed}-m1.wav`, Buffer.from(stereoWav(pa)));
   writeFileSync(`renders/grove-voice-${seed}-m${M}.wav`, Buffer.from(stereoWav(pb)));
   report.seeds[seed] = { topology: grove.topology, m1: metrics(a, grove, pa), [`m${M}`]: { ...metrics(b, grove, pb), dampingResidual: +b.dampingResidual.toExponential(3) } };

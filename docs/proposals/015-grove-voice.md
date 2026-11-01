@@ -152,13 +152,14 @@ If the audition favors the richer voice, it becomes an explicitly optional
 study beside the default Grove, never a silent replacement:
 
 - **Voice configuration** (separate from the v1 grove record):
-  `{ version: 1, partials: 3, attachU: 1, pickupU: 1, strikeU: [0.3, 1] }`.
+  `{ version: 1, family: 'clamped-free', partials: 3, attachU: 1, pickupU: 1, positions: [0.3, 0.6, 1] }`
+  (reconciled with Astra: three explicit positions, the lower bound, the
+  measured default and the tip, so the runtime bank is nine unit responses).
   Attachment and pickup fixed at the tip (the M = 1 equivalence point);
-  the playable strike position bounded to `u ∈ [0.3, 1]` because the
-  clamped-free shapes vanish toward the clamped end, where a strike would
-  be nearly silent at any force; the page may expose position as a second
-  gesture axis (e.g. where on the shell you touch) within that range, or
-  fix it at 0.6 (the measured default).
+  positions bounded to `[0.3, 1]` because the clamped-free shapes vanish
+  toward the clamped end; the page maps three shell zones to the three
+  positions as an artistic control layout, not shell acoustics; continuous
+  position is later work and is never claimed now.
 - **Low-band readout for the picture:** the shell animation reads the
   coherent envelope of the normal modes below 1.5× the lowest body tuning
   (the `lowBandIndex` the comparison uses), exactly as the M = 1 grove's
@@ -168,13 +169,20 @@ study beside the default Grove, never a silent replacement:
   partials, a temporal RMS of the all-band envelope with a stated window
   (e.g. 20 ms), may light the core only, labeled as such.
 - **Audio** keeps the fixed-gain, unit-bank, admission and capture
-  mechanics of the Grove; the unit bank for the richer voice is built from
-  `modalNetwork` the way the comparison tool builds it, with the strike
-  position quantized to a small set of unit buffers (e.g. 0.3, 0.45, 0.6,
-  0.8, 1.0) so captures stay exact and reproducible from the record.
-- **Record:** `{ kind: 'imagimusic-grove', grove, voice, events: [{ frame,
-  body, velocity, strikeU }], … }`; a record without `voice` is the
-  default Grove; the page never alters v1 records.
+  mechanics of the Grove; the factory `createGroveVoice(grove, config)`
+  (`src/score/grove-voice.js`, shared by the comparison tool and the
+  runtime) gives frozen, sample-rate-free signed pickup and stereo modes
+  for every position × struck body, ONE pickup scale over all of them and
+  ONE output gain from the worst unit stereo bound over all nine, so a
+  strike at another position never renormalizes history; buffer slot
+  `position · bodies + body`. With partials 1 at the tip the factory is
+  today's Grove exactly (tested against `createGroveInstrument`).
+- **Record:** a NEW capture kind with the canonical voice beside the
+  grove and events `{ body, position, strikeU, bufferIndex, frame,
+  velocity }` with derived fields validated and reconstructed; the v1 kind
+  is untouched and the presence or absence of a voice is never a silent
+  semantic change to it (Astra's contract). The optional voice is an
+  audition route, not a promotion; the original remains the default.
 
 ## Scope and ownership
 
