@@ -69,6 +69,16 @@ test('bellows voices exist only from noteOn: a scheduled future breath does not 
   assert.equal(collectState(1.5, snaps).voices.find(v => v.family === 'garden').noteOn, 1);
 });
 
+test('explicit engine-frozen steal levels win over the model fallback (repeated stop mid-steal)', () => {
+  const snap = { ...bellowsVoice, noteOff: null, stolenAt: 1.6, stolenFade: 0.04, stolenAmp: 0.1, stolenEnv: 0.25 };
+  const at = t => collectState(t, { bellows: { voices: [snap] } }).voices[0];
+  assert.ok(Math.abs(at(1.6).level - 0.1) < 1e-12 && Math.abs(at(1.6).modules.env.level - 0.25) < 1e-12);
+  assert.ok(Math.abs(at(1.62).level - 0.05) < 1e-12 && Math.abs(at(1.62).exciter.fill01 - 0.875) < 1e-12);
+  const fallback = collectState(1.62, { bellows: { voices: [{ ...snap, stolenAmp: undefined, stolenEnv: undefined }] } }).voices[0];
+  assert.ok(Math.abs(fallback.level - voiceDynamics(1.6, snap, snap.bellows, 48000).amp.level * 0.5) < 1e-12);
+  assert.ok(Math.abs(at(1.5).level - collectState(1.5, { bellows: { voices: [{ ...bellowsVoice, noteOff: null }] } }).voices[0].level) < 1e-12, 'explicit levels apply only after stolenAt');
+});
+
 test('held dampers are global state visible on idle slots, and choir LFO settings are note-local', () => {
   const frame = collectState(1.5, { ...snaps, garden: { voices: [], dampers: [5, 2] }, tine: { voices: [], dampers: [8] } });
   assert.deepEqual(frame.global.dampers, { garden: [2, 5], tine: [8] });

@@ -48,9 +48,14 @@ function bellowsVoice(voice, t, sampleRate) {
   // then ramp linearly to zero; filter, LFO, and source pitch keep following their already-scheduled automation.
   let envLevel = d.env.level, ampLevel = d.amp.level, stolen = false;
   if (voice.stolenAt !== undefined && t >= voice.stolenAt) {
+    // The live engine records the levels it actually froze (stolenAmp/stolenEnv); a repeated stop during an
+    // existing steal freezes the mid-fade level, which fresh voiceDynamics(stolenAt) cannot know. Prefer the
+    // engine's numbers when the snapshot carries them; planned stage voices omit them and fall back to the model.
     const frozen = voiceDynamics(voice.stolenAt, voice, voice.bellows, sampleRate);
+    const frozenAmp = Number.isFinite(voice.stolenAmp) ? voice.stolenAmp : frozen.amp.level;
+    const frozenEnv = Number.isFinite(voice.stolenEnv) ? voice.stolenEnv : frozen.env.level;
     const fade = Math.max(0, 1 - (t - voice.stolenAt) / (voice.stolenFade ?? 0.04));
-    envLevel = frozen.env.level * fade; ampLevel = frozen.amp.level * fade; stolen = true;
+    envLevel = frozenEnv * fade; ampLevel = frozenAmp * fade; stolen = true;
   }
   const age = t - voice.noteOn;
   return {
