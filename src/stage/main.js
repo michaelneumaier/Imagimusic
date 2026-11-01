@@ -15,7 +15,7 @@ let activePatch=structuredClone(DEFAULT_PATCH), importError='';
 if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
 let performance=createPerformance(activePatch),project=createProjection(performance.patch,{performance});
 let direct=createDirector(performance);
-const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=stageBindings({camera:true,performers:true});
+const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=stageBindings({camera:true,performers:true,performance});
 for(const caption of CAPTIONS){const p=document.createElement('p');p.className='caption';const strong=document.createElement('strong');strong.textContent=caption.label.toUpperCase()+' · ';p.append(strong,document.createTextNode(caption.text));$('captions').append(p);}
 function stop(){if(playing)study.seek(Math.min(performance.duration,live.time));request++;playing=false;audio.stop();choir?.stop();$('perform').textContent='▶ Play the passage';$('stage-state').textContent='SILENT STUDY · SEED '+performance.patch.seed;}
 function schedule(){

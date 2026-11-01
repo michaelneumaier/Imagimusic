@@ -18,8 +18,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     current=choices.find(b=>b.param===param)??choices[0];select.value=current.id;select.disabled=false;heading.textContent=target.replace('/slot',' · voice ');showRoute();render();
   }
   function choosePerformer(id){
-    const pump=id.startsWith('bellows/');
-    current={id:'performer/'+id,target:'performers',param:'gesture',field:`stage.performers.actors[id=${id}]`,inputs:pump?['bellows.adsr.a','bellows.adsr.d','bellows.adsr.s','bellows.adsr.r']:['tempo','seed','strikePosition'],label:'interpreted',note:pump?'Crosshead follows the sounding chamber envelope, including release and stealing. It does not measure air pressure.':'Hand follows a planned strike. Event identity and phase below explain this gesture; forces are not simulated.'};
+    current=bindings.find(binding=>binding.target===`performer/${id}`);if(!current)return;
     select.replaceChildren();const option=document.createElement('option');option.textContent='Event and articulation';select.append(option);select.disabled=true;heading.textContent='Keeper · '+id;route.clear();routeNote.textContent='This performer is linked to the event shown below.';render();
   }
   canvas.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
@@ -40,7 +39,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     const detail=explainBinding(current,lastFrame,getPatch());
     note.textContent=`${detail.label.toUpperCase()} · ${detail.note}`;
     const result=Array.isArray(detail.value)&&detail.value.length>8?`[${detail.value.length} sampled deflections]`:format(detail.value);
-    value.textContent=current.target==='performers'&&detail.value?`Gesture: ${detail.value.phase} · Event: ${detail.value.eventId??'none active'} · Contact: ${format(detail.value.contact)}${detail.value.unreachable?' · Unreachable: arm folded; original mallet remains':''}`:`${detail.field} → ${detail.param}: ${result}`;
+    value.textContent=current.target.startsWith('performer/')&&detail.value?`Gesture: ${detail.value.phase} · Event: ${detail.value.eventId??'none active'} · Contact: ${format(detail.value.contact)}${detail.value.unreachable?' · Unreachable: arm folded; original mallet remains':''}`:`${detail.field} → ${detail.param}: ${result}`;
     inputs.textContent=detail.inputs.map(input=>input.path+' = '+format(input.value)).join('\n');
   }
   return {update(frame){lastFrame=frame;render();route.update(frame);}};

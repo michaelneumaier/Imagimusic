@@ -1,10 +1,16 @@
+import { stageInputsFor } from '../bindings-catalog.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import { planPerformers,performerFrame } from '../perform/planner.js';
 import { strikerPose,RECOVERY_SECONDS } from '../excitation.js';
 import { stagePosition } from './layout.js';
 import { solveKeeperArm } from './keeper-rig.js';
 
-export const KEEPER_BINDING={id:'performers/poses',target:'performers',param:'poses',field:'stage.performers',inputs:['tempo','seed','strikePosition','geometry.lengthM'],label:'interpreted',note:'Motorized Keepers carry the strike gestures; endpoint timing follows each score event.'};
+/** The renderer and inspector use the same per-actor binding declarations. */
+export function keeperBindings(passage){
+  const actors=createKeeperProjection(passage)(0).actors;
+  for(let slot=0;slot<6;slot++)actors.push({id:`bellows/${slot}`,family:'bellows'});
+  return actors.map(actor=>({id:`performer/${actor.id}/gesture`,target:`performer/${actor.id}`,param:'gesture',field:`stage.performers.actors[id=${actor.id}]`,label:'interpreted',...stageInputsFor(actor.family==='bellows'?'pump':'performer','gesture'),inputs:[...stageInputsFor(actor.family==='bellows'?'pump':'performer','gesture').inputs.filter(path=>path!=='voice.velocity'),...(actor.family==='tine'?['geometry.lengthM']:[])]}));
+}
 export function articulateKeeper(shoulder,requestedHand){
   const joints=solveKeeperArm(shoulder,requestedHand,.7,.65,[0,0,-1]);
   if(joints)return {...joints,unreachable:false};
@@ -57,10 +63,14 @@ export function applyKeepers(world,state){
   world.keepers??=new Map();
   for(const body of world.keepers.values())body.root.visible=false;
   for(const pose of state.actors){
+    applyKeeper(world,pose);
+  }
+}
+export function applyKeeper(world,pose){
+    world.keepers??=new Map();
     let body=world.keepers.get(pose.id);if(!body){body=keeperBody(pose.family==='bellows');body.root.userData.performerId=pose.id;world.keepers.set(pose.id,body);world.scene.add(body.root);}
     body.root.visible=true;
     body.shoulder.position.fromArray(pose.shoulder);body.elbow.position.fromArray(pose.elbow);body.hand.position.fromArray(pose.hand);
     body.base.position.set(pose.shoulder[0],.05,pose.shoulder[2]);
     segment(body.upper,pose.shoulder,pose.elbow);segment(body.lower,pose.elbow,pose.hand);segment(body.rail,[pose.shoulder[0],.08,pose.shoulder[2]],pose.shoulder);
-  }
 }

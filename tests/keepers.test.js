@@ -33,7 +33,7 @@ test('pump crossheads stay on actual bellows lids through attack, sustain, relea
  world.choir.forEach((body,i)=>{body.root.position.fromArray(stagePosition('bellows',i));world.scene.add(body.root);});
  const first=passage.snapshots.bellows.voices[0];
  for(const t of [0,first.noteOn+.01,first.noteOn+.2,first.noteOff+.1,passage.duration]){
-  const frame=project(collectState(t,passage.snapshots));applyStage(frame,stageBindings({performers:true}),world);world.scene.updateMatrixWorld(true);
+  const frame=project(collectState(t,passage.snapshots));applyStage(frame,stageBindings({performers:true,performance:passage}),world);world.scene.updateMatrixWorld(true);
   for(let slot=0;slot<6;slot++){
    const top=new T.Box3().setFromObject(world.choir[slot].bellows).max.y;
    const bottom=new T.Box3().setFromObject(world.keepers.get(`bellows/${slot}`).hand).min.y;
@@ -67,4 +67,20 @@ test('unreachable Keeper targets preserve requested contact and render a finite 
  const requested=[20,0,0],pose=articulateKeeper([0,1,0],requested);
  assert.equal(pose.unreachable,true);assert.deepEqual(pose.requestedHand,requested);assert.ok([...pose.hand,...pose.elbow,...pose.shoulder].every(Number.isFinite));
  const world={scene:new T.Scene()};assert.doesNotThrow(()=>applyKeepers(world,{actors:[{id:'garden/0',family:'garden',...pose}]}));
+});
+
+test('each rendered Keeper has a declared inspectable binding to the same pose',async()=>{
+ const {createProjection,stageBindings}=await import('../src/stage/projection.js');
+ const {collectState}=await import('../src/state.js');
+ const {explainBinding,applyBindings}=await import('../src/bindings.js');
+ const passage=createPerformance(DEFAULT_PATCH),frame=createProjection(DEFAULT_PATCH,{performance:passage})(collectState(.5,passage.snapshots));
+ const bindings=stageBindings({performers:true,performance:passage}).filter(b=>b.target.startsWith('performer/'));
+ assert.equal(bindings.length,frame.stage.performers.actors.length);
+ const world={scene:new T.Scene()};
+ const {applyKeeper}=await import('../src/stage/keepers.js');
+ applyBindings(frame,bindings,(_target,_param,pose)=>applyKeeper(world,pose));
+ for(const actor of frame.stage.performers.actors){
+  const binding=bindings.find(b=>b.target===`performer/${actor.id}`),explanation=explainBinding(binding,frame,passage.patch);
+  assert.deepEqual(explanation.value,actor);assert.deepEqual(world.keepers.get(actor.id).hand.position.toArray(),actor.hand);assert.ok(explanation.note.length>20);
+ }
 });

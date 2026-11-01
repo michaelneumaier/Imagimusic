@@ -33,5 +33,5 @@ export function createWorld(canvas, fixedSize = null) {
     controls.update();render();
   }
   function dispose(){controls.dispose();scene.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});renderer.dispose();}
-  return {scene,camera,renderer,controls,garden,choir,tine,paths,render,view,dispose};
+  return {scene,camera,renderer,controls,garden,choir,tine,rail,paths,render,view,dispose};
 }
