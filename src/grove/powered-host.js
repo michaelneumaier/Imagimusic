@@ -43,11 +43,13 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
  function send(command){
   if(!['preparing','playing','suspended'].includes(state)||quietRequested)return false;
   if(command.kind!=='contact'||(command.zone!==null&&command.zone!==0&&command.zone!==1))throw new Error('Choose one of the two contact positions or lift.');
+  // Retain intent only; its requested frame is diagnostic, never saved as application time.
   if(state==='preparing'){pendingContact=command.zone===null?null:{kind:'contact',zone:command.zone,frame:Math.ceil(context.currentTime*context.sampleRate)};return true;}
   if(!node)return false;
   node.port.postMessage({type:'events',events:[{id:`contact-${serial++}`,kind:'contact',zone:command.zone,frame:Math.ceil(context.currentTime*context.sampleRate)}]});return true;
  }
  function quiet(){
+  // Retain intent only; its requested frame is diagnostic, never saved as application time.
   if(state==='preparing'){pendingContact=null;token++;prepareAbort?.abort();prepareAbort=null;setState(capture?.state==='complete'?'ended':'idle');return;}
   if(!node||quietRequested)return;
   node.port.postMessage({type:'events',events:[{id:`quiet-${serial++}`,kind:'quiet',frame:Math.ceil(context.currentTime*context.sampleRate)}]});quietRequested=true;contextChanged();
