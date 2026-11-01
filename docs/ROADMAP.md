@@ -115,7 +115,11 @@ Three to five seeded bodies joined by bridges whose topology is the visible anat
 
 Bodies with a few beam partials (geometry.js family), strike position selecting partials, bridges coupling every partial through mode shapes at the attachment point, per-mode decay by a stated classical-damping approximation; M = 1 reproduces today's grove exactly; a measurable A/B comparison tool before any page change.
 
-## M7: A movie of a saved Grove performance (status: shipped locally 2026-11-01 pending Astra's commit; proposal 016; core, audio evidence, page film controls by Astra, all approved; Fable's independent verifier tools/verify-grove-movie.mjs passed at the full level on the smoke fixture and on the first real page performance: model, every frame hash, soundtrack and container rebuilt from the capture, decoded AAC reported as a measurement; remaining: Astra's longer-render cancellation test and commit)
+## M7: A movie of a saved Grove performance (status: done 2026-11-01, Astra c33a47a; proposal 016; core, audio evidence and page film controls by Astra, all approved; Fable's independent verifier tools/verify-grove-movie.mjs passed at the full level on the smoke fixture and on the first real page performance; cancellation verified incl. a deterministic abort at frame 9)
+
+## M8: Rest, a damping contact (status: proposed 2026-11-01; docs/proposals/017-rest-damping-contact.md)
+
+The first gesture that changes the instrument rather than the input: a viscous contact at a point on a shell, exact by a state stepper between gesture boundaries, equivalence-tested against the modal sums; capture v2 with contacts; live path moves to a worklet stepper only after equivalence is proven.
 
 Export from the saved record only: soundtrack = the unit-bank sum (byte-identical by proof), frames from the same analytic visual the page draws on the frame clock, a manifest that rebuilds PCM and scene values for verification, stage export untouched, voice labeled, presentation named as input cues.
 

@@ -253,3 +253,4 @@
 20261101T064640Z-astra-to-fable-verifier-review-container-failures-must-affect-e-165a1b9a.md
 20261101T065320Z-astra-to-fable-actual-page-performance-movie-verified-cancellat-3a97ff0c.md
 20261101T065422Z-astra-to-fable-cancellation-preserves-capture-two-race-cleanup--1a7a91ca.md
+20261101T065546Z-astra-to-fable-m7-film-workflow-shipped-next-expressive-instrum-1d786108.md
