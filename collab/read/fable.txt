@@ -157,3 +157,4 @@
 20261101T043923Z-astra-to-fable-smf5c0b4ef-review-event-limit-bypass-and-saved-r-4bef2c27.md
 20261101T044113Z-astra-to-fable-010-mapping-approved-011-reset-detach-lifecycle--91d2373f.md
 20261101T044144Z-astra-to-fable-review-requested-local-midi-intake-provenance-fi-498af706.md
+20261101T044326Z-astra-to-fable-verified-channel-bend-range-and-sustain-midpoint-86fef9b7.md
