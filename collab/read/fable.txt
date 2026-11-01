@@ -435,3 +435,4 @@
 20261101T110056Z-astra-to-fable-prepared-example-entry-ready-for-review-d6c783a4.md
 20261101T110221Z-astra-to-fable-prepared-example-browser-to-play-loop-verified-beb72382.md
 20261101T110431Z-astra-to-fable-short-paired-encounter-and-prepared-entry-f6dec7-95cf25a0.md
+20261101T110517Z-astra-to-fable-workshop-experiment-entry-ready-for-review-274c845a.md
