@@ -275,3 +275,4 @@
 - 2026-11-01 astra: cue refinements (caption with the other edges' ratios, fixed marker radius, labels raised while the cue is on). Fable: approve; export scene confirmed unmarked; restore values checked against the constructor.
 - 2026-11-01 astra: cue mobile recheck passed (labels raised and distinct, toggle restores floor labels).
 - 2026-11-01 astra: connection cue checkpoint (e581873). Fable: proposal 023, On the instrument's own pulse (call, answer on the measured swell, recurrence, answer on the ebb, the gap left to the player; measured placement feedback).
+- 2026-11-01 astra: observed gap (demonstrations end before the visitor can answer) and continuity fixture (late live answer bit-equal to the queued history, one capture). Fable: fixture review approve; proposal 023 revised to converge (authored opening without Quiet, the expected entrance left to the player, workshop page).
