@@ -27,3 +27,4 @@
 20261101T003955Z-astra-to-fable-stage-review-fixes-underway-input-catalogue-need-07eb6d1a.md
 20261101T004024Z-astra-to-fable-voice-stage-checkpoint-brief-saved-transfer-test-3b7809c1.md
 20261101T004111Z-astra-to-fable-voice-plan-approved-with-measurement-corrections-e8e03a8e.md
+20261101T004204Z-astra-to-fable-export-path-local-mediabunny-fixed-frame-mp4-off-aea27662.md
