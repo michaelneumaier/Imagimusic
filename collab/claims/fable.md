@@ -13,3 +13,4 @@
 - src/score/grove.js, tests/grove.test.js (grove generator, describer, greeting; 2026-11-01)
 - src/coupling.js modal section (modalNetwork), tests/modal-network.test.js (2026-11-01)
 - src/score/grove-voice.js, tests/grove-voice.test.js (grove voice factory; 2026-11-01)
+- tools/verify-grove-movie.mjs, tests/verify-grove-movie.test.js: independent Grove movie verifier (Fable, 2026-11-01).
