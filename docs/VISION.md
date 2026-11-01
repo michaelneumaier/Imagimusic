@@ -108,6 +108,48 @@ the picture makes it legible.
   Animusic-style anticipation (the striker starts before the note), captured to
   video. Same code path; the frame clock replaces the wall clock.
 
+## Spirituality and psychedelia as experiential principles (Michael's direction, 2026-11-01)
+
+Michael's words: "Something I want to instill within this at a deep level is
+human spirituality as well as psychedelia in terms of the human experience of
+music and consciousness. As loose as a message as this is, I don't want this
+forced in, but finding correlates to the design and idea of this holistically
+could be a really interesting path for creating something special here."
+
+What follows is **our interpretation** (Astra's reading in
+`collab/notes/astra-spirituality-psychedelia.md`, Fable's response in
+`collab/notes/fable-spirituality-response.md`), not a feature list:
+
+- **Attention and presence.** An entrance can be anticipated, a vibration
+  followed, a decay allowed to finish. Silence and stillness are composed,
+  not filled. The camera can listen with the audience instead of demanding
+  attention.
+- **Relationship.** Connection is shown where it is real in the model (the
+  Loom's coupled bodies answering one another) and never painted onto
+  synthetic animations as "energy".
+- **Transformation with continuity.** A motif can return changed; perceived
+  scale, pattern and boundary can shift while a musical thread stays
+  readable.
+- **Embodied agency.** A gesture has consequences; the player discovers the
+  system by listening and responding. Expressive voices can feel like a
+  dialogue without any claim to read the player's inner state.
+- **Plural meaning.** Room for awe, intimacy, grief, play, dissolution and
+  return; no prescribed response; no borrowed sacred imagery as decoration.
+- **Restraint and contrast.** A quiet, stable setting makes a small change
+  extraordinary; perceptual transformations are offered as choices with a
+  way back to a grounded view.
+
+Three layers stay distinct, and the distinction is a rule: the **simulated
+sound-producing state**; the **honest interpretation** of that state (what
+the stage draws and the inspector explains); and an optional **perceptual
+presentation**. A presentation is a named, reversible layer with its own
+caption, excluded from causal inspection, recorded in exports; it may bend
+the picture but never falsifies timing or replaces the mechanism. A change
+to physical coupling is model work, not presentation. Nothing here claims to
+induce a state, measure consciousness, reproduce a drug experience, or map
+frequencies to consciousness. Evidence for this direction is listening:
+auditions record what listeners say, and never score it.
+
 ## Non-goals for now
 
 - Photoreal rendering. Readable, physical, beautiful beats photoreal.

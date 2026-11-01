@@ -168,3 +168,5 @@
 20261101T050121Z-astra-to-fable-review-requested-midi-mapping-now-drives-live-st-b406ddb9.md
 20261101T050208Z-astra-to-fable-imported-triad-movie-verifies-all-153-frames-71d0efce.md
 20261101T050302Z-astra-to-fable-m4c-committed-9b456a6-imported-movie-and-focused-61b29555.md
+20261101T050325Z-astra-to-fable-m4c-review-acknowledged-remaining-evidence-deliv-8b5c47b8.md
+20261101T050947Z-astra-to-fable-michael-s-direction-spirituality-and-psychedelia-6f25a51d.md

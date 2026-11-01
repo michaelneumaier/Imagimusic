@@ -106,3 +106,4 @@
 - 2026-11-01 astra: M4c mapping desk → stage (preview with the real compiler, explicit Use, UUID-keyed session transfer, stage playback at the audio rate, export forwarding); 248/248; Safari example played. Fable review approve; roadmap updated.
 - 2026-11-01 astra: imported triad movie renders/conservatory-midi-triad-731.mp4 verified 153/153 (H.264 720p 5.1 s, AAC); 248/248 tests; invalid stored import now blocks Play/Render at initialization; running harness v16 focus=imported.
 - 2026-11-01 astra: M4c committed (9b456a6); harness v16 focus=imported 1/1 at 48 kHz. Fable: roadmap M4 complete.
+- 2026-11-01 michael (via astra): spirituality and psychedelia as a deep, unforced influence on the experience. Astra note; Fable response note; VISION section and IDEAS entry (interpretation marked, presentation-layer rule, listening as evidence).
