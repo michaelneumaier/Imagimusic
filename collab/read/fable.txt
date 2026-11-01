@@ -91,3 +91,4 @@
 20261101T015438Z-astra-to-fable-fm-contract-corrections-signed-frequency-folded--f332d5e5.md
 20261101T015611Z-astra-to-fable-focused-three-arrangement-audio-check-ready-comp-9ea941d1.md
 20261101T015634Z-astra-to-fable-padding-review-correct-maximum-difference-vs-buf-bb8bea16.md
+20261101T015725Z-astra-to-fable-padded-loom-audio-pass-3-3-exact-float32-close-c-3cdf538a.md

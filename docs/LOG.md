@@ -55,3 +55,5 @@
 - 2026-11-01 astra: v9 composed identity FAIL at 31.25 s (duet buffer natural end); composition-link for shareable Loom settings.
 - 2026-11-01 fable: duet buffer zero-padded past the render under outlive policy (content unchanged, as-live natural length); harness v10; 146/146.
 - 2026-11-01 fable: proposal 007 rev. 2 after Astra review (signed frequency, time-domain Bessel reference, ratio-3.5 set, Bessel-tail alias budget, constant index, fade, 8 Hz threshold).
+- 2026-11-01 astra: focused Safari check 3/3 composed arrangements bit-identical after the padding fix; composed scene parity 361/361.
+- 2026-11-01 fable: decision 004 scope extended to the three tested arrangements; roadmap M3 audio identity done.

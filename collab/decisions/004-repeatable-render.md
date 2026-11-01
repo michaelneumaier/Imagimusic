@@ -49,6 +49,21 @@ inside the engine are **not established** by these metrics.
 4. Shipping assertions (harness ≥ v6): full and air renders bit-identical,
    peak within (0.01, 1), last 50 ms below 1e-3, length equal to duration.
 
+## Scope extension (2026-11-01, composed passages)
+
+With the optional Loom duet attached (composition v1), the duet's
+AudioBufferSource ran out of buffer before the render ended and the composed
+passage drifted (harness v9: difference after the buffer end at 31.064 s,
+peak at 31.255 s; the first v9 failure stays documented). The fix zero-pads
+the duet buffer past the stop time under the outlive policy, content
+unchanged. Verified on Safari 26.6.2 / 48 kHz / seed 731, three arrangements
+rendered twice each, all bit-identical float32 (1,609,893 samples, finite,
+bounded, tail below 3e-6, non-zero contribution vs. the base passage):
+matched default (peak 0.2077), detuned 339 Hz / coupling 0.02 / −33 cents /
+loss 0.8 (peak 0.1949), uncoupled 80 Hz / loss 0.2 (peak 0.1922)
+(`renders/loom-render-report-20261101T015618.json`). The verified set is
+exactly these; other arrangements are expected but not claimed.
+
 ## Consequences
 
 - `docs/ROADMAP.md`: the repeatability item closes with this evidence.
