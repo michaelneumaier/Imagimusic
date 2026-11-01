@@ -140,3 +140,28 @@ export function poweredRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
   out.push(snapshot(frames, frames / sr));
   return { fps, duration: frames / sr, frames: out };
 }
+
+// ---- after the encounter (proposal 021): what was just done, and the same touch on another grove ----
+/** One sentence of fact from a powered record: when the hands rested, where, and when the source stopped; no claim about the listener. */
+export function poweredSettledLine(record, recipe) {
+  validatePoweredRecord(record, recipe);
+  const sr = recipe.sampleRate, d = record.driver, zoneName = z => (recipe.zones[z] === 1 ? 'the bridge tip' : recipe.zones[z] === 0.3 ? 'the upper zone' : `u = ${recipe.zones[z]}`), t = f => (f / sr).toFixed(1) + ' s';
+  // A capture stores the actual forced frames; when Quiet fell at the source's end there was no release interval, so the source was stopped by Quiet.
+  const source = d.forcedFrames === 0 ? 'The source never ran.' : `The source ran for ${t(d.forcedFrames)}${record.ended && record.ended.frame === d.startFrame + d.forcedFrames ? ' (stopped by Quiet)' : ''}.`;
+  const hands = record.contacts.length ? record.contacts.map(c => `a hand at ${zoneName(c.zone)} from ${t(c.start)} to ${t(c.end)}`).join(', ') : 'no hand rested on the body';
+  return `${source} ${hands.charAt(0).toUpperCase() + hands.slice(1)}; the rest was the instrument answering.`;
+}
+
+/** The same touch on another grove: identical contact timing and positions, with the target grove's own declared source (its amplitude comes from its
+ *  own budget, so levels differ by grove and are stated); the source is never transplanted as a force in newtons across instruments. */
+export function transposePoweredRecord(record, sourceRecipe, targetRecipe) {
+  validatePoweredAdmission(record, sourceRecipe);
+  if (targetRecipe.sampleRate !== sourceRecipe.sampleRate || targetRecipe.bodies !== sourceRecipe.bodies) throw new Error('target recipe must match the source in sample rate and body count.');
+  const stable = v => JSON.stringify(v, (_, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(k => [k, x[k]])) : x);
+  if (stable(targetRecipe.positions) !== stable(sourceRecipe.positions) || stable(targetRecipe.zones) !== stable(sourceRecipe.zones) || stable(targetRecipe.strengths) !== stable(sourceRecipe.strengths) || stable(targetRecipe.voice) !== stable(sourceRecipe.voice) || targetRecipe.driver.body !== sourceRecipe.driver.body || targetRecipe.driver.position !== sourceRecipe.driver.position) throw new Error('target recipe must use the same positions, zones, strengths, voice and driver direction as the source; no remapping is defined.');
+  const d = record.driver, frequencyHz = targetRecipe.grove.bodies[d.body].hz, rotation = forceRotation(frequencyHz, targetRecipe.sampleRate), amplitude = d.forcedFrames > 0 ? poweredAmplitudeLimit(targetRecipe, { frequencyHz, forcedFrames: d.forcedFrames, rotation }) : 0;
+  const out = { ...structuredClone(record), grove: targetRecipe.grove, voice: targetRecipe.voice, outputGain: targetRecipe.outputGain, zones: targetRecipe.zones.slice(), strengths: targetRecipe.strengths.map(st => ({ name: st.name, c: st.c })), events: [],
+    driver: { ...d, frequencyHz, rotation, amplitude: Number.isFinite(amplitude) ? amplitude : 0 } };
+  validatePoweredAdmission(out, targetRecipe);
+  return { record: out, note: `the same hands at the same moments on Grove ${targetRecipe.grove.seed}; its source runs at that grove's own tuning (${frequencyHz.toFixed(1)} Hz) and declared level, so levels differ by grove` };
+}

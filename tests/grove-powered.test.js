@@ -113,3 +113,14 @@ test('version 2 contract: the force law is declared, the budget sums the actual 
   const v1 = structuredClone(rec); v1.version = 1; assert.throws(() => validatePoweredRecord(v1, recipe), /version 2/);
   const law = structuredClone(rec); law.driver.law = 'sample-held-sin'; assert.throws(() => validatePoweredRecord(law, recipe), /driver.law/);
 });
+
+test('after the encounter: a settled line of facts, and the same touch on another grove with that grove\'s own declared source', async () => {
+  const { poweredSettledLine, transposePoweredRecord } = await import('../src/score/grove-powered.js');
+  const sr = 8000, mk = seed => createPoweredRecipe(createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 1], strengths: { c1: 1 } }));
+  const a = mk(3), b = mk(7), rec = composeEncounterRecord(a, { contacts: [{ body: 0, zone: 0, strength: 0, start: 1600, end: 6400 }, { body: 0, zone: 1, strength: 0, start: 6480, end: 12000 }] });
+  const line = poweredSettledLine(rec, a); assert.match(line, /source ran for 2\.0 s/); assert.match(line, /upper zone from 0\.2 s to 0\.8 s/); assert.match(line, /bridge tip from 0\.8 s to 1\.5 s/); assert.ok(!/feel|calm|should/i.test(line));
+  const early = { ...rec, driver: { ...rec.driver, forcedFrames: 4000 }, contacts: [], ended: { frame: 4000, fadeFrames: rec.ended.fadeFrames } }; assert.match(poweredSettledLine(early, a), /stopped by Quiet/); assert.match(poweredSettledLine(early, a), /no hand rested/i);
+  const t = transposePoweredRecord(rec, a, b); assert.equal(t.record.grove.seed, 7); assert.deepEqual(t.record.contacts, rec.contacts); assert.notEqual(t.record.driver.amplitude, rec.driver.amplitude); assert.match(t.note, /own tuning/);
+  assert.equal(t.record.driver.frequencyHz, b.grove.bodies[0].hz); const pcm = renderPoweredRecord(t.record, b); assert.equal(pcm.channels[0].length, rec.ended.frame + rec.ended.fadeFrames);
+  const other = createPoweredRecipe(createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr, zones: [0.3, 0.6], strengths: { c1: 1 } })); assert.throws(() => transposePoweredRecord(rec, a, other), /same positions, zones/);
+});
