@@ -168,3 +168,4 @@
 - 2026-11-01 astra: Rest capture adapter (acknowledgements → v2 record, strict sequence, Quiet closes hands). Fable review approve; limits plan agreed with an origin note.
 - 2026-11-01 fable: the Rest invitation (ring, rest on it, rest on the neighbour, together with a light hand, Quiet) as worklet commands and the record it produces; admissible on every curated seed; rested tail under 0.3 of the free ring.
 - 2026-11-01 fable: first acknowledged Rest capture rebuilt in Node (valid, 512 samples, hashes recorded); independent comparison needs browser output hashes in the report.
+- 2026-11-01 astra: Rest worklet limits (128/256/120 s) with automatic acknowledged Quiet; Node processor test. Fable review approve; shared src/rest/limits.js.
