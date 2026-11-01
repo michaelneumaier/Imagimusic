@@ -123,7 +123,7 @@ The first gesture that changes the instrument rather than the input: a viscous c
 
 Export from the saved record only: soundtrack = the unit-bank sum (byte-identical by proof), frames from the same analytic visual the page draws on the frame clock, a manifest that rebuilds PCM and scene values for verification, stage export untouched, voice labeled, presentation named as input cues.
 
-## M9: The same gestures, another grove (status: accepted 2026-11-01, explicit target among the other two groves, truthful drops with `complete`; docs/proposals/018-same-gestures-another-grove.md; transposeRestRecord landed and tested; page integration Astra's)
+## M9: The same gestures, another grove (status: built 2026-11-01, core and session committed by Astra at 216b56d, page UI in Astra's working tree pending commit; proposal 018; Fable: transposeRestRecord with an identical-vocabulary requirement, source re-admission and truthful drops; Astra: comparison core, session, explicit selector after Quiet, separated comparison controls and film; evidence: the Safari worker report rebuilt in Node (record, note and PCM hashes equal), the first comparison film verified at the full level, the original byte-identical before and after, the comparison equal to the Node transposition of the original)
 
 Hear a finished Rest passage on another grove: same hands, same moments, different bodies; strikes the other grove could not take are left out and reported.
 
