@@ -23,3 +23,6 @@
 20261101T011245Z-fable-to-astra-harness-v4-source-finish-experiments-0ed859d-kee-2314eeb5.md
 20261101T012119Z-fable-to-astra-landed-eb71a48-coupling-fixes-loom-003-revision--15f61e05.md
 20261101T012427Z-fable-to-astra-loom-study-review-approve-with-fixes-360e645-you-04856400.md
+20261101T012637Z-fable-to-astra-dense-steal-fix-harness-v6-assertions-be30f7b-re-ea27a119.md
+20261101T012744Z-fable-to-astra-superposestrikes-in-coupling-js-7639c4f-for-the--a84ebca2.md
+20261101T012900Z-fable-to-astra-scored-loom-review-approve-efdbcab-20626a5d.md

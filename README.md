@@ -16,6 +16,12 @@ Open http://127.0.0.1:8080. Click **Begin sequence**, click a garden resonator, 
 
 Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passage on one 3D floor. Drag to orbit, choose a close view, or scrub the silent timeline. Use **Play this instrument in 3D** in the laboratory to transfer its current patch and seed into the stage. The transfer stays in this browser session; the direct stage link uses the default patch. Its plain score snapshots feed both live scheduling and the shared state bus. Stateless scene bindings permit reproducible seeking. Three.js 0.187.0 is vendored locally with license and verified package integrity; no installation or CDN is needed. WebGL2 is required for this preview; the 2D laboratory remains available.
 
+## Tension Loom study
+
+Open [Tension Loom](http://127.0.0.1:8080/loom.html). Strike either body or use **Play conversation** for eight alternating strikes with overlapping vibrations. Coupling changes both normal modes; zero coupling leaves the unstruck body silent. Detuning changes the exchange. Each stereo channel picks up one body's displacement, with a shared pickup scale for the scored passage. **Save stereo WAV** saves the full selected strike or conversation.
+
+The model is two coupled masses and springs, not an acoustic radiation solver. The picture shows displacement envelopes, switching to a labeled mean level above an 8 Hz mode split. A strike has a maximum 20-second tail with a quarter-second end fade. Changes to controls settle playback and take effect on the next performance. The scored renderer and arbitrary-time frame preserve interference between strikes; stage integration and movie export for this family remain future work.
+
 ## Three kinds of anatomy
 
 **The garden** interprets glass, bronze and string spectral families. Each visible layer shares the amplitude and decay of an audible mode. Mallets approach before scheduled contact; manual strikes use a 25 ms approach. Click different heights or use Strike position to change which modes get excited. Harder procedural strikes excite more upper-mode energy. These shapes and strike weights are artistic interpretations, not reconstructed physical objects.
@@ -45,7 +51,7 @@ Live and offline choir audio use the same source/filter/gain graph. A rolling co
 
 - **Render choir WAV:** the seeded Bellows phrase, including release tails, rendered at 48 kHz with the live graph and compressor.
 
-Exports are mono PCM16. Garden and tine render at 22.05 kHz and omit live stereo placement and the preview compressor. These are procedural renders, not recordings of manual performance or edits. A shared state bus, unified 3D stage and deterministic video are the next structural milestones.
+Laboratory WAV exports are mono PCM16; the Loom study exports stereo PCM16. Garden and tine render at 22.05 kHz and omit live stereo placement and the preview compressor. These are procedural renders, not recordings of manual performance or edits. The Conservatory also exports an MP4 with a separate trace manifest, using its shared score, state bus and procedural camera. Browser audio repeatability is under active verification; see the export validation notes.
 
 ## Collaborate and extend
 
