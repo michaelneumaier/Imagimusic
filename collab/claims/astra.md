@@ -154,3 +154,4 @@ Project home/catalog: project.html, project.css, src/project-catalog.js and welc
 Catalog restart resilience: tools/prepare-project-home.mjs; existing project-catalog.js availability handling for generated study links, local-only.
 
 Project home return path: index.html brand destination and accessible label only.
+Reproducible preliminary benchmark: tools/measure-ensemble-engine-cost.mjs, Node-only evidence with explicit excluded browser overhead.
