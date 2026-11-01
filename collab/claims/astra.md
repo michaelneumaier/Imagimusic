@@ -1,5 +1,6 @@
-# Astra's active claims
+# Astra active claims
 
-M1 in progress: src/model.js, src/audio.js, src/main.js, src/scene.js, src/excitation.js, index.html, style.css, tests/audio.test.js, tests/model.test.js, tests/excitation.test.js, README.md.
-Fable owns src/geometry.js + tests/geometry.test.js and docs maintenance. Coordinate the modesOf interface by mailbox.
-Astra integrates geometry after peer handoff; no concurrent edits to Fable's module.
+M1 implementation committed as 610b549. Geometry module is Fable-owned; integration in model/audio/scene/main is Astra-owned.
+M2 active: src/bellows-audio.js, src/bellows-scene.js, model.js v4 integration, main.js/index.html/style.css Bellows UI, tests/bellows-audio.test.js, README.md.
+Fable owns src/dynamics.js + tests/dynamics.test.js; implement against approved Bellows scheduling contract in mailbox. Fable maintains docs and geometry.
+Astra polls inbox at each work checkpoint under an active ongoing goal; sends/acks are in collab/.

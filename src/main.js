@@ -1,9 +1,11 @@
+import { mountBellows } from './bellows-ui.js';
 import { DEFAULT_PATCH, makeScore, validatePatch, tineModes, TINE_INDEX } from './model.js';
 import { InstrumentAudio } from './audio.js';
 import { drawGarden, drawTine, NOTE_NAMES } from './scene.js';
 import { APPROACH_SECONDS, LIVE_APPROACH_SECONDS, clamp01 } from './excitation.js';
 const $ = id => document.getElementById(id);
-let patch = { ...DEFAULT_PATCH }, playing = false, step = 0, nextTime = 0, score = makeScore(patch), voices = [];
+let bellowsUI = null;
+let patch = structuredClone(DEFAULT_PATCH), playing = false, step = 0, nextTime = 0, score = makeScore(patch), voices = [];
 const audio = new InstrumentAudio(), canvas = $('scene'), ctx = canvas.getContext('2d');
 let width = 1000, height = 430, targets = [];
 const tineCanvas = $('tine-scene'), tineCtx = tineCanvas.getContext('2d');
@@ -20,6 +22,7 @@ function syncUI() {
   $('material-description').textContent = descriptions[patch.material];
   document.querySelector('.scene-caption span').textContent = `01 / THE ${patch.material === 'string' ? 'HARMONIC' : patch.material.toUpperCase()} ORCHARD`;
   score = makeScore(patch);
+  bellowsUI?.syncUI();
   for (const key of ['lengthM', 'thicknessM']) {
     $(key).value = patch.geometry[key]; $(key + '-value').textContent = (patch.geometry[key] * 1000).toFixed(key === 'lengthM' ? 0 : 1) + ' mm';
   }
@@ -43,7 +46,7 @@ async function touch(index, position = patch.strikePosition) {
   catch (error) { notice('Audio could not start: ' + error.message); }
 }
 function stop() {
-  playing = false; audio.stop(); $('play').textContent = '▶ Begin sequence'; $('status').textContent = 'Quiet · ready to play';
+  playing = false; audio.stop(); bellowsUI?.stop(); $('play').textContent = '▶ Begin sequence'; $('status').textContent = 'Quiet · ready to play';
 }
 $('play').onclick = async () => {
   if (playing) { stop(); return; }
@@ -141,7 +144,9 @@ function draw() {
   voices = voices.filter(voice => voice.end > time);
   const result = drawGarden(ctx, width, height, { time, voices, patch, dampers: audio.dampers });
   targets = result.targets;
+  bellowsUI?.draw();
   tineTarget = drawTine(tineCtx, tineWidth, tineHeight, { time, voices, patch, damped: audio.dampers.has(TINE_INDEX), modes: tinePreview });
   document.querySelectorAll('[data-note]').forEach(button => button.classList.toggle('active', result.energies[Number(button.dataset.note)] > .12));
 }
+bellowsUI = mountBellows({ audio, getPatch: () => patch, setBellows: block => { patch = { ...patch, bellows: block }; syncUI(); }, notice, download });
 function frame(){draw();requestAnimationFrame(frame);}syncUI();resize();resizeTine();frame();

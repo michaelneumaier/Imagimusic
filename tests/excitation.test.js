@@ -23,7 +23,7 @@ test('striker reaches the sounding surface on the audio timestamp and recovers',
 test('version 1 instrument files migrate without losing their seed or settings', () => {
   const legacy = { ...DEFAULT_PATCH, version: 1 }; delete legacy.strikePosition; delete legacy.release;
   const upgraded = validatePatch(legacy);
-  assert.equal(upgraded.version, 3); assert.equal(upgraded.seed, legacy.seed);
+  assert.equal(upgraded.version, 4); assert.equal(upgraded.seed, legacy.seed);
   assert.equal(upgraded.strikePosition, .37); assert.equal(upgraded.release, .18);
   assert.throws(() => validatePatch({ ...DEFAULT_PATCH, release: 0 }));
 });

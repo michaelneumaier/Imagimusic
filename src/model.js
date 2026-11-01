@@ -1,3 +1,4 @@
+import { DEFAULT_BELLOWS, validateBellows } from './dynamics.js';
 import { modesOf, GEOMETRY_MATERIALS } from './geometry.js';
 import { excitationWeight, ATTACK_SECONDS, DECAY_TAUS } from './excitation.js';
 // The same modal definition drives audible partials and visible energy.
@@ -7,11 +8,11 @@ export const MATERIALS = {
   string: { ratios: [1, 2, 3, 4, 5], color: [185, 174, 255] },
 };
 export const NOTES = [48, 51, 55, 58, 60, 63, 67, 70];
-export const DEFAULT_PATCH = { version: 3, geometry: { material: 'steel', lengthM: 0.065, thicknessM: 0.001, widthM: 0.01 }, strikePosition: 0.37, release: 0.18, material: 'glass', damping: 0.38, brightness: 0.6, spread: 0.55, tempo: 84, seed: 731 };
+export const DEFAULT_PATCH = { version: 4, bellows: DEFAULT_BELLOWS, geometry: { material: 'steel', lengthM: 0.065, thicknessM: 0.001, widthM: 0.01 }, strikePosition: 0.37, release: 0.18, material: 'glass', damping: 0.38, brightness: 0.6, spread: 0.55, tempo: 84, seed: 731 };
 export const frequency = midi => 440 * 2 ** ((midi - 69) / 12);
 export function validatePatch(value) {
-  if (!value || ![1, 2, 3].includes(value.version) || !Object.hasOwn(MATERIALS, value.material)) throw new Error('Unsupported instrument file.');
-  const patch = { version: 3, material: value.material };
+  if (!value || ![1, 2, 3, 4].includes(value.version) || !Object.hasOwn(MATERIALS, value.material)) throw new Error('Unsupported instrument file.');
+  const patch = { version: 4, material: value.material };
   value = value.version === 1 ? { ...value, strikePosition: 0.37, release: 0.18 } : value;
   for (const [key, low, high] of [['strikePosition', 0, 1], ['release', 0.02, 1], ['damping', 0, 1], ['brightness', 0, 1], ['spread', 0, 1], ['tempo', 40, 160], ['seed', 0, 4294967295]]) {
     if (typeof value[key] !== 'number' || !Number.isFinite(value[key]) || value[key] < low || value[key] > high) throw new Error(`Invalid ${key}.`);
@@ -24,6 +25,7 @@ export function validatePatch(value) {
     if (typeof geometry[key] !== 'number' || !Number.isFinite(geometry[key]) || geometry[key] < low || geometry[key] > high) throw new Error(`Invalid geometry ${key}.`);
     patch.geometry[key] = geometry[key];
   }
+  patch.bellows = validateBellows(value.version < 4 ? DEFAULT_BELLOWS : value.bellows);
   if (!Number.isInteger(patch.seed)) throw new Error('Seed must be an integer.');
   return patch;
 }
