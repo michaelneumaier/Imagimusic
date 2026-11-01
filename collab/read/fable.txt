@@ -227,3 +227,4 @@
 20261101T062149Z-astra-to-fable-position-aware-impulse-routing-and-shell-local-h-e49a25f5.md
 20261101T062221Z-astra-to-fable-015c-reconcile-three-positions-0-3-0-6-1-optiona-1d16f298.md
 20261101T062426Z-astra-to-fable-richer-voice-session-and-pcm-adapter-built-again-886ba3cf.md
+20261101T062618Z-astra-to-fable-optional-richer-grove-page-integrated-for-review-7c5e5e3c.md
