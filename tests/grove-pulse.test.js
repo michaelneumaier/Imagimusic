@@ -40,6 +40,13 @@ test('on-pulse record: the cumulative phrase is admitted as its own history, wit
     assert.equal(p.grove, JSON.parse(JSON.stringify(p.grove)) && p.grove, 'canonical grove carried'); assert.ok(p.grove.includes('"seed"')); assert.ok(typeof p.voice === 'string');
   }
   assert.throws(() => composeOnPulsePhrase(createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), { body: 7 }), /index the grove/);
+  // Two cycles: the call-and-answer pair recurs before the final call; the opening on grove 7 then exceeds the bound and is refused.
+  const r3 = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), one = composeOnPulsePhrase(r3), two = composeOnPulsePhrase(r3, { cycles: 2 });
+  assert.equal(two.cycles, 2); assert.deepEqual(two.commands.map(c => [c.frame, c.body]), [[0, 0], [one.commands[1].frame, one.neighbor], [one.commands[2].frame, 0], [one.commands[2].frame + one.commands[1].frame, one.neighbor], [2 * one.commands[2].frame, 0]]);
+  assert.equal(two.endFrame, 2 * one.endFrame); assert.equal(two.expectedEntranceFrame, two.endFrame + one.commands[1].frame); assert.deepEqual(two.sections.map(s => s.id), ['call-1', 'answer-1', 'call-2', 'answer-2', 'return', 'yours']);
+  assert.match(onPulsePrompt(two, 'call-2'), /recurs/); assert.match(onPulsePrompt(two, 'answer-2'), /again/); assert.equal(onPulsePrompt(two, 'yours'), onPulsePrompt(one, 'yours'));
+  for (const answer of [null, 'expected']) { const rec = onPulseRecord(r3, two, { answer }); assert.equal(rec.record.events.length, answer ? 6 : 5); renderRestRecord(rec.record, r3); }
+  assert.throws(() => composeOnPulsePhrase(createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), { cycles: 2 }), /bound/); assert.throws(() => composeOnPulsePhrase(r3, { cycles: 4 }), /cycles/);
   // The frequency floor (period cap) in measureSecondStrike is never used silently: a recipe whose two lowest modes coincide is refused.
   const tight = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), v = tight.visual, [r0, r1] = v.lowBand; const saved = v.omegaD[r1]; v.omegaD[r1] = v.omegaD[r0] + 2 * Math.PI * (MIN_MODE_SPLIT_HZ / 2);
   assert.throws(() => composeOnPulsePhrase(tight), /closer than/); v.omegaD[r1] = saved;
