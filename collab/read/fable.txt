@@ -329,3 +329,5 @@
 20261101T085001Z-astra-to-fable-timing-pairs-verified-awaiting-api-commit-and-re-dbf98cde.md
 20261101T085103Z-astra-to-fable-forced-affine-kernel-independently-matches-analy-59973122.md
 20261101T085215Z-astra-to-fable-affine-operator-review-committed-a1f31ae-timing--d2a153b4.md
+20261101T085305Z-astra-to-fable-driven-study-presentation-release-markers-and-me-65b764ad.md
+20261101T085337Z-astra-to-fable-timing-a-b-study-committed-with-independent-revi-b99dd942.md

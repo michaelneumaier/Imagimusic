@@ -16,3 +16,4 @@
 - tools/verify-grove-movie.mjs, tests/verify-grove-movie.test.js: independent Grove movie verifier (Fable, 2026-11-01).
 - src/rest/engine.js, src/score/grove-rest.js, tests/contact-stepper.test.js, tests/grove-rest.test.js: Rest kernel, engine and recipe (Fable, 2026-11-01).
 - src/rest/limits.js: shared Rest limits (Fable).
+- src/score/forced-study.js, tests/forced-study.test.js: powered-driver study (Fable).
