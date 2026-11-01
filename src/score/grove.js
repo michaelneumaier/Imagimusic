@@ -170,3 +170,10 @@ export function validateGroveGreeting(greeting, g) {
   if (d < GREETING_BOUNDS.minSeconds || d > GREETING_BOUNDS.maxSeconds) throw new Error(`greeting lasts ${d.toFixed(1)} s; bound is ${GREETING_BOUNDS.minSeconds}..${GREETING_BOUNDS.maxSeconds} s.`);
   return greeting;
 }
+
+/** What was just heard: the authored fact of the greeting, one sentence from its sections, no claim about the listener. */
+export function greetingSettledLine(greeting) {
+  const ids = greeting.sections.map(s => s.id).join();
+  if (ids !== 'solo,neighbor,third,shared,silence') throw new Error('not a Grove greeting.');
+  return `One body alone. Body ${greeting.neighbor + 1} answered through the bridge, then body ${greeting.third + 1} arrived; all three together, then the ring was left to finish.`;
+}

@@ -165,3 +165,10 @@ export function validateGroveVoiceGreeting(greeting, grove) {
   if (d < VOICE_GREETING_BOUNDS.minSeconds || d > VOICE_GREETING_BOUNDS.maxSeconds) throw new Error(`greeting lasts ${d.toFixed(1)} s; bound is ${VOICE_GREETING_BOUNDS.minSeconds}..${VOICE_GREETING_BOUNDS.maxSeconds} s.`);
   return greeting;
 }
+
+/** What was just heard in the position-aware greeting: the authored fact, one sentence. */
+export function voiceGreetingSettledLine(greeting) {
+  const ids = greeting.sections.map(s => s.id).join();
+  if (ids !== 'places,answer,late,shared,silence') throw new Error('not a position-aware greeting.');
+  return `One body at three places, each twice: upper, middle, bridge tip. Body ${greeting.neighbor + 1} answered at the tip; body ${greeting.third + 1} arrived at the upper place; all three at the middle, then the ring was left to finish.`;
+}

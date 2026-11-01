@@ -74,3 +74,15 @@ test('the greeting keeps its promise for every curated seed and compiles to stri
     assert.throws(() => validateGroveGreeting(greeting, composeGrove({ seed: seed + 1 })), /belong to this grove|follow the grove/);
   }
 });
+
+test('the settled lines state the authored fact of each passage and refuse other recipes', async () => {
+  const { greetingSettledLine, composeGroveGreeting } = await import('../src/score/grove.js');
+  const { voiceGreetingSettledLine, composeGroveVoiceGreeting } = await import('../src/score/grove-voice.js');
+  const { restInvitationSettledLine, composeRestInvitation, createGroveRestRecipe } = await import('../src/score/grove-rest.js');
+  const g = composeGrove({ seed: 7 }), greeting = composeGroveGreeting(g), voice = composeGroveVoiceGreeting(g), rest = composeRestInvitation(createGroveRestRecipe(g, undefined, { sampleRate: 8000 }));
+  assert.match(greetingSettledLine(greeting), new RegExp(`Body ${greeting.neighbor + 1} answered`));
+  assert.match(voiceGreetingSettledLine(voice), /three places/);
+  assert.match(restInvitationSettledLine(rest), /not simply quieter/);
+  assert.throws(() => greetingSettledLine(voice), /not a Grove greeting/); assert.throws(() => voiceGreetingSettledLine(greeting), /not a position-aware/); assert.throws(() => restInvitationSettledLine(greeting), /not a Rest invitation/);
+  for (const line of [greetingSettledLine(greeting), voiceGreetingSettledLine(voice), restInvitationSettledLine(rest)]) assert.ok(!/feel|beautiful|calm|sacred/i.test(line), 'no claims about the listener');
+});

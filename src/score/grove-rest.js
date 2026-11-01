@@ -253,3 +253,10 @@ export function validateRestAdmission(record, recipe) {
   }
   return { bounds };
 }
+
+/** What was just heard in the Rest invitation: the authored fact, one sentence; the neighbour's ring is "changed", never "quieter". */
+export function restInvitationSettledLine(invitation) {
+  const ids = invitation.sections.map(s => s.id).join();
+  if (ids !== 'ring,rest,across,together,quiet') throw new Error('not a Rest invitation.');
+  return `A free ring. Then a firm hand on the struck body: its ring died under the hand. Then the same strike with the hand on body ${invitation.neighbor + 1} instead: the bridge carried the change and the ring was different, not simply quieter. All three with a light hand, then Quiet.`;
+}
