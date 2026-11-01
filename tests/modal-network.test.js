@@ -60,7 +60,17 @@ test('validation: shapes must return one finite weight per partial; bounds; malf
   assert.throws(() => modalNetwork({ bodies: Array.from({ length: 9 }, () => beamBody(200, 0.02, 0.3, 3)) }), /at most 24/);
   assert.throws(() => modalNetwork({ bodies: [{ ...b, decayRates: [5000] }] }), /not underdamped/);
   const sys = modalNetwork({ bodies: [b, b], edges: [{ a: 0, b: 1, kc: 10, ua: 1, ub: 1 }] });
-  assert.throws(() => sys.strike(2, 1), /out of range/);
+  assert.throws(() => sys.strike(2, 1), /body index/);
+  assert.throws(() => sys.strike(0, 1.5), /position in \[0, 1\]/);
+  assert.throws(() => modalNetwork({ bodies: [b, b], edges: [{ a: 0, b: 1, kc: 10, ua: -0.1, ub: 1 }] }), /position in \[0, 1\]/);
+  const r = sys.strike(0, 1); assert.throws(() => r.displacement(2, 1, 0.1), /pickup body/); assert.throws(() => r.bodyModes(0, 2), /position in/);
+  // snapshot: mutating the caller's data after construction changes nothing
+  const mutable = { mass: 0.02, frequencies: [200], decayRates: [0.3], shape: () => [1] }, sys2 = modalNetwork({ bodies: [mutable, { ...mutable }], edges: [{ a: 0, b: 1, kc: 10, ua: 1, ub: 1 }] });
+  const before = sys2.strike(0, 1, 0.01).displacement(1, 1, 0.3);
+  mutable.mass = 0.5; mutable.frequencies[0] = 50; mutable.decayRates[0] = 9;
+  assert.equal(sys2.strike(0, 1, 0.01).displacement(1, 1, 0.3), before);
+  assert.throws(() => { sys2.snapshot[0].frequencies[0] = 1; }, TypeError);
+  assert.ok(Number.isFinite(sys2.dampingResidual));
 });
 
 test('damping approximation evidence: discarded off-diagonal damping is reported, and the closed form tracks a direct damped ODE for a representative grove voice', () => {

@@ -252,26 +252,31 @@ export function networkPickupModes(system, impulse, body, { scale = networkPicku
 export const MODAL_MAX_COORDINATES = 24;
 
 /** bodies: [{ mass, frequencies: [Hz], decayRates: [1/s], shape: (u01) => [φ_1(u), …, φ_M(u)] }]; edges: [{ a, b, kc, ua, ub }]. */
-export function modalNetwork({ bodies, edges = [] } = {}) {
-  if (!Array.isArray(bodies) || bodies.length < 1) throw new Error('bodies must be a non-empty array.');
-  const offsets = [], sizes = [];
-  bodies.forEach((b, a) => {
+export function modalNetwork({ bodies: input, edges = [] } = {}) {
+  if (!Array.isArray(input) || input.length < 1) throw new Error('bodies must be a non-empty array.');
+  // Snapshot every number at construction: later mutation of the caller's arrays or mass cannot reach the system. The shape
+  // callback is kept by reference and MUST be pure and deterministic in u (a closure cannot be frozen; this is the stated contract).
+  const bodies = input.map((b, a) => {
     if (!b || typeof b !== 'object') throw new Error(`bodies[${a}] must be an object.`);
     positive(b.mass, `bodies[${a}].mass`);
     if (!Array.isArray(b.frequencies) || !b.frequencies.length || !Array.isArray(b.decayRates) || b.decayRates.length !== b.frequencies.length) throw new Error(`bodies[${a}]: frequencies and decayRates must be non-empty arrays of equal length.`);
     b.frequencies.forEach((f, j) => positive(f, `bodies[${a}].frequencies[${j}]`)); b.decayRates.forEach((g, j) => nonNegative(g, `bodies[${a}].decayRates[${j}]`));
-    if (typeof b.shape !== 'function') throw new Error(`bodies[${a}].shape must be a function of u01 returning one weight per partial.`);
-    offsets.push(sizes.reduce((s, x) => s + x, 0)); sizes.push(b.frequencies.length);
+    if (typeof b.shape !== 'function') throw new Error(`bodies[${a}].shape must be a pure function of u01 in [0, 1] returning one weight per partial.`);
+    return Object.freeze({ mass: b.mass, frequencies: Object.freeze(b.frequencies.slice()), decayRates: Object.freeze(b.decayRates.slice()), shape: b.shape });
   });
+  const offsets = [], sizes = [];
+  bodies.forEach(b => { offsets.push(sizes.reduce((s, x) => s + x, 0)); sizes.push(b.frequencies.length); });
+  const u01 = (v, name) => { finite(v, name); if (v < 0 || v > 1) throw new Error(`${name} must be a position in [0, 1].`); return v; };
+  const bodyIndex = (v, name) => { if (!Number.isInteger(v) || v < 0 || v >= bodies.length) throw new Error(`${name} must be a body index 0..${bodies.length - 1}.`); return v; };
   const n = sizes.reduce((s, x) => s + x, 0);
   if (n > MODAL_MAX_COORDINATES) throw new Error(`at most ${MODAL_MAX_COORDINATES} modal coordinates.`);
-  const shapeAt = (a, u) => { const w = bodies[a].shape(u); if (!Array.isArray(w) || w.length !== sizes[a] || !w.every(Number.isFinite)) throw new Error(`bodies[${a}].shape(${u}) must return ${sizes[a]} finite weights.`); return w; };
+  const shapeAt = (a, u) => { u01(u, 'u01'); const w = bodies[a].shape(u); if (!Array.isArray(w) || w.length !== sizes[a] || !w.every(Number.isFinite)) throw new Error(`bodies[${a}].shape(${u}) must return ${sizes[a]} finite weights.`); return w; };
   const seen = new Set();
   for (const [i, e] of edges.entries()) {
     if (!e || !Number.isInteger(e.a) || !Number.isInteger(e.b) || e.a < 0 || e.b < 0 || e.a >= bodies.length || e.b >= bodies.length) throw new Error(`edges[${i}]: a and b must be body indices.`);
     if (e.a === e.b) throw new Error(`edges[${i}]: a body cannot be bridged to itself.`);
     const key = `${Math.min(e.a, e.b)}-${Math.max(e.a, e.b)}`; if (seen.has(key)) throw new Error(`edges[${i}]: duplicate bridge ${key}.`); seen.add(key);
-    nonNegative(e.kc, `edges[${i}].kc`); finite(e.ua, `edges[${i}].ua`); finite(e.ub, `edges[${i}].ub`);
+    nonNegative(e.kc, `edges[${i}].kc`); u01(e.ua, `edges[${i}].ua`); u01(e.ub, `edges[${i}].ub`);
   }
   // Mass vector and stiffness matrix over all coordinates.
   const m = [], K = Array.from({ length: n }, () => new Array(n).fill(0));
@@ -292,14 +297,15 @@ export function modalNetwork({ bodies, edges = [] } = {}) {
   // What the approximation discards: the off-diagonal part of V D Vᵀ, reported relative to ‖D‖ so the caller can bound it.
   let discarded = 0, dNorm = 0; for (let r = 0; r < n; r++) for (let s2 = 0; s2 < n; s2++) { let d = 0; for (let k = 0; k < n; k++) d += vectors[r][k] * partialRates[k] * vectors[s2][k]; if (r !== s2) discarded += d * d; } for (const g of partialRates) dNorm += g * g;
   const dampingResidual = dNorm > 0 ? Math.sqrt(discarded) / Math.sqrt(dNorm) : 0;
+  if (!Number.isFinite(dampingResidual)) throw new Error('damping residual is not finite.');
   lambda.forEach((l, r) => { if (!Number.isFinite(l)) throw new RangeError('eigenvalues are not finite.'); if (l <= gammas[r] * gammas[r]) throw new Error(`mode ${r} is not underdamped: λ ${l} ≤ γ² ${gammas[r] * gammas[r]}.`); });
   const omegaD = lambda.map((l, r) => Math.sqrt(l - gammas[r] * gammas[r]));
   const participationByBody = vectors.map(v => bodies.map((_, a) => { let s = 0; for (let j = 0; j < sizes[a]; j++) s += v[offsets[a] + j] ** 2; return s; }));
-  const system = { n, bodies: bodies.length, sizes, offsets, m, K, A, lambda, omegaD, gammas, vectors, normalFreqsHz: omegaD.map(w => w / (2 * Math.PI)), participationByBody, eigen: { residual, orthogonality }, dampingResidual,
+  const system = { n, bodies: bodies.length, snapshot: bodies, sizes, offsets, m, K, A, lambda, omegaD, gammas, vectors, normalFreqsHz: omegaD.map(w => w / (2 * Math.PI)), participationByBody, eigen: { residual, orthogonality }, dampingResidual,
     damping: 'classical-damping approximation: each coupled normal mode decays at the participation-weighted mean of its partials\' decay rates; the undamped eigenproblem is exact' };
   /** Closed-form response to a strike of impulse J at position s on body a (bodies at rest). */
   system.strike = (a, s, J = 1) => {
-    if (!Number.isInteger(a) || a < 0 || a >= bodies.length) throw new Error('strike body out of range.'); finite(s, 's'); finite(J, 'J');
+    bodyIndex(a, 'strike body'); u01(s, 'strike position'); finite(J, 'J');
     const w = shapeAt(a, s), ydot0 = new Array(n).fill(0);
     for (let j = 0; j < sizes[a]; j++) ydot0[offsets[a] + j] = (J * w[j] / bodies[a].mass) * Math.sqrt(bodies[a].mass);   // ẏ = √m · q̇
     const qdot0 = vectors.map(v => v.reduce((sum, vi, k) => sum + vi * ydot0[k], 0)), coeff = qdot0.map((qd, r) => qd / omegaD[r]);
@@ -308,10 +314,10 @@ export function modalNetwork({ bodies, edges = [] } = {}) {
     const qdot = combine((r, t) => coeff[r] * Math.exp(-gammas[r] * t) * (omegaD[r] * Math.cos(omegaD[r] * t) - gammas[r] * Math.sin(omegaD[r] * t)));
     const qdot0Coordinates = ydot0.map((yd, k) => yd / Math.sqrt(m[k]));                     // initial velocity in physical coordinates
     /** Displacement and velocity of body b at pickup position p: w_b(p) = Σ_j φ_bj(p) q_bj(t). */
-    const displacement = (b, p, t) => { const qt = q(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
-    const velocity = (b, p, t) => { const qt = qdot(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
+    const displacement = (b, p, t) => { bodyIndex(b, 'pickup body'); const qt = q(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
+    const velocity = (b, p, t) => { bodyIndex(b, 'pickup body'); const qt = qdot(t), wb = shapeAt(b, p); let x = 0; for (let j = 0; j < sizes[b]; j++) x += wb[j] * qt[offsets[b] + j]; return x; };
     /** Body b's pickup at p as signed additive modes at the normal frequencies: amplitude_r = Σ_j φ_bj(p) coeff_r v_r[(b,j)] / √m_b. */
-    const bodyModes = (b, p) => { const wb = shapeAt(b, p); return coeff.map((c, r) => ({ frequency: omegaD[r] / (2 * Math.PI), amplitude: c * wb.reduce((s, wj, j) => s + wj * vectors[r][offsets[b] + j], 0) / Math.sqrt(bodies[b].mass), decay: gammas[r] > 0 ? 1 / gammas[r] : Infinity })); };
+    const bodyModes = (b, p) => { bodyIndex(b, 'pickup body'); const wb = shapeAt(b, p); return coeff.map((c, r) => ({ frequency: omegaD[r] / (2 * Math.PI), amplitude: c * wb.reduce((s, wj, j) => s + wj * vectors[r][offsets[b] + j], 0) / Math.sqrt(bodies[b].mass), decay: gammas[r] > 0 ? 1 / gammas[r] : Infinity })); };
     return { q, qdot, qdot0Coordinates, displacement, velocity, bodyModes, coeff, qdot0 };
   };
   return system;

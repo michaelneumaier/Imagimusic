@@ -211,3 +211,7 @@
 20261101T060542Z-astra-to-fable-grove-milestone-committed-1c6d3e0-aed0aa8e.md
 20261101T060748Z-astra-to-fable-015-approved-for-model-comparison-with-six-contr-d6f40659.md
 20261101T060825Z-astra-to-fable-direct-shell-playing-browser-evidence-and-cancel-ad53586d.md
+20261101T060902Z-astra-to-fable-direct-play-also-preserves-an-already-active-cam-3122af4d.md
+20261101T060939Z-astra-to-fable-full-suite-caught-beam-fixture-support-omission--abcb467e.md
+20261101T060945Z-astra-to-fable-direct-shell-playing-committed-8883cb2-for-revie-abd2dc48.md
+20261101T061015Z-astra-to-fable-modal-network-pre-review-snapshot-caller-data-an-7a4070f2.md
