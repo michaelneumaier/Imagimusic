@@ -41,3 +41,15 @@ test('pump crossheads stay on actual bellows lids through attack, sustain, relea
   }
  }
 });
+
+test('rapid repeated notes keep separate complete approach/recovery gestures in the scene',()=>{
+ const passage=createPerformance(DEFAULT_PATCH),first=passage.snapshots.garden.voices[0];
+ passage.events=[{family:'garden',voice:{...first,id:'a',noteOn:1}},{family:'garden',voice:{...first,id:'b',noteOn:1.3}}];
+ const sample=createKeeperProjection(passage);
+ assert.equal(sample(1.2).unplanned.length,0);
+ for(const [id,t] of [['a',1],['b',1.3]]){
+  assert.equal(sample(t-.1).actors.find(a=>a.eventId===id)?.phase,'approach');
+  assert.equal(sample(t).actors.find(a=>a.eventId===id)?.contact,1);
+ }
+ assert.notEqual(sample(1.15).actors.find(a=>a.eventId==='a')?.id,sample(1.15).actors.find(a=>a.eventId==='b')?.id);
+});

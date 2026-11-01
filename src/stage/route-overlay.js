@@ -41,6 +41,7 @@ export function createRouteOverlay(world) {
     }
     const body=family==='garden'?world.garden[slot]:world.tine;
     const resonator=family==='garden'?body.layers[Number(binding.param.slice(4))]??body.layers[0]:body.beam;
+    if(binding.param==='damper'){outline(body.damper);outline(resonator);link(body.damper,resonator,true);return 'Dashed: damper control → resonator release. Held dampers remain visible when the body is silent.';}
     outline(body.striker);outline(resonator);link(body.striker,resonator);
     return 'Solid: striker → resonator. The outline follows the selected part; motion remains an amplified view of the modeled response.';
   }

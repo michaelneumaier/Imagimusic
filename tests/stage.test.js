@@ -60,3 +60,18 @@ test('scheduled live voices match the visual score at both audio sample rates, i
     for(const [planned,actual] of pairs){assert.equal(actual.slot,planned.slot);assert.ok(Math.abs(actual.end-origin-planned.end)<1e-10);if(planned.stolenAt===undefined)assert.equal(actual.stolenAt,undefined);else assert.ok(Math.abs(actual.stolenAt-origin-planned.stolenAt)<1e-10);}
   }
 });
+
+test('idle held dampers reach the 3D scene and reset after release',async()=>{
+ const {gardenBody,choirBody,tineBody}=await import('../src/stage/bodies.js');
+ const {applyStage}=await import('../src/stage/projection.js');
+ const world={garden:Array.from({length:8},(_,i)=>gardenBody(i)),choir:Array.from({length:6},(_,i)=>choirBody(i)),tine:tineBody()};
+ const project=createProjection(DEFAULT_PATCH),bindings=stageBindings();
+ const held=project(collectState(0,{garden:{voices:[],dampers:[3]},tine:{voices:[],dampers:[8]}}));
+ assert.equal(held.voices.length,0);assert.equal(held.stage.garden[3].damper,1);assert.equal(held.stage.tine.damper,1);
+ applyStage(held,bindings,world);assert.equal(world.garden[3].damper.position.x,.43);
+ const beamBottom=.65-world.tine.beam.scale.y*.015;
+ assert.ok(Math.abs(world.tine.damper.position.y+.06-beamBottom)<1e-12,'tine pad reaches beam underside');
+ applyStage(project(collectState(0,{})),bindings,world);
+ assert.equal(world.garden[3].damper.position.x,.63);assert.equal(world.tine.damper.position.y,.4);
+ assert.ok(bindings.find(b=>b.target==='tine/slot8'&&b.param==='damper'));
+});

@@ -17,3 +17,5 @@ Keeper scene foundation: src/stage/keeper-rig.js, tests/keeper-rig.test.js. Pure
 Keeper integration: src/stage/keepers.js, projection/main/export, stage.html, tests/keepers.test.js; Fable owns src/perform planner.
 
 Bellows pump operators and per-actor inspection: keepers/projection/inspector, tests/keepers.test.js.
+
+Damper state/inspection binding fixes and full-recovery scene configuration in owned stage files; tests/stage.test.js and tests/keepers.test.js.

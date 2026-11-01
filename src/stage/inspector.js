@@ -9,9 +9,9 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
   function showRoute(){routeNote.textContent=route.select(current,getPatch(),lastFrame);}
   document.getElementById('inspect-clear').onclick=()=>{route.clear();routeNote.textContent='Route hidden. Select a part to trace its connections.';};
   const ray=new T.Raycaster(),point=new T.Vector2();
-  world.garden.forEach((body,i)=>{body.root.userData.bindingTarget=`garden/slot${i}`;body.layers.forEach((shell,n)=>shell.userData.bindingParam=`mode${n}`);body.striker.userData.bindingParam='striker';});
+  world.garden.forEach((body,i)=>{body.root.userData.bindingTarget=`garden/slot${i}`;body.damper.userData.bindingParam='damper';body.layers.forEach((shell,n)=>shell.userData.bindingParam=`mode${n}`);body.striker.userData.bindingParam='striker';});
   world.choir.forEach((body,i)=>{body.root.userData.bindingTarget=`bellows/slot${i}`;body.chamber.userData.bindingParam='aperture';body.bellows.userData.bindingParam='fill';body.horn.userData.bindingParam='level';body.pendulum.userData.bindingParam='swing';body.fastArc.userData.bindingParam='fast';});
-  world.tine.root.userData.bindingTarget='tine/slot8';world.tine.beam.userData.bindingParam='deflection';world.tine.striker.userData.bindingParam='reach';
+  world.tine.root.userData.bindingTarget='tine/slot8';world.tine.damper.userData.bindingParam='damper';world.tine.beam.userData.bindingParam='deflection';world.tine.striker.userData.bindingParam='reach';
   function choose(target,param){
     const choices=bindings.filter(b=>b.target===target);if(!choices.length)return;
     select.replaceChildren();for(const binding of choices){const option=document.createElement('option');option.value=binding.id;option.textContent=binding.param;select.append(option);}

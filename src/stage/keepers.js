@@ -1,13 +1,13 @@
 import * as T from '../../vendor/three/build/three.module.js';
 import { planPerformers,performerFrame } from '../perform/planner.js';
-import { strikerPose } from '../excitation.js';
+import { strikerPose,RECOVERY_SECONDS } from '../excitation.js';
 import { stagePosition } from './layout.js';
 import { solveKeeperArm } from './keeper-rig.js';
 
 export const KEEPER_BINDING={id:'performers/poses',target:'performers',param:'poses',field:'stage.performers',inputs:['tempo','seed','strikePosition','geometry.lengthM'],label:'interpreted',note:'Motorized Keepers carry the strike gestures; endpoint timing follows each score event.'};
 export function createKeeperProjection(passage){
   const voices=new Map(passage.events.filter(e=>e.family!=='bellows').map(e=>[e.voice.id,e.voice]));
-  const plans=['garden','tine'].map(family=>planPerformers(passage.events.filter(e=>e.family===family).map(e=>({...e.voice,slot:family==='tine'?0:e.voice.slot})),{family,slots:family==='tine'?1:8}));
+  const plans=['garden','tine'].map(family=>planPerformers(passage.events.filter(e=>e.family===family).map(e=>({...e.voice,slot:family==='tine'?0:e.voice.slot})),{family,slots:family==='tine'?1:8,minRecover:RECOVERY_SECONDS,recover:RECOVERY_SECONDS}));
   return t=>({unplanned:plans.flatMap(p=>p.unplanned.map(e=>({...e,family:p.family}))),actors:performerFrame(plans,t).performers.map(actor=>{
     const voice=voices.get(actor.eventId),gesture=voice&&['approach','contact','recover'].includes(actor.phase)?strikerPose(t,voice.noteOn,voice.approach):{reach:0,contact:0};
     const anchor=stagePosition(actor.family,actor.slot),position=voice?.position??passage.patch.strikePosition;
