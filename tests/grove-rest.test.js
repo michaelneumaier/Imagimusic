@@ -299,4 +299,5 @@ test('the individuality phrase is admissible on every grove, transposes whole, a
   for (const seed of GROVE_SEEDS) { const f = d[seed].facts; assert.equal(f.lowModesHz.length, 3); assert.ok(f.beatRatesHz.every(b => b >= 0 && b < 10)); assert.ok(f.lowDecaySeconds > 0.5 && f.lowDecaySeconds < 5); assert.ok(f.freeRingShare.every(s => s >= 0 && s < 3)); assert.ok(f.underFirmHandOnStruck[0] < 0.05, 'under a firm hand the struck shell keeps almost nothing (measured with the contact engaged)'); assert.ok(f.underFirmHandOnStruck.slice(1).every(s => s > 0.05 && s < 3)); assert.match(f.measure, /not an energy share/); assert.equal(d[seed].mayHear.length, 5); assert.ok(d[seed].mayHear.every(line => /may /.test(line)), 'nothing promised'); }
   assert.ok(d[11].facts.lowModesHz[0] > 180 && d[3].facts.lowModesHz[0] < 140, 'seed 11 sits a fifth above seeds 3 and 7 (measured)');
   assert.ok(d[3].facts.lowDecaySeconds > d[7].facts.lowDecaySeconds, 'seed 3 rings longer than seed 7 (measured)');
+  for (const bad of [0.5, 0, -1, Infinity, NaN, 61]) assert.throws(() => describeIndividuality(recipes[3], { seconds: bad }), /1\.\.60/);
 });

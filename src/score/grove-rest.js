@@ -352,6 +352,7 @@ export function composeIndividualityPhrase(recipe, { tempo = 60 } = {}) {
  *  relative amplitudes, not energy shares (they can exceed 1). Two gestures are measured: a free single strike on body 0 at the middle,
  *  and the same strike with a firm hand on body 0 at the bridge tip from 0.5 s. Phrased as what may be heard, never promised. */
 export function describeIndividuality(recipe, { seconds = 2 } = {}) {
+  if (!Number.isFinite(seconds) || seconds < 1 || seconds > 60) throw new Error('seconds must be a finite number in 1..60 (the window is the last second).');
   const g = recipe.grove, v = recipe.visual, sr = recipe.sampleRate, low = v.lowBand.map(r => v.omegaD[r] / (2 * Math.PI)), decay = v.lowBand.map(r => 1 / v.gammas[r]);
   const beats = []; for (let i = 0; i < low.length; i++) for (let j = i + 1; j < low.length; j++) beats.push(Math.abs(low[i] - low[j]));
   const firm = recipe.strengths.findIndex(st => st.name === 'firm'), tip = recipe.zones.length - 1;
