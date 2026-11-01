@@ -1,0 +1,9 @@
+# Optional connection cue — 2026-11-01
+
+The playable Original/Changed pair now offers a static viewing aid inside What changed. It selects the connection with greatest relative coupling change, marks that actual curve in warm ink, and reports its current stiffness relative to Original plus both other connections. Identical bodies/shared voice make the ratio meaningful. A third instrument receives no pair cue. This is an optional attention aid, default off, not a claim about energy flow, consciousness, or audible preference.
+
+Native Safari at 320×656: default unchecked; Changed shows bodies 1–3 at 1.33×, others 1.08× and 1.10× for the prepared example. Existing floor labels were unreadable at this size, so enabling the cue now raises/enlarges existing body numbers. Screenshot recheck shows distinct 01/02/03 above the bodies and the actual 1–3 curve. A short gesture runs with the same static curve while the body responds; Original keeps the cue with every ratio 1.00×. Turning it off removes the caption and marker and restores floor labels. No subjective listening assessment made.
+
+The helper's two focused tests pass, including canonical identity rejection, selected edge/ratio, other ratios, third-grove null, and unchanged-pair null. Third-grove suppression is tested at the helper boundary, not claimed as a native browser path here. Export builds a separate scene from the record and does not enable the overlay; films remain unmarked. The mesh is artistic and body movement amplified, not an acoustic geometry solver.
+
+Fable's real review: collab/reviews/20261101T1113Z-fable-reviews-connection-cue.md approves with a caption nit. That nit is fixed by reporting other edge ratios. Fable also approved the fixed .065 marker radius and temporary label layout in the 11:17:50Z follow-up: restoration matches both default and custom constructor values. Mobile recheck then passed as described above.

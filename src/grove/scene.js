@@ -35,10 +35,23 @@ export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
  });
  const bridges=anatomy.bridges.filter(b=>b.visible).map(spec=>{
   const a=anatomy.bodies[spec.a].attachment,b=anatomy.bodies[spec.b].attachment,sag=Math.min(a[1],b[1])-.35;
-  const curve=tube(root,[a,[(a[0]*2+b[0])/3,sag,(a[2]*2+b[2])/3],[(a[0]+b[0]*2)/3,sag,(a[2]+b[2]*2)/3],b],spec.radius,brass);
-  return {curve,spec};
+  const points=[a,[(a[0]*2+b[0])/3,sag,(a[2]*2+b[2])/3],[(a[0]+b[0]*2)/3,sag,(a[2]+b[2]*2)/3],b];
+  const curve=tube(root,points,spec.radius,brass);
+  return {curve,spec,points,highlight:null};
  });
- return {root,bodies,bridges,anatomy,dispose(){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});bodies.forEach(b=>b.labelTexture.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
+ function setBridgeHighlight(edge){
+  for(const [i,body] of bodies.entries()){
+   const marked=!!edge,custom=!!bodyLabels[i];
+   body.label.material.sizeAttenuation=!(marked||custom);body.label.material.needsUpdate=true;
+   body.label.scale.set(marked?(custom?.48:.24):(custom?.22:.65),marked?.12:(custom?.055:.325),1);
+   body.label.position.y=marked||custom?body.spec.position[1]+body.spec.scale[1]*1.3+.32:.45;
+  }
+  for(const bridge of bridges){const selected=!!edge&&bridge.spec.a===edge.a&&bridge.spec.b===edge.b;
+   if(selected&&!bridge.highlight){bridge.highlight=tube(root,bridge.points,.065,new T.MeshBasicMaterial({color:0xffe0a6}));bridge.highlight.castShadow=false;bridge.highlight.receiveShadow=false;}
+   if(bridge.highlight)bridge.highlight.visible=selected;
+  }
+ }
+ return {root,bodies,bridges,anatomy,setBridgeHighlight,dispose(){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});bodies.forEach(b=>b.labelTexture.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
 }
 /** Amplified response envelopes animate shell width and light, never edge flow. */
 export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[]){

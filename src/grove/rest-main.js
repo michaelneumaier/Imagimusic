@@ -1,3 +1,4 @@
+import {pairConnectionCue} from './pair-connection-cue.js';
 import {readRestPlayHandoff} from './rest-play-handoff.js';
 import {DEFAULT_VOICE_CONFIG} from '../score/grove-voice.js';
 import {composeGrove,GROVE_SEEDS} from '../score/grove.js';
@@ -31,10 +32,17 @@ function syncComparison(){
  comparisonMovie.setReady(!!result?.available&&!!world&&!busy);
 }
 function clearComparison(){comparison.clear();comparisonMovie.clear();comparisonStatus('Your original passage stays here.');}
+function syncConnectionCue(){
+ const cue=instrumentPair&&world&&$('show-connection').checked?pairConnectionCue(instrumentPair,shownGrove??grove):null;
+ sculpture?.setBridgeHighlight(cue);$('connection-cue').hidden=!cue;
+ if(cue)$('connection-cue').textContent=`${cue.label} This connection differs most between versions. Other connections: ${cue.others.map(e=>`${e.a+1} ↔ ${e.b+1}, ${e.ratio.toFixed(2)}×`).join('; ')} Original stiffness. The warm line’s fixed width is a marker, not a measurement or energy flow.`;
+ $('show-connection').disabled=!world;
+}
+$('show-connection').onchange=syncConnectionCue;
 function showGrove(next){
  if(shownGrove===next)return;shownGrove=next;
  if(world){if(sculpture){world.scene.remove(sculpture.root);sculpture.dispose();}sculpture=createGroveScene(next);world.scene.add(sculpture.root);}
- $('identity').textContent=instrumentPair&&next===grove?`${$('instrument-version').value==='changed'?'CHANGED':'ORIGINAL'} STRUCTURE · SEED ${next.seed}`:`GROVE ${next.seed}${next!==grove?' · COMPARISON':''}`;
+ $('identity').textContent=instrumentPair&&next===grove?`${$('instrument-version').value==='changed'?'CHANGED':'ORIGINAL'} STRUCTURE · SEED ${next.seed}`:`GROVE ${next.seed}${next!==grove?' · COMPARISON':''}`;syncConnectionCue();
 }
 const host=createRestHost({onChange:({state,error})=>{sync();if(state==='error'){clearExploration();status(error.message,true);}else if(state==='ended'){hands.clear();status(invitation?.pair?'Quiet. Keep this passage, then try the other version—or begin your own.':invitation?'Your turn: strike once, rest on that body, then try its neighbor.':'Quiet. Keep this passage, or begin your own.');}else if(state==='suspended')status('Audio paused. Resume keeps this passage; hands and Quiet can still be released.');},onDecision:ack=>{advanceExploration(ack);if(!ack.accepted&&ack.reason!=='ended')status(ack.reason==='headroom'?'Let this ring breathe before another strike.':'This passage is full of gestures. Choose Quiet, keep it, and begin another.');}});
 function clearExploration(){exploring=false;exploration=null;syncExploration();}
