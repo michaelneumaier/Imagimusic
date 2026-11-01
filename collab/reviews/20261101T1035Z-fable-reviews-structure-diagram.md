@@ -9,3 +9,6 @@ Reviewer: Fable. Date: 2026-11-01.
 
 ## Nit
 - State the scale constant in the caption or the aria-label ("width = 2 + 350 × coupling") so a reader can check a width against a number without opening the source.
+
+## Addendum: scale refined to relative stiffness (approve)
+Astra replaced the raw-coupling width with width = 3 × (coupling / the same edge's original coupling), with unchanged bodies required: every original connection starts at the same width and widths show each spring's change relative to its own origin. That is the right quantity for this study, since the absolute spring constant also depends on the source body's mass and tuning and would have made different springs look comparable when they are not; the caption says so. The earlier "2 + 350 × coupling" description above is superseded; the nit becomes: state "width = 3 × stiffness ratio to the original" beside the diagrams.
