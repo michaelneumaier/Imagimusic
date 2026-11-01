@@ -125,3 +125,99 @@ export function peakDisplacement(response, body, horizon, samples = 4000) {
   for (let k = 0; k <= samples; k++) { const xs = response.x(horizon * k / samples); peak = Math.max(peak, Math.abs(xs[body])); }
   return peak;
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Coupled NETWORK (proposal 014, The Grove): N lumped masses on their own springs, joined by bridge springs on the
+// given edges, with the pair's damping convention exactly:  M ẍ + 2γ M ẋ + K x = 0,  amplitude decay e^{−γt},
+// damped frequencies √(λ − γ²), underdamped required.  K_ii = m_i ω_i² + Σ_{edges at i} kc,  K_ab = −kc.
+// Mass-normalized A = M^{−1/2} K M^{−1/2} is symmetric; its modes come from cyclic Jacobi rotations (dependency-free).
+// Degenerate eigenvalues have an arbitrary basis, sign and order: only reconstructed x(t), v(t) and modal frequencies
+// are meaningful; tests compare those. `coupledPair` above is untouched; for N = 2 the two agree to rounding.
+// What is physical: the modal frequencies, each body's participation in each mode, and the common decay. What is a
+// stated convention: the sound pickup (displacement of a body) and one pickup level normalized over ALL unit-impulse
+// directions and all pickups, so equal force means equal pickup scale wherever it lands.
+
+export const NETWORK_MAX_BODIES = 8;
+
+/** Cyclic Jacobi eigen-decomposition of a symmetric matrix. Returns ascending eigenvalues and orthonormal eigenvectors (rows). */
+export function symmetricEigen(matrix, { sweeps = 100, relativeTolerance = 1e-15 } = {}) {
+  const n = matrix.length, a = matrix.map(row => row.slice()), v = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
+  const norm = Math.sqrt(a.flat().reduce((s, x) => s + x * x, 0)) || 1;
+  for (let sweep = 0; sweep < sweeps; sweep++) {
+    let off = 0; for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) off += a[p][q] * a[p][q];
+    if (Math.sqrt(off) <= relativeTolerance * norm) break;
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) {
+      if (a[p][q] === 0) continue;
+      const theta = (a[q][q] - a[p][p]) / (2 * a[p][q]);
+      const t = Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1)), c = 1 / Math.sqrt(t * t + 1), s = t * c;
+      for (let k = 0; k < n; k++) { const akp = a[k][p], akq = a[k][q]; a[k][p] = c * akp - s * akq; a[k][q] = s * akp + c * akq; }
+      for (let k = 0; k < n; k++) { const apk = a[p][k], aqk = a[q][k]; a[p][k] = c * apk - s * aqk; a[q][k] = s * apk + c * aqk; }
+      for (let k = 0; k < n; k++) { const vkp = v[k][p], vkq = v[k][q]; v[k][p] = c * vkp - s * vkq; v[k][q] = s * vkp + c * vkq; }
+    }
+  }
+  const order = Array.from({ length: n }, (_, j) => j).sort((i, j) => a[i][i] - a[j][j]);
+  const lambda = order.map(j => a[j][j]), vectors = order.map(j => v.map(row => row[j]));   // vectors[j] is the j-th eigenvector
+  // Residual and orthogonality, relative to the matrix norm: reported so callers and tests can assert them.
+  let residual = 0, ortho = 0;
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { let av = 0; for (let k = 0; k < n; k++) av += matrix[i][k] * vectors[j][k]; residual += (av - lambda[j] * vectors[j][i]) ** 2; }
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { let d = 0; for (let k = 0; k < n; k++) d += vectors[i][k] * vectors[j][k]; ortho += (d - (i === j ? 1 : 0)) ** 2; }
+  return { lambda, vectors, residual: Math.sqrt(residual) / norm, orthogonality: Math.sqrt(ortho) };
+}
+
+/** Build the network. masses (kg), frequencies (Hz, uncoupled), edges [{ a, b, kc }] (N/m), gamma (1/s). */
+export function coupledNetwork({ masses, frequencies, edges = [], gamma = 0 } = {}) {
+  if (!Array.isArray(masses) || !Array.isArray(frequencies) || masses.length !== frequencies.length) throw new Error('masses and frequencies must be arrays of the same length.');
+  const n = masses.length;
+  if (n < 2 || n > NETWORK_MAX_BODIES) throw new Error(`a network needs 2..${NETWORK_MAX_BODIES} bodies.`);
+  masses.forEach((m, i) => positive(m, `masses[${i}]`)); frequencies.forEach((f, i) => positive(f, `frequencies[${i}]`)); nonNegative(gamma, 'gamma');
+  if (!Array.isArray(edges)) throw new Error('edges must be an array of { a, b, kc }.');
+  const seen = new Set();
+  for (const [i, e] of edges.entries()) {
+    if (!e || !Number.isInteger(e.a) || !Number.isInteger(e.b) || e.a < 0 || e.b < 0 || e.a >= n || e.b >= n) throw new Error(`edges[${i}]: a and b must be body indices.`);
+    if (e.a === e.b) throw new Error(`edges[${i}]: a body cannot be bridged to itself.`);
+    const key = `${Math.min(e.a, e.b)}-${Math.max(e.a, e.b)}`; if (seen.has(key)) throw new Error(`edges[${i}]: duplicate bridge ${key}.`); seen.add(key);
+    nonNegative(e.kc, `edges[${i}].kc`);
+  }
+  const w = frequencies.map(f => 2 * Math.PI * f), K = Array.from({ length: n }, (_, i) => Array.from({ length: n }, () => 0));
+  for (let i = 0; i < n; i++) K[i][i] = masses[i] * w[i] * w[i];
+  for (const e of edges) { K[e.a][e.a] += e.kc; K[e.b][e.b] += e.kc; K[e.a][e.b] -= e.kc; K[e.b][e.a] -= e.kc; }
+  const A = K.map((row, i) => row.map((k, j) => k / Math.sqrt(masses[i] * masses[j])));
+  for (const row of [...K, ...A]) for (const value of row) if (!Number.isFinite(value)) throw new RangeError('derived stiffness is not finite; inputs are outside the representable range.');
+  const { lambda, vectors, residual, orthogonality } = symmetricEigen(A);
+  for (const l of lambda) if (!Number.isFinite(l)) throw new RangeError('eigenvalues are not finite.');
+  for (const l of lambda) if (l <= gamma * gamma) throw new Error(`system is not underdamped: eigenvalue ${l} ≤ γ² = ${gamma * gamma}.`);
+  const omegaD = lambda.map(l => Math.sqrt(l - gamma * gamma));
+  return { n, m: masses.slice(), f: frequencies.slice(), edges: edges.map(e => ({ a: e.a, b: e.b, kc: e.kc })), gamma, A, K, lambda, omegaD, vectors, normalFreqsHz: omegaD.map(x => x / (2 * Math.PI)), decayS: gamma > 0 ? 1 / gamma : Infinity, eigen: { residual, orthogonality } };
+}
+
+/** Closed-form response of the network to an impulse vector J (N·s per body) at t = 0 from rest. */
+export function networkStrikeResponse(system, impulse) {
+  const { n, m, vectors, omegaD, gamma } = system;
+  if (!Array.isArray(impulse) || impulse.length !== n) throw new Error(`impulse must have ${n} entries.`);
+  impulse.forEach((j, i) => finite(j, `impulse[${i}]`));
+  const ydot0 = impulse.map((j, i) => j / Math.sqrt(m[i]));
+  const qdot0 = vectors.map(v => v.reduce((s, vi, i) => s + vi * ydot0[i], 0));
+  const coeff = qdot0.map((qd, j) => qd / omegaD[j]);                   // q_j(t) = coeff_j e^{−γt} sin(ω_dj t)
+  const combine = q => { const y = new Array(n).fill(0); for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) y[i] += q[j] * vectors[j][i]; return y.map((yi, i) => yi / Math.sqrt(m[i])); };
+  const x = t => { finite(t, 't'); if (t < 0) return new Array(n).fill(0); const d = Math.exp(-gamma * t); return combine(coeff.map((c, j) => c * d * Math.sin(omegaD[j] * t))); };
+  const v = t => { finite(t, 't'); if (t < 0) return new Array(n).fill(0); const d = Math.exp(-gamma * t); return combine(coeff.map((c, j) => c * d * (omegaD[j] * Math.cos(omegaD[j] * t) - gamma * Math.sin(omegaD[j] * t)))); };
+  const bodyModes = i => coeff.map((c, j) => ({ frequency: omegaD[j] / (2 * Math.PI), amplitude: c * vectors[j][i] / Math.sqrt(m[i]), decay: gamma > 0 ? 1 / gamma : Infinity }));
+  /** Each body's share of each mode: |v_j[i]|², which sums to 1 over bodies for every mode (a participation table for the picture). */
+  const participation = vectors.map(v => v.map(vi => vi * vi));
+  return { x, v, coeff, qdot0, bodyModes, participation };
+}
+
+/** One pickup level for the whole network: `level` maps the largest |modal amplitude| over all unit impulses and all pickups. */
+export function networkPickupScale(system, { level = 0.19 } = {}) {
+  if (!Number.isFinite(level) || level < 0) throw new Error('level must be a finite non-negative number.');
+  let peak = 1e-300;
+  for (let b = 0; b < system.n; b++) { const r = networkStrikeResponse(system, system.m.map((_, i) => (i === b ? 1 : 0))); for (let i = 0; i < system.n; i++) for (const mode of r.bodyModes(i)) peak = Math.max(peak, Math.abs(mode.amplitude)); }
+  return level / peak;
+}
+
+/** Sound of body `body` for an impulse, as signed additive modes (the pair's convention), scaled by the network-wide pickup scale. */
+export function networkPickupModes(system, impulse, body, { scale = networkPickupScale(system) } = {}) {
+  if (!Number.isInteger(body) || body < 0 || body >= system.n) throw new Error(`body must be 0..${system.n - 1}.`);
+  if (!Number.isFinite(scale) || scale < 0) throw new Error('scale must be a finite non-negative number.');
+  return networkStrikeResponse(system, impulse).bodyModes(body).map(m => ({ frequency: m.frequency, amplitude: scale * m.amplitude, phase: 0, decay: m.decay }));
+}
