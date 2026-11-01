@@ -86,6 +86,8 @@ test('capture v2: a Rest record validates, renders exactly, equals the bank rout
   rejects(r => { r.grove = { ...r.grove, seed: 3 }; r.grove.layout[0].x += 1e-6; }, /grove differs/);
   rejects(r => { r.events[0].requestedFrame = 0; }, /unexpected keys/);
   rejects(r => { r.events[1].frame = 3602; r.events[1].order = 9; }, /after Quiet/);
+  rejects(r => { r.ended = { frame: 120 * sr + 1, fadeFrames: 200 }; }, /ended.frame beyond/);
+  rejects(r => { r.ended = { frame: 3601, fadeFrames: sr + 1 }; }, /at most one second/);
   rejects(r => { r.contacts[1].end = 3700; }, /after Quiet/);
   // Any frame in any order from checkpoints equals a straight run.
   const states = restRecordStates(rested, recipe, { every: 512 }), straight = createRestEngine(recipe), seen = [];

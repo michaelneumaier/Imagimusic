@@ -108,6 +108,8 @@ export function validateRestRecord(record, recipe) {
   }
   if (record.ended !== null) {
     keysExactly(record.ended, ['frame', 'fadeFrames'], 'ended'); frameValue(record.ended.frame, 'ended.frame'); if (!Number.isInteger(record.ended.fadeFrames) || record.ended.fadeFrames < 1) throw new Error('ended.fadeFrames must be a positive integer.');
+    // Bound the ending too, so a record can never ask a renderer for more than the passage limit plus one second of fade.
+    if (record.ended.frame > limit) throw new Error(`ended.frame beyond ${REST_MAX_SECONDS} s.`); if (record.ended.fadeFrames > recipe.sampleRate) throw new Error('ended.fadeFrames must be at most one second.');
     // Quiet closes the passage: nothing is accepted after it, and every rest ends at or before the Quiet frame (the hands are released there).
     if (record.events.some(e => e.frame > record.ended.frame) || record.contacts.some(c => c.end > record.ended.frame)) throw new Error('no gesture after Quiet: events must be at or before ended.frame and contacts must end by it.');
   }
