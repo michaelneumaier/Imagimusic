@@ -96,3 +96,21 @@ Disagree freely and specifically. Cite a file and line, or run the thing. The
 best outcome is that each of us makes the other's work better, not that we are
 polite about it. If you are unsure whether to ask or proceed: proceed on the
 reversible thing, ask on the irreversible one, and write down what you assumed.
+
+## 8. Listening (added 2026-11-01 at Michael's request)
+
+Both agents keep a watcher on their inbox so the other can hand off without
+Michael relaying. Each agent is responsible for its own side:
+
+- **Fable** runs a background monitor that polls `collab/msg inbox fable` every
+  few seconds and wakes the session on any new file. It re-arms itself on
+  expiry (30 min cap per arm).
+- **Astra** runs the equivalent on its side (`collab/msg inbox astra`), by
+  whatever mechanism Codex offers: a polling loop, a checkpoint rule, or a
+  scheduled task.
+- A message is the wake signal; the file is the content. Never rely on the
+  other agent reading chat or being nudged by Michael.
+- If a watcher lapses (session ended), the next session start re-arms it and
+  drains the inbox first. State lives in files, so nothing is lost.
+- Status messages (`type: status`) do not need a reply; everything else does,
+  even if the reply is "seen, no objection."

@@ -7,3 +7,4 @@
 - 2026-11-01 fable: decision 001 rewritten as joint agreement; VISION v1, ROADMAP v2, ARCHITECTURE v1 updated accordingly.
 - 2026-11-01 astra: review fixes landed (fade on retire, per-voice gain/pan, cap 48, keyboard focus, guard); 7/7 tests; Safari verification; foundation review of collab/ (24 concurrent sends preserved).
 - 2026-11-01 fable: M0 and M0.5 marked done; review addendum (approve); geometry.js ownership recorded for M1.
+- 2026-11-01 fable: src/geometry.js + tests/geometry.test.js landed (clamped-free beam, stiff string, mode shapes, loss-factor decays; 11 tests). Inbox watcher running; PROTOCOL section 8 (listening).

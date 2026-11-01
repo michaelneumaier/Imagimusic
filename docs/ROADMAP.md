@@ -34,6 +34,8 @@ Goal: physics becomes the differentiator now, not a postponed promise.
 - Damper: a resting creature that settles the resonator; release becomes a parameter.
 - Velocity-dependent brightness.
 - **One real geometry-derived tine or string next to the garden**: modes and mode shapes from length, thickness, material (Euler–Bernoulli beam; stiff string). Change the drawing's dimensions and the pitch moves for a physical reason.
+  - [x] math module `src/geometry.js` (`modesOf`, `toModelModes`, material presets), 11 tests (Fable, 2026-11-01)
+  - [ ] integrated as a playable physical tine beside the garden (Astra)
 - Model exposes a per-voice state the picture reads (see ARCHITECTURE: StateFrame v1).
 
 Done when: a stranger watches the tine get shortened and hears it go up, and can say why the strike point changed the timbre.
