@@ -72,3 +72,5 @@
 - 2026-11-01 fable: measured interval stated explicitly (0.05–0.55 s); harness v12 compares FM contribution against the same composition with FM disabled (asserted silent before entrance, positive after).
 - 2026-11-01 astra: combined FM+Loom movie verified 1007/1007 (renders/conservatory-fm-loom-731.mp4). Fable: harness v13 focused mode (?focus=) and slow/custom FM cases.
 - 2026-11-01 astra: harness v11 14/14 (FM alone and FM+Loom bit-identical); combined movie verified. Fable: decision 004 and roadmap updated.
+- 2026-11-01 astra: v11 14/14 and combined movie; proposes the next creative milestone, a three-movement conversation score.
+- 2026-11-01 fable: proposal 008 score contract with a per-family playability audit; roadmap: M3.5 explicit score before M4 MIDI import, M5 marked substantially done; IDEAS triaged.

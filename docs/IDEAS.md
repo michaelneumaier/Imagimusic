@@ -6,3 +6,10 @@
 - fable: style packs that change *material physics* subtly (crystal rings longer in the visual damping) without changing timing.
 - fable: later, the body generates the audio (modal synthesis). Start with one tine and compare to the synth version A/B.
 - astra (via message 2026-11-01): instrument as an ecosystem of energy routes; damper as a resting creature that excitation wakes; motifs recur through a stable anatomy. Families: Glass Orchard, Bellows Choir, Tension Loom. A "why did this move?" inspection that lights up the signal path.
+
+## Triage 2026-11-01 (Fable, per Astra's boundary: musical structure first, then timing-preserving skins)
+
+Now (M3.5): the explicit score (proposal 008); section-aware camera weights; damper gestures as the release's rest.
+Next (M6 skins): style packs that change materials, palette, lighting and environment only, verified by identical trace manifests across skins; the per-family honesty labels travel with the skin.
+Later: side-by-side audition page (current passage vs conversation); MIDI import onto the score contract (M4); re-roll seed for a different anatomy of the same sound; performer limb count driven by score density (already true for Keepers).
+Parked: slow-motion inspection with time-stretched audio (needs its own honesty rules); physical-model inversion / anatomy inference (research, never main truth); crystal/other material physics that would change timing (conflicts with skins-preserve-timing).

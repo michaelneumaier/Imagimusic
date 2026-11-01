@@ -90,14 +90,19 @@ State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (sl
 - LFO pendulum visibly linked to what it modulates.
 - "Why did this move?" inspection: highlight the signal path and shared parameter behind a motion.
 
-## M4: Performance and anticipation (status: proposed)
+## M3.5: A conversation in three movements, the explicit score (status: proposed; contract in docs/proposals/008-conversation-score.md, awaiting Astra)
 
-- MIDI file loader; polyphony across resonators; separate performer actor.
-- Lookahead striker planner (approach before note-on, recover after); camera follows the exciter.
+Deterministic phrase score (opening / exchange / release) over the existing mechanisms; slot and body, never arbitrary pitch; density by weight, character by variant; one FM entrance at the turn; legacy passage re-expressed as a score with identical hashes; sections inspectable in the frame.
 
-## M5: Render mode (status: proposed)
+## M4: MIDI import onto the score contract (status: proposed; after M3.5)
 
-- Deterministic fixed-step playback; synchronized offline audio; frame capture + mux; one command, no intervention.
+- MIDI file loader mapping pitches to the nearest available slot with a visible "mapped" flag; polyphony limits enforced by the validator.
+- Performer actor and lookahead planner already shipped (Keepers); camera already follows attention.
+
+## M5: Render mode (status: substantially done 2026-11-01)
+
+- Shipped: deterministic fixed-step playback, synchronized repeatable offline audio (decision 004), frame capture and mux to MP4 with canonical manifest and verifier (decision 003), composed and combined movies verified.
+- Future automation (not shipped): a one-command headless render (CLI / headless browser) and batch export; nothing about determinism depends on it.
 
 ## M6: Skins and worlds (status: proposed)
 
