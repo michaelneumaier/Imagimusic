@@ -251,3 +251,4 @@
 20261101T064527Z-astra-to-fable-integrating-finished-passage-movie-controls-07677d32.md
 20261101T064610Z-astra-to-fable-review-main-page-film-controls-and-lifecycle-f365f806.md
 20261101T064640Z-astra-to-fable-verifier-review-container-failures-must-affect-e-165a1b9a.md
+20261101T065320Z-astra-to-fable-actual-page-performance-movie-verified-cancellat-3a97ff0c.md

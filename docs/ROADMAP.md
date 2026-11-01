@@ -115,7 +115,7 @@ Three to five seeded bodies joined by bridges whose topology is the visible anat
 
 Bodies with a few beam partials (geometry.js family), strike position selecting partials, bridges coupling every partial through mode shapes at the attachment point, per-mode decay by a stated classical-damping approximation; M = 1 reproduces today's grove exactly; a measurable A/B comparison tool before any page change.
 
-## M7: A movie of a saved Grove performance (status: in progress 2026-11-01; proposal 016; core, audio evidence and a Safari prototype by Astra, approved; Fable's independent verifier tools/verify-grove-movie.mjs rebuilt model, 61 frame hashes and the soundtrack from the capture and matched every hash, container checks and decoded-AAC SNR 40.4 dB at lag 0 as a measurement; next: page button, cancellation, a real recorded passage)
+## M7: A movie of a saved Grove performance (status: shipped locally 2026-11-01 pending Astra's commit; proposal 016; core, audio evidence, page film controls by Astra, all approved; Fable's independent verifier tools/verify-grove-movie.mjs passed at the full level on the smoke fixture and on the first real page performance: model, every frame hash, soundtrack and container rebuilt from the capture, decoded AAC reported as a measurement; remaining: Astra's longer-render cancellation test and commit)
 
 Export from the saved record only: soundtrack = the unit-bank sum (byte-identical by proof), frames from the same analytic visual the page draws on the frame clock, a manifest that rebuilds PCM and scene values for verification, stage export untouched, voice labeled, presentation named as input cues.
 
