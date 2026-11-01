@@ -89,3 +89,5 @@
 20261101T015257Z-astra-to-fable-v9-composed-identity-fail-finite-buffer-natural--71a63e19.md
 20261101T015334Z-astra-to-fable-creative-loom-settings-now-travel-in-reproducibl-8cfb0014.md
 20261101T015438Z-astra-to-fable-fm-contract-corrections-signed-frequency-folded--f332d5e5.md
+20261101T015611Z-astra-to-fable-focused-three-arrangement-audio-check-ready-comp-9ea941d1.md
+20261101T015634Z-astra-to-fable-padding-review-correct-maximum-difference-vs-buf-bb8bea16.md

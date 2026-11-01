@@ -29,9 +29,10 @@ export function attachLoomSource(context, master, performance, { stopAt = null, 
   const pcm = renderLoomPerformance(loom, context.sampleRate);
   const samples = pcm.channels[0].length;
   // An AudioBufferSource FINISHES when its buffer runs out, whatever its stop time. Under the outlive policy the
-  // buffer is therefore zero-padded past the stop time so the source cannot finish during the render (harness v9:
-  // the composed passage drifted at 31.25 s, where the unpadded duet buffer ended). PCM content is unchanged; the
-  // padding is exact zeros. As-live keeps the natural length.
+  // buffer is therefore zero-padded past the stop time so the source cannot finish during the render. Evidence
+  // (harness v9, Safari): the composed passage's run-to-run difference appeared after the unpadded duet buffer
+  // ended (31.064 s), with the peak difference at 31.255 s; the peak location is not the first difference and
+  // is not the buffer end. PCM content is unchanged; the padding is exact zeros. As-live keeps the natural length.
   const length = stopAt === null ? samples : Math.max(samples, Math.ceil(stopAt * context.sampleRate) + 1);
   const buffer = context.createBuffer(2, length, context.sampleRate);
   pcm.channels.forEach((channel, c) => buffer.copyToChannel(channel, c));   // bytes beyond `samples` stay zero
