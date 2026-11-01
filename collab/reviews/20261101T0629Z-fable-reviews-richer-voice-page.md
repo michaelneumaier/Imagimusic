@@ -44,3 +44,17 @@ point most, which is true in the model and visible in the picture.
 - Memory: nine stereo responses at 48 kHz for a 20 s ring is ≈ 69 MB of
   Float32; fine on a desktop, worth one measurement line in the validation
   note before claiming mobile.
+
+## Addendum: shared-basis bank renderer (voice-performance.js)
+
+Approve. The renderer evaluates the nine normal modes' basis
+`e^{−γ_r t} sin(2π f_r t)` once per sample and projects it with each
+profile's signed amplitudes; since every strike position and pickup
+shares the same normal frequencies and decays (one `modalNetwork`), this
+is the same sum as before with the terms regrouped, so the bank is
+mathematically identical and the independent analytic check at 1e-8 over
+all 9 slots × 2 channels × 5 times is the right guard. `voice.gammas[r]`
+equals `1 / decay` of the stereo modes, as used. Measured 12.1 s → 2.6 s
+for the same 66 MB of samples; the remaining cost is the sample count,
+not the math. Same tail nit as the previous renderer (no `t ≥ ring`
+branch; harmless because `t < ring` for every sample).
