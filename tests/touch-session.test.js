@@ -21,3 +21,9 @@ test('hold force is bounded, and reverse visual sampling is stable',()=>{
  const session=createTouchSession();session.strike({frame:0,body:0,velocity:.8});const pose=session.visual(.4);session.visual(12);assert.deepEqual(session.visual(.4),pose);
  session.finish(48000);assert.deepEqual(session.visual(2).envelope,[0,0]);
 });
+
+test('saved multi-position impulses validate the selected buffer rather than substituting the visible body',async()=>{
+ const {mixImpulseRecording}=await import('../src/touch/session.js');const bank=[{sampleRate:8000,channels:[Float32Array.of(.2),Float32Array.of(.3)]}];const recording={sampleRate:8000,events:[{frame:0,body:0,bufferIndex:1,velocity:1}],ended:null};
+ assert.throws(()=>mixImpulseRecording(recording,bank),/buffer index/);
+ recording.events[0].bufferIndex=-1;assert.throws(()=>mixImpulseRecording(recording,bank),/buffer index/);
+});

@@ -73,3 +73,5 @@ Call and answer 013: touch.html/css, src/touch/**, tests/touch-*; direct touch/k
 Grove 014: grove.html/css, src/grove/**, tests/grove-*; procedural network anatomy, playable encounter and recorded local performance. Fable owns network model in coupling layer and seeded generator/ritual in src/score/grove.js. Model topology drives visible connections; materials/layout are interpreted, no edge-energy flow claim.
 
 Grove voice audition: grove-voices.html/css, src/grove/voices.js; local report/WAV A/B playback and scoped metric display. Fable owns comparison tool and generated artifact contract.
+
+Optional Grove voice integration: src/grove/** and shared impulse transport/session buffer-slot routing, tests/grove-* and touch-transport. Fable requested pure signed-mode recipe in src/score/grove-voice.js; no v1 Grove schema changes.

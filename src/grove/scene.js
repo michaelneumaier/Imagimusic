@@ -39,10 +39,10 @@ export function createGroveScene(grove,{vectors=[]}={}){
  return {root,bodies,bridges,anatomy,dispose(){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});bodies.forEach(b=>b.labelTexture.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
 }
 /** Amplified response envelopes animate shell width and light, never edge flow. */
-export function applyGroveScene(scene,{envelope=[]}={},holds=[]){
+export function applyGroveScene(scene,{envelope=[]}={},holds=[],positions=[]){
  for(const [i,body] of scene.bodies.entries()){
   const level=Math.max(0,envelope[i]??0),pulse=Math.min(.2,level*.6);
-  const held=holds[i]??0;body.gesture.visible=held>0;body.gesture.material.opacity=held>0?.35+.5*held:0;body.gesture.scale.setScalar(1+.35*held);
+  const held=holds[i]??0;body.gesture.position.y=positions[i]===undefined?0:(.5-positions[i])*2.6*body.spec.scale[1];body.gesture.visible=held>0;body.gesture.material.opacity=held>0?.35+.5*held:0;body.gesture.scale.setScalar(1+.35*held);
   body.form.scale.set(body.spec.scale[0]*(1+pulse),body.spec.scale[1],body.spec.scale[2]*(1+pulse));
   body.shell.material.emissiveIntensity=.025+Math.min(.7,level*2);body.core.material.emissiveIntensity=.1+Math.min(1.2,level*3);body.halo.material.opacity=.15+Math.min(.65,level*2);
  }

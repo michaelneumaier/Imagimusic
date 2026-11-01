@@ -1,11 +1,15 @@
 import * as T from '../../vendor/three/build/three.module.js';
 /** Scene picking uses the currently drawn shells. Empty space retains camera controls. */
-export function groveBodyAt(scene,camera,canvas,clientX,clientY){
+export function groveHitAt(scene,camera,canvas,clientX,clientY){
  const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return null;
  const point=new T.Vector2((clientX-rect.left)/rect.width*2-1,1-(clientY-rect.top)/rect.height*2),ray=new T.Raycaster();
  scene.root.updateMatrixWorld(true);camera.updateMatrixWorld(true);ray.setFromCamera(point,camera);
- const shells=scene.bodies.map(b=>b.shell),hit=ray.intersectObjects(shells,false)[0];return hit?shells.indexOf(hit.object):null;
+ const shells=scene.bodies.map(b=>b.shell),hit=ray.intersectObjects(shells,false)[0];if(!hit)return null;const shell=hit.object; if(!shell.geometry.boundingBox)shell.geometry.computeBoundingBox();const bounds=shell.geometry.boundingBox,local=shell.worldToLocal(hit.point.clone()),height=bounds.max.y-bounds.min.y;
+ return {body:shells.indexOf(shell),positionU:height?Math.max(0,Math.min(1,(bounds.max.y-local.y)/height)):.5};
 }
+export const groveBodyAt=(...args)=>groveHitAt(...args)?.body??null;
+/** Three explicit control zones, not a claim about the shell's acoustic geometry. */
+export function groveStrikeZone(u,positions=[.3,.6,1]){if(!Number.isFinite(u)||u<0||u>1||!positions.length||positions.some(p=>!Number.isFinite(p)||p<0||p>1))throw new Error('Invalid strike position');return positions.reduce((best,p,i)=>Math.abs(p-u)<Math.abs(positions[best]-u)?i:best,0);}
 /** Captured gestures cannot orbit the camera; cancellation never strikes. */
 export function bindGrovePlaying({canvas,controls,getScene,camera,canPlay,start,finish}){
  const pointers=new Map();let orbitActive=false;
@@ -14,10 +18,10 @@ export function bindGrovePlaying({canvas,controls,getScene,camera,canPlay,start,
  function reset(){const pending=[...pointers];pointers.clear();for(const [id,body] of pending){finish(body,`scene-${id}`,true);if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);}controls.enabled=true;canvas.style.cursor='';}
  function down(event){
   if(event.button!==0||!canPlay()||orbitActive)return;
-  const body=groveBodyAt(getScene(),camera,canvas,event.clientX,event.clientY);if(body===null)return;
+  const hit=groveHitAt(getScene(),camera,canvas,event.clientX,event.clientY);if(!hit)return;const {body}=hit;
   event.preventDefault();event.stopImmediatePropagation();
   if([...pointers.values()].includes(body))return;
-  pointers.set(event.pointerId,body);controls.enabled=false;canvas.setPointerCapture(event.pointerId);start(body,`scene-${event.pointerId}`);
+  pointers.set(event.pointerId,body);controls.enabled=false;canvas.setPointerCapture(event.pointerId);start(body,`scene-${event.pointerId}`,{positionU:hit.positionU});
  }
  function end(event,cancel=false){
   if(!pointers.has(event.pointerId))return;

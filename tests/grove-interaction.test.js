@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from '../vendor/three/build/three.module.js';
-import {groveBodyAt,bindGrovePlaying} from '../src/grove/interaction.js';
+import {groveBodyAt,groveHitAt,groveStrikeZone,bindGrovePlaying} from '../src/grove/interaction.js';
 function fixture(){
  const root=new T.Group(),shell=new T.Mesh(new T.SphereGeometry(1),new T.MeshBasicMaterial());root.add(shell);
  const scene={root,bodies:[{shell}]},camera=new T.PerspectiveCamera(45,1,.1,100);camera.position.z=5;camera.lookAt(0,0,0);camera.updateProjectionMatrix();
@@ -26,4 +26,10 @@ test('a second pointer cannot turn an active camera drag into a musical gesture'
  const bound=bindGrovePlaying({canvas,controls,getScene:()=>scene,camera,canPlay:()=>true,start:()=>events.push('start'),finish:()=>events.push('finish')});
  handlers.get('start')();assert.equal(emit('pointerdown').stopped,undefined);assert.deepEqual(events,[]);assert.equal(controls.enabled,true);
  handlers.get('end')();emit('pointerdown');assert.deepEqual(events,['start']);bound.dispose();assert.equal(handlers.size,0);
+});
+
+test('strike position is measured in shell-local height and snapped only to explicit zones',()=>{
+ const {scene,camera,canvas}=fixture();const center=groveHitAt(scene,camera,canvas,110,120);assert.equal(center.body,0);assert.ok(Math.abs(center.positionU-.5)<1e-12);scene.root.scale.set(2,3,1);const scaled=groveHitAt(scene,camera,canvas,110,120);assert.ok(Math.abs(scaled.positionU-.5)<1e-12);
+ assert.ok(groveHitAt(scene,camera,canvas,110,100).positionU<.5);assert.ok(groveHitAt(scene,camera,canvas,110,140).positionU>.5);
+ assert.deepEqual([0,.25,.6,.95,1].map(u=>groveStrikeZone(u)),[0,0,1,2,2]);assert.throws(()=>groveStrikeZone(NaN),/Invalid/);
 });

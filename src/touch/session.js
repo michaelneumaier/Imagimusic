@@ -41,17 +41,20 @@ export function createTouchSession(settings,sampleRate=48000){
 }
 /** These are the same unit buffers scheduled by the live transport. */
 export function renderTouchBank(session){return session.units.map(unit=>renderLoomPerformance(unit,session.snapshot().sampleRate));}
+/** A richer instrument may choose a cached impulse independently of its visible body. */
+export function impulseBufferIndex(event,bankLength){const index=event.bufferIndex??event.body;if(!Number.isInteger(index)||index<0||index>=bankLength)throw new Error('Invalid impulse buffer index');return index;}
 export function renderTouchRecording(recording,bank){
  const {events,sampleRate,ended}=recording;
  if(!events.length)throw new Error('Play a gesture before saving');
  if(bank.some(pcm=>pcm.sampleRate!==sampleRate))throw new Error('Touch buffer sample rates must match');
- const fullLength=Math.max(...events.map(e=>e.frame+bank[e.body].channels[0].length));
+ const indices=events.map(e=>impulseBufferIndex(e,bank.length));
+ const fullLength=Math.max(...events.map((e,i)=>e.frame+bank[indices[i]].channels[0].length));
  const length=ended?Math.min(fullLength,ended.frame+ended.fadeFrames):fullLength;
  const channels=[new Float32Array(length),new Float32Array(length)];
  // Match the cached Float32 impulses, not a newly normalized score.
  for(let c=0;c<2;c++){
   const sum=new Float64Array(length);
-  for(const event of events){const source=bank[event.body].channels[c];for(let i=0;i<source.length&&i+event.frame<length;i++)sum[i+event.frame]+=event.velocity*source[i];}
+  for(const [eventIndex,event] of events.entries()){const source=bank[indices[eventIndex]].channels[c];for(let i=0;i<source.length&&i+event.frame<length;i++)sum[i+event.frame]+=event.velocity*source[i];}
   for(let i=0;i<length;i++){const fade=ended?Math.max(0,Math.min(1,1-(i-ended.frame)/ended.fadeFrames)):1;channels[c][i]=sum[i]*fade;}
  }
  return {sampleRate,channels};

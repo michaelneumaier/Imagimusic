@@ -38,3 +38,17 @@ test('a finite authored sequence is validated before playback and keeps its exac
  assert.throws(()=>transport.playSequence([{frame:0,body:9,velocity:1}]),/Invalid/);assert.equal(transport.recording().events.length,2);assert.equal(nodes.length,2);
  context.currentTime=1.1;transport.quiet();assert.equal(transport.recording().ended.frame,520);
 });
+
+test('a position-aware session selects an impulse slot while preserving visible body and transport timing',async()=>{
+ const {context,bank,nodes}=fake();bank.push({sampleRate:8000,channels:[Float32Array.of(.2,.1),Float32Array.of(.1,.2)]});
+ const createSession=()=>{const events=[];return {strike(event){const saved={...event,bufferIndex:event.position===2?2:0};events.push(saved);return {accepted:true,event:saved};},snapshot:()=>({events:structuredClone(events),sampleRate:8000,ended:null}),finish(){}};};
+ const transport=createTouchTransport({createContext:()=>context,createSession,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});
+ await transport.enable({});transport.strike(0,.5,{position:2,frame:999,body:1,velocity:1});const event=transport.recording().events[0];assert.equal(event.body,0);assert.equal(event.velocity,.5);assert.equal(event.frame,0);assert.equal(event.position,2);assert.equal(event.bufferIndex,2);assert.equal(nodes[0].buffer.length,2);
+ assert.deepEqual([...transport.saveAudio().channels[0]],[Math.fround(.1),Math.fround(.05)]);
+});
+
+test('a malformed authored impulse slot is rejected before replacing the current passage',async()=>{
+ const {context,bank,nodes}=fake();const createSession=()=>{const events=[];return {strike(event){events.push({...event});return {accepted:true,event};},snapshot:()=>({events:structuredClone(events),sampleRate:8000,ended:null}),finish(){}};};
+ const transport=createTouchTransport({createContext:()=>context,createSession,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});await transport.enable({});transport.strike(0,.5);const before=transport.recording();
+ assert.throws(()=>transport.playSequence([{body:0,frame:0,velocity:.5,bufferIndex:2}]),/buffer index/);assert.deepEqual(transport.recording(),before);assert.equal(nodes.length,1);assert.equal(nodes[0].stopped,undefined);
+});

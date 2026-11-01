@@ -1,4 +1,4 @@
-import {createTouchSession,renderTouchRecording} from './session.js';
+import {createTouchSession,renderTouchRecording,impulseBufferIndex} from './session.js';
 import {createLoomRenderJob} from '../loom/render-job.js';
 function prepareBank(settings,sampleRate){
  const jobs=[0,1].map(body=>createLoomRenderJob({settings,body:null,score:[{time:0,body,velocity:1}],sampleRate}));
@@ -41,18 +41,18 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
    bank=result;buffers=bank.map(pcm=>{const buffer=context.createBuffer(2,pcm.channels[0].length,pcm.sampleRate);pcm.channels.forEach((values,c)=>buffer.copyToChannel(values,c));return buffer;});fresh();
   }catch(error){if(own!==token)return;job=null;state='error';emit();throw error;}
  }
- function strike(body,velocity){
+ function strike(body,velocity,details={}){
   if(!['ready','playing'].includes(state))return {accepted:false,reason:'not-ready'};
   if(context.state!=='running'){contextChanged();return {accepted:false,reason:'suspended'};}
   const scheduled=Math.ceil((context.currentTime+.025)*context.sampleRate)/context.sampleRate;
   origin??=scheduled;
-  const frame=Math.max(0,Math.round((scheduled-origin)*context.sampleRate)),result=session.strike({frame,body,velocity});
+  const frame=Math.max(0,Math.round((scheduled-origin)*context.sampleRate)),result=session.strike({...details,frame,body,velocity});
   if(!result.accepted)return result;
   schedule(result.event);
   state='playing';emit();return result;
  }
  function schedule(event){
-  const bus=master,node=scheduleTouchImpulse(context,buffers[event.body],bus,{when:origin+event.frame/context.sampleRate,velocity:event.velocity,onended(node){sources.delete(node);if((bus!==master||state==='ended')&&![...sources.values()].includes(bus))bus.disconnect();}});sources.set(node,bus);
+  const bus=master,node=scheduleTouchImpulse(context,buffers[impulseBufferIndex(event,buffers.length)],bus,{when:origin+event.frame/context.sampleRate,velocity:event.velocity,onended(node){sources.delete(node);if((bus!==master||state==='ended')&&![...sources.values()].includes(bus))bus.disconnect();}});sources.set(node,bus);
  }
  // Events use integer sample frames; convert authored seconds with Math.round(time * sampleRate).
  // An ended passage may also be replaced by a fresh sequence.
@@ -60,7 +60,7 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
   if(!bank||!['ready','playing','ended'].includes(state)||context.state!=='running')throw new Error('Prepare the instrument before playing its greeting');
   // Validate the entire finite score before changing the audible passage.
   const candidate=createSession(settings,context.sampleRate);
-  for(const event of events){const result=candidate.strike(event);if(!result.accepted)throw new Error(`Greeting exceeds ${result.reason}`);}
+  for(const event of events){const result=candidate.strike(event);if(!result.accepted)throw new Error(`Greeting exceeds ${result.reason}`);impulseBufferIndex(result.event,bank.length);}
   if(!events.length)throw new Error('The greeting needs at least one gesture');
   fresh();session=candidate;origin=Math.ceil((context.currentTime+.035)*context.sampleRate)/context.sampleRate;
   for(const event of session.snapshot().events)schedule(event);
