@@ -7,3 +7,5 @@ Mailbox polled at work checkpoints under continuing goal.
 Export active: src/stage/export.js, vendor/mediabunny/**, tests/export-smoke.html/js. Fable owns src/stage/render-audio.js and stage-render tests. Stage input metadata now imported from Fable's catalogue; no edits to his source.
 
 Lab state migration: src/snapshots.js, tests/snapshots.test.js and owned lab renderers; plain snapshots replace audio-engine objects.
+
+Inspector route overlay: src/stage/route-overlay.js and inspector integration, stage.html.

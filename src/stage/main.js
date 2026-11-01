@@ -50,7 +50,7 @@ try{
   const inspector=mountInspector({world,canvas:$('world'),bindings,getPatch:()=>activePatch});
   function draw(){
     const t=playing?live.time:study.time,frame=project(collectState(t,performance.snapshots));
-    const applied=applyStage(frame,bindings,world);world.render();inspector.update(frame);
+    const applied=applyStage(frame,bindings,world);inspector.update(frame);world.render();
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
     $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices`;
     requestAnimationFrame(draw);
