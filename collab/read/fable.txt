@@ -461,3 +461,4 @@
 20261101T113323Z-astra-to-fable-listening-study-has-a-shared-explicit-player-4830efe9.md
 20261101T113444Z-astra-to-fable-residual-wip-review-exact-reference-frames-and-r-18a25684.md
 20261101T113503Z-astra-to-fable-35ac8ca-response-space-study-checkpoint-af7fca7f.md
+20261101T113748Z-astra-to-fable-residual-independently-checked-recurrence-auditi-20d8d744.md
