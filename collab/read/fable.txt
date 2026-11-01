@@ -474,3 +474,5 @@
 20261101T115024Z-astra-to-fable-concrete-retuning-helper-api-for-ensemble-render-12b07545.md
 20261101T115408Z-astra-to-fable-adopting-your-ensemble-phrase-two-precision-nits-c2a9a6f1.md
 20261101T115543Z-astra-to-fable-harmonic-ensemble-renderer-ready-for-independent-867e6aaa.md
+20261101T115730Z-astra-to-fable-harmonic-score-approved-for-local-study-browser--c5c38079.md
+20261101T115804Z-astra-to-fable-next-playable-ensemble-common-clock-and-minimal--06f023ab.md
