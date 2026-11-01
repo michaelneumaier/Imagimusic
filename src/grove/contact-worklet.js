@@ -7,13 +7,18 @@ class GroveContactProcessor extends AudioWorkletProcessor{
   super();const {recipe,events=[],generation='offline'}=options.processorOptions??{};
   if(recipe?.sampleRate!==sampleRate)throw new Error('Rest recipe sample rate must match the audio context');
   if(!Array.isArray(recipe.energyFactors)||recipe.energyFactors.length!==recipe.channels||!recipe.energyFactors.every(v=>Number.isFinite(v)&&v>0)||!Number.isFinite(recipe.admissionCeiling)||recipe.admissionCeiling<=0||recipe.admissionCeiling>.9)throw new Error('Rest recipe needs a conservative energy admission bound');
-  this.recipe=recipe;this.generation=generation;this.engine=createRestEngine(recipe);this.queue=createContactEventQueue();this.commands=new Map();this.contacts=Array(recipe.bodies).fill(null);this.sample=new Float64Array(recipe.channels);this.stopped=false;this.finished=false;this.ending=null;this.acks=[];
+  this.recipe=recipe;this.generation=generation;this.engine=createRestEngine(recipe);this.queue=createContactEventQueue({capacity:1025,maxEvents:4097});this.commands=new Map();this.contacts=Array(recipe.bodies).fill(null);this.sample=new Float64Array(recipe.channels);this.stopped=false;this.finished=false;this.ending=null;this.acks=[];this.origin=null;this.strikes=0;this.contactStarts=0;
   this.apply=ack=>{const event=this.commands.get(ack.id);this.commands.delete(ack.id);
    let decision={accepted:true};
    if(this.ending)decision={accepted:false,reason:'ended'};
    else if(event.kind==='quiet'){this.ending={frame:ack.appliedFrame,fadeFrames:event.fadeFrames};this.contacts.fill(null);this.contactsChanged=true;}
-   else if(event.kind==='strike'){const bound=this.engine.candidateBound(event.position,event.body,event.velocity);if(!Number.isFinite(bound))throw new Error('Invalid Rest energy bound');decision={accepted:bound<=this.recipe.admissionCeiling,bound};if(decision.accepted)this.engine.strike(event.position,event.body,event.velocity);else decision.reason='headroom';}
-   else{this.contacts[event.body]=event.zone===null?null:{zone:event.zone,strength:event.strength};this.contactsChanged=true;}
+   else if(event.kind==='strike'&&this.strikes>=128)decision={accepted:false,reason:'strike-limit'};
+   else if(event.kind==='contact'&&event.zone!==null&&this.contactStarts>=256)decision={accepted:false,reason:'contact-limit'};
+   else if(event.kind==='strike'){const bound=this.engine.candidateBound(event.position,event.body,event.velocity);if(!Number.isFinite(bound))throw new Error('Invalid Rest energy bound');decision={accepted:bound<=this.recipe.admissionCeiling,bound};if(decision.accepted){this.engine.strike(event.position,event.body,event.velocity);this.strikes++;}else decision.reason='headroom';}
+   else{if(event.zone!==null)this.contactStarts++;this.contacts[event.body]=event.zone===null?null:{zone:event.zone,strength:event.strength};this.contactsChanged=true;}
+   if(decision.accepted&&this.origin===null&&(event.kind==='strike'||(event.kind==='contact'&&event.zone!==null))){
+    this.origin=ack.appliedFrame;const end={id:'$rest-auto-quiet',kind:'quiet',frame:this.origin+120*sampleRate,fadeFrames:Math.max(1,Math.round(.025*sampleRate))};this.queue.enqueue(end.id,end.frame);this.commands.set(end.id,end);
+   }
    this.acks.push({...ack,event,...decision});
   };
   this.port.onmessage=({data})=>{try{if(data.type!=='events')throw new Error('Unknown Rest worklet message');this.enqueue(data.events);this.port.postMessage({type:'queued',generation:this.generation,ids:data.events.map(event=>event.id)});}catch(error){this.fail(error,currentFrame);}};
@@ -22,11 +27,13 @@ class GroveContactProcessor extends AudioWorkletProcessor{
  enqueue(events){
   if(!Array.isArray(events))throw new Error('Rest events must be an array');
   for(const event of events){
+   if(typeof event.id==='string'&&event.id.startsWith('$rest-'))throw new Error('Reserved Rest event identity');
    const {body,kind}=event;if(kind!=='quiet'&&(!Number.isInteger(body)||body<0||body>=this.recipe.bodies))throw new Error('Invalid Rest event body');
    if(kind==='quiet'){if(!Number.isSafeInteger(event.fadeFrames)||event.fadeFrames<1||event.fadeFrames>sampleRate)throw new Error('Invalid Rest ending fade');}
    else if(kind==='strike'){if(!Number.isInteger(event.position)||!this.recipe.strikeVectors[event.position]||!Number.isFinite(event.velocity)||event.velocity<=0||event.velocity>1)throw new Error('Invalid Rest strike');}
    else if(kind==='contact'){if(event.zone!==null&&(!Number.isInteger(event.zone)||event.zone<0||event.zone>=this.recipe.zones.length||!Number.isInteger(event.strength)||event.strength<0||event.strength>=this.recipe.strengths.length))throw new Error('Invalid Rest contact');}
    else throw new Error('Unknown Rest event kind');
+   if(this.queue.pending>=1024||this.queue.scheduled>=4096)throw new Error('Rest input capacity exceeded');
    this.queue.enqueue(event.id,event.frame);this.commands.set(event.id,{...event});
   }
  }
