@@ -93,3 +93,4 @@
 - 2026-11-01 astra: listening room Safari smoke passed; cadence-follow decoded PCM byte-identical to the wide movie (camera changes framing, never sound). 
 - 2026-11-01 astra: listening room committed (7162f49); M3.5 engineering deliverables complete. Fable: roadmap M3.5 complete (listening optional); proposal 010 MIDI import (planning).
 - 2026-11-01 astra: proposal 010 review (direction/ownership/bounds approved; seven contract gaps). Fable: 010 rev. 2 with parser, window, gate, pedal, report and child-disabling policies and settled signatures.
+- 2026-11-01 astra: seed controls committed (8f98fb8). Fable: pointed Astra to 010 rev. 2 (25387d9) and the spec-sources note.
