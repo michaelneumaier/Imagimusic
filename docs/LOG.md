@@ -111,3 +111,4 @@
 - 2026-11-01 astra: listening doorway browser lifecycle verified (prepare, play, quiet, seek, continue, switch study, keep sound); wording correction on the direction (constrain claims, not art). Fable: doorway review approve with one should-fix; wording applied in VISION and the response note.
 - 2026-11-01 astra: listening doorway: aspect-sensitive camera zoom (presentation only) after a 400×656 Safari check cropped the pair; kept WAV (48 kHz, 1,538,705 stereo frames) byte-identical with an independent renderLoomPerformance + stereoWav render (renders/listening-close-kin.wav).
 - 2026-11-01 astra: Loom journey review approve-with-fixes (facade setting override, shallow freeze, section beats length, wording). Fable: all fixed with tests.
+- 2026-11-01 astra: listening doorway committed (fc64cc4) with validation note. Fable: roadmap M5.5 shipped.
