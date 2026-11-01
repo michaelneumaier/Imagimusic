@@ -12,6 +12,7 @@ test('the powered-driver study: declared budget respected at every sample, ident
     const recipe = createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), study = composeForcedStudy(recipe, { forceSeconds: 1, ringSeconds: 1.5 });
     assert.equal(study.kind, FORCED_STUDY_KIND); assert.notEqual(study.kind, 'imagimusic-grove-rest'); assert.ok(study.driver.amplitude > 0 && Number.isFinite(study.driver.amplitude));
     const out = renderForcedStudy(study); assert.equal(out.cases.length, 3);
+    assert.equal(out.markers.released[1], study.intervals.contactSeconds[1], 'the contact endpoint is the rounded total in seconds'); assert.equal(out.frames, study.driver.forcedFrames + study.driver.ringFrames);
     for (const c of out.cases) {
       assert.ok(c.pcm.channels.every(ch => ch.every(Number.isFinite)));
       assert.ok(c.boundRatioMax <= 1 + 1e-9, `${seed}/${c.id}: energy budget ratio ${c.boundRatioMax}`); assert.ok(c.boundRatioAfter10ms <= c.boundRatioMax && c.boundRatioAtRelease <= c.boundRatioMax && c.boundRatioAtRelease > 0);
