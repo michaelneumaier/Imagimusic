@@ -21,6 +21,8 @@ Working product entry points:
 - Response-space and recurrence studies: /renders/open-phrase-study/ and /renders/open-phrase-recurrence/.
 
 Next implementation order after the checkpoint:
+**Historical checklist below:** steps 2 and the capture/schema traps have since been resolved by the kept ensemble checkpoint at the end of this note. Canonical empty-event Rest records now represent silent parts; the one-processor diagnostic gives a common actual ending. Do not reimplement the earlier separate-node alternatives. The live host and target-browser performance gate remain outstanding. See `astra-three-groves-encounter.md` for the proposed first playable experience.
+
 1. Read initial-idea.md, collab/PROTOCOL.md, both claims and mailbox. Inspect current git status/history; do not infer completion from this note. Read collab/notes/fable-ensemble-contract.md and its approval exchange.
 2. Settle the versioned ensemble wrapper before host work: three canonical Groves/voices, shared sample rate, fixed1/3 mix gain, per-part actual offsets and endings, explicit never-struck part behavior, bounded total duration and rendering. Preserve source identity; no zero-velocity placeholder events.
 3. Fable implements pure wrapper validation/rendering and meaningful reconstruction tests on owned paths, after explicit handoff. Astra first benchmarks Fable’s preferred single-processor/three-engine route on target devices. If viable, implement one common-clock host and an ensemble processor/capture adapter with one global Quiet. Keep the existing Rest routes unchanged. The three-node route is a fallback requiring offset reconciliation; it is not the settled default. Record actual acknowledgements, including late/refused gestures.

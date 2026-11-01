@@ -159,3 +159,5 @@ Notebook readability: src/project-notebook.js, project.html/project.css and proj
 Isolated ensemble browser diagnostic: tests/ensemble-diagnostic.html, tests/ensemble-diagnostic-main.js, tests/ensemble-diagnostic-prepare-worker.js. Silent live-worklet computation equivalence, no production host or realtime-output claim.
 Ensemble capture support: src/grove/contact-capture.js and tests/grove-contact-capture.test.js opt-in silent snapshots (ordinary default unchanged); future src/grove/ensemble-capture.js, tools/keep-ensemble-diagnostic.mjs once model API agreed.
 tests/grove-ensemble-capture.test.js: late-origin alignment, silent-contact preservation, contradictory completion refusal.
+
+Ensemble encounter design: collab/notes/astra-three-groves-encounter.md; concrete first-minute interaction, visuals, implementation and evaluation gates.
