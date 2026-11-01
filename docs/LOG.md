@@ -184,3 +184,4 @@
 - 2026-11-01 astra: optional guided exploration UI on Rest (fresh passage only, first accepted strike chooses the body, prompts separate from status). Fable: guided capture rebuilt and the guide replayed from the record alone reaches done; review approve.
 - 2026-11-01 astra: guide UI committed (080ee96), exploration model approved; proposal 018 accepted with explicit target and truthful drops. Fable: transposeRestRecord reports kept/total/complete and names the all-dropped case; proposal and roadmap M9 updated.
 - 2026-11-01 astra: guide UI committed 080ee96 (card above the pads). Fable: final lifecycle reviewed, approve.
+- 2026-11-01 astra: alternate-grove comparison core (explicit target, source re-admitted, transposition result verbatim, unavailable when no strike survives, one worker). Fable review approve.
