@@ -72,10 +72,24 @@ export function applyBindings(frame, bindings, setParam) {
   });
 }
 
-/** The "why did this move?" answer: the chain part -> binding -> state field -> inputs, with live values. */
+/** Voices a binding speaks for: the voice its field selects, or, for projected fields (stage.*), the sounding voices of the target's family/slot. */
+export function voicesForBinding(binding, frame) {
+  if (binding.field.startsWith('voices')) { const v = resolveField(frame, binding.field.split('.')[0]); return v ? [v] : []; }
+  const m = /^([a-z]+)\/slot(\d+)/.exec(binding.target); if (!m || !Array.isArray(frame.voices)) return [];
+  const family = m[1], slot = Number(m[2]);
+  return frame.voices.filter(v => v.family === family && v.slot === slot && v.age >= 0);
+}
+
+/** The "why did this move?" answer: the chain part -> binding -> state field -> inputs, with live values.
+ *  `voice.*` inputs resolve against the binding's voices: one value, or a de-duplicated list when several voices share the slot. */
 export function explainBinding(binding, frame, patch = {}) {
   const raw = resolveField(frame, binding.field);
   const value = raw === undefined ? null : (binding.map ?? (v => v))(raw, frame);
-  const inputs = binding.inputs.map(path => ({ path, value: path.startsWith('voice.') ? resolveField({ voice: resolveField(frame, binding.field.split('.')[0]) }, path) : resolveField(patch, path) }));
-  return { id: binding.id, target: binding.target, param: binding.param, field: binding.field, label: binding.label ?? 'interpreted', note: binding.note ?? null, raw: raw ?? null, value, inputs };
+  const voices = voicesForBinding(binding, frame);
+  const inputs = binding.inputs.map(path => {
+    if (!path.startsWith('voice.')) return { path, value: resolveField(patch, path) };
+    const values = [...new Set(voices.map(v => resolveField(v, path.slice(6))).filter(x => x !== undefined))];
+    return { path, value: values.length === 0 ? undefined : values.length === 1 ? values[0] : values };
+  });
+  return { id: binding.id, target: binding.target, param: binding.param, field: binding.field, label: binding.label ?? 'interpreted', note: binding.note ?? null, raw: raw ?? null, value, inputs, voices: voices.map(v => v.id) };
 }

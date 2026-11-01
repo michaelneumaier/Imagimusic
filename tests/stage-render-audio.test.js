@@ -3,7 +3,32 @@ import assert from 'node:assert/strict';
 import { DEFAULT_PATCH } from '../src/model.js';
 import { MAX_VOICES } from '../src/audio.js';
 import { createPerformance } from '../src/stage/performance.js';
-import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, MASTER_GAIN } from '../src/stage/render-audio.js';
+import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRenders, MASTER_GAIN, FAMILIES } from '../src/stage/render-audio.js';
+
+test('diagnostic options isolate families, bypass the compressor, and keep nodes connected offline', () => {
+  const performance = createPerformance(DEFAULT_PATCH);
+  const full = buildPerformanceGraph(new Context(), performance);
+  assert.deepEqual(full.options, { lookahead: 0.24, families: FAMILIES, compressor: true, keepNodes: true });
+  assert.ok(full.scheduled.filter(s => s.family === 'bellows').every(s => s.graph.source.onended === null));
+  assert.ok(full.scheduled.filter(s => s.family !== 'bellows').every(s => s.voice.nodes.every(n => n.onended === null)));
+  const live = buildPerformanceGraph(new Context(), performance, { keepNodes: false });
+  assert.ok(live.scheduled.filter(s => s.family === 'bellows').every(s => typeof s.graph.source.onended === 'function'));
+  assert.ok(live.scheduled.filter(s => s.family !== 'bellows').every(s => s.voice.nodes.every(n => typeof n.onended === 'function')));
+  const gardenOnly = buildPerformanceGraph(new Context(), performance, { families: ['garden'] });
+  assert.ok(gardenOnly.scheduled.length > 0 && gardenOnly.scheduled.every(s => s.family === 'garden'));
+  const ctx = new Context(), bypass = buildPerformanceGraph(ctx, performance, { compressor: false });
+  assert.equal(bypass.limiter, null); assert.ok(bypass.master.connections.includes(ctx.destination));
+  assert.ok(!ctx.nodes.some(n => n.kind === 'compressor'));
+  assert.throws(() => buildPerformanceGraph(new Context(), performance, { families: ['piano'] }), /unknown family/);
+});
+
+test('compareRenders reports identity, max/rms difference and the location of the largest difference', () => {
+  const a = new Float32Array([0, 0.5, -0.25, 0.1]), b = new Float32Array([0, 0.5, -0.25, 0.1]);
+  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, lengths: [4, 4] });
+  const c = new Float32Array([0, 0.5, -0.2, 0.1]), r = compareRenders(a, c, 4);
+  assert.equal(r.identical, false); assert.ok(Math.abs(r.maxDiff - 0.05) < 1e-7); assert.equal(r.atSample, 2); assert.equal(r.atSeconds, 0.5);
+  assert.equal(compareRenders(a, new Float32Array(3), 4).identical, false);
+});
 
 class Parameter {
   events = [];

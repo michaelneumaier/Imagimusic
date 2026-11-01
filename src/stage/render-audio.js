@@ -21,12 +21,23 @@ export const SCHEDULE_LOOKAHEAD = 0.24;
 
 export const bellowsSeed = (patch, voice) => (patch.seed + voice.id * 997) >>> 0;
 
-export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD } = {}) {
+// Options (diagnostics and offline hygiene):
+//   families   which families to schedule (default all three); use to isolate a nondeterminism to one engine
+//   compressor false bypasses the native DynamicsCompressor (master -> destination); test-only
+//   keepNodes  true (default for offline) removes the engines' onended disconnect handlers. Live engines disconnect
+//              ended nodes to free resources; in offline rendering those callbacks land on the main thread at
+//              scheduler-dependent moments, and a node graph whose inputs vanish mid-render can be processed
+//              differently from one fed zeros, which breaks bit-for-bit repeatability. Offline has no resource
+//              pressure, so nothing is disconnected until the render is done.
+export const FAMILIES = ['garden', 'tine', 'bellows'];
+
+export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD, families = FAMILIES, compressor = true, keepNodes = true } = {}) {
   if (!context || typeof context.createGain !== 'function') throw new Error('buildPerformanceGraph needs an AudioContext-like context.');
   if (!performance || !Array.isArray(performance.events) || !performance.patch) throw new Error('performance must have events and patch (see createPerformance).');
+  for (const f of families) if (!FAMILIES.includes(f)) throw new Error(`unknown family '${f}'.`);
   const master = context.createGain(); master.gain.value = MASTER_GAIN;
-  const limiter = context.createDynamicsCompressor();
-  master.connect(limiter).connect(context.destination);
+  const limiter = compressor ? context.createDynamicsCompressor() : null;
+  if (limiter) master.connect(limiter).connect(context.destination); else master.connect(context.destination);
 
   // Bind an InstrumentAudio to this context and drive its clock to each event's schedule moment.
   const garden = new InstrumentAudio();
@@ -35,7 +46,7 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
   Object.defineProperty(garden, 'time', { get: () => cursor, configurable: true });
 
   const patch = performance.patch, sampleRate = context.sampleRate;
-  const events = [...performance.events].sort((a, b) => a.voice.noteOn - b.voice.noteOn);
+  const events = [...performance.events].filter(e => families.includes(e.family)).sort((a, b) => a.voice.noteOn - b.voice.noteOn);
   const scheduled = [];
   for (const { family, voice } of events) {
     cursor = Math.max(0, voice.noteOn - lookahead);
@@ -50,22 +61,37 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
         gain.linearRampToValueAtTime(0, voice.end);
       }
       graph.source.start(voice.noteOn); graph.source.stop(voice.end + 0.01);
+      if (keepNodes) graph.source.onended = null;
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: voice.end, seed, stolenAt: voice.stolenAt, graph });
     } else {
       const live = garden.strike(voice.slot, patch, voice.velocity, voice.noteOn, voice.position);
+      if (live && keepNodes) for (const node of live.nodes) node.onended = null;
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: live ? live.end : null, voice: live, skipped: !live });
     }
   }
-  return { master, limiter, garden, scheduled };
+  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes } };
 }
 
-export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead } = {}) {
+export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes } = {}) {
   if (typeof OfflineContext !== 'function') throw new Error('OfflineAudioContext is not available in this environment; render in a browser (tests/stage-render-browser.html).');
   if (!Number.isFinite(sampleRate) || sampleRate <= 0) throw new Error('sampleRate must be positive.');
   if (!performance || !Number.isFinite(performance.duration) || performance.duration <= 0) throw new Error('performance.duration must be positive.');
   const length = Math.ceil(performance.duration * sampleRate);
   const context = new OfflineContext(1, length, sampleRate);
-  buildPerformanceGraph(context, performance, lookahead === undefined ? {} : { lookahead });
+  const options = {};
+  if (lookahead !== undefined) options.lookahead = lookahead;
+  if (families !== undefined) options.families = families;
+  if (compressor !== undefined) options.compressor = compressor;
+  if (keepNodes !== undefined) options.keepNodes = keepNodes;
+  buildPerformanceGraph(context, performance, options);
   const buffer = await context.startRendering();
   return buffer.getChannelData(0);
+}
+
+/** Compare two renders: max and RMS difference, where the largest difference sits, and whether they are identical. */
+export function compareRenders(a, b, sampleRate = 48000) {
+  const n = Math.min(a.length, b.length);
+  let max = 0, at = -1, sum = 0;
+  for (let i = 0; i < n; i++) { const d = Math.abs(a[i] - b[i]); sum += d * d; if (d > max) { max = d; at = i; } }
+  return { identical: max === 0 && a.length === b.length, maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate, lengths: [a.length, b.length] };
 }

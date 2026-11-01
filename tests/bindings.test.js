@@ -58,6 +58,20 @@ test('explainBinding answers "why did this move?" with the field value and the i
   assert.equal(dead.value, null); assert.equal(dead.raw, null);
 });
 
+test('explainBinding resolves voice inputs for projected stage fields from the target family/slot, listing several voices when they overlap', () => {
+  const projected = { ...frame, stage: { garden: [null, null, { energies: [0.2, 0.1, 0, 0, 0] }] } };
+  const b = validateBinding({ id: 'garden/slot2/mode0', target: 'garden/slot2', param: 'mode0', field: 'stage.garden[2].energies[0]', inputs: ['strikePosition', 'voice.velocity', 'voice.noteHz'] });
+  const why = explainBinding(b, projected, patch);
+  assert.equal(why.value, 0.2); assert.deepEqual(why.voices, ['7']);
+  assert.equal(why.inputs.find(i => i.path === 'voice.velocity').value, 0.8);
+  assert.equal(why.inputs.find(i => i.path === 'voice.noteHz').value, 196);
+  const two = { ...projected, voices: [...frame.voices, { ...frame.voices[0], id: '8', noteHz: 220 }] };
+  assert.deepEqual(explainBinding(b, two, patch).inputs.find(i => i.path === 'voice.noteHz').value, [196, 220]);
+  assert.deepEqual(explainBinding(b, two, patch).voices, ['7', '8']);
+  const idle = explainBinding(b, { ...projected, voices: [] }, patch);
+  assert.equal(idle.inputs.find(i => i.path === 'voice.velocity').value, undefined); assert.deepEqual(idle.voices, []);
+});
+
 test('bindings are stateless: the same frame always yields the same values regardless of history', () => {
   const b = validateBindings([iris, mallet]);
   const run = () => { const out = []; applyBindings(frame, b, (t, p, v) => out.push(v)); return out; };

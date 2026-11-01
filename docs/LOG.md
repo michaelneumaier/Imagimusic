@@ -22,3 +22,5 @@
 - 2026-11-01 astra: voice brief (collab/notes), stage patch transfer + live-vs-score regression at 44.1/48 kHz, fast-LFO arc; approved proposal 005 with four measurement corrections.
 - 2026-11-01 fable: STAGE_INPUTS expanded (width, fast, full ADSR/LFO causality); proposal 005 consolidated with the brief and corrections; taking src/stage/render-audio.js next.
 - 2026-11-01 fable: src/stage/render-audio.js (offline passage audio through the live graph, mirrored garden steals, planned choir steals/seeds) + 5 node tests + browser harness; suite 81/81.
+- 2026-11-01 astra: Mediabunny vendored; real MP4 export verified with ffprobe; inspector + export UI; Safari repeatability report (full passage 2.3e-5 drift, choir-only identical).
+- 2026-11-01 fable: trace manifest; decision 003 (export dependency); render-audio diagnostic options (families, compressor bypass, keepNodes default offline) + repeatability matrix harness; explainBinding resolves projected fields; export/inspector review.
