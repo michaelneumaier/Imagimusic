@@ -91,3 +91,4 @@
 - 2026-11-01 astra: cadence camera committed (4c11070), Safari parity 275/275, opening screenshot includes all mechanisms; audition tool run confirmed. Fable: roadmap updated; pending cadence-follow movie, comparison view, audition.
 - 2026-11-01 astra: audition page (audition.html/css, src/audition/main.js) with both verified manual movies, selectable cadence-follow movie (verified 1960/1960), embedded plot. Fable: audition SVG relaid (stacked legend, time ticks, onsets-per-bar bars on a shared scale, section bands), verified by rendered preview; page review approve.
 - 2026-11-01 astra: listening room Safari smoke passed; cadence-follow decoded PCM byte-identical to the wide movie (camera changes framing, never sound). 
+- 2026-11-01 astra: listening room committed (7162f49); M3.5 engineering deliverables complete. Fable: roadmap M3.5 complete (listening optional); proposal 010 MIDI import (planning).
