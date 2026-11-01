@@ -150,3 +150,4 @@ Optional listening note: tools/open-phrase-player.mjs; collapsed free-text note 
 Harmonic ensemble audition: tools/render-harmonic-groves.mjs and local renders/harmonic-groves; three separately validated whole-cluster instruments, matched histories unison/triad, fixed1/3mixgain, per-part evidence and shared listening player. No cross-grove coupling or playback-rate transposition.
 
 - Harmonic study link wording: tools/open-phrase-player.mjs optional escaped playLinkLabel, preserving existing studies default.
+Project home/catalog: project.html, project.css, src/project-catalog.js and welcome.html project-home link. Local showcase with live route inventory, milestone/roadmap/vision/history archive and restart checkpoint.
