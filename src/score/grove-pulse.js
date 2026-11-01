@@ -3,10 +3,14 @@
 // Reference delays come from isolated second-strike trials (measureSecondStrike); they are not outcomes of this cumulative phrase, which is why
 // onPulseRecord renders and admits the phrase as its own history. No claim about what is heard.
 import { REST_QUIET_FADE_SECONDS, REST_RECORD_KIND, REST_RECORD_VERSION, measureSecondStrike, validateRestAdmission } from './grove-rest.js';
+import { canonicalGrove } from './grove.js';
+import { canonicalVoiceConfig } from './grove-voice.js';
 
 export const PULSE_PHRASE_VERSION = 1;
-/** The physical period is 1/(f₂ − f₁) of the two lowest low-band modes (the same period measureSecondStrike sweeps); the authored unit is that
- *  period, doubled once when it is shorter than minUnitSeconds (a 0.4 s count is fast), never more. The two are reported separately. */
+/** The physical period is 1/(f₂ − f₁) of the two lowest low-band modes, as measureSecondStrike reports it: rounded to 3 decimals, and floored there at
+ *  1/0.05 s; this composer refuses a recipe whose two lowest modes are closer than MIN_MODE_SPLIT_HZ instead of using the floor silently. The authored
+ *  unit is that period, doubled once when it is shorter than minUnitSeconds (a 0.4 s count is fast), never more. The two are reported separately. */
+export const MIN_MODE_SPLIT_HZ = 0.05;
 export const PULSE_BOUNDS = Object.freeze({ minUnitSeconds: 0.6, maxOpeningSeconds: 12, minRingSeconds: 1, maxRingSeconds: 20 });
 
 /** The opening: call (body a), answer on the measured reference delay (neighbour b), call again at three units. The expected next entrance
@@ -14,6 +18,8 @@ export const PULSE_BOUNDS = Object.freeze({ minUnitSeconds: 0.6, maxOpeningSecon
 export function composeOnPulsePhrase(recipe, { body = 0, velocity = 0.6, steps = 12 } = {}) {
   if (!Number.isInteger(body) || body < 0 || body >= recipe.bodies) throw new Error('body must index the grove.');
   if (!Number.isFinite(velocity) || velocity <= 0 || velocity > 1) throw new Error('velocity must be in (0, 1].');
+  const v = recipe.visual, low = v.lowBand.map(r => v.omegaD[r] / (2 * Math.PI)).sort((a, b) => a - b);
+  if (low.length < 2 || low[1] - low[0] < MIN_MODE_SPLIT_HZ) throw new Error(`the two lowest modes are closer than ${MIN_MODE_SPLIT_HZ} Hz; no usable period.`);
   const sr = recipe.sampleRate, ref = measureSecondStrike(recipe, { body, steps, velocity });
   const period = ref.beatPeriodSeconds, multiple = period < PULSE_BOUNDS.minUnitSeconds ? 2 : 1, unitSeconds = +(period * multiple).toFixed(3);
   const unitFrames = Math.round(unitSeconds * sr), returnFrame = 3 * unitFrames, answerFrame = ref.best.frame;
@@ -33,6 +39,7 @@ export function composeOnPulsePhrase(recipe, { body = 0, velocity = 0.6, steps =
   ];
   return {
     version: PULSE_PHRASE_VERSION, body, neighbor: ref.neighbor, position, velocity, sampleRate: sr,
+    grove: canonicalGrove(recipe.grove), voice: canonicalVoiceConfig(recipe.voice), positions: recipe.positions.slice(),
     physicalPeriodSeconds: period, pulseUnitSeconds: unitSeconds, referenceDelaySeconds: ref.best.delaySeconds, endFrame: returnFrame,
     reference: { beatPeriodSeconds: period, lowModesHz: ref.lowModesHz, delaySeconds: ref.best.delaySeconds, delayFrame: answerFrame, rangeDb: ref.rangeDb, steps,
       note: 'reference delay from isolated second-strike trials on a single ring (measureSecondStrike); a reference for placing the authored answer, not a measured outcome of this phrase, whose state is cumulative.' },
@@ -46,7 +53,9 @@ export function composeOnPulsePhrase(recipe, { body = 0, velocity = 0.6, steps =
  *  answer: null (opening alone), 'expected' (at the expected entrance), 'half' (half a unit later), or an exact frame after the return.
  *  Validated with the cumulative admission check, so the phrase is admitted as its own history, not by its isolated references. */
 export function onPulseRecord(recipe, phrase, { answer = null, ringSeconds = 4 } = {}) {
-  if (phrase?.version !== PULSE_PHRASE_VERSION || phrase.sampleRate !== recipe.sampleRate) throw new Error('phrase does not belong to this recipe.');
+  if (phrase?.version !== PULSE_PHRASE_VERSION) throw new Error('unsupported phrase version.');
+  // Bound to the instrument it was measured on (Astra's finding): canonical grove, canonical voice, position vocabulary and sample rate must all match.
+  if (phrase.grove !== canonicalGrove(recipe.grove) || phrase.voice !== canonicalVoiceConfig(recipe.voice) || JSON.stringify(phrase.positions) !== JSON.stringify(recipe.positions) || phrase.sampleRate !== recipe.sampleRate) throw new Error('phrase does not belong to this recipe (grove, voice, positions or sample rate differ).');
   if (!Number.isFinite(ringSeconds) || ringSeconds < PULSE_BOUNDS.minRingSeconds || ringSeconds > PULSE_BOUNDS.maxRingSeconds) throw new Error(`ringSeconds must be in ${PULSE_BOUNDS.minRingSeconds}..${PULSE_BOUNDS.maxRingSeconds}.`);
   const sr = recipe.sampleRate, events = phrase.commands.map((c, order) => ({ frame: c.frame, order, body: c.body, position: c.position, velocity: c.velocity }));
   let answerFrame = null;

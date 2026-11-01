@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { composeGrove, GROVE_SEEDS } from '../src/score/grove.js';
 import { DEFAULT_VOICE_CONFIG } from '../src/score/grove-voice.js';
 import { createGroveRestRecipe, renderRestRecord, measureSecondStrike, validateRestRecord } from '../src/score/grove-rest.js';
-import { composeOnPulsePhrase, onPulseRecord, onPulsePrompt, PULSE_BOUNDS, PULSE_PHRASE_VERSION } from '../src/score/grove-pulse.js';
+import { composeOnPulsePhrase, onPulseRecord, onPulsePrompt, PULSE_BOUNDS, PULSE_PHRASE_VERSION, MIN_MODE_SPLIT_HZ } from '../src/score/grove-pulse.js';
 
 const sr = 8000;
 test('on-pulse phrase: a bounded opening on the measured swell with no Quiet, the expected entrance stated and not scheduled, on every curated grove', () => {
@@ -35,6 +35,12 @@ test('on-pulse record: the cumulative phrase is admitted as its own history, wit
     for (const r of [alone, expected, half]) { validateRestRecord(r.record, recipe); const pcm = renderRestRecord(r.record, recipe); assert.equal(pcm.channels[0].length, r.record.ended.frame + r.record.ended.fadeFrames); assert.ok(pcm.channels[0].some(v => v !== 0)); }
     assert.throws(() => onPulseRecord(recipe, p, { answer: p.commands[2].frame }), /after the return/); assert.throws(() => onPulseRecord(recipe, p, { ringSeconds: 0.5 }), /ringSeconds/);
     assert.throws(() => onPulseRecord(createGroveRestRecipe(composeGrove({ seed }), DEFAULT_VOICE_CONFIG, { sampleRate: 16000 }), p), /belong/);
+    const otherSeed = GROVE_SEEDS.find(s => s !== seed); assert.throws(() => onPulseRecord(createGroveRestRecipe(composeGrove({ seed: otherSeed }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), p), /belong/, 'same rate, different grove');
+    const otherVoice = { ...DEFAULT_VOICE_CONFIG, positions: [DEFAULT_VOICE_CONFIG.positions[1]] }; assert.throws(() => onPulseRecord(createGroveRestRecipe(composeGrove({ seed }), otherVoice, { sampleRate: sr }), p), /belong/, 'same grove, different voice');
+    assert.equal(p.grove, JSON.parse(JSON.stringify(p.grove)) && p.grove, 'canonical grove carried'); assert.ok(p.grove.includes('"seed"')); assert.ok(typeof p.voice === 'string');
   }
   assert.throws(() => composeOnPulsePhrase(createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), { body: 7 }), /index the grove/);
+  // The period floor in measureSecondStrike is never used silently: a recipe whose two lowest modes coincide is refused.
+  const tight = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), v = tight.visual, [r0, r1] = v.lowBand; const saved = v.omegaD[r1]; v.omegaD[r1] = v.omegaD[r0] + 2 * Math.PI * (MIN_MODE_SPLIT_HZ / 2);
+  assert.throws(() => composeOnPulsePhrase(tight), /closer than/); v.omegaD[r1] = saved;
 });
