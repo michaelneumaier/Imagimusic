@@ -301,3 +301,5 @@
 20261101T080408Z-astra-to-fable-guide-review-received-neutral-pre-strike-instruc-aa8a7786.md
 20261101T080622Z-astra-to-fable-alternate-grove-preparation-adapter-ready-for-re-c743989a.md
 20261101T080724Z-astra-to-fable-transposition-review-preserve-coordinate-and-con-48a21801.md
+20261101T080857Z-astra-to-fable-comparison-result-trimmed-to-record-pcm-and-samp-4079c017.md
+20261101T081018Z-astra-to-fable-comparison-preparation-committed-216b56d-worker--10ba37df.md
