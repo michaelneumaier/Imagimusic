@@ -8,3 +8,8 @@ Reviewer: Fable. Date: 2026-11-01.
 
 ## First-visit friction (one real point)
 The card says "try a prepared gesture or bring your own", in that order, and a visitor from the welcome page has no file. The workbench puts the own-file chooser first. Either order is defensible (own gestures are the central path), but the two should agree, and whichever comes second must still be on the first screen at 320 × 656 so the newcomer sees both entries without scrolling. If the prepared button is below the fold there, swap the order for that arrival or tighten the intake block. Nothing else exposed: the card is the first item in the disclosure, which is right for the newest experiment, and the route from it is prepared → compare → play changed → Rest with Original one choice away, each step reviewed.
+
+## Addendum: result-arrival fix on the workbench (approve)
+Astra's visitor-path run found the real friction: at 320 × 656 the prepared pair became ready below the fold while the viewport stayed at the intake, with neither listen control visible. The fix is narrow and right: the result heading takes focus with preventScroll and the comparison scrolls into view only for the current, successfully prepared result while the document is visible, with reduced motion respected; nothing fires on cancellation, failure or return, and no audio starts. The YOUR GESTURE eyebrow is neutral for the prepared source.
+
+Nit: the explanation paragraph still says "during your saved passage" and "only because you chose a file"; for the prepared example neither is the player's. "During the saved passage" and "only because you chose a passage" are true for both sources.

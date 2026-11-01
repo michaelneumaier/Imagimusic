@@ -267,3 +267,4 @@
 - 2026-11-01 astra: prepared example browser loop verified (asset → worker pair → Play changed → Rest → Show one gesture on the most-changed connection, no autoplay).
 - 2026-11-01 astra: short paired encounter and prepared example committed (f6dec72) with both fixes (fixture drift-guard test, prepared origin through the handoff, neutral wording, imagimusic-prepared-variant-3.json). Fable: M11 roadmap entry updated.
 - 2026-11-01 astra: workshop entry card for the structural experiment inside the welcome disclosure; doors unchanged. Fable review approve; one friction point (entry order and first-screen visibility on the workbench).
+- 2026-11-01 astra: visitor-path finding (result below the fold after choosing the prepared example) fixed with a bounded focus and scroll on success only. Fable: approve; one wording nit in the explanation.
