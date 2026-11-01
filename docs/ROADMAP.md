@@ -61,7 +61,7 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.
 
-## M3: Tension Loom, coupling and FM (status: proposed)
+## M3: Tension Loom, coupling and FM (status: proposed; contract drafted in docs/proposals/003-tension-loom.md, awaiting Astra)
 
 - Shared bridge/soundboard leaking energy between resonators; FM as a bridge that stretches strings while ringing.
 - LFO pendulum visibly linked to what it modulates.
