@@ -16,7 +16,7 @@ export function createRestEngine(recipe) {
   if (recipe?.version !== REST_RECIPE_VERSION) throw new Error('unsupported rest recipe version.');
   const { dim, n, channels } = recipe, states = new Map(recipe.contactStates.map(s => [s.key, Float64Array.from(s.phi)]));
   const strikeVectors = recipe.strikeVectors.map(row => row.map(v => Float64Array.from(v))), pickups = recipe.pickupVectors.map(v => Float64Array.from(v));
-  const freeKey = recipe.contactStates[0].key;
+  const freeKey = recipe.contactStates[0].key, fmax = Math.max(...(recipe.energyFactors ?? [Infinity]));
   let x = new Float64Array(dim), phi = states.get(freeKey), key = freeKey, next = new Float64Array(dim);
   return {
     get key() { return key; },
@@ -32,6 +32,10 @@ export function createRestEngine(recipe) {
     read(out = new Float64Array(channels)) { for (let ch = 0; ch < channels; ch++) { let s = 0; const v = pickups[ch]; for (let i = 0; i < n; i++) s += v[i] * x[i]; out[ch] = recipe.outputGain * s; } return out; },
     /** Step 4. */
     step() { for (let i = 0; i < dim; i++) { let s = 0; const row = i * dim; for (let j = 0; j < dim; j++) s += phi[row + j] * x[j]; next[i] = s; } const t = x; x = next; next = t; },
+    /** Rigorous ceiling on every future output sample while only damping acts: outputGain · √(2E) · max energy factor. */
+    bound() { return recipe.outputGain * Math.sqrt(2 * this.energy()) * fmax; },
+    /** The same ceiling if this strike were applied now (nothing is mutated): E' = E + ẏ·Δ + ½|Δ|². */
+    candidateBound(position, body, velocity) { const v = strikeVectors[position]?.[body]; if (!v || !Number.isFinite(velocity)) throw new Error('unknown strike position or body, or non-finite velocity.'); let cross = 0, self = 0; for (let i = n; i < dim; i++) { const d = velocity * v[i]; cross += x[i] * d; self += d * d; } return recipe.outputGain * Math.sqrt(Math.max(0, 2 * (this.energy() + cross + 0.5 * self))) * fmax; },
     /** Mechanical energy in the recipe's mass-normalized coordinates (for evidence, not sound). */
     energy() { let e = 0; for (let i = 0; i < n; i++) { e += 0.5 * x[n + i] * x[n + i]; for (let j = 0; j < n; j++) e += 0.5 * x[i] * recipe.stiffness[i * n + j] * x[j]; } return e; },
   };
@@ -51,4 +55,20 @@ export function renderRestPassage(recipe, { strikes = [], contacts = [], frames 
     engine.step();
   }
   return out;
+}
+
+/** Parse a contact key back into per-body contacts (null or { zone, strength }). */
+export const parseContactKey = key => key.split('|').map(part => (part === '-' ? null : { zone: Number(part[0]), strength: Number(part.slice(1)) }));
+
+/** The picture from a state (pure, no history): per-body low-band envelope as groveVoiceEnvelope defines it, plus the contacts in force. */
+export function visualFromState(recipe, state, contactKey) {
+  const { n, bodies } = recipe, v = recipe.visual; if (!v) throw new Error('recipe has no visual projection data.');
+  if (!state || state.length !== recipe.dim) throw new Error('state has the wrong dimension.');
+  const re = new Array(bodies).fill(0), im = new Array(bodies).fill(0);
+  for (const r of v.lowBand) {
+    const vec = v.modeVectors[r]; let q = 0, qd = 0; for (let i = 0; i < n; i++) { q += vec[i] * state[i]; qd += vec[i] * state[n + i]; }
+    const aRe = (qd + v.gammas[r] * q) / v.omegaD[r], aIm = q;
+    for (let b = 0; b < bodies; b++) { re[b] += v.pickupByMode[r][b] * aRe; im[b] += v.pickupByMode[r][b] * aIm; }
+  }
+  return { envelope: re.map((x, b) => Math.hypot(x, im[b])), lowBand: true, contacts: parseContactKey(contactKey), interpretation: v.interpretation };
 }

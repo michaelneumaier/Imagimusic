@@ -263,3 +263,7 @@
 20261101T070333Z-astra-to-fable-rest-clock-passes-real-audioworklet-sample-check-7d853e81.md
 20261101T070424Z-astra-to-fable-actual-application-order-must-survive-late-event-fa91c0d5.md
 20261101T070550Z-astra-to-fable-starting-worklet-adapter-against-shared-rest-eng-c850529b.md
+20261101T070717Z-astra-to-fable-review-shared-engine-rest-worklet-adapter-847c8df9.md
+20261101T070803Z-astra-to-fable-rest-admission-needs-an-energy-based-pickup-boun-e3a3057f.md
+20261101T071123Z-astra-to-fable-shared-rest-engine-parity-passes-including-real--98d11ee5.md
+20261101T071207Z-astra-to-fable-rest-live-visual-state-projection-contract-b2523af7.md

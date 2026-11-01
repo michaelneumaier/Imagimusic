@@ -85,3 +85,46 @@ test('capture v2: a Rest record validates, renders exactly, equals the bank rout
   for (let i = 0; i < states.frames; i++) { if ([0, 1, 700, 2401, 2402, 3000, 3700].includes(i)) seen.push([i, straight.state]); for (const k of rested.events) if (k.frame === i) straight.strike(k.position, k.body, k.velocity); straight.setContacts(keyAt(i)); straight.step(); }
   for (const [i, s] of seen.reverse()) { const r = states.stateAt(i); assert.ok(r.every((v, k) => v === s[k]), `frame ${i} from a checkpoint equals the straight run exactly`); }
 });
+
+test('admission: the energy pickup bound holds at every sample under rests, strikes during holds and overlaps; the free bank bound does not', async () => {
+  const { createVoiceInstrument, voiceOutputBound } = await import('../src/grove/voice-performance.js');
+  const sr = 8000, out = new Float64Array(2);
+  for (const seed of GROVE_SEEDS) {
+    const grove = composeGrove({ seed }), recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr }), e = createRestEngine(recipe);
+    assert.ok(recipe.energyFactors.length === 2 && recipe.energyFactors.every(f => f > 0));
+    const strikes = [{ frame: 0, position: 1, body: 0, velocity: 0.5 }, { frame: 2000, position: 2, body: 1, velocity: 0.4 }, { frame: 5600, position: 0, body: 2, velocity: 1 }, { frame: 5600, position: 2, body: 0, velocity: 0.7 }];
+    const contacts = [{ body: 0, zone: 2, strength: 1, start: 800, end: 4800 }, { body: 1, zone: 1, strength: 0, start: 1600, end: 6400 }, { body: 2, zone: 0, strength: 1, start: 6000, end: 9000 }];
+    const keyAt = i => contactStateKey([0, 1, 2].map(b => { const c = contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+    let ceiling = 0, lastEnergy = Infinity;
+    for (let i = 0; i < 12000; i++) {
+      for (const k of strikes) if (k.frame === i) { const predicted = e.candidateBound(k.position, k.body, k.velocity); e.strike(k.position, k.body, k.velocity); assert.ok(Math.abs(predicted - e.bound()) <= 1e-12 * Math.max(1, predicted), 'candidateBound equals bound after the strike'); ceiling = e.bound(); lastEnergy = Infinity; }
+      e.setContacts(keyAt(i)); e.read(out);
+      assert.ok(Math.abs(out[0]) <= ceiling + 1e-15 && Math.abs(out[1]) <= ceiling + 1e-15, `seed ${seed} frame ${i}: |out| ${Math.max(Math.abs(out[0]), Math.abs(out[1]))} within the ceiling ${ceiling} set at the last strike`);
+      const en = e.energy(); assert.ok(en <= lastEnergy * (1 + 1e-12), 'energy never rises between strikes'); lastEnergy = en;
+      e.step();
+    }
+    assert.ok(e.candidateBound(1, 0, 1) < recipe.admissionCeiling, 'one more full strike on a settled instrument is admissible');
+  }
+  // Refutation (Astra 070803Z): under a rest the output can exceed the free bank bound, so that bound is not an invariant with contacts.
+  const grove = composeGrove({ seed: 11 }), recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr }), inst = createVoiceInstrument(grove, DEFAULT_VOICE_CONFIG, sr), r = createRestEngine(recipe);
+  r.strike(2, 0, 1); let worst = 0;
+  for (let i = 0; i < 1.5 * sr; i++) { if (i === Math.floor(0.02 * sr)) r.setContacts(contactStateKey([null, { zone: 2, strength: 1 }, null])); r.read(out); worst = Math.max(worst, Math.max(Math.abs(out[0]), Math.abs(out[1])) / voiceOutputBound(inst, [{ frame: 0, body: 0, position: 2, velocity: 1 }], i)); r.step(); }
+  assert.ok(worst > 1.1, `free bank bound exceeded under a rest by ${worst.toFixed(3)}×`);
+});
+
+test('the picture from a state equals the bank route picture with no rests, and reports the contacts in force', async () => {
+  const { visualFromState, parseContactKey } = await import('../src/rest/engine.js');
+  const { groveVoiceEnvelope } = await import('../src/score/grove-voice.js');
+  const grove = composeGrove({ seed: 7 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr }), voice = createGroveVoice(grove), e = createRestEngine(recipe);
+  const strikes = [{ frame: 0, position: 1, body: 0, velocity: 0.5 }, { frame: 1600, position: 2, body: 2, velocity: 0.8 }];
+  let worst = 0, scale = 0;
+  for (let i = 0; i <= 2 * sr; i++) {
+    for (const k of strikes) if (k.frame === i) e.strike(k.position, k.body, k.velocity);
+    if (i % 400 === 0 && i > 0) { const got = visualFromState(recipe, e.state, e.key).envelope, ref = groveVoiceEnvelope(voice, strikes.map(k => ({ ...k, time: k.frame / sr })), i / sr); got.forEach((g, b) => { worst = Math.max(worst, Math.abs(g - ref[b])); scale = Math.max(scale, ref[b]); }); }
+    e.step();
+  }
+  assert.ok(worst / scale < 1e-9, `state picture vs strike-history picture: ${worst / scale} of peak`);
+  e.setContacts(contactStateKey([null, { zone: 2, strength: 1 }, null])); const v = visualFromState(recipe, e.state, e.key);
+  assert.deepEqual(v.contacts, [null, { zone: 2, strength: 1 }, null]); assert.ok(v.lowBand && v.envelope.length === 3);
+  assert.deepEqual(parseContactKey('-|21|00'), [null, { zone: 2, strength: 1 }, { zone: 0, strength: 0 }]);
+});

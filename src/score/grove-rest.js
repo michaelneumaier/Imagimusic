@@ -10,6 +10,8 @@ import { REST_RECIPE_VERSION, contactStateKey, createRestEngine, renderRestPassa
 export const REST_STRENGTHS = Object.freeze({ light: 12, firm: 60 });
 export const REST_STRENGTH_NAMES = Object.freeze(Object.keys(REST_STRENGTHS));
 export const REST_MAX_STATES = 512;
+/** Peak ceiling for admission of a strike under the energy bound (a rigorous bound, so no extra margin is hidden elsewhere). */
+export const REST_ADMISSION_CEILING = 0.9;
 
 /** Enumerate every combination of (no rest | zone × strength) over the bodies; the first state is "no contact". */
 export function enumerateContactStates(bodies, zones, strengths) {
@@ -34,12 +36,23 @@ export function createGroveRestRecipe(grove, config = DEFAULT_VOICE_CONFIG, { sa
   const strikeVectors = c.positions.map(u => g.bodies.map((_, body) => Array.from(strikeImpulse(system, { body, u, J: 1 }))));
   // Pickup vectors reproduce the bank's stereo mix: output_ch = pickupScale · Σ_b pans[b][ch] · displacement(b, pickupU).
   const pickupVectors = [0, 1].map(ch => { const v = new Array(dim).fill(0); g.bodies.forEach((_, b) => { const w = system.snapshot[b].shape(c.pickupU), o = system.offsets[b]; for (let j = 0; j < system.sizes[b]; j++) v[o + j] += voice.pickupScale * pans[b][ch] * w[j] / Math.sqrt(system.snapshot[b].mass); }); return v; });
+  // Admission invariant (Astra, 071803Z): for the positive-definite mass-normalized stiffness A, |p·y| ≤ √(p·A⁻¹p) · √(y·Ay) ≤ √(p·A⁻¹p) · √(2E)
+  // by Cauchy–Schwarz in the A-norm, and E never increases while only damping acts (free or any contact). So after a strike, every future
+  // output sample until the next strike is bounded by outputGain · √(2E) · f_ch; p·A⁻¹p = Σ_r (v_r·p)² / λ_r from the eigenbasis.
+  const energyFactors = pickupVectors.map(p => Math.sqrt(system.vectors.reduce((sum, v, r) => { let d = 0; for (let i = 0; i < n; i++) d += v[i] * p[i]; return sum + d * d / system.lambda[r]; }, 0)));
+  // Visual projection data: the low-band coherent envelope per body at the pickup, the same quantity groveVoiceEnvelope draws,
+  // but from a state: envelope_i = |Σ_{r∈lowBand} c_{r,i} · A_r| with A_r = (q̇_r + γ_r q_r)/ω_r + i·q_r the mode's analytic amplitude.
+  const visual = { lowBand: voice.lowBandIndex.slice(), omegaD: system.omegaD.slice(), gammas: system.gammas.slice(), modeVectors: system.vectors.map(v => v.slice()),
+    pickupByMode: system.vectors.map(v => g.bodies.map((_, b) => { const w = system.snapshot[b].shape(c.pickupU), o = system.offsets[b]; let d = 0; for (let j = 0; j < system.sizes[b]; j++) d += w[j] * v[o + j]; return voice.pickupScale * d / Math.sqrt(system.snapshot[b].mass); })),
+    interpretation: 'low-band coherent displacement envelope at the pickup per body, from the state; identical to the bank route picture with no rests; not loudness, not radiation',
+    snapshot: 'a state snapshot posted after a block describes the start of frame currentFrame + blockLength (after the last step of the block)' };
   return {
-    version: REST_RECIPE_VERSION, kind: 'imagimusic-grove-rest-recipe', sampleRate, n, dim, bodies, channels: 2,
+    version: REST_RECIPE_VERSION, kind: 'imagimusic-grove-rest-recipe', visual, sampleRate, n, dim, bodies, channels: 2, energyFactors, admissionCeiling: REST_ADMISSION_CEILING,
     seed: g.seed, voice: c, positions: c.positions.slice(), zones: restZones.slice(), strengths: strengthNames.map((name, i) => ({ name, c: strengthValues[i] })),
     contactStates, strikeVectors, pickupVectors, outputGain: voice.outputGain, pickupScale: voice.pickupScale, ring: voice.ring, fade: voice.fade,
     stiffness: Array.from({ length: n * n }, (_, i) => system.A[Math.floor(i / n)][i % n]),
     order: 'at frame i: apply strikes due at i to velocity; select the contact state active at i ([start, end)); read pickups as output i; step to i + 1',
+    admission: 'a strike is admitted iff outputGain · √(2·E_after) · max(energyFactors) ≤ admissionCeiling, where E_after = E + ẏ·Δ + ½|Δ|² for the velocity impulse Δ; this bounds every later output sample while only damping (free or any contact) acts; the free bank bound is not valid under contacts (measured violation up to 1.25× on seed 11) and is not used',
     exactness: 'exact linear evolution between gesture boundaries at the sample instants, up to matrix-exponential truncation and floating-point roundoff; no time-stepping approximation; classical damping as in the modal sums; viscous point contact only',
     realism: 'a rest is a viscous damper at one point of one shell with two stated coefficients; no hand mass or stiffness, no nonlinear contact, no pressure sensing; not a measurement of any real hand on any real shell',
   };
