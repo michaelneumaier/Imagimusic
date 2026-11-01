@@ -151,3 +151,4 @@ Harmonic ensemble audition: tools/render-harmonic-groves.mjs and local renders/h
 
 - Harmonic study link wording: tools/open-phrase-player.mjs optional escaped playLinkLabel, preserving existing studies default.
 Project home/catalog: project.html, project.css, src/project-catalog.js and welcome.html project-home link. Local showcase with live route inventory, milestone/roadmap/vision/history archive and restart checkpoint.
+Catalog restart resilience: tools/prepare-project-home.mjs; existing project-catalog.js availability handling for generated study links, local-only.

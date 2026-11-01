@@ -22,6 +22,19 @@ const entries=[
  ['One more return','renders/open-phrase-recurrence/index.html','Listening studies','Rendered study','Compare one and two cycles of the opening, alone and with the same delayed answer.'],
  ['Three Groves','renders/harmonic-groves/index.html','Listening studies','Rendered study','Three intact instruments: a shared pitch center versus C–E♭–G, with matched gestures and a fixed mix.']
 ];
+const studyAvailability=new Map();
+function updateStudyLinks(){
+ for(const link of document.querySelectorAll('a[href^="renders/"],a[data-study-url]')){
+  const url=link.dataset.studyUrl??link.getAttribute('href');
+  if(!studyAvailability.has(url))continue;
+  if(!link.dataset.studyUrl){link.dataset.studyUrl=url;link.dataset.originalLabel=link.textContent;}
+  if(studyAvailability.get(url)){
+   link.href=url;link.textContent=link.dataset.originalLabel;link.removeAttribute('aria-disabled');link.classList.remove('unavailable');
+  }else{
+   link.removeAttribute('href');link.textContent=link.dataset.originalLabel.replace(' ↗','')+' · not prepared in this local copy';link.setAttribute('aria-disabled','true');link.classList.add('unavailable');
+  }
+ }
+}
 const catalog=document.getElementById('catalog'),search=document.getElementById('search'),category=document.getElementById('category'),count=document.getElementById('count');
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}
 function render(){
@@ -30,6 +43,7 @@ function render(){
  for(const [title,url,group,status,description] of shown){const card=element('article',null,'card'),top=element('div',null,'card-top');top.append(element('span',group),element('span',status,'tag'+(/Study|study|Prototype/.test(status)?' study':'')));card.append(top,element('h3',title),element('p',description));const link=element('a','Open '+title+' ↗');link.href=url;card.append(link);catalog.append(card);}
  if(!shown.length)catalog.append(element('p','No matching studies. Try another word or choose Everything.','empty'));
  count.textContent=shown.length+' of '+entries.length+' entries · local working collection';
+ updateStudyLinks();
 }
 search.addEventListener('input',render);category.addEventListener('change',render);render();
 const notebook=document.getElementById('notebook'),title=document.getElementById('document-title'),status=document.getElementById('document-status'),source=document.getElementById('document-source'),text=document.getElementById('document-text');
@@ -41,3 +55,8 @@ for(const button of document.querySelectorAll('[data-doc]'))button.addEventListe
  try{const response=await fetch(button.dataset.doc,{signal:request.signal});if(!response.ok)throw new Error('This document is unavailable ('+response.status+').');const body=await response.text();if(own!==revision)return;text.textContent=body;status.textContent='Working source · Markdown shown as plain text. Historical entries describe their own checkpoint, not necessarily the current state.';}
  catch(error){if(own===revision&&error.name!=='AbortError')status.textContent=error.message+' Use the source link or try again.';}
 });
+
+// Only generated pages are optional in a fresh checkout. No audio is loaded.
+for(const [,url] of entries.filter(e=>e[1].startsWith('renders/'))){
+ fetch(url,{method:'HEAD',cache:'no-store'}).then(response=>response.status===405?fetch(url,{cache:'no-store'}):response).then(response=>studyAvailability.set(url,response.ok),()=>studyAvailability.set(url,false)).then(updateStudyLinks);
+}
