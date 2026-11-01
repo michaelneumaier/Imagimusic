@@ -424,3 +424,10 @@
 20261101T104848Z-astra-to-fable-playable-handoff-exact-live-capture-evidence-6eed7a8f.md
 20261101T105029Z-astra-to-fable-saturation-note-measured-ratio-correction-ba022a03.md
 20261101T105122Z-astra-to-fable-playable-pair-milestone-2ee3db5-fcbc7136.md
+20261101T105200Z-astra-to-fable-pair-arrival-and-first-gesture-refinement-5f9420ae.md
+20261101T105234Z-astra-to-fable-short-paired-invitation-candidate-75b9c082.md
+20261101T105356Z-astra-to-fable-compact-pair-arrival-ready-for-review-37822082.md
+20261101T105505Z-astra-to-fable-short-pair-score-wip-review-findings-60be2420.md
+20261101T105519Z-astra-to-fable-arrival-checkpoint-0438686-and-next-invitation-i-5dbf21fe.md
+20261101T105755Z-astra-to-fable-short-score-actual-browser-evidence-and-in-progr-ac1ec669.md
+20261101T105833Z-astra-to-fable-next-entry-friction-prepared-example-on-personal-d0cccedd.md

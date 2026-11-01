@@ -351,3 +351,36 @@ test('bridge energy exchange is measurable per bridge and a declared bounded ada
   assert.deepEqual(adaptGroveByExchange(grove, ex, { k: 0 }), JSON.parse(JSON.stringify(validateGrove(grove))), 'k = 0 changes nothing');
   assert.throws(() => adaptGroveByExchange(grove, ex, { k: 3 }), /0\.\.2/);
 });
+
+test('pair invitation: one short repeatable gesture across the most-changed bridge, same commands on both structures, bounded, 1–3 position voices', async () => {
+  const { composeRestPairInvitation, mostChangedBridge, restInvitationRecord, renderRestRecord, restPairInvitationPrompt, restPairInvitationSettledLine, REST_PAIR_INVITATION_BOUNDS, bridgeEnergyExchange, adaptGroveByExchange, restRecordLength } = await import('../src/score/grove-rest.js');
+  const { DEFAULT_VOICE_CONFIG } = await import('../src/score/grove-voice.js');
+  const sr = 8000, grove = composeGrove({ seed: 3 }), recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const plain = composeRestPairInvitation(recipe);
+  assert.equal(plain.ratio, null); assert.ok(plain.body === 0 || plain.neighbor === 0); assert.ok(plain.seconds >= REST_PAIR_INVITATION_BOUNDS.minSeconds && plain.seconds <= REST_PAIR_INVITATION_BOUNDS.maxSeconds);
+  assert.deepEqual(plain.sections.map(s => s.id), ['ring', 'across', 'release', 'quiet']); assert.equal(plain.position, 1);
+  const record = restInvitationRecord(recipe, plain);
+  assert.equal(record.events.length, 1); assert.equal(record.contacts.length, 1); assert.equal(record.contacts[0].body, plain.neighbor); assert.equal(record.contacts[0].zone, recipe.zones.length - 1);
+  assert.equal(recipe.strengths[record.contacts[0].strength].name, 'firm'); assert.ok(restRecordLength(record, recipe) / sr <= REST_PAIR_INVITATION_BOUNDS.maxSeconds);
+  const pcm = renderRestRecord(record, recipe); assert.ok(pcm.channels[0].some(v => v !== 0));
+  // Against a changed structure: the bridge that changed most is chosen, the ratio reported, and the SAME commands apply to both recipes.
+  const ex = bridgeEnergyExchange(record, recipe), changed = adaptGroveByExchange(grove, ex, { k: 0.5 }), changedRecipe = createGroveRestRecipe(changed, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const m = mostChangedBridge(changed, grove); assert.ok(m.changed); const expected = changed.bridges.reduce((best, br, i) => { const r = br.coupling / grove.bridges[i].coupling; return r > best.r ? { r, i } : best; }, { r: 0, i: -1 });
+  assert.equal(m.index, expected.i); assert.equal(m.ratio, +expected.r.toFixed(3));
+  const onChanged = composeRestPairInvitation(changedRecipe, { against: grove }), onOriginal = composeRestPairInvitation(recipe, { against: changed });
+  assert.deepEqual(onChanged.bridge, { a: changed.bridges[m.index].a, b: changed.bridges[m.index].b }); assert.deepEqual(onOriginal.bridge, onChanged.bridge);
+  assert.deepEqual(onChanged.commands, onOriginal.commands); assert.equal(onChanged.ratio, m.ratio); assert.equal(onOriginal.ratio, +(1 / expected.r).toFixed(3));
+  const recOriginal = restInvitationRecord(recipe, onOriginal), recChanged = restInvitationRecord(changedRecipe, onChanged);
+  assert.deepEqual(recOriginal.events, recChanged.events); assert.deepEqual(recOriginal.contacts, recChanged.contacts); assert.deepEqual(recOriginal.ended, recChanged.ended);
+  assert.match(restPairInvitationPrompt(onChanged, 'across'), /changed most/); assert.match(restPairInvitationSettledLine(onChanged), /valid answer/); assert.match(restPairInvitationPrompt(plain, 'across'), /the connection between/);
+  // Identical groves: no change, so the plain fallback applies. Different shapes are refused. Tempo bounds keep the gesture within 5..10 s.
+  assert.equal(composeRestPairInvitation(recipe, { against: grove }).ratio, null); assert.throws(() => mostChangedBridge(grove, composeGrove({ seed: 7 })), /identical except for their couplings/);
+  assert.throws(() => composeRestPairInvitation(recipe, { tempo: 40 }), /bound/); assert.throws(() => composeRestPairInvitation(recipe, { tempo: 160 }), /bound/);
+  // Same topology with a different tuning is not the same instrument: refused. (Astra's finding: lengths alone would have passed it.)
+  const { validateGrove: checkGrove } = await import('../src/score/grove.js');
+  const heavier = checkGrove({ ...JSON.parse(JSON.stringify(grove)), bodies: grove.bodies.map((b, i) => (i === 0 ? { ...b, mass: +(b.mass * 1.05).toFixed(4) } : b)) });
+  assert.throws(() => mostChangedBridge(changed, heavier), /identical except for their couplings/);
+  // A one-position voice still gets a gesture: the only position, the last zone (not asserted to be a physical tip).
+  const oneVoice = { ...DEFAULT_VOICE_CONFIG, positions: [DEFAULT_VOICE_CONFIG.positions[1]] }, r1 = createGroveRestRecipe(grove, oneVoice, { sampleRate: sr }), p1 = composeRestPairInvitation(r1);
+  assert.equal(p1.position, 0); assert.equal(p1.zone, r1.zones.length - 1); assert.equal(restInvitationRecord(r1, p1).contacts.length, 1);
+});

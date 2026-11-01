@@ -474,3 +474,62 @@ export function adaptGroveByExchange(grove, exchange, { k = 0.5 } = {}) {
   const bridges = g.bridges.map(br => { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); if (e.share === 0) return { ...br }; const rounded = +Math.min(hi, Math.max(lo, br.coupling * (1 + k * e.share))).toFixed(4); return { ...br, coupling: Math.min(hi, Math.max(br.coupling, rounded)) }; });
   return validateGrove({ ...g, bridges });
 }
+
+// ---- Pair invitation (proposal 022 workshop): one short repeatable gesture across the connection that changed most ----------------------------
+export const REST_PAIR_INVITATION_BOUNDS = Object.freeze({ minSeconds: 5, maxSeconds: 10 });
+/** Pick the bridge of `grove` whose coupling differs most (by ratio) from the same bridge of `against`; the groves must be identical except for couplings. */
+export function mostChangedBridge(grove, against) {
+  const g = validateGrove(grove), o = validateGrove(against);
+  // The two groves must be identical except for their couplings (same bodies, tuning, layout, loss and bridge set), checked by canonical identity.
+  const shape = JSON.parse(JSON.stringify(g)); shape.bridges.forEach(br => { const same = o.bridges.find(e => e.a === br.a && e.b === br.b); if (same) br.coupling = same.coupling; });
+  if (g.bridges.length !== o.bridges.length || canonicalGrove(shape) !== canonicalGrove(o)) throw new Error('the two groves must be identical except for their couplings.');
+  let best = null;
+  g.bridges.forEach((br, i) => {
+    const same = o.bridges.find(e => e.a === br.a && e.b === br.b);
+    const ratio = br.coupling / same.coupling, change = Math.abs(Math.log(ratio));
+    if (!best || change > best.change + 1e-12) best = { index: i, a: br.a, b: br.b, ratio: +ratio.toFixed(3), change };
+  });
+  return { index: best.index, a: best.a, b: best.b, ratio: best.ratio, changed: best.change > 1e-12 };
+}
+/** A 6–8 s gesture a person can repeat on both structures with the same commands: strike one end of the chosen bridge, rest a firm hand on the other
+ *  end while it rings, lift, Quiet. With `against`, the bridge is the one that changed most between the two groves (ties and no change fall back to the
+ *  first bridge of body 0). Works with one to three strike positions (the middle one when there are three) and any zone count (the hand rests at the
+ *  last zone, whatever position that is for the saved voice). The firm strength is required. Pure; the record it produces is restInvitationRecord(recipe, invitation). */
+export function composeRestPairInvitation(recipe, { tempo = 72, against = null } = {}) {
+  if (!Number.isInteger(tempo) || tempo < 40 || tempo > 160) throw new Error('tempo must be an integer in 40..160.');
+  const sr = recipe.sampleRate, beat = b => Math.round(b * 60 / tempo * sr), firm = recipe.strengths.findIndex(s => s.name === 'firm');
+  if (firm < 0) throw new Error('the pair invitation needs the firm strength.');
+  if (!recipe.positions?.length || !recipe.zones?.length) throw new Error('the pair invitation needs at least one strike position and one zone.');
+  const g = recipe.grove, position = Math.floor((recipe.positions.length - 1) / 2), tip = recipe.zones.length - 1;
+  let bridge = null, ratio = null;
+  if (against) { const m = mostChangedBridge(g, against); if (m.changed) { bridge = g.bridges[m.index]; ratio = m.ratio; } }
+  if (!bridge) bridge = g.bridges.find(e => e.a === 0 || e.b === 0) ?? g.bridges[0];
+  if (!bridge) throw new Error('the pair invitation needs a bridge.');
+  const body = bridge.a, neighbor = bridge.b;
+  const id = (() => { let n = 0; return () => `pair-${n++}`; })();
+  const commands = [
+    { id: id(), kind: 'strike', frame: beat(0), body, position, velocity: 0.6 },                       // ring: the struck end alone
+    { id: id(), kind: 'contact', frame: beat(2.5), body: neighbor, zone: tip, strength: firm },       // across: a firm hand on the other end
+    { id: id(), kind: 'contact', frame: beat(5.5), body: neighbor, zone: null },                      // release: lift, what remains rings on
+    { id: id(), kind: 'quiet', frame: beat(8), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) },
+  ];
+  const sections = [{ id: 'ring', beats: [0, 2.5] }, { id: 'across', beats: [2.5, 5.5] }, { id: 'release', beats: [5.5, 8] }, { id: 'quiet', beats: [8, 8] }];
+  const seconds = commands.at(-1).frame / sr + REST_QUIET_FADE_SECONDS;
+  if (seconds < REST_PAIR_INVITATION_BOUNDS.minSeconds || seconds > REST_PAIR_INVITATION_BOUNDS.maxSeconds) throw new Error(`pair invitation lasts ${seconds.toFixed(1)} s; bound is ${REST_PAIR_INVITATION_BOUNDS.minSeconds}..${REST_PAIR_INVITATION_BOUNDS.maxSeconds} s.`);
+  return { version: 1, tempo, seconds: +seconds.toFixed(3), body, neighbor, bridge: { a: bridge.a, b: bridge.b }, ratio, position, zone: tip, sections, commands };
+}
+/** Factual prompt and settled line for the pair invitation (no claim about what is heard). */
+export function restPairInvitationPrompt(invitation, sectionId) {
+  const b = invitation.body + 1, n = invitation.neighbor + 1, link = invitation.ratio === null ? `the connection between ${b} and ${n}` : `the connection that changed most, ${b} to ${n} (×${invitation.ratio})`;
+  switch (sectionId) {
+    case 'ring': return `Strike body ${b} once and let it ring.`;
+    case 'across': return `Rest a firm hand on body ${n}, across ${link}.`;
+    case 'release': return `Lift. What remains rings on.`;
+    case 'quiet': return `Quiet. The same commands on the other structure are the comparison.`;
+    default: throw new Error(`unknown section ${sectionId}.`);
+  }
+}
+export function restPairInvitationSettledLine(invitation) {
+  const b = invitation.body + 1, n = invitation.neighbor + 1;
+  return `Body ${b} rang; a firm hand rested on body ${n} across ${invitation.ratio === null ? 'their connection' : `the connection that changed most (×${invitation.ratio})`}, then lifted. The same gesture on the other structure is the comparison; hearing no difference is a valid answer.`;
+}

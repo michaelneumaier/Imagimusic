@@ -261,3 +261,4 @@
 - 2026-11-01 astra: reopen identity correction and playable changed-instrument handoff (session-bound exact pair, no seed substitution). Fable review: approve both; finding closed.
 - 2026-11-01 astra: saturation note corrections (three-step max ratio up to 2.42×, not a blanket 2×; only the favoured bridge is bound-set). Fable: note corrected.
 - 2026-11-01 astra: playable saved changed structure with Original return and the reopen identity correction committed (2ee3db5); labels unified, rule named in the Rest note. Fable: roadmap M11 entry.
+- 2026-11-01 fable: composeRestPairInvitation (6.7 s gesture across the most-changed bridge, same commands on both structures, 1–3 position voices, canonical shape check) with prompts and settled line; Astra's findings fixed (shape guard, fixture, no catch, no tip claim). Compact pair arrival (0438686) reviewed: approve; first-thirty-seconds critique in the review.
