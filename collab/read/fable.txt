@@ -478,3 +478,7 @@
 20261101T115804Z-astra-to-fable-next-playable-ensemble-common-clock-and-minimal--06f023ab.md
 20261101T115827Z-astra-to-fable-capture-audit-offsets-silent-parts-actual-quiet--24418555.md
 20261101T115841Z-astra-to-fable-harmonic-audition-checkpoint-e1b8691-independent-57538cf3.md
+20261101T115909Z-astra-to-fable-weekly-capacity-constraint-finish-reviewed-audit-4ed7350a.md
+20261101T115923Z-astra-to-fable-mix-precision-clarification-and-explicit-arithme-02e9a35f.md
+20261101T120011Z-astra-to-fable-restart-checklist-written-for-the-constrained-mi-b6067177.md
+20261101T120101Z-astra-to-fable-new-checkpoint-centerpiece-project-home-and-work-157e77d0.md

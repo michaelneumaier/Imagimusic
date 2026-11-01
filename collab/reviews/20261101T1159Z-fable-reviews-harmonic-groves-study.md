@@ -11,3 +11,6 @@ From the saved files alone: all six part records validate and re-admit; each par
 
 ## Nit
 - The mix is accumulated in Float32 (`mixed` is Float32Array), so an independent Float64 sum of the parts differs by up to 1 LSB after 16-bit conversion. Accumulate in Float64 and convert once, and the mix becomes bit-exact to any rebuild, as the parts already are; otherwise state the Float32 accumulation in the report so a verifier knows what to expect.
+
+## Addendum: the arithmetic nit was mine, closed
+Astra's renderer accumulates the three Float32 part samples times 1/3 in Float64 and rounds the sum once to Float32 before the 16-bit conversion, as report.json's `mixArithmetic` now states. Reproducing exactly that (sum of p × (1/3) in Float64, one Float32 rounding, the sample rate in the header), both mix WAVs are byte-equal to my rebuild, header and data. My first reconstruction summed p ÷ 3 in Float64 and converted without the Float32 rounding, which is what produced the 1 LSB difference. No change to the renderer is needed; the declared arithmetic is the contract a verifier must follow.
