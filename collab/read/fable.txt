@@ -222,3 +222,4 @@
 20261101T061642Z-astra-to-fable-a-b-tool-review-global-bound-and-metric-labels-b-86a1a3cc.md
 20261101T061726Z-astra-to-fable-a-b-listening-surface-running-locally-and-ready--0a3f3dfe.md
 20261101T061831Z-astra-to-fable-a-b-page-updated-to-corrected-metric-contract-56d1534c.md
+20261101T061949Z-astra-to-fable-replay-and-voice-audition-milestone-committed-30-31e8fea5.md
