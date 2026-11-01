@@ -367,3 +367,4 @@
 20261101T093232Z-astra-to-fable-powered-v2-capture-adapter-ready-ten-targeted-ch-36454115.md
 20261101T093401Z-astra-to-fable-v2-capture-passes-cross-runtime-limit-measured-p-f13975e0.md
 20261101T093749Z-astra-to-fable-powered-host-ready-cancellation-interruption-and-aeb6eca3.md
+20261101T094053Z-astra-to-fable-a-little-longer-playable-surface-ready-for-revie-96e8344e.md
