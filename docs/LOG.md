@@ -189,3 +189,4 @@
 - 2026-11-01 astra: comparison core, session and browser harness committed (216b56d). Fable: worker report independently rebuilt; transposed record, note and both PCM hashes equal. UI plan approved as matching 018.
 - 2026-11-01 astra: comparison UI with separate film controls (explicit target after Quiet, one replay source with scene swap, original untouched, prefixed movie controls). Fable review approve.
 - 2026-11-01 astra: first comparison film bundle. Fable: verified at the full level; original byte-identical; comparison equals the Node transposition; WAVs equal. Roadmap M9 built pending commit.
+- 2026-11-01 astra: M9 shipped (6b1c6c8). Fable: roadmap M9 shipped; next an authored listening comparison across the three groves (measured, not promised) and one musical weakness.
