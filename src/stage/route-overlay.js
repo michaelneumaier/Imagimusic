@@ -26,6 +26,11 @@ export function createRouteOverlay(world) {
     clear();if(!binding)return '';
     const lfo=settings(binding,patch,frame);selection={binding,patch,key:JSON.stringify([lfo.target,lfo.rateHz])};
     const [family,slotText]=binding.target.split('/'),slot=Number(slotText.slice(4));
+    if(family==='fm'){
+      [world.fm.carriage,world.fm.carrier,world.fm.wheel].forEach(outline);
+      link(world.fm.wheel,world.fm.carriage,true);link(world.fm.carriage,world.fm.carrier,true);
+      return 'Modulation controls instantaneous frequency. Carriage and halo visualize model envelopes; the linkage is interpreted, not a physical force path.';
+    }
     if(family==='loom'){
       const bodies=world.loom.bodies;
       bodies.forEach(body=>{outline(body.body);outline(body.striker);link(body.striker,body.body);});

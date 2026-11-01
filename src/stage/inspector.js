@@ -14,6 +14,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
   world.tine.root.userData.bindingTarget='tine/slot8';world.tine.damper.userData.bindingParam='damper';world.tine.beam.userData.bindingParam='deflection';world.tine.striker.userData.bindingParam='reach';
   world.loom.bodies.forEach((body,i)=>{body.body.userData.bindingTarget=`loom/slot${i}`;body.body.userData.bindingParam='width';body.striker.userData.bindingTarget=`loom/slot${i}`;body.striker.userData.bindingParam='striker';});
   world.loom.bridge.userData.bindingTarget='loom/bridge';world.loom.bridge.userData.bindingParam='opacity';
+  for(const [object,target,param] of [[world.fm.carriage,'fm/tensioner','pull'],[world.fm.rod,'fm/tensioner','pull'],[world.fm.halo,'fm/carrier','width'],[world.fm.carrier,'fm/carrier','glow'],[world.fm.wheel,'fm/wheel','angle']]){object.userData.bindingTarget=target;object.userData.bindingParam=param;}
   function choose(target,param){
     const choices=bindings.filter(b=>b.target===target);if(!choices.length)return;
     select.replaceChildren();for(const binding of choices){const option=document.createElement('option');option.value=binding.id;option.textContent=binding.param;select.append(option);}
