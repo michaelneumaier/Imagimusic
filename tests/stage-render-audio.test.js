@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DEFAULT_PATCH } from '../src/model.js';
 import { MAX_VOICES } from '../src/audio.js';
 import { createPerformance } from '../src/stage/performance.js';
-import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRenders, MASTER_GAIN, FAMILIES } from '../src/stage/render-audio.js';
+import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRenders, inflightRenders, MASTER_GAIN, FAMILIES } from '../src/stage/render-audio.js';
 
 test('diagnostic options isolate families, bypass the compressor, and keep nodes connected offline', () => {
   const performance = createPerformance(DEFAULT_PATCH);
@@ -125,6 +125,17 @@ test('garden voice stealing is mirrored at the schedule moment, not ignored', ()
   assert.ok(garden.voices.length <= MAX_VOICES);
   // Without stealing pressure nothing is retired.
   assert.ok(buildPerformanceGraph(new Context(), base).scheduled.every(s => s.family === 'bellows' || s.voice.fadeAt === undefined));
+});
+
+test('the graph stays referenced for the whole render and is released afterwards', async () => {
+  let seenDuringRender = -1;
+  class Observing extends FakeOffline { async startRendering() { seenDuringRender = inflightRenders(); await new Promise(r => setTimeout(r, 5)); return super.startRendering(); } }
+  assert.equal(inflightRenders(), 0);
+  const samples = await renderPerformanceAudio(createPerformance(DEFAULT_PATCH), 8000, { OfflineContext: Observing });
+  assert.equal(seenDuringRender, 1); assert.equal(inflightRenders(), 0); assert.ok(samples.length > 0);
+  class Failing extends FakeOffline { async startRendering() { throw new Error('encoder exploded'); } }
+  await assert.rejects(() => renderPerformanceAudio(createPerformance(DEFAULT_PATCH), 8000, { OfflineContext: Failing }), /exploded/);
+  assert.equal(inflightRenders(), 0);
 });
 
 test('renderPerformanceAudio sizes the offline context from the passage and fails clearly without one', async () => {

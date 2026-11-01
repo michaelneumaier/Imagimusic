@@ -62,4 +62,6 @@ await check('Air choir passage stays bounded and repeatable', async () => {
 const passed = results.filter(r => r.passed).length;
 document.getElementById('summary').textContent = `${passed}/${results.length} stage render checks passed.`;
 if (passage) { const button = document.getElementById('wav'); button.disabled = false; button.onclick = () => { const url = URL.createObjectURL(new Blob([encodeWav(passage, 48000)], { type: 'audio/wav' })); const a = document.createElement('a'); a.href = url; a.download = `imagimusic-stage-${DEFAULT_PATCH.seed}.wav`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }
-const report = document.createElement('pre'); report.textContent = JSON.stringify({ results, matrix }, null, 2); document.body.append(report);
+const reportText = JSON.stringify({ generated: new Date().toISOString(), ...environment, results, matrix }, null, 2);
+const report = document.createElement('pre'); report.textContent = reportText; document.body.append(report);
+{ const button = document.getElementById('report'); button.disabled = false; button.onclick = () => { const url = URL.createObjectURL(new Blob([reportText], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `stage-render-report-${DEFAULT_PATCH.seed}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }

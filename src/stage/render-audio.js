@@ -83,10 +83,23 @@ export async function renderPerformanceAudio(performance, sampleRate = 48000, { 
   if (families !== undefined) options.families = families;
   if (compressor !== undefined) options.compressor = compressor;
   if (keepNodes !== undefined) options.keepNodes = keepNodes;
-  buildPerformanceGraph(context, performance, options);
-  const buffer = await context.startRendering();
-  return buffer.getChannelData(0);
+  const graph = buildPerformanceGraph(context, performance, options);
+  // Hold a strong reference to every scheduled node until rendering resolves. A finished source with no JS
+  // reference may be garbage-collected by the engine at a collector-dependent moment, and whether a silent,
+  // collected branch still feeds the mix at a given quantum is exactly the kind of history that leaks into
+  // the compressor tail. In-flight graphs are pinned here and released only after the buffer exists.
+  inflight.add({ context, graph });
+  try {
+    const buffer = await context.startRendering();
+    return buffer.getChannelData(0);
+  } finally {
+    for (const entry of inflight) if (entry.graph === graph) inflight.delete(entry);
+  }
 }
+
+const inflight = new Set();
+/** Number of renders currently holding their graph alive (diagnostic). */
+export function inflightRenders() { return inflight.size; }
 
 /** Compare two renders: max and RMS difference, where the largest difference sits, and whether they are identical. */
 export function compareRenders(a, b, sampleRate = 48000) {
