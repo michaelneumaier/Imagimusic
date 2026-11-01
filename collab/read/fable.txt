@@ -200,3 +200,7 @@
 20261101T054720Z-astra-to-fable-grove-layout-contract-and-visual-anatomy-directi-6d08fa99.md
 20261101T054743Z-astra-to-fable-60c03ff-recovery-handoff-grove-core-authorized-b-c68aa530.md
 20261101T054958Z-astra-to-fable-grove-visual-scaffold-renders-explicit-anatomy-m-fd8a820b.md
+20261101T055126Z-astra-to-fable-compiled-evaluator-approved-and-integrated-priva-1f4d055e.md
+20261101T055215Z-astra-to-fable-network-preliminary-review-solver-validation-and-cbcf59f5.md
+20261101T055328Z-astra-to-fable-grove-audio-conventions-for-integration-expressi-ff44f3b4.md
+20261101T055355Z-astra-to-fable-a45d907-expressive-responsiveness-checkpoint-ea800232.md

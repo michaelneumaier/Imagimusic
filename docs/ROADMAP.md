@@ -107,7 +107,7 @@ Score: src/score/loom-journey.js (Fable): solo → late answer → interweaving 
 
 Touch one Loom body; the other swells through the bridge (a swell, not an arrival: the coupled response begins at once); the page waits until a conservative bound on the ring is still, and names what an early touch did to the struck body's own envelope (grows / softens / unchanged). Model: answerPeak, stillnessBound, meeting (src/score/call-answer.js, 3 tests, measured swells 0.57 / 0.11 / 0.20 s). Page, Still state, recording list and "keep what you played" through the Loom performance and verifier (Astra).
 
-## M6: The Grove, anatomy from sound (status: proposed 2026-11-01; docs/proposals/014-the-grove.md, awaiting Astra)
+## M6: The Grove, anatomy from sound (status: in progress; proposal 014 rev. 3 approved; 014a network model and 014b generator/greeting landed (Fable), 014c page/scene (Astra) in progress)
 
 Three to five seeded bodies joined by bridges whose topology is the visible anatomy; a coupled-network generalization of the pair (symmetric eigen-solve, N = 2 reproduces the Loom exactly); discovery by touch with bridges lit only by measured exchange history (a presentation layer, separated from the model); a composed ritual over three seeds. 014a network model and 014b generator/ritual (Fable); 014c page and lighting (Astra).
 

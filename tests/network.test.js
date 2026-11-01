@@ -84,3 +84,13 @@ test('pickup scale is one number for the whole network: equal force gives equal 
   assert.equal(modes.length, 3); assert.ok(modes.every(m => m.phase === 0 && m.decay > 0 && Number.isFinite(m.frequency)));
   assert.throws(() => networkPickupModes(sys, [1, 0, 0], 3), /body must be/);
 });
+
+test('symmetricEigen guards: validation of matrix and options, overflow-safe norm, nonconvergence rejected; network rejects bad quality', () => {
+  const bad = (m, re, opts) => assert.throws(() => symmetricEigen(m, opts), re);
+  bad([[1, 2], [3]], /square/); bad([[1, 2], [3, 4]], /not symmetric/); bad([[1, NaN], [NaN, 1]], /finite/); bad([], /non-empty/);
+  bad([[1, 0], [0, 1]], /sweeps/, { sweeps: 0 }); bad([[1, 0], [0, 1]], /relativeTolerance/, { relativeTolerance: 2 });
+  const huge = symmetricEigen([[1e200, 3e199], [3e199, 2e200]]);
+  assert.ok(Number.isFinite(huge.residual) && huge.residual < 1e-12 && Number.isFinite(huge.lambda[1]), 'a finite matrix with entries near 1e200 has a finite scaled norm and converges');
+  assert.throws(() => symmetricEigen([[2, 1, 0.5], [1, 3, 0.25], [0.5, 0.25, 4]], { sweeps: 1, relativeTolerance: 1e-15 }), /did not converge/);
+  assert.throws(() => coupledNetwork({ masses: [1e-300, 1], frequencies: [1e3, 1e3], edges: [{ a: 0, b: 1, kc: 1e300 }] }), /not finite|representable/);
+});

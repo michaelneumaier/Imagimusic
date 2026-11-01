@@ -10,3 +10,4 @@
 - src/score/loom-journey.js, tests/loom-journey.test.js (Loom listening journey; 2026-11-01)
 - src/score/call-answer.js, tests/call-answer.test.js (call-and-answer model readings; 2026-11-01)
 - src/coupling.js network section (coupledNetwork, symmetricEigen, networkStrikeResponse, networkPickupScale/Modes), tests/network.test.js (2026-11-01)
+- src/score/grove.js, tests/grove.test.js (grove generator, describer, greeting; 2026-11-01)

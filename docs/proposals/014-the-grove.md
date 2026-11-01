@@ -110,6 +110,42 @@ numbers, not adjectives. `composeGroveRitual(grove)` → the touch score
 (solo, neighbor, far side late, shared, silence) within 15–35 s, validated
 the way the journey is.
 
+## The generator as built (014b), and the three curated seeds, measured
+
+`src/score/grove.js`: `composeGrove({ seed })` (three bodies; chain or
+triangle; body 0 on a base note from the garden's lower five, the others
+within ±40 cents; masses 0.01–0.04 kg; couplings 0.002–0.014; loss
+0.35–0.7; layout `[{ x, z }]` normalized and centered), `validateGrove`,
+`canonicalGrove`, `groveSystem` (the authoritative bridge convention:
+kc = coupling · m_a · ω_a² with the bridge's first body, so no page needs
+to duplicate it), `groveEnvelope`, `describeGrove`, `composeGroveGreeting`
+/ `validateGroveGreeting` / `greetingStrikes` / `greetingDuration`,
+`groveNeighbors`. `GROVE_SEEDS = [3, 7, 11]`, chosen from a scan of seeds
+0–23 for three different relationships. Measured by `describeGrove` from
+the drawn envelope on a 2 ms grid, unit touch on body 0:
+
+| Seed | Anatomy | Tuning (cents from base) | Body 1 swells | Body 2 swells | What it exhibits |
+| --- | --- | --- | --- | --- | --- |
+| 3 | triangle, base C3 | 0 / −34 / −1.5 | 0.222 s, ratio 0.18 | 0.436 s, ratio 0.80 | the near-unison body answers fully and a little later; the detuned body answers faintly though it is just as connected |
+| 7 | chain, base C3 | 0 / +15.9 / −7.6 | 0.200 s, ratio 0.36 | 0.360 s, ratio 0.25 | in this chain the far body happens to swell later and smaller than the neighbor (a measured fact of this seed, not a rule) |
+| 11 | triangle, base G3 | 0 / +7.2 / +3 | 0.200 s, ratio 0.76 | 0.100 s, ratio 0.62 | a tight cluster: both answer strongly and quickly, the farther-tuned one first |
+
+Participation (`|v_j[i]|²` per mode and body) is reported per seed for
+the interior bands; it is participation in the mass-normalized modal
+basis, not an envelope level, and for repeated eigenvalues the basis is
+arbitrary, so bands are an optional disclosed representation that the
+page may omit in degenerate cases.
+
+Audio conventions agreed with Astra: one `networkPickupScale` over all
+unit impulses and pickups; stereo as a fixed equal-power pan from
+`layout.x`, weighted 1/√N across pickups, stated as a pickup convention
+(not radiation); one fixed global output gain per network chosen from the
+worst unit-strike stereo modal bound so full force is admissible and
+later strikes never renormalize history; captures use the touch page's
+cached unit buffers, onset frames and Quiet. The drawn envelope keeps the
+real modal phases; any smoothing of fast beating is a separately labeled
+readout, added only after measuring the raw one.
+
 ## The page (Astra)
 
 `grove.html` + `src/grove/**`: bodies placed from `layout`, bridges drawn

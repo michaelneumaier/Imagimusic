@@ -141,11 +141,22 @@ export const NETWORK_MAX_BODIES = 8;
 
 /** Cyclic Jacobi eigen-decomposition of a symmetric matrix. Returns ascending eigenvalues and orthonormal eigenvectors (rows). */
 export function symmetricEigen(matrix, { sweeps = 100, relativeTolerance = 1e-15 } = {}) {
-  const n = matrix.length, a = matrix.map(row => row.slice()), v = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
-  const norm = Math.sqrt(a.flat().reduce((s, x) => s + x * x, 0)) || 1;
-  for (let sweep = 0; sweep < sweeps; sweep++) {
-    let off = 0; for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) off += a[p][q] * a[p][q];
-    if (Math.sqrt(off) <= relativeTolerance * norm) break;
+  if (!Array.isArray(matrix) || matrix.length < 1 || matrix.some(row => !Array.isArray(row) || row.length !== matrix.length)) throw new Error('matrix must be a non-empty square array of arrays.');
+  const n = matrix.length;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) finite(matrix[i][j], `matrix[${i}][${j}]`);
+  if (!Number.isInteger(sweeps) || sweeps < 1 || sweeps > 1000) throw new Error('sweeps must be an integer in 1..1000.');
+  if (!(relativeTolerance > 0 && relativeTolerance < 1)) throw new Error('relativeTolerance must be within (0, 1).');
+  // Overflow-safe Frobenius norm: scale by the largest magnitude first (a finite matrix always has a finite norm this way).
+  const maxAbs = Math.max(...matrix.flat().map(Math.abs));
+  const frobenius = rows => { const m = Math.max(...rows.flat().map(Math.abs)); return m === 0 ? 0 : m * Math.sqrt(rows.flat().reduce((s, x) => s + (x / m) * (x / m), 0)); };
+  const norm = frobenius(matrix) || 1;
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (Math.abs(matrix[i][j] - matrix[j][i]) > 1e-12 * (maxAbs || 1)) throw new Error(`matrix is not symmetric at [${i}][${j}].`);
+  const a = matrix.map(row => row.slice()), v = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
+  let converged = false;
+  for (let sweep = 0; sweep <= sweeps; sweep++) {
+    let off = 0; for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) off += (a[p][q] / norm) * (a[p][q] / norm);
+    if (Math.sqrt(off) <= relativeTolerance) { converged = true; break; }
+    if (sweep === sweeps) break;
     for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) {
       if (a[p][q] === 0) continue;
       const theta = (a[q][q] - a[p][p]) / (2 * a[p][q]);
@@ -155,13 +166,16 @@ export function symmetricEigen(matrix, { sweeps = 100, relativeTolerance = 1e-15
       for (let k = 0; k < n; k++) { const vkp = v[k][p], vkq = v[k][q]; v[k][p] = c * vkp - s * vkq; v[k][q] = s * vkp + c * vkq; }
     }
   }
+  if (!converged) throw new Error(`symmetricEigen did not converge in ${sweeps} sweeps.`);
   const order = Array.from({ length: n }, (_, j) => j).sort((i, j) => a[i][i] - a[j][j]);
   const lambda = order.map(j => a[j][j]), vectors = order.map(j => v.map(row => row[j]));   // vectors[j] is the j-th eigenvector
   // Residual and orthogonality, relative to the matrix norm: reported so callers and tests can assert them.
   let residual = 0, ortho = 0;
-  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { let av = 0; for (let k = 0; k < n; k++) av += matrix[i][k] * vectors[j][k]; residual += (av - lambda[j] * vectors[j][i]) ** 2; }
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { let av = 0; for (let k = 0; k < n; k++) av += (matrix[i][k] / norm) * vectors[j][k]; residual += (av - (lambda[j] / norm) * vectors[j][i]) ** 2; }
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { let d = 0; for (let k = 0; k < n; k++) d += vectors[i][k] * vectors[j][k]; ortho += (d - (i === j ? 1 : 0)) ** 2; }
-  return { lambda, vectors, residual: Math.sqrt(residual) / norm, orthogonality: Math.sqrt(ortho) };
+  const out = { lambda, vectors, residual: Math.sqrt(residual), orthogonality: Math.sqrt(ortho) };
+  if (!Number.isFinite(out.residual) || !Number.isFinite(out.orthogonality)) throw new Error('eigen-decomposition quality is not finite.');
+  return out;
 }
 
 /** Build the network. masses (kg), frequencies (Hz, uncoupled), edges [{ a, b, kc }] (N/m), gamma (1/s). */
@@ -184,6 +198,7 @@ export function coupledNetwork({ masses, frequencies, edges = [], gamma = 0 } = 
   const A = K.map((row, i) => row.map((k, j) => k / Math.sqrt(masses[i] * masses[j])));
   for (const row of [...K, ...A]) for (const value of row) if (!Number.isFinite(value)) throw new RangeError('derived stiffness is not finite; inputs are outside the representable range.');
   const { lambda, vectors, residual, orthogonality } = symmetricEigen(A);
+  if (!(residual <= 1e-10) || !(orthogonality <= 1e-10)) throw new Error(`eigen-decomposition did not meet the network's quality bound (residual ${residual}, orthogonality ${orthogonality}).`);
   for (const l of lambda) if (!Number.isFinite(l)) throw new RangeError('eigenvalues are not finite.');
   for (const l of lambda) if (l <= gamma * gamma) throw new Error(`system is not underdamped: eigenvalue ${l} ≤ γ² = ${gamma * gamma}.`);
   const omegaD = lambda.map(l => Math.sqrt(l - gamma * gamma));
