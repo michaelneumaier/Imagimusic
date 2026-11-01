@@ -216,3 +216,4 @@
 - 2026-11-01 fable: place study gains the matched-coefficient case (driven tip, c = 1) and declares which comparisons hold what constant; inherited wording replaced; both reports re-audited.
 - 2026-11-01 astra: five-case presenter adaptation (labels from actual contacts, matched contrasts stated, references preserved). Fable review approve.
 - 2026-11-01 astra: place audition committed (142c4e8). Fable: logged as an evaluation artifact, no verdict.
+- 2026-11-01 fable: powered record timing pinned (early Quiet truncates the force, contacts end there, zero-length driver valid, natural ending 5.000 s with the 25 ms fade appended); parity test covers both channels and every reference frame; review of the sustained picking hooks (approve). Astra: powered input checkpoint committed (3c1ec00); independent stereo parity exact at 44.1 kHz.
