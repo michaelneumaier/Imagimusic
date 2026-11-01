@@ -16,7 +16,7 @@ export async function exportGroveMovie(recording,pcm,camera,{signal,onProgress=(
  const stem=`imagimusic-grove-${manifest.capture.grove.seed}-${manifest.capture.kind==='imagimusic-grove-voice'?'partials':'original'}`;
  const {wav,audio:audioEvidence}=await groveMovieAudioEvidence(pcm,stem+'.wav');check();
  const buffer=new AudioBuffer({length:manifest.audioSamples,numberOfChannels:2,sampleRate});pcm.channels.forEach((c,i)=>buffer.copyToChannel(c,i));
- const canvas=document.createElement('canvas');let world,sculpture,output,tasks=[];
+ const canvas=document.createElement('canvas');let world,sculpture,output,tasks=[],finalized=false;
  try{
   world=createGroveWorld(canvas,{width,height});sculpture=createGroveScene(manifest.capture.grove);world.scene.add(sculpture.root);
   world.camera.position.fromArray(manifest.camera.position);world.controls.target.fromArray(manifest.camera.target);world.camera.lookAt(world.controls.target);
@@ -27,8 +27,8 @@ export async function exportGroveMovie(recording,pcm,camera,{signal,onProgress=(
    check();const frame=plan.sample(times[i]);if(traceHash(frame)!==manifest.modelFrameHashes[i])throw new Error('Grove model changed during movie rendering');applyGroveScene(sculpture,frame);world.render();await video.add(times[i],1/fps);
    if(i%8===0){onProgress(`Rendering frame ${i+1} / ${times.length}`);await new Promise(resolve=>setTimeout(resolve,0));}
   }video.close();})()];
-  await Promise.all(tasks);check();onProgress('Finishing the movie…');await output.finalize();check();
+  await Promise.all(tasks);check();onProgress('Finishing the movie…');await output.finalize();finalized=true;check();
   return {blob:new Blob([target.buffer],{type:'video/mp4'}),wav,stem,manifest:{...manifest,audio:audioEvidence,presentation:{strikeCues:'brief recorded-input rings; derived from model strike events, presentation values excluded from modelFrameHashes',gestureRing:false,voice:manifest.capture.kind==='imagimusic-grove-voice'?'With partials · exploration':'Original'},codecs:{video:'avc',audio:'aac'},encoding:'Source is the saved stereo Float32 mix. AAC is lossy, may include codec padding, and codec bytes depend on the implementation. Source PCM and saved WAV have separate hashes. Video frames sample i/30 before the exact source-audio end; the final frame can extend less than 1/30 second beyond it.'}};
- }catch(error){stopped=true;if(output)await output.cancel().catch(()=>{});await Promise.allSettled(tasks);throw error;}
+ }catch(error){stopped=true;if(output&&!finalized)await output.cancel().catch(()=>{});await Promise.allSettled(tasks);throw error;}
  finally{sculpture?.dispose();world?.dispose();}
 }

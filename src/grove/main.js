@@ -7,6 +7,7 @@ import {createGroveVoiceSession} from './voice-session.js';
 import {createGroveSession} from './session.js';
 import {createGroveStudyJob} from './render-job.js';
 import {createGroveReplay} from './replay.js';
+import {bindGroveMovieControls} from './movie-controls.js';
 import {createGroveGreetingPlan,groveGreetingFrames} from './greeting.js';
 import {bindGrovePlaying,groveStrikeZone} from './interaction.js';
 import {createGroveWorld} from './world.js';
@@ -17,8 +18,9 @@ const replay=createGroveReplay({onChange:({state})=>{if(mode==='replay'){$('repl
 function stopReplay(){replay.stop();if(mode==='replay')mode='live';}
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
 const rich=()=>$('voice').value==='partials';
+const movie=bindGroveMovieControls({getSource:()=>({recording:transport.recording(),pcm:transport.saveAudio(),camera:{position:world.camera.position.toArray(),target:world.controls.target.toArray()}})});
 const transport=createImpulseTransport({createSession:(settings,sr)=>settings.voice?createGroveVoiceSession(settings,sr):createGroveSession(settings.grove,sr),prepare:createGroveStudyJob,onChange:({state,recording})=>{
- const open=['ready','playing'].includes(state),has=!!recording?.events.length;
+ const open=['ready','playing'].includes(state),has=!!recording?.events.length;movie.setReady(state==='ended'&&has&&!!world);
  pads.forEach(p=>p.disabled=!open||mode==='greeting');$('begin').disabled=state==='preparing'||open;
  $('begin').textContent=state==='preparing'?'Opening the grove…':state==='suspended'?'Resume the grove ↗':open?'The grove is open':'Enter the grove ↗';
  $('greeting').disabled=!open||(has&&mode!=='greeting');$('greeting').textContent=mode==='greeting'?'Hear it again':'Hear its greeting';$('greeting').title=has&&mode!=='greeting'?'Choose New passage to hear the greeting again.':'';
@@ -53,7 +55,7 @@ $('greeting').onclick=()=>{clearHolds();const previous=mode;try{const sr=transpo
 $('replay').onclick=async()=>{clearHolds();mode='replay';status('Listening back to your finished passage…');try{await replay.play(transport.saveAudio());}catch(error){status(error.message,true);}};
 $('quiet').onclick=()=>{clearHolds();if(mode==='replay'){stopReplay();$('quiet').disabled=true;status('Quiet. Your original passage is still here.');}else transport.quiet();};$('new').onclick=()=>{stopReplay();clearHolds();mode='live';transport.newPassage();status('Your turn. Touch one body and stay with what answers.');$('hint').textContent='Hold a body or its numbered pad, then release. A longer hold gives a stronger touch.';};
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){$('quiet').click();return;}if(e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,select,textarea'))return;const body=keys.indexOf(e.key.toLowerCase());if(body>=0){e.preventDefault();start(body,`k-${body}`);}});
-window.addEventListener('keyup',e=>{const body=keys.indexOf(e.key.toLowerCase());if(body>=0){e.preventDefault();finish(body,`k-${body}`);}});window.addEventListener('blur',clearHolds);document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReplay();clearHolds();transport.quiet();}});window.addEventListener('pagehide',()=>{stopReplay();transport.quiet();});
+window.addEventListener('keyup',e=>{const body=keys.indexOf(e.key.toLowerCase());if(body>=0){e.preventDefault();finish(body,`k-${body}`);}});window.addEventListener('blur',clearHolds);document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReplay();clearHolds();transport.quiet();}});window.addEventListener('pagehide',()=>{movie.dispose();stopReplay();transport.quiet();});
 function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 $('save').onclick=()=>{try{download(stereoWav(transport.saveAudio()),'audio/wav',`imagimusic-grove-${grove.seed}${rich()?'-partials':''}.wav`);status('The complete passage was saved as sound.');}catch(error){status(error.message,true);}};$('score').onclick=()=>download(JSON.stringify(transport.recording(),null,2),'application/json',`imagimusic-grove-${grove.seed}${rich()?'-partials':''}.json`);
 for(const seed of GROVE_SEEDS){const option=document.createElement('option');option.value=seed;option.textContent=`Grove ${seed}`;$('seed').append(option);}const initial=Number(new URLSearchParams(location.search).get('seed'));if(GROVE_SEEDS.includes(initial))$('seed').value=initial;
