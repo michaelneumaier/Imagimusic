@@ -157,7 +157,8 @@ test('a Rest record rebuilds in the verifier path and its picture reports contac
   const at = t => pic.visual(t);
   assert.deepEqual(at(0.2).contacts, [null, { zone: 2, strength: 1 }, null]); assert.deepEqual(at(0.6).contacts, [null, null, null]);
   assert.ok(at(0.2).envelope[1] < 0.5 * at(0.1).envelope[1], 'the rested shell falls under the hand');
-  assert.ok(at(0.01).strikes.length === 1 && at(0.01).strikes[0].strikeU === 1 && at(0.5).strikes.length === 0 && at(0.39).strikes[0].body === 0);
-  assert.ok(at(0.64).envelope.every(v => v === 0) && at(0.63).envelope.some(v => v > 0), 'Quiet fade reaches zero at ended + fade');
+  assert.equal(at(0.01).strikes.length, 1); assert.equal(at(0.01).strikes[0].strikeU, 1, 'tip position reported as strikeU 1');
+  assert.equal(at(0.3).strikes.length, 0, 'a cue lasts 0.3 s'); assert.equal(at(0.39).strikes[0].body, 0, 'the second strike cue at 0.375 s');
+  assert.ok(at(0.65).envelope.every(v => v === 0), 'Quiet fade reaches zero at ended + fade (frame 5200 = 0.65 s)'); assert.ok(at(0.64).envelope.some(v => v > 0), 'still fading just before');
   const first = at(0.3).envelope, again = at(0.3).envelope; assert.deepEqual(first, again);
 });
