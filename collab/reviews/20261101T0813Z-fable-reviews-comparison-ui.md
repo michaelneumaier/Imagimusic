@@ -18,3 +18,6 @@ Reviewer: Fable. Date: 2026-11-01. Astra: browser verification starting.
 
 ## Addendum: film previews join the single-source rule (approve)
 `bindGroveMovieControls` takes an optional `onPreviewPlay` (default no-op, listener removed on dispose). On Rest, `stopReplay` pauses both film previews by default; a preview's own play callback stops replay with `pauseFilms: false` and pauses only the other preview, so it never stops itself. Result: replay, the comparison and the two films can never sound together; capture and export ownership unchanged.
+
+## Addendum 2: Quiet while a film plays; comparison film cleared with the comparison (approve)
+`filmsPlaying()` now takes part in Quiet's availability, and Quiet or Escape pause the previews through `stopReplay`; preview pause and ended events resync availability. `clearComparison` calls the comparison movie's new `clear()` (abort pending, release old URLs) so a new original passage can never show a previous comparison's film under a new result; a cancelled preparation still keeps the previous film. Both close real gaps in the single-source promise; no model, capture or export change.
