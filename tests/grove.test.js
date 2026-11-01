@@ -31,6 +31,9 @@ test('validateGrove rejects anatomy that does not follow the model', () => {
   rejects(c => { c.loss = 0.1; }, /loss/);
   rejects(c => { c.extra = 1; }, /unsupported field/);
   rejects(c => { c.cluster.baseMidi = 49; }, /garden notes/);
+  rejects(c => { c.cluster.baseHz = NaN; }, /cluster\.baseHz/);
+  rejects(c => { c.cluster.baseMidi = 51; }, /garden notes|frequency of cluster\.baseMidi|does not follow/);
+  rejects(c => { c.cluster.baseHz += 1; }, /frequency of cluster\.baseMidi/);
 });
 
 test('describeGrove measures swells from the drawn envelope and participation sums to one; curated seeds are distinct and documented', () => {

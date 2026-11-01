@@ -50,6 +50,7 @@ export function validateGrove(g) {
   if (!Number.isInteger(g.seed) || g.seed < 0 || g.seed > 4294967295) throw new Error('seed out of range.');
   if (!GROVE_TOPOLOGIES.includes(g.topology)) throw new Error('unknown topology.');
   keysExactly(g.cluster, ['baseMidi', 'baseHz'], 'cluster'); if (!NOTES.includes(g.cluster.baseMidi)) throw new Error('cluster base must be one of the garden notes.');
+  finite(g.cluster.baseHz, 'cluster.baseHz'); if (Math.abs(g.cluster.baseHz - frequency(g.cluster.baseMidi)) > 0.01) throw new Error('cluster.baseHz must be the frequency of cluster.baseMidi.');
   if (!Array.isArray(g.bodies) || g.bodies.length !== GROVE_BODIES) throw new Error(`exactly ${GROVE_BODIES} bodies.`);
   g.bodies.forEach((b, i) => { keysExactly(b, ['id', 'hz', 'cents', 'mass'], `body ${i}`); if (b.id !== i) throw new Error(`body ${i}: id must equal its index.`); within(b.hz, GROVE_BOUNDS.hz, `body ${i}.hz`); within(b.mass, GROVE_BOUNDS.mass, `body ${i}.mass`); within(b.cents, [-GROVE_BOUNDS.clusterCents, GROVE_BOUNDS.clusterCents], `body ${i}.cents`); if (Math.abs(b.hz - g.cluster.baseHz * 2 ** (b.cents / 1200)) > 0.01) throw new Error(`body ${i}: hz does not follow from the cluster base and cents.`); });
   if (g.bodies[0].cents !== 0) throw new Error('body 0 sits on the cluster base.');

@@ -128,3 +128,4 @@
 - 2026-11-01 astra: network preliminary review (solver guards), audio conventions for the grove, compiled evaluator integrated (long study 304 ms vs 3468 ms). Fable: symmetricEigen validation/overflow-safe norm/nonconvergence rejection and network quality bound; 014b src/score/grove.js (composeGrove, describeGrove, greeting) with curated seeds 3/7/11 measured; proposal 014 table; roadmap M6 in progress.
 - 2026-11-01 astra: compiled expression adapter integrated (a45d907; private WeakMap, frozen performance, plain-replay fallback; long study 304 ms). Fable: quick-check approve.
 - 2026-11-01 astra: grove instrument/session/transport additions (network-wide pickup scale, exact stereo collapse, fixed gain + admission, playSequence validated atomically). Fable review approve.
+- 2026-11-01 astra: grove page running with the greeting; 014b finding: cluster.baseHz unvalidated. Fable: baseHz finite and consistent with baseMidi (regression); page review approve.
