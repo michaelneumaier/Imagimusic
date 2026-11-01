@@ -52,3 +52,5 @@
 - 2026-11-01 astra: Loom ensemble wired (opt-in ?loom=1, cancellable preparation, composed export + verifier). Fable review approve.
 - 2026-11-01 astra: composed full movie verified 1007/1007 with canonical composition; ensemble UI + caption live; 144 tests.
 - 2026-11-01 fable: proposal 007 FM tensioner contract (closed-form FM phase, alias policy, Bessel/Carson reference cases, PCM-from-model sound path) sent for agreement.
+- 2026-11-01 astra: v9 composed identity FAIL at 31.25 s (duet buffer natural end); composition-link for shareable Loom settings.
+- 2026-11-01 fable: duet buffer zero-padded past the render under outlive policy (content unchanged, as-live natural length); harness v10; 146/146.

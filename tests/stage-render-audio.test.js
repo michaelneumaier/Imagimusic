@@ -55,12 +55,24 @@ test('an attached Loom duet plays its deterministic stereo PCM through the same 
   const ctx = new Context(), graph = buildPerformanceGraph(ctx, duet, { sourceLifetime: 'outlive-render', renderEnd: duet.duration });
   assert.ok(graph.loom); assert.equal(graph.loom.mixGain, 0.7); assert.equal(graph.loom.buffer.numberOfChannels, 2);
   const expected = renderLoomPerformance(loom, 48000);
-  assert.deepEqual(graph.loom.buffer.getChannelData(0), expected.channels[0]); assert.deepEqual(graph.loom.buffer.getChannelData(1), expected.channels[1]);
+  // Outlive policy: the buffer is zero-padded past the stop time (a buffer source finishes when its buffer ends),
+  // the PCM content is unchanged, and the padding is exact zeros.
+  assert.equal(graph.loom.samples, expected.channels[0].length);
+  assert.equal(graph.loom.paddedLength, Math.ceil((duet.duration + 1) * 48000) + 1);
+  assert.ok(graph.loom.paddedLength > graph.loom.samples);
+  for (const c of [0, 1]) {
+    const data = graph.loom.buffer.getChannelData(c);
+    assert.equal(data.length, graph.loom.paddedLength);
+    assert.deepEqual(data.subarray(0, graph.loom.samples), expected.channels[c]);
+    assert.ok(data.subarray(graph.loom.samples).every(v => v === 0));
+  }
   assert.equal(graph.loom.source.startTime, 0); assert.equal(graph.loom.source.stopTime, duet.duration + 1);       // outlive policy
   assert.ok(graph.loom.gain.connections.includes(graph.master) && graph.loom.source.connections.includes(graph.loom.gain));
   assert.equal(graph.loom.source.onended, null);
   const asLive = buildPerformanceGraph(new Context(), duet);
   assert.ok(Math.abs(asLive.loom.source.stopTime - (loom.duration + 0.01)) < 1e-12); assert.equal(asLive.loom.mixGain, 0.7);
+  assert.equal(asLive.loom.paddedLength, asLive.loom.samples, 'as-live keeps the natural buffer length');
+  assert.deepEqual(asLive.loom.buffer.getChannelData(1), expected.channels[1]);
   const { LOOM_MIX_GAIN } = await import('../src/stage/composition.js');
   assert.equal(buildPerformanceGraph(new Context(), { ...duet, composition: undefined }).loom.mixGain, LOOM_MIX_GAIN);
   // The real contract path: attachLoomPerformance → buildPerformanceGraph plays the duet at the shared gain.

@@ -27,15 +27,20 @@ export function attachLoomSource(context, master, performance, { stopAt = null, 
   const loom = performance.loom;
   if (!loom) return null;
   const pcm = renderLoomPerformance(loom, context.sampleRate);
-  const length = pcm.channels[0].length;
+  const samples = pcm.channels[0].length;
+  // An AudioBufferSource FINISHES when its buffer runs out, whatever its stop time. Under the outlive policy the
+  // buffer is therefore zero-padded past the stop time so the source cannot finish during the render (harness v9:
+  // the composed passage drifted at 31.25 s, where the unpadded duet buffer ended). PCM content is unchanged; the
+  // padding is exact zeros. As-live keeps the natural length.
+  const length = stopAt === null ? samples : Math.max(samples, Math.ceil(stopAt * context.sampleRate) + 1);
   const buffer = context.createBuffer(2, length, context.sampleRate);
-  pcm.channels.forEach((samples, c) => buffer.copyToChannel(samples, c));
+  pcm.channels.forEach((channel, c) => buffer.copyToChannel(channel, c));   // bytes beyond `samples` stay zero
   const source = context.createBufferSource(); source.buffer = buffer;
   const gain = context.createGain(); gain.gain.value = mixGain ?? loom.mixGain ?? performance.composition?.loomMixGain ?? LOOM_MIX_GAIN;   // same constant the live adapter uses
   source.connect(gain).connect(master);
   source.start(0);
   source.stop(stopAt ?? loom.duration + 0.01);
-  return { source, gain, buffer, samples: length, duration: loom.duration, mixGain: gain.gain.value };
+  return { source, gain, buffer, samples, paddedLength: length, duration: loom.duration, mixGain: gain.gain.value };
 }
 
 export const MASTER_GAIN = 0.24;

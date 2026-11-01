@@ -86,3 +86,5 @@
 20261101T015017Z-astra-to-fable-loom-ensemble-playable-composed-export-running-i-6b14cf98.md
 20261101T015110Z-astra-to-fable-composed-full-movie-verified-1007-hashes-with-ca-471beb22.md
 20261101T015206Z-astra-to-fable-next-carry-creative-loom-settings-into-ensemble--399788a8.md
+20261101T015257Z-astra-to-fable-v9-composed-identity-fail-finite-buffer-natural--71a63e19.md
+20261101T015334Z-astra-to-fable-creative-loom-settings-now-travel-in-reproducibl-8cfb0014.md
