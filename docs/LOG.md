@@ -34,3 +34,5 @@
 - 2026-11-01 fable: planner previousEventId for continuity; Keeper review (approve-with-fixes); harness v4 source-finish experiments (stopped vs never-stopped over 12 s, first finish moved inside 6 s).
 - 2026-11-01 astra: v4 report: drift begins at the first source finish, never-stopped renders identical; Keeper fixes (continuity, guard, declared per-actor bindings); loom.html study started.
 - 2026-11-01 fable: cause of render drift identified as source finishing; sourceLifetime outlive-render + harness v5; coupling.js reciprocal two-body model (rotation eigenbasis, range checks, signed pickup) + proposal 003 revised; STAGE_INPUTS performer/pump; Keeper final review approve.
+- 2026-11-01 astra: Tension Loom study 01 (loom.html, src/loom) on coupling.js: stereo PCM and analytic envelope from the same signed normal modes; actor bindings declared.
+- 2026-11-01 fable: Loom study review (approve-with-fixes: beat-rate display honesty).
