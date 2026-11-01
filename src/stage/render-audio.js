@@ -31,14 +31,21 @@ export const bellowsSeed = (patch, voice) => (patch.seed + voice.id * 997) >>> 0
 //              pressure, so nothing is disconnected until the render is done.
 export const FAMILIES = ['garden', 'tine', 'bellows'];
 
-//   neverStop  DIAGNOSTIC ONLY: re-schedules every source's stop far beyond the render so no source finishes during
-//              it. When a source finishes, the engine disables its output on a main-thread-timed path and the mix
-//              bookkeeping changes at a scheduler-dependent quantum; this option tests whether run-to-run drift
-//              begins with the first finish. It leaves a residual tone at the envelope's final ramp value, so it is
-//              not a rendering mode.
-export const NEVER_STOP_TIME = 1e6;
+//   sourceLifetime 'as-live' (default until the engine zeroes mode gains at their intended end) stops every source
+//              where the live engine does. 'outlive-render' re-schedules every source's stop to renderEnd + 1 s so
+//              NO source finishes during the render. Evidence (harness v4, Safari, 2026-11-01): every render in
+//              which a source finished drifted run-to-run beginning within one sample of the first finish, and
+//              every render in which none finished was bit-identical; when a source finishes, the engine changes
+//              the mix's input set at a scheduler-dependent quantum. 'outlive-render' is only a correct rendering
+//              mode once each mode gain is set to exactly 0 at its intended end (otherwise the oscillator keeps
+//              sounding at the envelope's final ramp value); the garden engine must do that in strike().
+//   renderEnd  seconds; required for 'outlive-render' (renderPerformanceAudio passes performance.duration).
+export const OUTLIVE_MARGIN = 1;
 
-export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD, families = FAMILIES, compressor = true, keepNodes = true, neverStop = false } = {}) {
+export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD, families = FAMILIES, compressor = true, keepNodes = true, sourceLifetime = 'as-live', renderEnd } = {}) {
+  if (!['as-live', 'outlive-render'].includes(sourceLifetime)) throw new Error(`sourceLifetime must be 'as-live' or 'outlive-render'.`);
+  if (sourceLifetime === 'outlive-render' && !(Number.isFinite(renderEnd) && renderEnd > 0)) throw new Error('outlive-render needs a positive renderEnd.');
+  const outlive = sourceLifetime === 'outlive-render', stopAt = outlive ? renderEnd + OUTLIVE_MARGIN : null;
   if (!context || typeof context.createGain !== 'function') throw new Error('buildPerformanceGraph needs an AudioContext-like context.');
   if (!performance || !Array.isArray(performance.events) || !performance.patch) throw new Error('performance must have events and patch (see createPerformance).');
   for (const f of families) if (!FAMILIES.includes(f)) throw new Error(`unknown family '${f}'.`);
@@ -67,19 +74,20 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
         gain.setValueAtTime(voiceDynamics(at, voice, patch, sampleRate).amp.level, at);
         gain.linearRampToValueAtTime(0, voice.end);
       }
-      graph.source.start(voice.noteOn); graph.source.stop(neverStop ? NEVER_STOP_TIME : voice.end + 0.01);
+      // The choir's gain already ramps to exactly 0 at the release end, so outliving the render adds no residual.
+      graph.source.start(voice.noteOn); graph.source.stop(outlive ? stopAt : voice.end + 0.01);
       if (keepNodes) graph.source.onended = null;
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: voice.end, seed, stolenAt: voice.stolenAt, graph });
     } else {
       const live = garden.strike(voice.slot, patch, voice.velocity, voice.noteOn, voice.position);
-      if (live) for (const node of live.nodes) { if (keepNodes) node.onended = null; if (neverStop) node.stop(NEVER_STOP_TIME); }
+      if (live) for (const node of live.nodes) { if (keepNodes) node.onended = null; if (outlive) node.stop(stopAt); }
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: live ? live.end : null, voice: live, skipped: !live });
     }
   }
-  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, neverStop } };
+  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
 }
 
-export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes, neverStop } = {}) {
+export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes, sourceLifetime } = {}) {
   if (typeof OfflineContext !== 'function') throw new Error('OfflineAudioContext is not available in this environment; render in a browser (tests/stage-render-browser.html).');
   if (!Number.isFinite(sampleRate) || sampleRate <= 0) throw new Error('sampleRate must be positive.');
   if (!performance || !Number.isFinite(performance.duration) || performance.duration <= 0) throw new Error('performance.duration must be positive.');
@@ -90,7 +98,7 @@ export async function renderPerformanceAudio(performance, sampleRate = 48000, { 
   if (families !== undefined) options.families = families;
   if (compressor !== undefined) options.compressor = compressor;
   if (keepNodes !== undefined) options.keepNodes = keepNodes;
-  if (neverStop !== undefined) options.neverStop = neverStop;
+  if (sourceLifetime !== undefined) { options.sourceLifetime = sourceLifetime; options.renderEnd = performance.duration; }
   const graph = buildPerformanceGraph(context, performance, options);
   // Hold a strong reference to every scheduled node until rendering resolves. A finished source with no JS
   // reference may be garbage-collected by the engine at a collector-dependent moment, and whether a silent,

@@ -51,3 +51,12 @@
 20261101T010841Z-astra-to-fable-v3-results-short-controls-identical-full-graph-s-33cb9379.md
 20261101T010918Z-astra-to-fable-bellows-operators-and-per-actor-inspection-ready-0ccf9b68.md
 20261101T011031Z-astra-to-fable-scene-recovery-contract-and-damper-binding-fix-53eeafe1.md
+20261101T011148Z-astra-to-fable-next-loom-study-reciprocal-energy-exchange-and-f-aa938023.md
+20261101T011209Z-astra-to-fable-damper-bindings-and-scene-recovery-fixes-ready-f-a9914aff.md
+20261101T011329Z-astra-to-fable-keeper-review-fixes-continuous-position-changes--499d8931.md
+20261101T011405Z-astra-to-fable-keeper-fixes-ready-request-declarative-actor-met-91ead1a5.md
+20261101T011508Z-astra-to-fable-per-actor-rendering-and-inspection-now-share-bin-620dc069.md
+20261101T011535Z-astra-to-fable-v4-source-finish-results-available-test-silent-r-050ba2fd.md
+20261101T011625Z-astra-to-fable-actor-metadata-integrated-causal-input-correctio-ecad12bb.md
+20261101T011649Z-astra-to-fable-coupled-pair-preliminary-review-weak-coupling-ei-693744a3.md
+20261101T011822Z-astra-to-fable-building-the-first-playable-reciprocal-loom-stud-d431f7c2.md

@@ -10,7 +10,8 @@ async function check(name, run) {
 }
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
-export const HARNESS_VERSION = 4;   // bump on every change to the experiments so reports are comparable
+const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
+export const HARNESS_VERSION = 5;   // bump on every change to the experiments so reports are comparable
 const environment = { harnessVersion: HARNESS_VERSION, userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
 let passage = null;
 
@@ -104,15 +105,31 @@ await check('Source-finish experiments: stopped vs never-stopped over 12 s; firs
   const span12 = 12, garden12 = base.snapshots.garden.voices.filter(v => v.noteOn < span12);
   const mk = (voices, duration, patch = base.patch) => ({ ...base, patch, events: voices.map(voice => ({ family: 'garden', voice })), duration, snapshots: { garden: { voices, dampers: [] } } });
   const twice = async (p, options) => compareRenders(await renderPerformanceAudio(p, 48000, options), await renderPerformanceAudio(p, 48000, options), 48000);
+  const OUT = { sourceLifetime: 'outlive-render' };
   const loneStopped = await twice(mk([first], span12), { compressor: false });
-  const loneNever = await twice(mk([first], span12), { compressor: false, neverStop: true });
+  const loneNever = await twice(mk([first], span12), { compressor: false, ...OUT });
   const gardenStopped = await twice(mk(garden12, span12), { compressor: false });
-  const gardenNever = await twice(mk(garden12, span12), { compressor: false, neverStop: true });
+  const gardenNever = await twice(mk(garden12, span12), { compressor: false, ...OUT });
   const damped = createPerformance({ ...DEFAULT_PATCH, damping: 1 }, 48000), dFirst = damped.snapshots.garden.voices[0];
   const dp = { ...damped, events: [{ family: 'garden', voice: dFirst }], duration: 6, snapshots: { garden: { voices: [dFirst], dampers: [] } } };
-  const earlyFinish = await twice(dp, { compressor: false }), earlyNever = await twice(dp, { compressor: false, neverStop: true });
+  const earlyFinish = await twice(dp, { compressor: false }), earlyNever = await twice(dp, { compressor: false, ...OUT });
   const out = { firstModeStopsAt: first.noteOn + Math.min(...first.modes.map(m => m.decay * 9)), loneStopped12s: loneStopped, loneNeverStopped12s: loneNever, gardenStopped12s: gardenStopped, gardenNeverStopped12s: gardenNever, dampedFirstModeStopsAt: dFirst.noteOn + Math.min(...dFirst.modes.map(m => m.decay * 9)), dampedLoneStopped6s: earlyFinish, dampedLoneNeverStopped6s: earlyNever };
   Object.assign(matrix, { 'finish: lone strike 12 s, stopped': loneStopped, 'finish: lone strike 12 s, never stopped': loneNever, 'finish: garden 12 s, stopped': gardenStopped, 'finish: garden 12 s, never stopped': gardenNever, 'finish: damped lone strike 6 s, stopped': earlyFinish, 'finish: damped lone strike 6 s, never stopped': earlyNever });
+  return out;
+});
+// v5: the candidate lifecycle on the full passage, compressor and air included. 'outlive-render' stops every source
+// after the render ends. Expected: bit-identical run to run. Also compares the candidate against the as-live render
+// of the same passage: once the engine zeroes each mode gain at its intended end, the two differ only where the
+// as-live run's finishes perturbed the mix (rounding units); until then the candidate carries the final-ramp residual
+// (reported as asLiveVsOutlive so the size of that residual is on record, not hidden).
+await check('Candidate lifecycle: full passage with sources outliving the render, twice, with compressor; air choir too', async () => {
+  const outlive = { sourceLifetime: 'outlive-render' };
+  const full = await twiceFull(DEFAULT_PATCH, outlive);
+  const air = structuredClone(DEFAULT_PATCH); air.bellows.source = 'air';
+  const fullAir = await twiceFull(air, outlive);
+  const asLive = await render(DEFAULT_PATCH), candidate = await render(DEFAULT_PATCH, outlive);
+  const out = { fullOutlive: full, fullAirOutlive: fullAir, asLiveVsOutlive: compareRenders(asLive, candidate, 48000) };
+  Object.assign(matrix, { 'lifecycle: full passage, outlive-render': full, 'lifecycle: full passage air, outlive-render': fullAir, 'lifecycle: as-live vs outlive-render (same seed)': out.asLiveVsOutlive });
   return out;
 });
 await check('WAV resolution: every variant identical after 16-bit quantization (WAV path only; AAC takes float32 and is lossy)', async () => {

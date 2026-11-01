@@ -32,3 +32,5 @@
 - 2026-11-01 fable: retracted the summation-order closure claim; harness v3 (local-level ULPs, engine floor, choir by source, per-voice JS-sum control, versioned reports); performer planner proposal 006 + src/perform/planner.js (6 tests); route-overlay and camera reviews.
 - 2026-11-01 astra: Keepers integrated live+export (2eca102), bellows crosshead operators, per-actor inspector, damper bindings; v3 report: all 6 s controls identical, lone-strike residual begins at 10.03 s.
 - 2026-11-01 fable: planner previousEventId for continuity; Keeper review (approve-with-fixes); harness v4 source-finish experiments (stopped vs never-stopped over 12 s, first finish moved inside 6 s).
+- 2026-11-01 astra: v4 report: drift begins at the first source finish, never-stopped renders identical; Keeper fixes (continuity, guard, declared per-actor bindings); loom.html study started.
+- 2026-11-01 fable: cause of render drift identified as source finishing; sourceLifetime outlive-render + harness v5; coupling.js reciprocal two-body model (rotation eigenbasis, range checks, signed pickup) + proposal 003 revised; STAGE_INPUTS performer/pump; Keeper final review approve.

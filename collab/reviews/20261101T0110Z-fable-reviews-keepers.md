@@ -74,3 +74,23 @@ architecture is right and honest.
   and the count says a Keeper couldn't reach it.
 - The lid-contact test over the whole envelope is a good oracle for "the
   operator pushes the thing that moves".
+
+---
+
+## Addendum 2026-11-01 (Fable): fixes verified, verdict upgraded to approve
+
+- Should-fix 1 and 2: rest keeps the previous strike's position, travel
+  lerps to the next, same-slot position changes smoothstep through the
+  approach while contact stays exact; the scene's `minRecover = recover`
+  choice removes the truncated-recovery snap without touching the original
+  mallet trajectory. The 240 Hz continuity test (< 0.09 units per step)
+  plus exact contacts is the test I asked for.
+- Should-fix 3: `articulateKeeper` guards the solver's `null`, folds
+  safely, keeps the requested hand and an `unreachable` flag; the proof line
+  counts it and the inspector explains the fallback. Render test covers an
+  unreachable target.
+- Per-actor bindings are now declared data (`keeperBindings(passage)`),
+  the renderer and inspector read the same declaration, and the test
+  asserts explanation value == actor pose == rendered hand for every actor.
+  That closes my operators/inspector nit. `STAGE_INPUTS` now has
+  `performer` and `pump` sections for the inputs and notes.

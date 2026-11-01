@@ -42,6 +42,26 @@ export const STAGE_INPUTS = {
   stage: {
     intensity: { inputs: [], note: 'modeled output intensity (sum of voice levels), not a measured RMS' },
   },
+  // Performers (proposal 006): the visible actors that carry exciters. Their hand IS the per-slot strike endpoint;
+  // contact timing comes from the planned strike, never from the arm. 'gesture' is the whole pose descriptor
+  // { slot, phase, progress01, eventId, previousEventId, shoulder, elbow, hand, contact, unreachable? }.
+  // Poses are not velocity-dependent today: striker reach and contact timing ignore velocity, and bellows fill is
+  // 1 − env. List velocity only once a mallet size or stroke depth follows it.
+  performer: {
+    gesture:  { inputs: ['tempo', 'seed', 'strikePosition', 'geometry.lengthM'], note: 'hand follows a planned strike: event identity and phase explain this gesture; actuator forces are not simulated' },
+    slot:     { inputs: ['tempo', 'seed'], note: 'rail position: where along the instrument the carriage is, fractional while travelling (interpreted motorized carriage)' },
+    phase:    { inputs: ['tempo', 'seed'], note: 'rest, travel, approach, contact, recover; contact coincides with the audible onset' },
+    hand:     { inputs: ['strikePosition', 'geometry.lengthM', 'geometry.thicknessM'], note: 'the mallet endpoint: exact at contact (same point and instant as the per-slot striker); height is blended during approach when the strike position changes on the same slot, for continuity' },
+    elbow:    { inputs: [], note: 'exact two-link solution from shoulder and hand with a fixed bend; a folded fallback when unreachable, counted and shown' },
+    contact:  { inputs: ['strikePosition'], note: 'contact flash at the strike point' },
+    unreachable: { inputs: ['geometry.lengthM', 'strikePosition'], note: 'the rig could not reach this strike point; the per-slot mallet still shows the strike and the sound is unaffected' },
+  },
+  pump: {
+    gesture:  { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: 'crosshead follows the sounding chamber envelope, including release and stealing; it does not measure air pressure' },
+    hand:     { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: 'crosshead face on the bellows lid; its height is the envelope (interpreted)' },
+    phase:    { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: 'envelope stage of the voice in this chamber, or rest when idle' },
+    contact:  { inputs: ['bellows.adsr.a', 'bellows.adsr.d', 'bellows.adsr.s', 'bellows.adsr.r'], note: '1 − bellows fill: how far the operator has pressed' },
+  },
 };
 
 /** Look up inputs/note for a stage binding; 'mode3' falls back to 'modeN'. Returns null when nothing is declared. */

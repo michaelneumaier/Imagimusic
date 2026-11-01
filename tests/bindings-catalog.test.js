@@ -11,6 +11,11 @@ test('every stage binding has declared per-parameter inputs and a note, so the i
     assert.ok(Array.isArray(entry.inputs) && typeof entry.note === 'string' && entry.note.length > 10);
   }
   assert.deepEqual(stageInputsFor('garden', 'mode3'), STAGE_INPUTS.garden.modeN);
+  for (const family of ['performer', 'pump']) for (const param of ['gesture', 'hand', 'phase', 'contact']) {
+    const e = stageInputsFor(family, param); assert.ok(e && Array.isArray(e.inputs) && e.note.length > 10, `${family}/${param}`);
+  }
+  assert.ok(stageInputsFor('performer', 'unreachable').note.includes('sound is unaffected'));
+  assert.ok(stageInputsFor('pump', 'gesture').note.includes('not measure air pressure'));
   assert.equal(stageInputsFor('nope', 'x'), null); assert.equal(stageInputsFor('bellows', 'nope'), null);
   assert.ok(STAGE_INPUTS.bellows.aperture.inputs.includes('voice.noteHz') && STAGE_INPUTS.bellows.resonance.inputs.includes('bellows.resonance'));
 });
