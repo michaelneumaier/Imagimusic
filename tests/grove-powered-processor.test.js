@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {composeGrove} from '../src/score/grove.js';
 import {createGroveRestRecipe} from '../src/score/grove-rest.js';
-import {createPoweredRecipe,poweredAmplitudeLimit} from '../src/score/grove-powered.js';
+import {createPoweredRecipe,poweredAmplitudeLimit,POWERED_FORCE_LAW} from '../src/score/grove-powered.js';
 import {renderPoweredPassage,forceRotation} from '../src/rest/powered-engine.js';
 import {createPoweredProcessor} from '../src/grove/powered-processor.js';
 const sr=8000,recipe=createPoweredRecipe(createGroveRestRecipe(composeGrove({seed:3}),undefined,{sampleRate:sr,zones:[.3,1],strengths:{c1:1}}));
-const driver={body:0,position:1,startFrame:0,frequencyHz:recipe.grove.bodies[0].hz,forcedFrames:800};driver.rotation=forceRotation(driver.frequencyHz,sr);driver.amplitude=poweredAmplitudeLimit(recipe,driver);
+const driver={law:POWERED_FORCE_LAW,body:0,position:1,startFrame:0,frequencyHz:recipe.grove.bodies[0].hz,forcedFrames:800};driver.rotation=forceRotation(driver.frequencyHz,sr);driver.amplitude=poweredAmplitudeLimit(recipe,driver);
 function render({events=[],originFrame=0,quietFrame=1600,fadeFrames=200,blocks=[128],inject=()=>{}}={}){
  const processor=createPoweredProcessor({recipe,driver,originFrame,quietFrame,fadeFrames,events}),channels=[[],[]],messages=[];let frame=0,j=0;
  while(!processor.finished){const n=blocks[j++%blocks.length],chunk=[new Float32Array(n),new Float32Array(n)];inject(processor,frame);processor.process(chunk,frame);chunk.forEach((ch,i)=>channels[i].push(...ch));messages.push(...processor.drain());frame+=n;}

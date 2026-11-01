@@ -3,6 +3,7 @@ import {createContactEventQueue} from './contact-events.js';
 /** One source-only encounter. Absolute transport frames are acknowledged; the
  * driver and saved ending use frames relative to origin. No model preparation. */
 export function createPoweredProcessor({recipe,driver,originFrame=0,quietFrame,fadeFrames,events=[]}){
+ if(recipe.zones.length!==2||recipe.strengths.length!==1||recipe.strengths[0].name!=='c1'||recipe.strengths[0].c!==1)throw new Error('Powered encounter requires two zones and the single c1 contact coefficient');
  const sr=recipe.sampleRate;
  for(const [name,v] of Object.entries({originFrame,quietFrame,fadeFrames}))if(!Number.isSafeInteger(v)||v<(name==='originFrame'?0:1))throw new Error(`Invalid ${name}`);
  if(driver.startFrame!==0||!Number.isSafeInteger(driver.forcedFrames)||driver.forcedFrames<1||driver.forcedFrames>quietFrame||!Number.isFinite(driver.amplitude)||driver.amplitude<0||!Number.isFinite(driver.frequencyHz)||driver.frequencyHz<=0||driver.frequencyHz>=sr/2)throw new Error('Invalid encounter driver');
