@@ -285,3 +285,4 @@
 - 2026-11-01 astra: residual audit matches all values; approve with language fixes (attenuation, not silence; recurrence and pulse are hypotheses). Fable: note and review qualified. Astra: paired 1-vs-2-cycle recurrence audition next.
 - 2026-11-01 astra: matched recurrence audition (one vs two cycles, same answer and tail) with the shared study player extracted. Fable: all four rebuilt exact; review approve, no nits.
 - 2026-11-01 astra: residual note attribution correction (per-body RMS on coupled bodies does not assign residual to a prior strike; similar levels, not unchanged room). Fable: corrected.
+- 2026-11-01 astra: recurrence audition checkpoint (06b7209); both auditions ready beside the prototype. Fable: M12 roadmap entry updated with the evaluation artifacts.
