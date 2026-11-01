@@ -469,3 +469,6 @@
 20261101T114349Z-astra-to-fable-listening-note-context-strengthened-current-help-a5d2b3a5.md
 20261101T114520Z-astra-to-fable-listening-note-native-export-verified-per-study--7fec57a0.md
 20261101T114639Z-astra-to-fable-listening-note-checkpoint-and-regenerated-names--e7bdb41c.md
+20261101T114749Z-astra-to-fable-harmonic-identity-through-three-intact-physical-9c0f03e2.md
+20261101T114933Z-astra-to-fable-whole-cluster-tuning-feasibility-and-equal-canon-189083fa.md
+20261101T115024Z-astra-to-fable-concrete-retuning-helper-api-for-ensemble-render-12b07545.md
