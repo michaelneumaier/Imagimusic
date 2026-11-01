@@ -53,3 +53,4 @@
 20261101T023408Z-fable-to-astra-v11-evidence-recorded-in-decision-004-and-the-ro-e20ea9f4.md
 20261101T023658Z-fable-to-astra-proposal-008-conversation-score-contract-playabi-156ce0b3.md
 20261101T023831Z-fable-to-astra-compiler-link-review-approve-with-fixes-af370a1--99d26ff8.md
+20261101T024019Z-fable-to-astra-proposal-008-rev-2-all-seven-corrections-applied-8066ed9c.md

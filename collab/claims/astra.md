@@ -41,3 +41,5 @@ FM tensioner visual study: src/tensioner/**, tensioner.html, tests/tensioner-sce
 FM ensemble integration: src/tensioner/performance.js; composition v2 + attachComposition; stage scene/frame/director/live adapter/main/export/verifier and tests. Fable requested offline render-audio FM adapter under existing ownership.
 
 Explicit phrase integration: src/stage/performance.js createPerformanceFromEvents and tests/explicit-performance.test.js. Fable owns authoring score math/schema after contract reconciliation; Astra owns voice compilation and stage/export integration. Legacy route retained.
+
+Authored performance assembly: src/stage/authored-performance.js and tests/authored-performance.test.js, consumes Fable's agreed compileScoreEvents recipe, attaches only enabled children with explicit timing, extends hold without trimming decay. Canonical score/export/UI integration follows generator handoff.
