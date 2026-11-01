@@ -17,7 +17,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 15;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 16;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -244,6 +244,39 @@ await check('Generated phrase: composeConversation presets through createScorePe
     const last = lastOnsetSeconds(score);
     assert(passage.events.every(e => e.voice.noteOn <= last + 1e-9) && (passage.loom?.events ?? []).every(e => e.time <= last + 1e-9), `${label}: an onset inside the hold`);
     out[label] = { peak, last50msPeak: tail, last500msPeak: tail500, last500msPeakDb: tail500 > 0 ? 20 * Math.log10(tail500) : -Infinity, seconds: a.length / rate, assembledDuration: passage.duration, lastOnsetSeconds: last, scheduledEvents: passage.events.length, loomStrikes: (passage.loom?.events ?? []).length, fmEntranceSeconds: passage.fm?.time ?? null };
+  }
+  return out;
+});
+
+await check('Imported MIDI: the desk example file through createImportedPerformance at 44.1 and 48 kHz, twice each', async () => {
+  // IMPORTED-MIDI evidence (proposal 010): the desk's example SMF is parsed, mapped (bellows, pedal off) and assembled exactly
+  // as the stage will do it, rendered twice per rate; asserted bit-identical, finite, bounded, silent final 0.5 s, exact length.
+  // Base-only import: both optional children are disabled explicitly by the adapter. No live/offline identity is claimed.
+  const { parseSMF } = await import('../src/midi/smf.js');
+  const { exampleMidiBytes } = await import('../src/midi/preview.js');
+  const { createImportedPerformance } = await import('../src/stage/imported-performance.js');
+  const { DEFAULT_COMPOSITION } = await import('../src/stage/composition.js');
+  const { DEFAULT_TENSIONER } = await import('../src/fm.js');
+  const bytes = exampleMidiBytes(), digest = await crypto.subtle.digest('SHA-256', bytes);
+  const sha256 = Array.from(new Uint8Array(digest), n => n.toString(16).padStart(2, '0')).join('');
+  const list = parseSMF(bytes, { name: 'three-note-example.mid' });
+  const imported = { version: 1, source: { name: 'three-note-example.mid', bytes: bytes.length, sha256 }, notes: list,
+    plan: { version: 1, window: { startSeconds: 0, endSeconds: list.durationSeconds }, lead: 0.35, tailSeconds: 4, velocityCurve: 'linear', assignments: [{ track: 0, channel: 'all', family: 'bellows', sustainPedal: false }] } };
+  const composition = { ...structuredClone(DEFAULT_COMPOSITION), version: 2, loom: { ...DEFAULT_COMPOSITION.loom, enabled: true }, fm: { enabled: true, settings: { ...DEFAULT_TENSIONER } } };
+  const rates = focus ? [48000] : [44100, 48000], out = {};
+  for (const rate of rates) {
+    const passage = createImportedPerformance(DEFAULT_PATCH, imported, composition, rate);
+    assert(passage.childrenDisabledByImport.length === 2 && !passage.composition.loom.enabled && !passage.composition.fm.enabled, 'both unused children must be disabled explicitly');
+    const a = await renderPerformanceAudio(passage, rate), b = await renderPerformanceAudio(passage, rate);
+    const r = compareRenders(a, b, rate); let peak = 0, tail500 = 0; const tailStart = a.length - Math.round(rate * 0.5);
+    for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (!Number.isFinite(v)) throw new Error(`imported @ ${rate}: non-finite PCM at ${i}`); peak = Math.max(peak, v); if (i >= tailStart) tail500 = Math.max(tail500, v); }
+    const label = `imported MIDI: desk example @ ${rate} Hz`;
+    matrix[label] = r;
+    assert(r.identical, `${label}: not identical, max ${r.maxDiff} at ${r.atSeconds}s`);
+    assert(peak > .001 && peak < 1, `${label}: peak outside range ${peak}`);
+    assert(tail500 < 1e-3, `${label}: final 0.5 s above -60 dBFS (peak ${tail500})`);
+    assert(Math.abs(a.length / rate - passage.duration) < 1 / rate + 1e-9, `${label}: length does not match assembled duration`);
+    out[label] = { peak, last500msPeak: tail500, seconds: a.length / rate, assembledDuration: passage.duration, counts: passage.mappingReport.counts, warnings: passage.mappingReport.warnings.map(w => w.kind), sha256 };
   }
   return out;
 });

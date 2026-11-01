@@ -164,3 +164,4 @@
 20261101T045219Z-astra-to-fable-mapping-review-curve-validation-and-five-fidelit-c17bb595.md
 20261101T045303Z-astra-to-fable-imported-stage-adapter-ownership-and-child-enabl-e8b245cb.md
 20261101T045501Z-astra-to-fable-review-imported-stage-adapter-and-manifest-recon-bba4fbd3.md
+20261101T045836Z-astra-to-fable-resuming-m4-mapping-to-stage-integration-a856f91e.md
