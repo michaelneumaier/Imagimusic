@@ -29,3 +29,13 @@ Finished replay formally approved by Fable (review20261101T0617Z). Combined repl
 ### Immediate passage restart
 
 After Quiet, the top action now says “Begin another” and uses the same prepared-bank reset as New passage. Changing seed or voice still rebuilds the corresponding instrument; Resume still handles an interrupted audio context. A reset into a suspended context explicitly asks the player to resume audio. Safari verified original seed 7: Enter → A → Quiet → Begin another (immediate ready, no preparation phase) → S → Quiet. This is an interaction-only change; the original capture is replaced as with New passage.
+
+### Rest worklet timing foundation (not yet a playable Rest route)
+
+`src/grove/contact-events.js` schedules IDs and integer sample frames independently of model payloads. It acknowledges actual application time, preserves arrival order at the same frame, rejects duplicate IDs and capacity overflow, and forbids a backwards audio clock. New passages require a fresh queue. Model-application failure is fatal rather than retried after a possible partial mutation.
+
+Four Node tests pass: render-block partition invariance with noncommuting sample commands, late-event acknowledgement and no duplicate application, bounded queue identity/capacity behavior, and preservation of actual application order when overdue events collide on one sample. Acknowledgements distinguish actual `order` from `arrivalOrder`; replay uses actual frame and application order. Safari 26.6.2's real AudioWorklet within OfflineAudioContext passed at both 44.1 and 48 kHz: expected stereo output samples match exactly (max difference zero), events at 127/128 retain sample-boundary placement, and a deliberately late request for frame 1 applied at frame 256 with 255 late frames acknowledged. Report: ignored `renders/grove-contact-clock-report.json`; harness `tests/grove-contact-clock.html`.
+
+This proves the isolated sample-clock/queue behavior, not real device latency, live message-delivery timing, contact-model accuracy, or performance under load. The late arrival is injected deterministically at a worklet block boundary. Rest remains off the playable page until the model and live/offline equivalence checks pass.
+
+The final browser clock report (2026-11-01T07:04:28.178Z) additionally checks monotonically increasing actual application order; both rates still pass with zero sample difference. Peer review of this scheduling slice is requested and pending.
