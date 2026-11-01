@@ -142,3 +142,11 @@ Astra found that newPassage and seed-change cleared comparison film state but re
 Validation: node --test tests/grove-movie-controls.test.js passed (1/1). The deferred-preparation race starts a newer operation before the old one rejects; checks newer status/button ownership and no post-clear stale error. Safari generated a real short film, then Your turn removed its preview/download links and reopened live body controls. A second real short film was generated; selecting Grove 7 removed that film and opened the new instrument. Model audio and export encoding were not changed; no new listening claim.
 
 Fable approved the Rest/shared-control change in collab/reviews/20261101T0834Z-fable-reviews-film-ownership.md. His review found the analogous old-film retention on the separate Grove page; that page also needs its preview/replay/Quiet ownership aligned in a follow-up. This checkpoint does not claim that Grove route is fixed.
+
+### 2026-11-01 — Grove playback ownership aligned
+
+Grove now pauses the film before replay or film preparation, stops replay when the native film starts, includes film playback in Quiet availability, and pauses film on Quiet/hidden-page cleanup. Starting a new passage or configuring a seed/voice clears the film and pending render through the reviewed shared controls.
+
+Validation: syntax check plus replay/movie lifecycle tests passed (4/4). Safari generated a real 4.3-second Original-voice film. Starting Listen back paused native video at 0.064 s while the scene entered LISTENING BACK. Starting film during a restarted replay changed scene phase to QUIET and native control to Pause. A fresh film play followed immediately by Quiet paused at 0.042 s and reported the original passage retained. (An earlier delayed Quiet attempt reached the natural end and is not used as proof of interruption.) New passage removed the preview/download links and reopened all three body pads. Seed/voice invalidation uses the same configure path, inspected in code; those two variants were not separately browser-tested in this checkpoint. No sound model or rendered media encoding changed.
+
+Fable approved this change in collab/reviews/20261101T0836Z-fable-reviews-grove-playback-coordination.md. README now explicitly describes playback exclusivity and the need to save films before passage/seed/voice changes.
