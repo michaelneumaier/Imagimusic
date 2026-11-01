@@ -212,3 +212,11 @@ export function restRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
   out.push(snapshot(frames, frames / sr));
   return { fps, duration: frames / sr, frames: out };
 }
+
+/** What a movie plan needs from a Rest record, in the shape the Grove plan reads: exact PCM, sample count and the picture at any time. */
+export function restMovieSource(record, recipe, { every = 1024 } = {}) {
+  validateRestRecord(record, recipe);
+  const audioSamples = restRecordLength(record, recipe), picture = restRecordVisual(record, recipe, { every });
+  return { kind: REST_RECORD_KIND, sampleRate: recipe.sampleRate, audioSamples, duration: audioSamples / recipe.sampleRate, capture: JSON.parse(canonicalRestRecord(record, recipe)),
+    sample: time => picture.visual(time), pcm: () => renderRestRecord(record, recipe), voiceLabel: 'Rest · exploration' };
+}

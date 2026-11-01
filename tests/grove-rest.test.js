@@ -192,3 +192,13 @@ test('the sequential picture frames equal restRecordVisual sampled at i/fps, wit
   for (const i of [0, 1, 7, 50, 120, seq.frames.length - 2]) { const a = seq.frames[i], b = ref.visual(i / fps); assert.deepEqual(a.contacts, b.contacts); assert.deepEqual(a.strikes, b.strikes); a.envelope.forEach((v, k) => assert.ok(Math.abs(v - b.envelope[k]) <= 1e-12 * Math.max(1, Math.abs(v)), `frame ${i} body ${k}`)); }
   const last = seq.frames.at(-1); assert.equal(last.time, seq.duration); assert.ok(last.envelope.every(v => v === 0), 'terminal frame is silent after the Quiet fade');
 });
+
+test('the movie source of a Rest record gives the exact sample count, canonical capture, any-order frames and the record render', async () => {
+  const { restMovieSource, restInvitationRecord, composeRestInvitation, renderRestRecord, restRecordVisual } = await import('../src/score/grove-rest.js');
+  const sr = 8000, recipe = createGroveRestRecipe(composeGrove({ seed: 3 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr }), record = restInvitationRecord(recipe, composeRestInvitation(recipe, { tempo: 120 }));
+  const src = restMovieSource(record, recipe, { every: 512 }), pcm = src.pcm(), ref = renderRestRecord(record, recipe), pic = restRecordVisual(record, recipe, { every: 512 });
+  assert.equal(src.audioSamples, record.ended.frame + record.ended.fadeFrames); assert.equal(pcm.channels[0].length, src.audioSamples);
+  assert.ok(pcm.channels.every((c, ch) => c.every((v, i) => v === ref.channels[ch][i])));
+  for (const t of [1.5, 0.2, src.duration, 0.7]) assert.deepEqual(src.sample(t), pic.visual(t));
+  assert.equal(src.capture.kind, 'imagimusic-grove-rest'); assert.equal(src.voiceLabel, 'Rest · exploration');
+});
