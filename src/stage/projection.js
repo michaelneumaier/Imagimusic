@@ -3,7 +3,7 @@ import { tineModes } from '../model.js';
 import { validateBindings, applyBindings } from '../bindings.js';
 
 export const CAPTIONS = [
-  {label:'interpreted',text:'Glass shells show the summed modal envelopes of overlapping strikes. Slow sway makes energy visible; it is not audio-rate vibration.'},
+  {label:'interpreted',text:'Resonator shells show the summed modal envelopes of overlapping strikes. Slow sway makes energy visible; it is not audio-rate vibration.'},
   {label:'interpreted',text:'Each bellows follows an envelope. Iris opening maps cutoff logarithmically; horn light follows modeled amplitude. The chamber is not an acoustic simulation.'},
   {label:'physical',text:'Tine frequencies and mode shapes come from beam geometry. Deflection is amplified and slowed; excitation and radiation remain stylized.'},
 ];
@@ -13,12 +13,12 @@ export function createProjection(patch) {
     const garden=Array.from({length:8},(_,slot)=>modalSlot(frame,'garden',slot));
     const tine=modalSlot(frame,'tine',8);
     tine.deflection=Array.from({length:65},(_,i)=>tine.energies.reduce((sum,energy,n)=>sum+(shapes[n]?.[i]??0)*energy*Math.sin(frame.t*(4+n*.7))*.6,0));
-    tine.length=patch.geometry.lengthM*35;tine.thickness=patch.geometry.thicknessM*35;
+    tine.length=patch.geometry.lengthM*35;tine.thickness=patch.geometry.thicknessM*35;tine.width=patch.geometry.widthM*35;
     const bellows=Array.from({length:6},(_,slot)=>{
       const voices=frame.voices.filter(v=>v.family==='bellows'&&v.slot===slot&&v.age>=0).sort((a,b)=>a.age-b.age);
       const v=voices[0];
       return {fill:v?.exciter.fill01??1,aperture:v?.modules.filter.aperture01??aperture01(patch.bellows.cutoffHz),level:v?.level??0,
-        swing:patch.bellows.lfo.rateHz>8?0:(v?.modules.lfo.value??0)*.65,resonance:v?.modules.filter.resonance??patch.bellows.resonance};
+        fast:patch.bellows.lfo.rateHz>8,swing:patch.bellows.lfo.rateHz>8?0:(v?.modules.lfo.value??0)*.65,resonance:v?.modules.filter.resonance??patch.bellows.resonance};
     });
     return {...frame,stage:{garden,tine,bellows}};
   };
@@ -37,8 +37,8 @@ export function stageBindings(){
     for(let n=0;n<5;n++)add(target,`mode${n}`,`${field}.energies[${n}]`,['material','brightness','damping','strikePosition'],CAPTIONS[0],(e,frame)=>({energy:e,sway:Math.sin(frame.t*5+i+n)*e*.55}));
     add(target,'striker',field,['strikePosition'],CAPTIONS[0],s=>({visible:s.visible,reach:s.reach,position:s.position}));
   }
-  for(let i=0;i<6;i++)for(const param of ['fill','aperture','level','swing','resonance'])add(`bellows/slot${i}`,param,`stage.bellows[${i}].${param}`,['bellows.adsr','bellows.cutoffHz','bellows.envAmount','bellows.lfo'],CAPTIONS[1]);
-  for(const param of ['length','thickness','deflection','reach','position','visible'])add('tine/slot8',param,`stage.tine.${param}`,['geometry','strikePosition','damping'],CAPTIONS[2]);
+  for(let i=0;i<6;i++)for(const param of ['fill','aperture','level','swing','fast','resonance'])add(`bellows/slot${i}`,param,`stage.bellows[${i}].${param}`,['bellows.adsr','bellows.cutoffHz','bellows.envAmount','bellows.lfo'],CAPTIONS[1]);
+  for(const param of ['length','thickness','width','deflection','reach','position','visible'])add('tine/slot8',param,`stage.tine.${param}`,['geometry','strikePosition','damping'],CAPTIONS[2]);
   return validateBindings(list);
 }
 export function applyStage(frame,bindings,world){
@@ -54,11 +54,13 @@ export function applyStage(frame,bindings,world){
       if(param==='aperture')body.blades.forEach(({blade})=>{blade.position.x=.12+value*.24;blade.rotation.z=.65-value*.7;});
       if(param==='level'){body.glow.material.opacity=Math.min(.7,value*.8);body.horn.material.emissive.setHex(0xaccf80);body.horn.material.emissiveIntensity=value*.7;}
       if(param==='swing')body.pendulum.rotation.z=value;
+      if(param==='fast'){body.pendulum.visible=!value;body.fastArc.visible=value;}
       if(param==='resonance')body.chamber.scale.z=1+value*.15;
     } else {
       const body=world.tine;
       if(param==='length')body.beam.scale.x=value;
       if(param==='thickness')body.beam.scale.y=value/.03;
+      if(param==='width')body.beam.scale.z=value/.22;
       if(param==='deflection'){
         const positions=body.beam.geometry.attributes.position;
         for(let i=0;i<positions.count;i++){const u=body.base[i*3],idx=Math.min(64,Math.max(0,Math.round(u*64)));positions.setY(i,body.base[i*3+1]+value[idx]/body.beam.scale.y);}

@@ -1,4 +1,5 @@
-import { DEFAULT_PATCH } from '../model.js';
+import { readStagePatch } from './exchange.js';
+import { DEFAULT_PATCH, MATERIALS } from '../model.js';
 import { InstrumentAudio } from '../audio.js';
 import { BellowsAudio } from '../bellows-audio.js';
 import { collectState, traceHash } from '../state.js';
@@ -8,7 +9,9 @@ import { createWorld } from './world.js';
 import { createProjection, stageBindings, applyStage, CAPTIONS } from './projection.js';
 const $=id=>document.getElementById(id);
 const audio=new InstrumentAudio();let choir=null,world=null,playing=false,origin=0,cursor=0,request=0;
-let performance=createPerformance(DEFAULT_PATCH),project=createProjection(performance.patch);
+let activePatch=structuredClone(DEFAULT_PATCH), importError='';
+if(new URLSearchParams(location.search).get('instrument')==='lab'){try{activePatch=readStagePatch(sessionStorage);}catch(error){importError=error.message+' Using the default instrument.';}}
+let performance=createPerformance(activePatch),project=createProjection(performance.patch);
 const study=new FrameClock(),live=new WallClock(()=>Math.max(0,audio.time-origin)),bindings=stageBindings();
 for(const caption of CAPTIONS){const p=document.createElement('p');p.className='caption';const strong=document.createElement('strong');strong.textContent=caption.label.toUpperCase()+' · ';p.append(strong,document.createTextNode(caption.text));$('captions').append(p);}
 function stop(){if(playing)study.seek(Math.min(performance.duration,live.time));request++;playing=false;audio.stop();choir?.stop();$('perform').textContent='▶ Play the passage';$('stage-state').textContent='SILENT STUDY · SEED '+performance.patch.seed;}
@@ -27,7 +30,7 @@ $('perform').onclick=async()=>{
   if(playing){stop();return;}const token=++request;
   try{await audio.enable();if(token!==request)return;
     choir??=new BellowsAudio(audio.context,audio.master);audio.stop();choir.stop();
-    performance=createPerformance(DEFAULT_PATCH,audio.context.sampleRate);project=createProjection(performance.patch);
+    performance=createPerformance(activePatch,audio.context.sampleRate);project=createProjection(performance.patch);
     origin=audio.time+.1;cursor=0;playing=true;study.reset();$('seek').max=performance.duration;
     $('perform').textContent='Ⅱ Pause passage';$('stage-state').textContent='PLAYING · SEED '+performance.patch.seed;$('error').textContent='';schedule();
   }catch(error){stop();$('error').textContent=error.message;}
@@ -39,7 +42,10 @@ $('view').onchange=()=>world?.view($('view').value);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
 setInterval(schedule,25);
 try{
-  world=createWorld($('world'));stop();
+  world=createWorld($('world'));
+  const color=MATERIALS[activePatch.material].color;
+  for(const body of world.garden)for(const shell of body.layers){shell.material.color.setRGB(...color.map(c=>c/255));shell.material.emissive.copy(shell.material.color);}
+  stop();$('error').textContent=importError;
   function draw(){
     const t=playing?live.time:study.time,frame=project(collectState(t,performance.snapshots));
     const applied=applyStage(frame,bindings,world);world.render();

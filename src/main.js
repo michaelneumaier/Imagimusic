@@ -1,3 +1,4 @@
+import { storeStagePatch } from './stage/exchange.js';
 import { mountBellows } from './bellows-ui.js';
 import { DEFAULT_PATCH, makeScore, validatePatch, tineModes, TINE_INDEX } from './model.js';
 import { InstrumentAudio } from './audio.js';
@@ -56,6 +57,10 @@ $('play').onclick = async () => {
   } catch (error) { notice(error.message); }
 };
 $('stop').onclick = stop;
+$('open-stage').onclick = event => {
+  try { storeStagePatch(sessionStorage, patch); stop(); }
+  catch (error) { event.preventDefault(); notice('Could not transfer instrument: ' + error.message); }
+};
 setInterval(() => {
   if (!playing || audio.context.state !== 'running') return;
   if (nextTime < audio.time - 0.15) nextTime = audio.time + APPROACH_SECONDS;

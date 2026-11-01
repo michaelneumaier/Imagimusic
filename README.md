@@ -14,7 +14,7 @@ Open http://127.0.0.1:8080. Click **Begin sequence**, click a garden resonator, 
 
 ## The shared 3D stage
 
-Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passage on one 3D floor. Drag to orbit, choose a close view, or scrub the silent timeline. The stage currently uses the default patch and seed 731; laboratory edits do not yet transfer. Its plain score snapshots feed both live scheduling and the shared state bus. Stateless scene bindings permit reproducible seeking. Three.js 0.187.0 is vendored locally with license and verified package integrity; no installation or CDN is needed. WebGL2 is required for this preview; the 2D laboratory remains available.
+Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passage on one 3D floor. Drag to orbit, choose a close view, or scrub the silent timeline. Use **Play this instrument in 3D** in the laboratory to transfer its current patch and seed into the stage. The transfer stays in this browser session; the direct stage link uses the default patch. Its plain score snapshots feed both live scheduling and the shared state bus. Stateless scene bindings permit reproducible seeking. Three.js 0.187.0 is vendored locally with license and verified package integrity; no installation or CDN is needed. WebGL2 is required for this preview; the 2D laboratory remains available.
 
 ## Three kinds of anatomy
 

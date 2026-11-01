@@ -47,8 +47,11 @@ export function choirBody(slot) {
   rod([-.65,1.75,0],[-.43,1.75,0],.035,brass,root);
   const pendulum=new T.Group();pendulum.position.set(-.4,2.48,.1);root.add(pendulum);
   rod([0,0,0],[0,-.55,0],.018,brass,pendulum);mesh(new T.SphereGeometry(.065,12,10),material(palette.green,.3),pendulum,[0,-.55,0]);
+  const arcPoints=Array.from({length:33},(_,i)=>{const angle=-.65+i/32*1.3;return new T.Vector3(Math.sin(angle)*.55,-Math.cos(angle)*.55,0);});
+  const fastArc=new T.Line(new T.BufferGeometry().setFromPoints(arcPoints),new T.LineBasicMaterial({color:palette.green,transparent:true,opacity:.65}));
+  fastArc.position.copy(pendulum.position);fastArc.visible=false;root.add(fastArc);
   const glow=mesh(new T.CircleGeometry(.32,32),new T.MeshBasicMaterial({color:palette.green,transparent:true,opacity:0,depthWrite:false}),chamber,[0,0,.06]);
-  return {root,bellows,chamber,blades,horn,pendulum,source,glow,slot};
+  return {root,bellows,chamber,blades,horn,pendulum,fastArc,source,glow,slot};
 }
 export function tineBody() {
   const root=new T.Group(),brass=material(palette.brass),steel=material(palette.steel,.85,.24);
