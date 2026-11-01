@@ -59,3 +59,4 @@
 - 2026-11-01 fable: decision 004 scope extended to the three tested arrangements; roadmap M3 audio identity done.
 - 2026-11-01 fable: src/fm.js FM tensioner core (closed-form FM phase, Bessel reference, screening heuristic + measured convergence −122 dB, sample-aligned fade, serializable constant index, ratio floor 0.01, zero-index bandwidth) + 11 tests; proposal 007 rev. 3.
 - 2026-11-01 astra: FM tensioner scene with six declared bindings, Safari-checked.
+- 2026-11-01 astra: FM tensioner study page (tensioner.html) on the validated core via a shared audio render job; Fable review approve.
