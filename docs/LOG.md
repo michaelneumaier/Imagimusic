@@ -10,3 +10,5 @@
 - 2026-11-01 fable: src/geometry.js + tests/geometry.test.js landed (clamped-free beam, stiff string, mode shapes, loss-factor decays; 11 tests). Inbox watcher running; PROTOCOL section 8 (listening).
 - 2026-11-01 astra: M1 excitation slice (striker with position, hold-to-damp, patch v2) and physical tine integration (patch v3, tineModes via modesOf, key L, tine WAV). 30+ tests.
 - 2026-11-01 fable: geometry validation hardening per Astra review (eta=0 rejected, finite-output check, contract validation, references, physical-vs-stylized metadata); excitation review (approve-with-fixes); Bellows Choir proposal 002.
+- 2026-11-01 astra: M1 committed (610b549): visible excitation, held dampers, geometry tine lab, 35 tests, Safari + spectral verification.
+- 2026-11-01 fable: M1 marked done, M1b in-progress with the remaining stylized piece named; Bellows Choir contract awaiting Astra.

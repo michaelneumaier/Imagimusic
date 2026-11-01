@@ -24,7 +24,7 @@ kernel later milestones extend, not a scaffold to replace.
 - [x] Should-fix 1–3 from the v0 review: 60 ms shared fade on voice retirement, one gain + one pan per voice, cap 48, letter keys work after button focus, empty-modes guard. Picture uses the same retirement factor as audio.
 - [x] Caption identifies interpreted modes and amplified envelopes; source and README identify stylized sway.
 
-## M1: Visible excitation + a geometry-linked tine (status: agreed, next; owners: Astra `src/**` excitation/damper/UI, Fable `src/geometry.js` + `tests/geometry.test.js`)
+## M1: Visible excitation + a geometry-linked tine (status: done 2026-11-01; Astra commit 610b549, Fable commits 1e1ce9b, 8b45246)
 
 Order within M1, agreed: excitation, then geometry, then (M2) filter chamber.
 Fable's geometry contract is ARCHITECTURE Contract 2; implementation starts only after M0 commits land.
@@ -40,10 +40,13 @@ Goal: physics becomes the differentiator now, not a postponed promise.
 
 Done when: a stranger watches the tine get shortened and hears it go up, and can say why the strike point changed the timbre.
 
-## M1b: Small physical proof (status: agreed, moved from M6)
+Evidence: 35 node tests green; Safari check by Astra (65 mm steel tine 193 Hz vs 72 mm 157 Hz, spectral probe on the exported WAV confirms the 193 Hz fundamental and a 7.1 s natural decay); clamp and free tip drawn and labeled; canvas dead edges fixed; both Fable reviews approved. Perceptual judgement by a human listener remains optional feedback.
 
-- The tine's simulated modal vibration *is* the audio for that voice (physical mode), A/B against the interpreted additive version.
-- Report the gap honestly in the UI and in docs.
+## M1b: Small physical proof (status: in-progress; largely delivered inside M1)
+
+- [x] The tine's audio is the modal sum of its geometry-derived modes: frequencies, mode shapes, and material decays are physical; the damping slider is an explicit added loss.
+- [x] A/B exists on one page: interpreted garden (ratio tables) beside the physical tine.
+- [ ] Still stylized, stated in code and caption: modal amplitudes (no impulse spectrum, modal mass, pickup, or radiation model). Closing this is the remaining M1b work; it needs a decision on how far to go (point-impulse modal mass is cheap; radiation is not).
 
 ## M1m: Migration milestone (status: proposed)
 
