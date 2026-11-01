@@ -40,3 +40,22 @@ A microphone records the resulting pressure signal at one position; it does not 
 - [Praat Burg formant analysis](https://www.fon.hum.uva.nl/praat/manual/Sound__To_Formant__burg____.html): LPC formulation, ceiling sensitivity and spurious-pole caveats.
 - [W3C Web Audio API](https://www.w3.org/TR/webaudio/): processing architecture. Current linked specification is a draft; implementation support must be checked separately.
 - [W3C Media Capture and Streams](https://www.w3.org/TR/mediacapture-streams/): explicit capture, constraints, settings and track lifecycle.
+
+## First experience and review sequence
+
+Planning checkpoint: Astra approves the proposal's measured / estimated / inferred distinction and V0–V3 order. Keep this a planning track while the current FM ensemble is integrated. Fable owns proposed extraction math and synthetic evaluation; Astra owns proposed capture, device feedback and visual bindings. Numerical acceptance thresholds remain experiment targets until a reference setup and pitch range are specified.
+
+The first session should take about a minute and require no knowledge of acoustics:
+
+| Gesture | What the picture should reveal | What we check |
+| --- | --- | --- |
+| Stay quiet, then gently sustain “ah” | A visible floor, then a spectrum and confident harmonic strands | Silence does not invent a pitch; the entrance is prompt |
+| Slide the pitch while keeping “ah” | Harmonic spacing changes continuously | No stable octave jumps; resonance estimates are not required in V0 |
+| Hold a pitch and change “ah–ee–oo” | Strength shifts among the measured bands; later V1 adds estimated resonance regions | Pitch and vowel color remain visibly different gestures |
+| Close the lips into “mmm,” then reopen | The changed spectrum remains visible throughout | Humming never disappears just because a vowel model loses confidence |
+| Alternate “sss,” “shh,” and a gentle “p” | Different spectral distributions and a short attack | Noise is represented without a fabricated note |
+| Stop abruptly | Live energy clears; any optional trail is visually separate | Processing delay and decorative persistence are distinguishable |
+
+Three creative directions can share the same analysis: a **woven spectrum** with harmonic threads; a **resonance lantern** with broad luminous bands; and an **articulation landscape** where spectral energy makes ridges and attacks make ripples. Start with the woven spectrum beside a plain spectrogram, then evaluate whether the other forms communicate more without obscuring the sound. Closed-mouth and unfamiliar sounds must remain interesting even when no classifier can name them.
+
+Review refinements for Fable: spectral flatness alone is not a measurement of breath or unvoiced energy; combine it with level and label the mist as an interpretation. Likewise, do not categorically suppress formants solely because the mouth is closed: retain the raw view and show estimates only when their model checks support them. Praat's documented ceiling sensitivity and spurious poles motivate explicit uncertainty, not anatomical certainty. Its effective window duration can differ from the full sample window, so benchmark records must state both rather than compare unlike “25 ms” settings.

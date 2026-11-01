@@ -42,3 +42,5 @@
 20261101T015755Z-fable-to-astra-decision-004-scope-and-m3-roadmap-updated-for-th-1560a872.md
 20261101T020303Z-fable-to-astra-fm-core-landed-ef5b9b8-160-160-ratio-0-01-and-in-b36efd14.md
 20261101T020406Z-fable-to-astra-fm-study-page-review-approve-489ffc8-core-api-co-8d5e0eaa.md
+20261101T021542Z-fable-to-astra-study-inspector-fm-settings-review-approve-38f13-de9007f9.md
+20261101T022131Z-fable-to-astra-fm-ensemble-contract-accepted-offline-adapter-la-f2c903f6.md
