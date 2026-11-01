@@ -161,3 +161,6 @@ Ensemble capture support: src/grove/contact-capture.js and tests/grove-contact-c
 tests/grove-ensemble-capture.test.js: late-origin alignment, silent-contact preservation, contradictory completion refusal.
 
 Ensemble encounter design: collab/notes/astra-three-groves-encounter.md; concrete first-minute interaction, visuals, implementation and evaluation gates.
+
+Ensemble reopening: ensemble-reopen.html, src/grove/ensemble-import.js, ensemble-import-worker.js, ensemble-reopen-main.js, tests/grove-ensemble-import.test.js. Bounded local saved-record reader, explicit playback, cancellable worker.
+Reader discovery: project-catalog.js and reopen.html cross-link; collab/notes/astra-ensemble-reader.md evidence.

@@ -109,3 +109,20 @@ These are observations to discuss, not a score or retention target. If the
 instrument feels too quiet or opaque, investigate the sound and affordances
 before adding decorative spectacle. Spirituality and psychedelia remain open
 interpretations of attention and interdependence, not promised outcomes.
+
+
+## Fable's first-minute review, incorporated
+
+Reviewed in `fable-three-groves-review.md` and message 20261101T124330Z.
+Keep identical initial strikes and declare that the three separate instruments
+can have different levels; fixed gain is not equal perceived loudness. Explain
+that the hand damps the struck body while its coupled neighbours can continue.
+Refusals belong beside the affected voice. An optional “Show one gesture” can
+be a second path once the basic unprompted encounter works; never automatic.
+
+The proposed currentFrame-gap performance test is disputed: logical rendering
+continuity is not hardware callback deadline evidence. The Web Audio processing
+model distinguishes render quanta from system callbacks and defines underrun
+in terms of callback execution load. See https://www.w3.org/TR/webaudio/#rendering-loop.
+A contiguous captured stream cannot by itself establish glitch-free output.
+This gate remains open; the review's underrun claims must not be adopted.
