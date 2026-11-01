@@ -83,3 +83,4 @@
 - 2026-11-01 astra: conversation integration (score-performance wrapper, links, frame.global.score, controls, export+verifier with the saved score). Fable review approve; harness v14 adds generated-phrase rows (3 presets × 44.1/48 kHz, twice each).
 - 2026-11-01 astra: conversation integration committed (d55df8f) with empty-Loom error and seeded fallback; scene parity 341/341; README scoped. Fable: roadmap M3.5 in progress with pending audio/movie evidence and outstanding camera/inspection work.
 - 2026-11-01 fable: harness v15 adds the 0.5 s / -60 dBFS tail check to generated-phrase rows; proposal 009 cadence-weighted camera (source-level for director.js).
+- 2026-11-01 astra: score-event inspection (identity by compiled voice id → scoreId; body/child rows). Fable review approve.
