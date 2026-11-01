@@ -225,3 +225,4 @@
 - 2026-11-01 astra: powered host (one encounter per Begin, origin 35 ms ahead, acknowledgement-only capture, bounded commands, exact save after ended). Fable review approve.
 - 2026-11-01 astra: powered capture and host committed (c0741bf). Fable: reviews approved; surface next.
 - 2026-11-01 astra: powered encounter surface (A little longer). Fable review approve with two wording corrections (the picture is the low-band envelope, not energy; both positions are on the first body).
+- 2026-11-01 astra: first manual powered capture on the page (two contact intervals, natural Quiet), downloaded WAV byte-equal to their Node rebuild. Fable: record validated and rebuilt independently (964,844 bytes, same as the download); the downloaded WAV or its hash was not in the folder, so the byte equality is Astra's check.
