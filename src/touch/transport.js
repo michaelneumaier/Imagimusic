@@ -12,9 +12,11 @@ export function scheduleTouchFade(context,master,when,fadeFrames){master.gain.se
 
 /** Each scheduled buffer is one impulse; all share a fixed-gain output bus. */
 export function createTouchTransport({createContext=()=>new AudioContext(),prepare=prepareBank,onChange=()=>{}}={}){
- let context,session,bank,buffers,master,origin=null,state='idle',token=0,job,settings;
+ let context,session,bank,buffers,master,origin=null,state='idle',token=0,job,settings,suspendedFrom=null;
  const sources=new Map();
  const emit=()=>onChange({state,recording:session?.snapshot()??null});
+ function contextChanged(){if(context.state!=='running'&&['ready','playing'].includes(state)){suspendedFrom=state;state='suspended';emit();}else if(context.state==='running'&&state==='suspended'){state=suspendedFrom??'ready';suspendedFrom=null;emit();}}
+ async function resume(){if(!context||state!=='suspended')return;await context.resume();contextChanged();if(context.state!=='running')throw new Error('Audio is still interrupted. Try Resume again.');}
  function time(){if(origin===null)return 0;const raw=Math.max(0,context.currentTime-origin),end=session.snapshot().ended;return end?Math.min(raw,(end.frame+end.fadeFrames)/context.sampleRate):raw;}
  function quiet(){
   if(!context||!master||!session)return;
@@ -23,25 +25,25 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
    const when=origin+frame/context.sampleRate;
    scheduleTouchFade(context,master,when,session.snapshot().ended.fadeFrames);
    for(const node of sources.keys())node.stop(when+.03);
-   state='ended';emit();
+   state='ended';suspendedFrom=null;emit();
   }
  }
  function cancel(){token++;job?.cancel();job=null;quiet();}
  function fresh(){
   quiet();if(master&&![...sources.values()].includes(master))master.disconnect();session=createTouchSession(settings,context.sampleRate);origin=null;
-  master=context.createGain();master.connect(context.destination);state='ready';emit();
+  master=context.createGain();master.connect(context.destination);state='ready';suspendedFrom=null;contextChanged();emit();
  }
  async function enable(nextSettings){
   cancel();const own=token;settings=structuredClone(nextSettings);state='preparing';emit();
   try{
-   context??=createContext();await context.resume();if(own!==token)return;
+   if(!context){context=createContext();context.onstatechange=contextChanged;}await context.resume();if(own!==token)return;
    job=prepare(settings,context.sampleRate);const result=await job.promise;if(own!==token)return;job=null;
    bank=result;buffers=bank.map(pcm=>{const buffer=context.createBuffer(2,pcm.channels[0].length,pcm.sampleRate);pcm.channels.forEach((values,c)=>buffer.copyToChannel(values,c));return buffer;});fresh();
   }catch(error){if(own!==token)return;job=null;state='error';emit();throw error;}
  }
  function strike(body,velocity){
   if(!['ready','playing'].includes(state))return {accepted:false,reason:'not-ready'};
-  if(context.state==='suspended')return {accepted:false,reason:'suspended'};
+  if(context.state!=='running'){contextChanged();return {accepted:false,reason:'suspended'};}
   const scheduled=Math.ceil((context.currentTime+.025)*context.sampleRate)/context.sampleRate;
   origin??=scheduled;
   const frame=Math.max(0,Math.round((scheduled-origin)*context.sampleRate)),result=session.strike({frame,body,velocity});
@@ -53,5 +55,5 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
  function recording(){return session?.snapshot()??null;}
  function saveAudio(){if(!bank||!session)throw new Error('Prepare the instrument first');return renderTouchRecording(session.snapshot(),bank);}
  function dispose(){cancel();context?.close();}
- return {enable,strike,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
+ return {enable,resume,strike,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
 }

@@ -20,3 +20,7 @@ Offline graph comparison does not capture speakers, device latency, or a physica
 ## Actual peer review
 
 Fable approved session in `collab/reviews/20261101T0537Z-fable-reviews-touch-session.md` and page/transport in `collab/reviews/20261101T0541Z-fable-reviews-touch-page.md`. Addressed visual caching, use of normalized stillness bound, and wording about this touch rather than a future swell. Numerical tolerance evidence sent separately in canonical mailbox.
+
+## Interruption recovery follow-up
+
+AudioContext state changes now expose Resume when audio is suspended or interrupted. Resuming preserves the existing bank, origin and captured gestures rather than starting over. A fake-context regression test verifies refusal of a silent strike during interruption, retention of the first gesture and correct onset of the next after resume. Focused touch suite6/6 passed; actual OS/device interruption is not claimed as tested. This does not alter the impulse rendering or save algorithm.

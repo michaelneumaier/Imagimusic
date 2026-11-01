@@ -21,3 +21,12 @@ test('superseded bank preparation cannot replace the newer instrument',async()=>
  const first=transport.enable({frequency:180});await Promise.resolve();const second=transport.enable({frequency:240});await Promise.resolve();requests[1](bank);await second;requests[0](bank);await first;
  assert.equal(transport.recording().settings.frequency,240);assert.equal(transport.state,'ready');
 });
+
+test('an interrupted context resumes the existing capture rather than discarding it',async()=>{
+ const {context,bank,nodes}=fake();context.resume=async()=>{context.state='running';context.onstatechange?.();};
+ const transport=createTouchTransport({createContext:()=>context,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});
+ await transport.enable({});transport.strike(0,.5);const first=transport.recording().events[0];
+ context.state='interrupted';context.onstatechange();assert.equal(transport.state,'suspended');assert.equal(transport.strike(1,.5).accepted,false);
+ await transport.resume();assert.equal(transport.state,'playing');assert.deepEqual(transport.recording().events,[first]);
+ context.currentTime+=.5;transport.strike(1,.5);assert.equal(transport.recording().events[1].frame,4000);assert.equal(nodes.length,2);
+});

@@ -11,9 +11,10 @@ function status(text,error=false){$('status').textContent=text;$('status').datas
 const transport=createTouchTransport({onChange:({state,recording})=>{
  const playable=['ready','playing'].includes(state),has=!!recording?.events.length;
  pads.forEach(pad=>pad.disabled=!playable);$('begin').disabled=state==='preparing'||playable;
- $('begin').textContent=state==='preparing'?'Preparing the connection…':playable?'The instrument is open':'Enter the instrument ↗';
+ $('begin').textContent=state==='preparing'?'Preparing the connection…':state==='suspended'?'Resume the instrument ↗':playable?'The instrument is open':'Enter the instrument ↗';
  $('quiet').disabled=!has||state==='ended'||state==='preparing';$('new').disabled=!has||state==='preparing';$('save').disabled=!has||state==='preparing';$('score').disabled=!has||state==='preparing';
  $('count').textContent=has?`${recording.events.length} ${recording.events.length===1?'gesture':'gestures'} held here`:'Nothing played yet';
+ if(state==='suspended')status('Audio was interrupted. Resume to keep playing this passage.');
  if(state==='ended')status('Quiet. Keep this passage, or begin a new one.');
 }});
 function configure(){
@@ -21,7 +22,7 @@ function configure(){
  $('model-detail').textContent=`This connection uses ${settings.frequency} Hz base tuning, ${settings.detune} cents detuning, coupling ${settings.coupling}, and loss ${settings.loss}/s. A unit left touch gives the other body its first drawn envelope maximum at ${peaks[0].swellSeconds?.toFixed(3)??'no distinct'} seconds, about ${(peaks[0].ratio*100).toFixed(0)}% of the struck body’s first peak (2 ms measurement grid). This is a swell, not sound arriving after a delay.`;
  const url=new URL(location.href);url.searchParams.set('bridge',$('bridge').value);history.replaceState(null,'',url);stillAt=0;lastGesture=null;
 }
-async function enter(){clearHolds();status('Preparing the two responses…');try{await transport.enable(settings);stillAt=0;lastGesture=null;$('hint').textContent='Both bodies belong to the same ringing system.';status('Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
+async function enter(){clearHolds();if(transport.state==='suspended'){try{await transport.resume();status('The connection is open again. Your passage is still here.');}catch(error){status(error.message,true);}return;}status('Preparing the two responses…');try{await transport.enable(settings);stillAt=0;lastGesture=null;$('hint').textContent='Both bodies belong to the same ringing system.';status('Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
 $('begin').onclick=enter;$('bridge').onchange=()=>{configure();enter();};
 function clearHolds(){held.clear();pads.forEach(pad=>{pad.setAttribute('aria-pressed','false');pad.style.setProperty('--hold','0%');});}
 function begin(body,key){if(!['ready','playing'].includes(transport.state)||held.has(body))return;held.set(body,{key,start:performance.now()});pads[body].setAttribute('aria-pressed','true');}
