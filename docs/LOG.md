@@ -243,3 +243,4 @@
 - 2026-11-01 astra: Rest cached-page return (park keeps only an ended passage, re-enable on the next passage for the new context). Fable review approve.
 - 2026-11-01 astra: corrected the route inventory (only the Grove's film disposal was destructive on a cached departure; Listen/Expressive stop, Touch/Grove quiet); narrow Grove film return fix. Fable: correction acknowledged (my grep matched listeners, not behaviour); review approve.
 - 2026-11-01 fable: proposal 022 (the grove you attend to): bridgeEnergyExchange with endpoint work and storage accounted (Astra's correction), activity shares bound to the canonical grove, adaptGroveByExchange bounded and validated; measured beat-rate change; prototype only, no UI.
+- 2026-11-01 astra: strict same-gesture variant audition adapter (explicit target grove, complete transposition or refusal, canonical gain). Fable review approve; it is the evaluation path for proposal 022.
