@@ -56,7 +56,7 @@ try{
     frame.stage.camera=direct(t,$('direction').value,{position:world.camera.position.toArray(),target:world.controls.target.toArray()});
     const applied=applyStage(frame,bindings,world);inspector.update(frame);world.render();
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
-    $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices · ${frame.stage.performers.actors.length} Keepers · ${frame.stage.performers.unplanned.length} unassigned strikes`;
+    $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices · ${frame.stage.performers.actors.length} Keepers · ${frame.stage.performers.unplanned.length} unassigned strikes · ${frame.stage.performers.actors.filter(a=>a.unreachable).length} unreachable arms`;
     requestAnimationFrame(draw);
   }
   draw();

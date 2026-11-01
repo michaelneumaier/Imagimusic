@@ -40,7 +40,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     const detail=explainBinding(current,lastFrame,getPatch());
     note.textContent=`${detail.label.toUpperCase()} · ${detail.note}`;
     const result=Array.isArray(detail.value)&&detail.value.length>8?`[${detail.value.length} sampled deflections]`:format(detail.value);
-    value.textContent=current.target==='performers'&&detail.value?`Gesture: ${detail.value.phase} · Event: ${detail.value.eventId??'none active'} · Contact: ${format(detail.value.contact)}`:`${detail.field} → ${detail.param}: ${result}`;
+    value.textContent=current.target==='performers'&&detail.value?`Gesture: ${detail.value.phase} · Event: ${detail.value.eventId??'none active'} · Contact: ${format(detail.value.contact)}${detail.value.unreachable?' · Unreachable: arm folded; original mallet remains':''}`:`${detail.field} → ${detail.param}: ${result}`;
     inputs.textContent=detail.inputs.map(input=>input.path+' = '+format(input.value)).join('\n');
   }
   return {update(frame){lastFrame=frame;render();route.update(frame);}};

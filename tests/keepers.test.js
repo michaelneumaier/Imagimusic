@@ -53,3 +53,18 @@ test('rapid repeated notes keep separate complete approach/recovery gestures in 
  }
  assert.notEqual(sample(1.15).actors.find(a=>a.eventId==='a')?.id,sample(1.15).actors.find(a=>a.eventId==='b')?.id);
 });
+
+test('changing strike positions stays continuous across rest, travel and same-slot approach',()=>{
+ const passage=createPerformance(DEFAULT_PATCH),first=passage.snapshots.garden.voices[0];
+ passage.events=[{family:'garden',voice:{...first,id:'a',slot:0,noteOn:1,position:.15}},{family:'garden',voice:{...first,id:'b',slot:0,noteOn:2,position:.85}},{family:'garden',voice:{...first,id:'c',slot:1,noteOn:4,position:.25}}];
+ const sample=createKeeperProjection(passage);let previous=sample(0);
+ for(let t=1/240;t<5;t+=1/240){const next=sample(t);for(const actor of next.actors){const old=previous.actors.find(a=>a.id===actor.id);assert.ok(Math.hypot(...actor.hand.map((v,i)=>v-old.hand[i]))<.09,`hand jump at ${t}`);}previous=next;}
+ for(const {voice} of passage.events){const actor=sample(voice.noteOn).actors.find(a=>a.eventId===voice.id);assert.ok(actor);assert.equal(actor.hand[1],voice.position*(3.35-voice.slot*.21));}
+});
+
+test('unreachable Keeper targets preserve requested contact and render a finite folded fallback',async()=>{
+ const {articulateKeeper}=await import('../src/stage/keepers.js');
+ const requested=[20,0,0],pose=articulateKeeper([0,1,0],requested);
+ assert.equal(pose.unreachable,true);assert.deepEqual(pose.requestedHand,requested);assert.ok([...pose.hand,...pose.elbow,...pose.shoulder].every(Number.isFinite));
+ const world={scene:new T.Scene()};assert.doesNotThrow(()=>applyKeepers(world,{actors:[{id:'garden/0',family:'garden',...pose}]}));
+});

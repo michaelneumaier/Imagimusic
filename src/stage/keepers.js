@@ -5,19 +5,31 @@ import { stagePosition } from './layout.js';
 import { solveKeeperArm } from './keeper-rig.js';
 
 export const KEEPER_BINDING={id:'performers/poses',target:'performers',param:'poses',field:'stage.performers',inputs:['tempo','seed','strikePosition','geometry.lengthM'],label:'interpreted',note:'Motorized Keepers carry the strike gestures; endpoint timing follows each score event.'};
+export function articulateKeeper(shoulder,requestedHand){
+  const joints=solveKeeperArm(shoulder,requestedHand,.7,.65,[0,0,-1]);
+  if(joints)return {...joints,unreachable:false};
+  const folded=shoulder.map((v,i)=>v+[.25,.1,.15][i]);
+  return {...solveKeeperArm(shoulder,folded,.7,.65,[0,0,-1]),requestedHand:[...requestedHand],unreachable:true};
+}
 export function createKeeperProjection(passage){
   const voices=new Map(passage.events.filter(e=>e.family!=='bellows').map(e=>[e.voice.id,e.voice]));
   const plans=['garden','tine'].map(family=>planPerformers(passage.events.filter(e=>e.family===family).map(e=>({...e.voice,slot:family==='tine'?0:e.voice.slot})),{family,slots:family==='tine'?1:8,minRecover:RECOVERY_SECONDS,recover:RECOVERY_SECONDS}));
+  const firstEvents=new Map(plans.flatMap(plan=>plan.actors.map(actor=>[actor.id,voices.get(actor.assignments[0]?.eventId)])));
   return t=>({unplanned:plans.flatMap(p=>p.unplanned.map(e=>({...e,family:p.family}))),actors:performerFrame(plans,t).performers.map(actor=>{
     const voice=voices.get(actor.eventId),gesture=voice&&['approach','contact','recover'].includes(actor.phase)?strikerPose(t,voice.noteOn,voice.approach):{reach:0,contact:0};
-    const anchor=stagePosition(actor.family,actor.slot),position=voice?.position??passage.patch.strikePosition;
+    const previous=voices.get(actor.previousEventId)??firstEvents.get(actor.id);
+    const fromPosition=previous?.position??passage.patch.strikePosition,toPosition=voice?.position??fromPosition;
+    let blend=1;
+    if(actor.phase==='travel')blend=actor.progress01;
+    else if(actor.phase==='approach'&&previous&&voice&&previous.slot===voice.slot){const p=actor.progress01;blend=p*p*(3-2*p);}
+    const anchor=stagePosition(actor.family,actor.slot),position=fromPosition+(toPosition-fromPosition)*blend;
     const local=actor.family==='garden'?[-.38-(1-gesture.reach)*.55,position*(3.35-actor.slot*.21),0]:[.2+position*passage.patch.geometry.lengthM*35,.78+(1-gesture.reach)*.6,0];
     const hand=anchor.map((v,i)=>v+local[i]);
     // A motorized carriage follows height; the two rigid links preserve their lengths.
     const lane=Number(actor.id.split('/').at(-1));
     const shoulder=actor.family==='garden'?[anchor[0]-1,Math.max(.2,hand[1]-.3),anchor[2]-.3-lane*.07]:[hand[0]-.5,.55,anchor[2]-.35];
-    const joints=solveKeeperArm(shoulder,hand,.7,.65,[0,0,-1]);
-    return {...actor,...joints,contact:gesture.contact};
+    const joints=articulateKeeper(shoulder,hand);
+    return {...actor,...joints,contact:joints.unreachable?0:gesture.contact};
   })});
 }
 
@@ -27,7 +39,7 @@ export function pumpOperators(chambers){
     const anchor=stagePosition('bellows',slot),scale=.45+chamber.fill*.6;
     const hand=[anchor[0],.65+.635*scale+.02,anchor[2]];
     const shoulder=[anchor[0]-.65,.95,anchor[2]-.45];
-    return {id:`bellows/${slot}`,family:'bellows',slot,eventId:chamber.voiceId,phase:chamber.phase,contact:1-chamber.fill,...solveKeeperArm(shoulder,hand,.7,.65,[0,0,-1])};
+    return {id:`bellows/${slot}`,family:'bellows',slot,eventId:chamber.voiceId,phase:chamber.phase,contact:1-chamber.fill,...articulateKeeper(shoulder,hand)};
   });
 }
 
