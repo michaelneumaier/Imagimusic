@@ -28,3 +28,16 @@ test('control rod endpoints stay attached through slow phase and changing carria
   assert.ok(ends[0].distanceTo(carriage)<1e-12);assert.ok(ends[1].distanceTo(pin)<1e-12);
  }
 });
+test('real FM model state drives every binding and settles at its sample-aligned audio endpoint',async()=>{
+ const {DEFAULT_TENSIONER,validateTensioner,tensionerCore,tensionerEnd,tensionerState}=await import('../src/fm.js');
+ const scene=createTensionerScene();
+ for(const ratio of [.01,2,3.5]){
+  const model=tensionerCore(validateTensioner({...DEFAULT_TENSIONER,ratio})),{endS}=tensionerEnd(model,48000);
+  for(const t of [0,.13,.8,endS-.01,endS]){
+   const frame=tensionerSceneFrame(tensionerState(t,model,endS)),applied=applyTensionerScene(frame,scene);
+   assert.ok(applied.every(v=>!v.missing));
+   assert.equal(scene.arm.visible,t<endS&&ratio===.01);
+  }
+  assert.equal(scene.halo.material.emissiveIntensity,0);assert.equal(scene.carriage.position.x,.8);
+ }
+});

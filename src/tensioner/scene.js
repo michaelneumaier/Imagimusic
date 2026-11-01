@@ -38,7 +38,7 @@ function updateLinks(scene){
  connect(scene.rod,right,control);
 }
 
-const inputs=['fm.carrierHz','fm.ratio','fm.index','fm.indexDecayS','fm.ampDecayS'];
+const inputs=['fm.carrierHz','fm.ratio','fm.index','fm.indexDecayS','fm.constantIndex','fm.ampDecayS'];
 export const TENSIONER_BINDINGS=validateBindings([
  {id:'fm/pull',target:'fm/tensioner',param:'pull',field:'stage.tensioner.pull',inputs,map:v=>.8+.4*v,label:'interpreted',note:'Carriage travel follows the remaining modulation envelope; no physical tension or back-reaction is simulated.'},
  {id:'fm/width',target:'fm/carrier',param:'width',field:'stage.tensioner.bandwidth',inputs,map:v=>.018+.06*Math.log2(1+v/220),label:'interpreted',note:'String halo radius is .018 + .06 log2(1 + estimated occupied bandwidth / 220 Hz). This is a bandwidth estimate, not displacement.'},

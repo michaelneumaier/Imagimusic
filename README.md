@@ -18,6 +18,12 @@ Open [The Conservatory](http://127.0.0.1:8080/stage.html) for an ensemble passag
 
 Enable **Include Tension Loom** on the stage to add its coupled pair to the ensemble. Eight alternating strikes follow the shared tempo and seed. In the study, **Play this Loom in the ensemble** carries your frequency, coupling, detuning and loss into a reproducible URL; the stage’s study link carries those settings back for editing. Sound preparation is cancellable, and playback starts every instrument on the same audio clock. The movie manifest saves the separate composition settings; the artifact verifier rebuilds the composed scene from them.
 
+## FM tensioner study
+
+Open [FM tensioner](http://127.0.0.1:8080/tensioner.html). Explore slow vibrato, metallic and bell-like starting points, then change carrier pitch, modulation ratio, index and decay. Play renders the complete tone from the integrated-frequency model; Silent study samples the same envelopes at an exact time. Save WAV exports mono PCM16. Fast modulation is a static disc; phase rotation is shown only below 8 Hz. The string halo is an estimated bandwidth display, and the linkage is interpreted, not a physical tension simulation.
+
+Safari's downloaded default metallic WAV was byte-identical to an independent model render: 663,145 samples at 48 kHz, peak 0.189897, final sample zero (renders/fm-tensioner-metallic.wav). Alias screening is a heuristic; the current numerical convergence check covers specified reference components and a representative setting, not every possible sound.
+
 ## Tension Loom study
 
 Open [Tension Loom](http://127.0.0.1:8080/loom.html). Strike either body or use **Play conversation** for eight alternating strikes with overlapping vibrations. Coupling changes both normal modes; zero coupling leaves the unstruck body silent. Detuning changes the exchange. Each stereo channel picks up one body's displacement, with a shared pickup scale for the scored passage. **Save stereo WAV** saves the full selected strike or conversation. **Silent study** scrubs the selected response without sound; Quiet returns the bodies to rest. Its seven declared scene bindings drive the same reusable bodies at every timestamp.
