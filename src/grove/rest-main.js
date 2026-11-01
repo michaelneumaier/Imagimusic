@@ -83,7 +83,7 @@ $('invite').onclick=()=>{try{clearExploration();releaseAll();invitation=composeR
 $('instrument-version').onchange=async()=>{
  if(!instrumentPair)return;
  stopReplay();movie.clear();clearComparison();picture=null;releaseAll();const own=++viewToken;invitation=null;clearExploration();
- grove=instrumentPair[$('instrument-version').value];build();status('Opening this version for a fresh passage…');
+ grove=instrumentPair[$('instrument-version').value];$('instrument-invitation').textContent=$('instrument-version').value==='original'?'Repeat a gesture you tried in Changed. Listen for what stays familiar and what shifts.':'Strike one body. Stay with the ring. Try that same gesture in Original.';build();status('Opening this version for a fresh passage…');
  try{await host.enable(grove,voice);if(own===viewToken&&host.state==='ready')status(`${$('instrument-version').value==='changed'?'Changed':'Original'} is open. Strike once and listen.`);}catch(error){if(own===viewToken)status(error.message,true);}
 };
 $('seed').onchange=()=>{if(instrumentPair)return;stopReplay();movie.clear();clearComparison();picture=null;releaseAll();viewToken++;invitation=null;clearExploration();grove=composeGrove({seed:Number($('seed').value)});build();status('Preparing this grove…');host.enable(grove).then(()=>status('Strike once. Rest a hand while it rings, then lift.')).catch(error=>status(error.message,true));const url=new URL(location.href);url.searchParams.set('seed',grove.seed);history.replaceState(null,'',url);};
@@ -126,8 +126,8 @@ const query=new URLSearchParams(location.search);
 if(query.has('instrument')){
  $('instrument-pair').hidden=false;
  if(document.referrer===new URL('adapt.html',location.href).href){$('instrument-return').textContent='Back to your comparison ↗';$('instrument-return').onclick=e=>{e.preventDefault();history.back();};}
- try{instrumentPair=readRestPlayHandoff(sessionStorage,query.get('instrument'));grove=instrumentPair.changed;voice=instrumentPair.voice;$('seed-label').hidden=true;$('instrument-note').textContent='One declared rule stiffened connections according to modeled spring activity in your saved passage. Play Changed, then return to Original and explore what answers differently. New hands use Rest’s Light and Firm strengths at the saved voice’s strike positions.';}
- catch(error){instrumentError=error.message;$('instrument-choice').hidden=true;$('instrument-note').textContent=`${error.message} The ordinary Rest instrument below is Grove 3.`;}
+ try{instrumentPair=readRestPlayHandoff(sessionStorage,query.get('instrument'));grove=instrumentPair.changed;voice=instrumentPair.voice;document.body.classList.add('instrument-pair-mode');$('seed-label').hidden=true;$('instrument-note').textContent='Try one gesture in each.';}
+ catch(error){instrumentError=error.message;$('instrument-choice').hidden=true;$('instrument-invitation').hidden=true;$('instrument-explanation').hidden=true;$('instrument-note').textContent=`${error.message} The ordinary Rest instrument below is Grove 3.`;}
 }
 const initial=Number(query.get('seed'));if(!query.has('instrument')&&[3,7,11].includes(initial)){$('seed').value=initial;grove=composeGrove({seed:initial});}
 try{world=createGroveWorld($('world'));}catch{status('The 3D view is unavailable; the body controls still work.');$('world').hidden=true;}build();if(instrumentError)status(instrumentError,true);
