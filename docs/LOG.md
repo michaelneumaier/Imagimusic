@@ -250,3 +250,4 @@
 - 2026-11-01 astra: repeated-adaptation listening study rendered (phrase on seed 3, steps 0/1/3, same gestures and gain). Fable: independently verified (rebuilds, identical gestures, adaptation chain); tool review approve; roadmap evaluation artifact.
 - 2026-11-01 astra: three-stage adaptation audition page and shared local player. Fable review approve (text states the rule and its limits; no appeal claim).
 - 2026-11-01 astra: three-stage adaptation listening page committed (305eb00); both local studies ready for Michael.
+- 2026-11-01 astra: optional static structure diagrams (default collapsed) on the adaptation audition page. Fable review approve.
