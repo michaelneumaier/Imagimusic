@@ -9,7 +9,7 @@ import {stagePosition} from '../src/stage/layout.js';
 
 test('camera paths are bounded and seek-independent, with smooth score attention',()=>{
  const passage=createPerformance(DEFAULT_PATCH),direct=createDirector(passage);
- for(const mode of ['establish','follow','detail']){
+ for(const mode of ['establish','follow','detail','cinematic']){
   const expected=direct(3,mode);direct(29,mode);direct(0,mode);assert.deepEqual(direct(3,mode),expected);
   let previous;
   for(let t=0;t<passage.duration;t+=1/60){const pose=direct(t,mode);assert.ok([...pose.position,...pose.target].every(Number.isFinite));assert.ok(pose.position[1]>2);if(previous)assert.ok(Math.hypot(...pose.position.map((v,i)=>v-previous.position[i]))<.12);previous=pose;}
@@ -62,5 +62,28 @@ test('conversation camera stays smooth, seek-independent, and widens the opening
    const before=direct(time-1e-7,'follow'),after=direct(time+1e-7,'follow');assert.ok(Math.hypot(...after.position.map((v,i)=>v-before.position[i]))<1e-5);
   }
   t.diagnostic(JSON.stringify({character,maxStep,maxRadius,meanDistances:means}));
+ }
+});
+
+test('musical orbit follows tempo, remains continuous and replays at arbitrary times',async()=>{
+ const {composeConversation}=await import('../src/score/conversation.js');
+ const {createScorePerformance}=await import('../src/stage/score-performance.js');
+ for(const tempo of [40,84,160]){
+  const score=composeConversation({tempo}),p=createScorePerformance(DEFAULT_PATCH,score),direct=createDirector(p);
+  let previous;
+  for(let t=0;t<p.duration;t+=1/120){
+   const pose=direct(t,'cinematic');
+   assert.ok([...pose.position,...pose.target].every(Number.isFinite));
+   assert.ok(Math.hypot(...pose.position)<22);
+   if(previous)assert.ok(Math.hypot(...pose.position.map((v,i)=>v-previous.position[i]))<.12);
+   previous=pose;
+  }
+  for(const beat of [0,4,16,32,48,64]){
+   const t=score.lead+beat*60/tempo,pose=direct(t,'cinematic');
+   direct(p.duration,'cinematic');direct(0,'cinematic');assert.deepEqual(direct(t,'cinematic'),pose);
+   const delta=pose.position.map((v,i)=>v-pose.target[i]);
+   const expectedAngle=.48+.22*Math.sin(beat/16*Math.PI*2);
+   assert.ok(Math.abs(Math.atan2(delta[0],delta[2])-expectedAngle)<1e-12);
+  }
  }
 });

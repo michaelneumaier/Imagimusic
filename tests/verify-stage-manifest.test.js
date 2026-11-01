@@ -45,3 +45,12 @@ test('FM composition proof includes the featured model and rejects omitted or ch
  const changed=structuredClone(m);changed.composition.fm.settings.index=2;assert.equal(verifyStageManifest(changed).valid,false);
  const malformed=structuredClone(m);malformed.composition.fm.settings.extra=true;assert.throws(()=>verifyStageManifest(malformed),/canonical/);
 });
+
+test('musical orbit export metadata rebuilds and a changed camera is detected',()=>{
+ const p=createPerformance(DEFAULT_PATCH),base=createProjection(DEFAULT_PATCH,{performance:p}),direct=createDirector(p);
+ const camera={mode:'cinematic',position:[9,6.5,12],target:[0,1,0]};
+ const project=f=>{const out=base(f);out.stage.camera=direct(f.t,camera.mode,camera);return out;};
+ const m={...createTraceManifest({...p,duration:1},{project}),instrument:DEFAULT_PATCH,camera,width:1280,height:720,videoDuration:1,codecs:{video:'avc',audio:'aac'}};
+ assert.equal(verifyStageManifest(m).valid,true);
+ assert.equal(verifyStageManifest({...m,camera:{...camera,mode:'follow'}}).valid,false);
+});

@@ -15,7 +15,7 @@ export function verifyStageManifest(saved){
  try{canonical=validatePatch(saved.instrument);}catch{throw new Error('Instrument is not a canonical patch');}
  if(!isDeepStrictEqual(canonical,saved.instrument))throw new Error('Instrument is not a canonical patch');
  if(saved.fps!==30||saved.sampleRate!==48000)throw new Error('Unsupported export timebase');
- if(!['manual','establish','follow','detail'].includes(saved.camera.mode??'manual'))throw new Error('Unknown camera mode');
+ if(!['manual','establish','follow','detail','cinematic'].includes(saved.camera.mode??'manual'))throw new Error('Unknown camera mode');
  for(const key of ['position','target'])if(!Array.isArray(saved.camera[key])||saved.camera[key].length!==3||!saved.camera[key].every(Number.isFinite))throw new Error(`Invalid camera ${key}`);
  let composition;
  if(saved.composition!==undefined){

@@ -4,6 +4,7 @@ import { stagePosition,LOOM_STAGE_PLACEMENT,FM_STAGE_PLACEMENT } from './layout.
 import * as T from '../../vendor/three/build/three.module.js';
 import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import { gardenBody, choirBody, tineBody, mesh, palette } from './bodies.js';
+import {createSurfaceLighting} from './surface-lighting.js';
 
 /** Scene construction only. Musical motion is applied through frame bindings. */
 export function createWorld(canvas, fixedSize = null) {
@@ -11,12 +12,14 @@ export function createWorld(canvas, fixedSize = null) {
   renderer.setPixelRatio(fixedSize ? 1 : Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
   const scene=new T.Scene();scene.background=new T.Color(0x101c20);scene.fog=new T.FogExp2(0x101c20,.026);
+  const surfaceLighting=createSurfaceLighting(renderer);scene.environment=surfaceLighting.environment;scene.environmentIntensity=.65;
   const camera=new T.PerspectiveCamera(42,1,.1,100);camera.position.set(9,6.5,12);
   const controls=new OrbitControls(camera,canvas);controls.target.set(0,1,0);controls.enableDamping=false;controls.minDistance=5;controls.maxDistance=28;controls.maxPolarAngle=Math.PI*.48;controls.update();
   scene.add(new T.HemisphereLight(0xd5e9dc,0x192119,2.2));
   const key=new T.DirectionalLight(0xffe5b6,4);key.position.set(-3,12,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-12;key.shadow.camera.right=12;key.shadow.camera.top=12;key.shadow.camera.bottom=-12;key.shadow.normalBias=.035;scene.add(key);
   const rim=new T.DirectionalLight(0x7cc8c3,3);rim.position.set(2,7,-8);scene.add(rim);
   const floor=mesh(new T.CylinderGeometry(10,10,.25,96),new T.MeshStandardMaterial({color:0x223530,metalness:.25,roughness:.7}),scene,[0,-.15,0]);
+  floor.material.roughnessMap=surfaceLighting.grain;
   const rings=new T.Group();scene.add(rings);
   for(let r=3;r<=9;r+=2){const ring=mesh(new T.TorusGeometry(r,.012,6,96),new T.MeshStandardMaterial({color:0x58675a,metalness:.5,roughness:.7}),rings,[0,-.015,0]);ring.rotation.x=Math.PI/2;}
   const garden=Array.from({length:8},(_,i)=>{const body=gardenBody(i);body.root.position.set(...stagePosition('garden',i));scene.add(body.root);return body;});
@@ -36,6 +39,6 @@ export function createWorld(canvas, fixedSize = null) {
     else {camera.position.set(9,6.5,12);controls.target.set(0,1,0);}
     controls.update();render();
   }
-  function dispose(){controls.dispose();scene.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});renderer.dispose();}
+  function dispose(){controls.dispose();surfaceLighting.dispose();scene.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});renderer.dispose();}
   return {scene,camera,renderer,controls,garden,choir,tine,rail,loom,fm,paths,render,view,dispose};
 }

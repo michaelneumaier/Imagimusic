@@ -17,7 +17,7 @@ export function gardenBody(index) {
   cylinder(.44,.16,dark,root,[0,.08,0]);cylinder(.065,height+.35,brass,root,[0,height/2+.18,0]);
   const layers=[];
   for(let n=0;n<5;n++) {
-    const surface=new T.MeshPhysicalMaterial({color:palette.glass,metalness:.25,roughness:.21,transparent:true,opacity:.62,side:T.DoubleSide,emissive:palette.glass,emissiveIntensity:0});
+    const surface=new T.MeshPhysicalMaterial({color:palette.glass,metalness:.15,roughness:.18,clearcoat:.7,clearcoatRoughness:.12,transparent:true,opacity:.62,side:T.DoubleSide,emissive:palette.glass,emissiveIntensity:0});
     const shell=mesh(new T.SphereGeometry(.28+n*.035,24,12,0,Math.PI*2,0,Math.PI*.74),surface,root,[0,height-n*height*.145,0]);
     shell.scale.y=.65;layers.push(shell);
     const rim=mesh(new T.TorusGeometry(.28+n*.035,.012,6,32),brass,shell);rim.rotation.x=Math.PI/2;rim.position.y=-.04;
