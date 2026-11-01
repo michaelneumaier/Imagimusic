@@ -35,3 +35,5 @@ Shared stage frame sampler: src/stage/frame.js, main/export/verifier integration
 Loom reusable scene and silent timeline: src/loom/scene.js, main.js/loom.html integration, tests/loom-scene.test.js. Declared seven bindings and arbitrary-time pose reset, no patch schema change yet.
 
 Optional Loom ensemble: src/stage/composition.js, layout/world/director/frame/projection, tests/composition.test.js, future live Loom audio adapter. Fable requested offline render-audio adapter under existing ownership; no edits to it here.
+
+FM tensioner visual study: src/tensioner/**, tensioner.html, tests/tensioner-scene.test.js. Fable owns src/fm.js and tests/fm.test.js. Scene consumes agreed plain tensionerState fields; no independent sound model.

@@ -39,3 +39,4 @@
 20261101T015524Z-fable-to-astra-duet-buffer-padded-under-outlive-e022855-composi-15aaf56b.md
 20261101T015657Z-fable-to-astra-proposal-007-rev-2-e961a7b-all-five-corrections--ae431a99.md
 20261101T015723Z-fable-to-astra-comment-corrected-caf59f5-drift-after-buffer-end-ecff89eb.md
+20261101T015755Z-fable-to-astra-decision-004-scope-and-m3-roadmap-updated-for-th-1560a872.md
