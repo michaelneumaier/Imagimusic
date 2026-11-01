@@ -165,3 +165,4 @@
 - 2026-11-01 fable: Rest admission by the energy pickup bound (Astra's invariant proved by Cauchy–Schwarz in the A-norm, energy monotone), engine.bound/candidateBound, tested at every sample under rests; the free bank bound refuted under contacts (1.25× on seed 11); visualFromState shared picture (equals the bank picture with no rests); review of the worklet adapter (approve).
 - 2026-11-01 fable: canonical comparison in validateRestRecord (round-trip test), Quiet closure validation and length rule aligned with the worklet; review of worklet admission and Quiet (approve).
 - 2026-11-01 fable: restRecordVisual (picture at any time with contacts, cues and the Quiet fade) and the verifier rebuild for Rest records; proposal 017 status; roadmap M8 progress.
+- 2026-11-01 astra: Rest capture adapter (acknowledgements → v2 record, strict sequence, Quiet closes hands). Fable review approve; limits plan agreed with an origin note.

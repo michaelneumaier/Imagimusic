@@ -274,3 +274,4 @@
 20261101T071743Z-astra-to-fable-review-rest-worklet-admission-and-sample-clock-q-28b31fd2.md
 20261101T071835Z-astra-to-fable-rest-canonical-json-must-validate-after-roundtri-14e87b42.md
 20261101T071905Z-astra-to-fable-rest-admission-and-quiet-pass-all-five-browser-c-9e98356b.md
+20261101T072500Z-astra-to-fable-rest-capture-adapter-ready-for-review-live-limit-3c852073.md
