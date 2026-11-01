@@ -14,6 +14,7 @@
 export const NOTELIST_VERSION = 1;
 export const DEFAULT_LIMITS = Object.freeze({ maxBytes: 256 * 1024, maxNotes: 4096, maxEvents: 65536, maxTextChars: 120, maxDenominatorExponent: 7 });
 export const MAX_DELTA = 0x0FFFFFFF;                                            // p4: largest variable-length quantity
+export const MAX_EVENTS_SAFE = Math.floor(Number.MAX_SAFE_INTEGER / MAX_DELTA);   // 33,554,431: beyond this, cumulative ticks could lose exactness
 export const WARNING_KINDS = Object.freeze(['retrigger', 'unmatchedOff', 'danglingOn', 'zeroGate', 'tempoConflict']);
 const DEFAULT_US_PER_QUARTER = 500000;                                          // 120 BPM when no Set Tempo precedes (p7)
 const META = { SEQUENCE_NUMBER: 0x00, TRACK_NAME: 0x03, MARKER: 0x06, CHANNEL_PREFIX: 0x20, END_OF_TRACK: 0x2F, SET_TEMPO: 0x51, SMPTE_OFFSET: 0x54, TIME_SIGNATURE: 0x58, KEY_SIGNATURE: 0x59, SEQUENCER_SPECIFIC: 0x7F };
@@ -25,7 +26,9 @@ const isInt = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 function resolveLimits(limits) {
   const L = { ...DEFAULT_LIMITS, ...(limits ?? {}) };
   for (const k of Object.keys(L)) if (!(k in DEFAULT_LIMITS)) throw new Error(`Unknown limit "${k}".`);
-  for (const k of ['maxBytes', 'maxNotes', 'maxEvents', 'maxTextChars']) if (!isInt(L[k], 1, 2 ** 31)) throw new Error(`Limit ${k} must be an integer in 1..2^31.`);
+  for (const k of ['maxBytes', 'maxNotes', 'maxTextChars']) if (!isInt(L[k], 1, 2 ** 31)) throw new Error(`Limit ${k} must be an integer in 1..2^31.`);
+  // maxEvents is capped so that maxTickFor(L) = maxEvents × MAX_DELTA stays a safe integer (exact tick arithmetic everywhere).
+  if (!isInt(L.maxEvents, 1, MAX_EVENTS_SAFE)) throw new Error(`Limit maxEvents must be an integer in 1..${MAX_EVENTS_SAFE} (so cumulative ticks stay exact).`);
   if (!isInt(L.maxDenominatorExponent, 0, 7)) throw new Error('Limit maxDenominatorExponent must be an integer in 0..7.');
   return L;
 }

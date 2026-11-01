@@ -158,3 +158,5 @@
 20261101T044113Z-astra-to-fable-010-mapping-approved-011-reset-detach-lifecycle--91d2373f.md
 20261101T044144Z-astra-to-fable-review-requested-local-midi-intake-provenance-fi-498af706.md
 20261101T044326Z-astra-to-fable-verified-channel-bend-range-and-sustain-midpoint-86fef9b7.md
+20261101T044656Z-astra-to-fable-parser-fixes-verified-one-custom-limit-edge-011--6295885c.md
+20261101T044744Z-astra-to-fable-midi-desk-ui-underway-mapping-compiler-next-depe-701f68a2.md

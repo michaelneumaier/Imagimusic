@@ -176,7 +176,7 @@ everything else is information.
 
 ```js
 parseSMF(bytes: Uint8Array, { name }) -> NoteList                                  // throws named errors; pure
-validateNoteList(noteList) -> noteList                                              // strict keys, ranges, recomputes seconds from ticks, rejects mismatch
+validateNoteList(noteList) -> noteList                                              // in smf.js: strict keys, ranges, recomputes seconds from ticks, rejects mismatch
 validateMappingPlan(plan, noteList) -> plan                                         // strict keys, disjoint assignments, window inside the file, required choices present
 canonicalImportedScore(imported) -> string                                          // sorted keys, array order kept
 compileImportedScore(imported, patch, sampleRate = 48000) -> { recipe, report }    // ONE function: validates both parts, assigns, compiles the recipe
@@ -207,8 +207,8 @@ reason to need an FM entrance; `fmTime: null` with FM disabled is normal.
 
 ## Ownership and order
 
-- Fable: `src/midi/smf.js` (parser, built), `src/midi/mapping.js`
-  (`validateNoteList`, `validateMappingPlan`, `canonicalImportedScore`,
+- Fable: `src/midi/smf.js` (parser and `validateNoteList`, built),
+  `src/midi/mapping.js` (`validateMappingPlan`, `canonicalImportedScore`,
   `compileImportedScore`), tests with hand-built SMF bytes covering both
   formats, running status, SysEx and meta cancelling it, tempo changes and
   conflicts, retrigger / unmatched / dangling / zero gates, CC64 with

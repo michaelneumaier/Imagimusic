@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseSMF, validateNoteList, canonicalNoteList, secondsAtTick } from '../src/midi/smf.js';
+import { parseSMF, validateNoteList, canonicalNoteList, secondsAtTick, MAX_EVENTS_SAFE, MAX_DELTA, maxTickFor } from '../src/midi/smf.js';
 
 // ---- byte builders (hand-built fixtures; nothing here depends on a MIDI library) ----
 const vlq = n => { const out = [n & 0x7f]; while ((n >>= 7) > 0) out.unshift((n & 0x7f) | 0x80); return out; };
@@ -197,4 +197,15 @@ test('validator rejects the adversarial records from the review', () => {
   rejects('notes not an array', c => { c.notes = {}; }, /must be an array/);
   rejects('too many warnings', c => { c.warnings = new Array(70000).fill({ kind: 'zeroGate', noteId: c.notes[0].noteId, detail: 'x' }); }, /at most/);
   assert.equal(JSON.parse(canonicalNoteList(base)).eventCount, 4);
+});
+
+test('a configured maxEvents can never push the tick bound past the safe-integer range', () => {
+  assert.equal(MAX_EVENTS_SAFE, Math.floor(Number.MAX_SAFE_INTEGER / MAX_DELTA));
+  assert.ok(Number.isSafeInteger(maxTickFor({ maxEvents: MAX_EVENTS_SAFE })));
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxEvents: 2 ** 31 } }), /Limit maxEvents/);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxEvents: MAX_EVENTS_SAFE + 1 } }), /Limit maxEvents/);
+  const list = parseSMF(SPEC_EXAMPLE, { limits: { maxEvents: MAX_EVENTS_SAFE } });
+  const unsafe = structuredClone(list); unsafe.endTick = 2 ** 54; unsafe.durationSeconds = secondsAtTick(unsafe.tempoMap, unsafe.ppq, unsafe.endTick);
+  assert.throws(() => validateNoteList(unsafe, { limits: { maxEvents: MAX_EVENTS_SAFE } }), /endTick/);
+  assert.throws(() => validateNoteList(unsafe, { limits: { maxEvents: 2 ** 31 } }), /Limit maxEvents/);
 });
