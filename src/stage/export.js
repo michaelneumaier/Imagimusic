@@ -46,7 +46,7 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
       video.close();
     })()];
     await Promise.all(tasks);check();onProgress('Finishing the MP4…');await output.finalize();check();
-    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,...(passage.composition?{composition:passage.composition}:{}),instrument:patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default, air choir and three tested Loom arrangements; codec bytes implementation-dependent'}};
+    return {blob:new Blob([target.buffer],{type:'video/mp4'}),manifest:{...manifest,...(passage.composition?{composition:passage.composition}:{}),instrument:patch,width,height,videoDuration:times.length/fps,camera:cameraPose,codecs:{video:'avc',audio:'aac'},encoding:'Deterministic scene state; repeated float32 audio verified on Safari 26.6.2 at 48 kHz for seed 731, default, air choir, three tested Loom arrangements, and default featured FM with and without Loom; codec bytes implementation-dependent'}};
   }catch(error){stopped=true;await output.cancel().catch(()=>{});await Promise.allSettled(tasks);throw error;}
   finally{world.dispose();}
 }

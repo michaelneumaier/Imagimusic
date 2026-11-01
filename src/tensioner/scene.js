@@ -49,7 +49,7 @@ export const TENSIONER_BINDINGS=validateBindings([
 ]);
 export function tensionerSceneFrame(state,{active=true}={}){
  const sounding=active&&state.amplitude>0,slow=sounding&&Number.isFinite(state.modulatorPhase01);
- return {stage:{tensioner:{pull:sounding?state.tension01:0,bandwidth:sounding?state.bandwidthEstimateHz:0,amplitude:sounding?state.amplitude:0,angle:slow?state.modulatorPhase01*Math.PI*2:0,slow,fast:sounding&&!slow}}};
+ return {stage:{tensioner:{positiveInstantaneousFrequency:state.positiveInstantaneousFrequency??null,pull:sounding?state.tension01:0,bandwidth:sounding?state.bandwidthEstimateHz:0,amplitude:sounding?state.amplitude:0,angle:slow?state.modulatorPhase01*Math.PI*2:0,slow,fast:sounding&&!slow}}};
 }
 export function setTensionerParameter(scene,target,param,value){
  if(param==='pull')scene.carriage.position.x=value;

@@ -36,6 +36,7 @@ test('real FM model state drives every binding and settles at its sample-aligned
   for(const t of [0,.13,.8,endS-.01,endS]){
    const frame=tensionerSceneFrame(tensionerState(t,model,endS)),applied=applyTensionerScene(frame,scene);
    assert.ok(applied.every(v=>!v.missing));
+   assert.equal(frame.stage.tensioner.positiveInstantaneousFrequency,model.positiveInstantaneousFrequency);
    assert.equal(scene.arm.visible,t<endS&&ratio===.01);
   }
   assert.equal(scene.halo.material.emissiveIntensity,0);assert.equal(scene.carriage.position.x,.8);

@@ -74,6 +74,8 @@ try{
   function draw(){
     const t=playing?live.time:study.time,frame=frames.sample(t,{mode:$('direction').value,position:world.camera.position.toArray(),target:world.controls.target.toArray()});
     const applied=applyStage(frame,frames.bindings,world);inspector.update(frame);world.render();
+    $('fm-readout').hidden=!frame.stage.tensioner;
+    if(frame.stage.tensioner)$('fm-readout').textContent=`FM carrier ${performance.fm.settings.carrierHz} Hz · Modulator ${performance.fm.core.modulatorHz.toFixed(2)} Hz · ${frame.stage.tensioner.positiveInstantaneousFrequency?'Positive instantaneous frequency':'Signed instantaneous frequency; digital FM'} · Entrance ${performance.fm.time.toFixed(2)} s`;
     $('time').textContent=t.toFixed(2)+' s';if(playing)$('seek').value=t;
     $('proof').textContent=`STATE ${traceHash(frame)} · ${applied.length} declared motion bindings · ${frame.voices.length} voices · ${frame.stage.performers.actors.length} Keepers · ${frame.stage.performers.unplanned.length} unassigned strikes · ${frame.stage.performers.actors.filter(a=>a.unreachable).length} unreachable arms`;
     requestAnimationFrame(draw);

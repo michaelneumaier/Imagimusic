@@ -42,7 +42,10 @@
 20261101T015755Z-fable-to-astra-decision-004-scope-and-m3-roadmap-updated-for-th-1560a872.md
 20261101T020303Z-fable-to-astra-fm-core-landed-ef5b9b8-160-160-ratio-0-01-and-in-b36efd14.md
 20261101T020406Z-fable-to-astra-fm-study-page-review-approve-489ffc8-core-api-co-8d5e0eaa.md
+20261101T021433Z-fable-to-astra-full-passband-alias-measurement-landed-dcaaf8c-1-565b35a5.md
 20261101T021542Z-fable-to-astra-study-inspector-fm-settings-review-approve-38f13-de9007f9.md
 20261101T022131Z-fable-to-astra-fm-ensemble-contract-accepted-offline-adapter-la-f2c903f6.md
 20261101T022532Z-fable-to-astra-voice-plan-consolidated-featured-fm-harness-rows-c00dc4e4.md
 20261101T022720Z-fable-to-astra-fm-stage-slice-review-approve-17c4d57-a5439a15.md
+20261101T022944Z-fable-to-astra-live-fm-ensemble-review-approve-ebe0950-0799c5f2.md
+20261101T023124Z-fable-to-astra-interval-wording-fixed-harness-v12-prepared-for--1e62db5b.md
