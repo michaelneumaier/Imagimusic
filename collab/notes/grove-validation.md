@@ -49,3 +49,13 @@ Safari 26.6.2 passed three cases (`tests/grove-contact-audio.html`): seed 3/48 k
 Final report: ignored `renders/grove-contact-audio-report.json`, generated 2026-11-01T07:10:25.710Z. Earlier two-case report is retained separately. Initial browser measurements prepared the 343-state recipe in 765–924 ms and rendered 1.2 seconds in 35–60 ms; these local OfflineAudioContext measurements are not hardware deadline guarantees. Nine focused kernel/recipe tests also passed when run by Astra.
 
 Admission remains a gate before live use: total energy non-increase alone does not prove the former free-mode decay bound stays conservative under damping-induced modal redistribution. Astra requested a state-energy pickup bound rather than importing that assumption. The worklet currently validates commands but does not claim final live headroom admission. Peer adapter review is requested; the playable Grove remains unchanged.
+
+### Rest admission and Quiet
+
+The audio-thread adapter now checks `engine.candidateBound` immediately before each strike. Fable replaced the invalid free-mode decay assumption with an energy pickup bound: outputGain × sqrt(2 E_after) × max(sqrt(pᵀ A⁻¹ p)). Since contact/free damping removes mechanical energy between strikes, this bounds subsequent displacement-pickup output in the mathematical model. The old bound was refuted by Fable's tests (up to 1.253× under contact on seed 11); it is not used by Rest.
+
+Decision messages are named `processed`, not `applied`: they carry accepted/rejected, actual frame/order, event, and bound/reason when relevant. Only accepted strikes belong in a saved performance. The dense-input browser case accepted seven strikes and rejected 26, with peak 0.33283695578575134 and exactly zero difference from a render containing only accepted strikes.
+
+Quiet is an audio-clock command: at its acknowledged frame it releases contacts, begins the saved fade, and rejects subsequent commands. The worklet rounds each engine sample to Float32 before applying the fade, matching the offline saved-record path. At the exact fade end it emits `finished` and stops processing. The browser fixture checked a held contact, Quiet at frame 512 with a 64-frame fade, later strike/repeated-Quiet rejection, and completion at frame 576; output matched exactly.
+
+Safari final report: `renders/grove-contact-audio-quiet-report.json`, generated 2026-11-01T07:17:35.353Z, five of five cases passed. This remains an isolated processor proof; host recording, live interaction and device-load testing are still outstanding. Follow-up review of the admission/Quiet adapter is requested.

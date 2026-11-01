@@ -6,11 +6,15 @@ class GroveContactProcessor extends AudioWorkletProcessor{
  constructor(options){
   super();const {recipe,events=[],generation='offline'}=options.processorOptions??{};
   if(recipe?.sampleRate!==sampleRate)throw new Error('Rest recipe sample rate must match the audio context');
-  this.recipe=recipe;this.generation=generation;this.engine=createRestEngine(recipe);this.queue=createContactEventQueue();this.commands=new Map();this.contacts=Array(recipe.bodies).fill(null);this.sample=new Float64Array(recipe.channels);this.stopped=false;this.acks=[];
+  if(!Array.isArray(recipe.energyFactors)||recipe.energyFactors.length!==recipe.channels||!recipe.energyFactors.every(v=>Number.isFinite(v)&&v>0)||!Number.isFinite(recipe.admissionCeiling)||recipe.admissionCeiling<=0||recipe.admissionCeiling>.9)throw new Error('Rest recipe needs a conservative energy admission bound');
+  this.recipe=recipe;this.generation=generation;this.engine=createRestEngine(recipe);this.queue=createContactEventQueue();this.commands=new Map();this.contacts=Array(recipe.bodies).fill(null);this.sample=new Float64Array(recipe.channels);this.stopped=false;this.finished=false;this.ending=null;this.acks=[];
   this.apply=ack=>{const event=this.commands.get(ack.id);this.commands.delete(ack.id);
-   if(event.kind==='strike')this.engine.strike(event.position,event.body,event.velocity);
+   let decision={accepted:true};
+   if(this.ending)decision={accepted:false,reason:'ended'};
+   else if(event.kind==='quiet'){this.ending={frame:ack.appliedFrame,fadeFrames:event.fadeFrames};this.contacts.fill(null);this.contactsChanged=true;}
+   else if(event.kind==='strike'){const bound=this.engine.candidateBound(event.position,event.body,event.velocity);if(!Number.isFinite(bound))throw new Error('Invalid Rest energy bound');decision={accepted:bound<=this.recipe.admissionCeiling,bound};if(decision.accepted)this.engine.strike(event.position,event.body,event.velocity);else decision.reason='headroom';}
    else{this.contacts[event.body]=event.zone===null?null:{zone:event.zone,strength:event.strength};this.contactsChanged=true;}
-   this.acks.push({...ack,event});
+   this.acks.push({...ack,event,...decision});
   };
   this.port.onmessage=({data})=>{try{if(data.type!=='events')throw new Error('Unknown Rest worklet message');this.enqueue(data.events);this.port.postMessage({type:'queued',generation:this.generation,ids:data.events.map(event=>event.id)});}catch(error){this.fail(error,currentFrame);}};
   this.enqueue(events);
@@ -18,8 +22,9 @@ class GroveContactProcessor extends AudioWorkletProcessor{
  enqueue(events){
   if(!Array.isArray(events))throw new Error('Rest events must be an array');
   for(const event of events){
-   const {body,kind}=event;if(!Number.isInteger(body)||body<0||body>=this.recipe.bodies)throw new Error('Invalid Rest event body');
-   if(kind==='strike'){if(!Number.isInteger(event.position)||!this.recipe.strikeVectors[event.position]||!Number.isFinite(event.velocity)||event.velocity<=0||event.velocity>1)throw new Error('Invalid Rest strike');}
+   const {body,kind}=event;if(kind!=='quiet'&&(!Number.isInteger(body)||body<0||body>=this.recipe.bodies))throw new Error('Invalid Rest event body');
+   if(kind==='quiet'){if(!Number.isSafeInteger(event.fadeFrames)||event.fadeFrames<1||event.fadeFrames>sampleRate)throw new Error('Invalid Rest ending fade');}
+   else if(kind==='strike'){if(!Number.isInteger(event.position)||!this.recipe.strikeVectors[event.position]||!Number.isFinite(event.velocity)||event.velocity<=0||event.velocity>1)throw new Error('Invalid Rest strike');}
    else if(kind==='contact'){if(event.zone!==null&&(!Number.isInteger(event.zone)||event.zone<0||event.zone>=this.recipe.zones.length||!Number.isInteger(event.strength)||event.strength<0||event.strength>=this.recipe.strengths.length))throw new Error('Invalid Rest contact');}
    else throw new Error('Unknown Rest event kind');
    this.queue.enqueue(event.id,event.frame);this.commands.set(event.id,{...event});
@@ -27,16 +32,19 @@ class GroveContactProcessor extends AudioWorkletProcessor{
  }
  fail(error,frame){if(this.stopped)return;this.stopped=true;this.port.postMessage({type:'error',generation:this.generation,frame,message:error.message});}
  process(inputs,outputs){
-  const channels=outputs[0];if(this.stopped){for(const channel of channels)channel.fill(0);return false;}
+  const channels=outputs[0];if(this.stopped||this.finished){for(const channel of channels)channel.fill(0);return false;}
   let i=0;
   try{
    for(;i<channels[0].length;i++){
+    const frame=currentFrame+i;if(this.ending&&frame>=this.ending.frame+this.ending.fadeFrames){for(const channel of channels)channel.fill(0,i);this.finished=true;this.finishedFrame=frame;break;}
     this.contactsChanged=false;this.queue.applyThrough(currentFrame+i,this.apply);if(this.contactsChanged)this.engine.setContacts(contactStateKey(this.contacts));
-    this.engine.read(this.sample);for(let ch=0;ch<channels.length;ch++){const value=this.sample[ch];if(!Number.isFinite(value))throw new Error('Non-finite Rest output');channels[ch][i]=value;}this.engine.step();
+    const fade=this.ending?Math.max(0,Math.min(1,1-(frame-this.ending.frame)/this.ending.fadeFrames)):1;
+    this.engine.read(this.sample);for(let ch=0;ch<channels.length;ch++){const value=Math.fround(this.sample[ch]);if(!Number.isFinite(value))throw new Error('Non-finite Rest output');channels[ch][i]=value*fade;}this.engine.step();
    }
   }catch(error){for(const channel of channels)channel.fill(0,i);this.fail(error,currentFrame+i);}
-  if(this.acks.length){this.port.postMessage({type:'applied',generation:this.generation,events:this.acks});this.acks=[];}
-  return !this.stopped;
+  if(this.acks.length){this.port.postMessage({type:'processed',generation:this.generation,events:this.acks});this.acks=[];}
+  if(this.finished)this.port.postMessage({type:'finished',generation:this.generation,frame:this.finishedFrame,ended:{...this.ending}});
+  return !this.stopped&&!this.finished;
  }
 }
 registerProcessor('imagimusic-grove-contact',GroveContactProcessor);
