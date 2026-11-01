@@ -1,3 +1,4 @@
+import {createResponseCauseArcs} from './response-cause-arcs.js';
 import * as T from '../../vendor/three/build/three.module.js';
 export const RESPONSE_TRACE_COLORS=[0xa4d0b8,0xd8b5d8,0x9fc7dc];
 /** Presentation only: time circles the base once over the fixed encounter window.
@@ -15,6 +16,7 @@ export function createResponseTrace({duration=5.025,maxSamples=512,maxGap=.15}={
   const geometry=new T.BufferGeometry(),positions=new Float32Array((maxSamples-1)*6);geometry.setAttribute('position',new T.BufferAttribute(positions,3));geometry.setDrawRange(0,0);
   const line=new T.LineSegments(geometry,new T.LineBasicMaterial({color,transparent:true,opacity:.8,depthWrite:false}));line.frustumCulled=false;root.add(line);return line;
  });
+ const causeArcs=createResponseCauseArcs({duration});root.add(causeArcs.root);
  const marks=[],labels=[];
  for(const time of [0,2,5]){const angle=-Math.PI/4+2*Math.PI*time/duration,points=[2.25,4.45].map(radius=>new T.Vector3(radius*Math.cos(angle),.04,radius*Math.sin(angle)));const geometry=new T.BufferGeometry().setFromPoints(points),material=new T.LineDashedMaterial({color:0xb8b4bf,transparent:true,opacity:.25,dashSize:.06,gapSize:.08}),mark=new T.Line(geometry,material);mark.computeLineDistances();root.add(mark);marks.push(mark);}
  // Clock labels belong to the browser presentation, not the numerical history.
@@ -23,7 +25,7 @@ export function createResponseTrace({duration=5.025,maxSamples=512,maxGap=.15}={
   const texture=new T.CanvasTexture(canvas),material=new T.SpriteMaterial({map:texture,transparent:true,depthWrite:false,sizeAttenuation:false}),label=new T.Sprite(material),angle=-Math.PI/4+2*Math.PI*time/duration;label.position.set(4.6*Math.cos(angle),.1,4.6*Math.sin(angle));root.add(label);labels.push(label);
  }
  let last=null,count=0,segments=0;
- function reset(){last=null;count=segments=0;for(const line of lines)line.geometry.setDrawRange(0,0);}
+ function reset(){causeArcs.reset();last=null;count=segments=0;for(const line of lines)line.geometry.setDrawRange(0,0);}
  function append({time,envelope}){
   if(!Array.isArray(envelope)||envelope.length!==3)throw new Error('Trace needs three body responses');
   const points=envelope.map((value,body)=>responseTracePoint(body,time,value,duration));
@@ -34,7 +36,7 @@ export function createResponseTrace({duration=5.025,maxSamples=512,maxGap=.15}={
   }segments++;}
   last={time,points};count++;return true;
  }
- return {root,append,reset,resize(camera){for(const label of labels)label.scale.set(.22/camera.zoom,.055/camera.zoom,1);},setVisible(value){root.visible=!!value;},get stats(){return {samples:count,segments,lastTime:last?.time??null};},dispose(){for(const line of [...lines,...marks]){line.geometry.dispose();line.material.dispose();}for(const label of labels){label.material.map.dispose();label.material.dispose();}root.removeFromParent();}};
+ return {root,append,reset,setCauses:history=>causeArcs.set(history),resize(camera){for(const label of labels)label.scale.set(.22/camera.zoom,.055/camera.zoom,1);},setVisible(value){root.visible=!!value;},get stats(){return {samples:count,segments,lastTime:last?.time??null};},dispose(){causeArcs.dispose();for(const line of [...lines,...marks]){line.geometry.dispose();line.material.dispose();}for(const label of labels){label.material.map.dispose();label.material.dispose();}root.removeFromParent();}};
 }
 /** Consume every stored picture sample, even when display refreshes skip ahead. */
 export function advanceResponseTrace(trace,picture,time,index=0){

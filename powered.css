@@ -3,3 +3,5 @@
 .next-touch{max-width:620px;color:#d3c5df;font-size:15px;line-height:1.65;margin:0 0 22px;padding-left:16px;border-left:2px solid #a58eb966}
 
 .trace-controls{margin:24px 0}.trace-controls button{font-size:12px}.trace-controls button[aria-pressed=true]{border-color:#bfa2da;color:#dfcee9}.trace-controls p{font-size:12px;line-height:1.6;color:#b6b4c0;max-width:650px;margin:12px 0}#trace-legend{display:flex;gap:18px;font-size:11px;letter-spacing:.06em}#trace-legend span:nth-child(1){color:#a4d0b8}#trace-legend span:nth-child(2){color:#d8b5d8}#trace-legend span:nth-child(3){color:#9fc7dc}
+
+#cause-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;font-size:11px}#cause-legend span:before{content:"";display:inline-block;width:12px;height:4px;margin-right:6px;vertical-align:middle;background:currentColor}#cause-legend span:nth-child(1){color:#e7c887}#cause-legend span:nth-child(2){color:#e7e2ee}#cause-legend span:nth-child(3){color:#dc9572}

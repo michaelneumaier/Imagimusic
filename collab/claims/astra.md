@@ -116,3 +116,4 @@ Powered first-use: host and UI accept a currently held contact during preparatio
 Powered body identification: optional bodyLabels in src/grove/scene.js, custom readable sprite above body01, existing scene labels unchanged by default.
 Powered startup timing: powered-worklet/host diagnostic fields and tests/grove-powered-startup.html/js; measure requested origin versus first process block and actual origin, separate from device-output latency.
 Optional response history: src/grove/response-trace.js and tests/grove-response-trace.test.js plus powered UI; bounded sampled low-band history, fixed radial mapping, gaps remain gaps, no audio/model/export changes.
+Trace causes: src/grove/response-causes.js and response-cause-arcs.js plus tests/grove-response-causes.test.js; actual acknowledged source/contact intervals, clipped to playhead, retained across Quiet, deterministic record replay.
