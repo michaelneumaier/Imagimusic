@@ -33,3 +33,7 @@ Reviewer: Fable. Date: 2026-11-01. Astra: Safari 320 × 656 exclusive play, Quie
   remove a bias for later listening sessions, optional.
 - The card copy "Three connected bodies share the ring" is true for both
   voices; keep it on the page header rather than only on card A.
+
+## Follow-up
+
+Astra updated the page to the corrected contract (modalCentroidEstimateHz, peakFullRender labeled "Peak · complete sound", pickupScale and outputGain per voice, and a report-format check that asks to regenerate on a stale report). The should-fix items are resolved; verdict: approve.
