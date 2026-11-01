@@ -1,3 +1,4 @@
+import { stagePosition } from './layout.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import { gardenBody, choirBody, tineBody, mesh, palette } from './bodies.js';
@@ -16,9 +17,9 @@ export function createWorld(canvas, fixedSize = null) {
   const floor=mesh(new T.CylinderGeometry(10,10,.25,96),new T.MeshStandardMaterial({color:0x223530,metalness:.25,roughness:.7}),scene,[0,-.15,0]);
   const rings=new T.Group();scene.add(rings);
   for(let r=3;r<=9;r+=2){const ring=mesh(new T.TorusGeometry(r,.012,6,96),new T.MeshStandardMaterial({color:0x58675a,metalness:.5,roughness:.7}),rings,[0,-.015,0]);ring.rotation.x=Math.PI/2;}
-  const garden=Array.from({length:8},(_,i)=>{const body=gardenBody(i);body.root.position.set((i-3.5)*1.15,0,1.1+Math.abs(i-3.5)*.12);scene.add(body.root);return body;});
-  const choir=Array.from({length:6},(_,i)=>{const body=choirBody(i);body.root.position.set((i-2.5)*1.6,0,-2.4-Math.cos(i*.7)*.25);scene.add(body.root);return body;});
-  const tine=tineBody();tine.root.position.set(-1.6,0,4.1);scene.add(tine.root);
+  const garden=Array.from({length:8},(_,i)=>{const body=gardenBody(i);body.root.position.set(...stagePosition('garden',i));scene.add(body.root);return body;});
+  const choir=Array.from({length:6},(_,i)=>{const body=choirBody(i);body.root.position.set(...stagePosition('bellows',i));scene.add(body.root);return body;});
+  const tine=tineBody();tine.root.position.set(...stagePosition('tine'));scene.add(tine.root);
   const rail=mesh(new T.CylinderGeometry(.055,.055,9.2,16),new T.MeshStandardMaterial({color:palette.brass,metalness:.8,roughness:.3}),scene,[0,.2,-1.2]);rail.rotation.z=Math.PI/2;
   const paths=new Map();
   garden.forEach((b,i)=>paths.set(`garden/${i}`,b));choir.forEach((b,i)=>paths.set(`choir/${i}`,b));paths.set('tine/0',tine);

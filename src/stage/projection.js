@@ -1,3 +1,4 @@
+import { CAMERA_BINDING } from './director.js';
 import { stageInputsFor } from '../bindings-catalog.js';
 import { aperture01 } from '../dynamics.js';
 import { tineModes } from '../model.js';
@@ -30,7 +31,7 @@ function modalSlot(frame,family,slot){
   const gesture=voices.filter(v=>v.exciter.visible).sort((a,b)=>Math.abs(a.age)-Math.abs(b.age))[0];
   return {energies,reach:gesture?.exciter.reach??0,visible:!!gesture,position:gesture?.exciter.pos01??.37,damper:Math.max(0,...voices.map(v=>v.damper.pressure))};
 }
-export function stageBindings(){
+export function stageBindings({camera=false}={}){
   const list=[];
   function add(target,param,field,inputs,note,map){const spec=stageInputsFor(target.split('/')[0],param);if(!spec)throw new Error('Missing binding metadata: '+target+'/'+param);list.push({id:target+'/'+param,target,param,field,inputs:spec.inputs,label:note.label,note:spec.note,map});}
   for(let i=0;i<8;i++) {
@@ -40,10 +41,12 @@ export function stageBindings(){
   }
   for(let i=0;i<6;i++)for(const param of ['fill','aperture','level','swing','fast','resonance'])add(`bellows/slot${i}`,param,`stage.bellows[${i}].${param}`,['bellows.adsr','bellows.cutoffHz','bellows.envAmount','bellows.lfo'],CAPTIONS[1]);
   for(const param of ['length','thickness','width','deflection','reach','position','visible'])add('tine/slot8',param,`stage.tine.${param}`,['geometry','strikePosition','damping'],CAPTIONS[2]);
+  if(camera)list.push({...CAMERA_BINDING});
   return validateBindings(list);
 }
 export function applyStage(frame,bindings,world){
   return applyBindings(frame,bindings,(target,param,value)=>{
+    if(target==='camera'){world.camera.position.fromArray(value.position);world.controls.target.fromArray(value.target);world.camera.lookAt(world.controls.target);return;}
     const [family,slotName]=target.split('/'),slot=Number(slotName.slice(4));
     if(family==='garden'){
       const body=world.garden[slot];

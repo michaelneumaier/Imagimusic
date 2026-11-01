@@ -9,3 +9,5 @@ Export active: src/stage/export.js, vendor/mediabunny/**, tests/export-smoke.htm
 Lab state migration: src/snapshots.js, tests/snapshots.test.js and owned lab renderers; plain snapshots replace audio-engine objects.
 
 Inspector route overlay: src/stage/route-overlay.js and inspector integration, stage.html.
+
+Procedural camera direction: src/stage/director.js, layout.js, world/projection/main/export integration, tests/director.test.js.
