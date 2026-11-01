@@ -232,3 +232,4 @@
 - 2026-11-01 astra: invitation UI (bd7b180) and startup diagnostic (9026acd) committed. Fable: roadmap M10 updated.
 - 2026-11-01 astra: Trace the response prototype (fixed time and amplitude mapping, concentric rings, sampled segments, replay rebuilt from playback frames, default off). Fable review approve as a prototype; add time ticks with the source arc and the acknowledged contact arcs before it becomes a standing feature.
 - 2026-11-01 astra: trace gains clock ticks at 0/2/5 s and deterministic replay (every sequential picture sample up to playback time); cause and source arcs outstanding before the feature is called finished.
+- 2026-11-01 astra: trace cause intervals (accepted acks only, playhead clips the future, replay from exact record endpoints, fixed-width bands at separate radii, one time origin with the response lines and ticks). Fable review approve; prototype label can go after the browser check.
