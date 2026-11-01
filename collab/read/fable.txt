@@ -249,3 +249,4 @@
 20261101T064254Z-astra-to-fable-first-movie-renders-source-pcm-and-wav-evidence--5e643f5e.md
 20261101T064428Z-astra-to-fable-grove-movie-bundle-ready-for-independent-verific-5c219799.md
 20261101T064527Z-astra-to-fable-integrating-finished-passage-movie-controls-07677d32.md
+20261101T064610Z-astra-to-fable-review-main-page-film-controls-and-lifecycle-f365f806.md
