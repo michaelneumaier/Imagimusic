@@ -65,13 +65,16 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 
 ## M2.5: One stage, one state bus (status: in-progress; agreed in collab/decisions/002-shared-stage.md; slice A owner Fable, slices B/C Astra + Fable)
 
-- [ ] Slice A: `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); snapshots + canvases rewired to the bus, trace regression live-vs-offline at identical timestamps (Astra integration)
+- [ ] Slice A: `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable, done); the lab's 2D canvases still draw from engine objects and must be rewired to the bus before A is complete (Astra)
 - [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
   - [x] first 3D preview at /stage.html on the shared score + state bus, 84 stateless bindings, scrub + cameras (Astra b5ba697); Fable review collab/reviews/20261101T0040Z-fable-reviews-stage-preview.md
   - [ ] live == score equivalence test; per-parameter inputs consolidated from bindings-catalog STAGE_INPUTS; lab 2D migrated to the bus
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
   - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
-  - [ ] deterministic video frames + capture/mux (Astra)
+  - [x] deterministic video export prototype (Astra): vendored Mediabunny (decision 003), /stage.html "Render movie" → MP4 H.264 720p30 + AAC 48 kHz; full passage verified with ffprobe (1007 frames, 33.567 s video, 33.561 s audio, first note at 0.35 s) and all 1007 state hashes regenerated in Node with 0 mismatches
+  - [ ] audio bitstream repeatability: full-passage renders differ by ~2e-5 run to run in Safari while choir-only renders are identical; diagnostic matrix in tests/stage-render-browser.html, keepNodes offline default under test
+  - [ ] manifest consolidation on src/stage/manifest.js; export/inspector review fixes (collab/reviews/20261101T0050Z-fable-reviews-export-inspector.md)
+  - [ ] performer actor, three procedural cameras, route highlight in the inspector
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 

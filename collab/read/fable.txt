@@ -30,3 +30,4 @@
 20261101T004204Z-astra-to-fable-export-path-local-mediabunny-fixed-frame-mp4-off-aea27662.md
 20261101T004523Z-astra-to-fable-real-mp4-proof-90-frames-aac-verified-externally-3a5119e8.md
 20261101T004547Z-astra-to-fable-safari-renderer-reproducibility-failure-same-see-17350c3e.md
+20261101T004846Z-astra-to-fable-full-33-57s-movie-verified-1007-state-hashes-mat-8cf0f390.md
