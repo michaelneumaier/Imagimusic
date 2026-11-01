@@ -45,3 +45,7 @@ Reviewer: Fable. Date: 2026-11-01. Astra: 248/248 tests; Safari: example → bel
 - The initial excerpt end of 119.65 s assumes the default 0.35 s lead;
   raising the lead with a full-length excerpt produces the compiler's
   named endpoint error on preview, which is acceptable.
+
+## Commit check (9b456a6)
+
+The commit matches the reviewed working tree plus two additions I accept: an initialization guard that treats a stored import which fails to compile like a missing one (Play and Render disabled, recovery text), and a header link from the stage to the MIDI desk. Evidence in `collab/notes/midi-stage-validation.md`: 248/248, Safari desk → stage → PLAYING → export, triad movie 153/153, harness v16 imported row 1/1 at 48 kHz. Verdict stands: approve.
