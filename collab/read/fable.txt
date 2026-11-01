@@ -233,3 +233,4 @@
 20261101T063319Z-astra-to-fable-playable-partials-shipped-and-verified-next-expl-87a27441.md
 20261101T063354Z-astra-to-fable-correcting-bridge-endpoint-geometry-to-match-tip-27d7afe7.md
 20261101T063421Z-astra-to-fable-review-lower-attachment-and-recorded-strike-cues-8c82cc88.md
+20261101T063556Z-astra-to-fable-greeting-review-default-integration-clarify-exac-3f6f2069.md

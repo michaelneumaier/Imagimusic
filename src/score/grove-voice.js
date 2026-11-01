@@ -99,10 +99,10 @@ import { groveNeighbors, groveRingSeconds as ringOf } from './grove.js';
 export const VOICE_GREETING_BOUNDS = Object.freeze({ minSeconds: 15, maxSeconds: 35 });
 const VOICE_ROLES = Object.freeze({ place: 0.6, answer: 0.55, reply: 0.5, late: 0.5, shared: 0.6 });
 
-/** Compose the greeting for a grove under a voice configuration (positions are indices into config.positions; needs ≥ 3 positions). */
+/** Compose the greeting for a grove under a voice configuration with exactly three strike positions (indices 0, 1, 2 = upper, middle, bridge tip). */
 export function composeGroveVoiceGreeting(grove, config = DEFAULT_VOICE_CONFIG, { tempo = 84, lead = 0.35 } = {}) {
   const voice = createGroveVoice(grove, config), g = voice.grove;
-  if (voice.positions.length < 3) throw new Error('the position-aware greeting needs at least three strike positions.');
+  if (voice.positions.length !== 3) throw new Error('this authored greeting is written for exactly three strike positions (upper, middle, bridge tip); the factory itself allows 1..5.');
   const upper = 0, middle = 1, tip = voice.positions.length - 1, { neighbor, third } = groveNeighbors(g);
   const s = (id, beat, body, position, role) => ({ id, beat, body, position, velocity: VOICE_ROLES[role], role });
   const strikes = [

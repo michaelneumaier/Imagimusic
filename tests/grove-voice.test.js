@@ -74,5 +74,6 @@ test('the position-aware greeting keeps its promise on every curated seed and co
     rejects(c => { c.strikes[0].position = 5; }, /index the voice positions/);
     rejects(c => { c.tempo = 40; }, /greeting lasts/);
   }
-  assert.throws(() => composeGroveVoiceGreeting(composeGrove({ seed: 3 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.6] }), /at least three strike positions/);
+  assert.throws(() => composeGroveVoiceGreeting(composeGrove({ seed: 3 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.6] }), /exactly three strike positions/);
+  assert.throws(() => composeGroveVoiceGreeting(composeGrove({ seed: 3 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.3, 0.5, 0.7, 1] }), /exactly three strike positions/);
 });
