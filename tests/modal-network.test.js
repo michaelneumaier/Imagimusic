@@ -78,20 +78,27 @@ test('damping approximation evidence: discarded off-diagonal damping is reported
   const kc = 0.006 * 0.02 * (2 * Math.PI * 196) ** 2, edges = [{ a: 0, b: 1, kc, ua: 1, ub: 1 }, { a: 1, b: 2, kc: kc * 0.7, ua: 0.8, ub: 1 }];
   const sys = modalNetwork({ bodies, edges });
   assert.ok(Number.isFinite(sys.dampingResidual) && sys.dampingResidual >= 0 && sys.dampingResidual < 1, `discarded off-diagonal damping, relative Frobenius: ${sys.dampingResidual}`);
-  // Direct integration of M q̈ + C q̇ + K q = 0 with C = diag(2 m_k γ_k) (the pair's 2γM convention per partial), RK4, from the strike's initial velocity.
+  // Direct integration of M q̈ + C q̇ + K q = 0 with C = diag(2 m_k γ_k) (the pair's 2γM convention per partial), RK4, from the strike's
+  // initial velocity. Run at two step sizes: the discrepancy to the closed form falls ~16× per halving (RK4's own error dominates), so the
+  // finest-step discrepancy is an upper bound on the approximation error, and the two-step difference bounds the numerical error.
   const strike = sys.strike(0, 0.6, 0.01), n = sys.n, rates = bodies.flatMap(b => b.decayRates);
-  let q = new Array(n).fill(0), v = strike.qdot0Coordinates.slice();
   const acc = (q, v) => q.map((_, k) => { let kq = 0; for (let l = 0; l < n; l++) kq += sys.K[k][l] * q[l]; return -(2 * rates[k] * v[k]) - kq / sys.m[k]; });
-  const h = 1 / 96000, T = 0.6; let maxErr = 0, scale = 0;
-  for (let step = 1; step * h <= T; step++) {
-    const k1q = v, k1v = acc(q, v);
-    const q2 = q.map((x, k) => x + 0.5 * h * k1q[k]), v2 = v.map((x, k) => x + 0.5 * h * k1v[k]), k2q = v2, k2v = acc(q2, v2);
-    const q3 = q.map((x, k) => x + 0.5 * h * k2q[k]), v3 = v.map((x, k) => x + 0.5 * h * k2v[k]), k3q = v3, k3v = acc(q3, v3);
-    const q4 = q.map((x, k) => x + h * k3q[k]), v4 = v.map((x, k) => x + h * k3v[k]), k4q = v4, k4v = acc(q4, v4);
-    q = q.map((x, k) => x + h / 6 * (k1q[k] + 2 * k2q[k] + 2 * k3q[k] + k4q[k])); v = v.map((x, k) => x + h / 6 * (k1v[k] + 2 * k2v[k] + 2 * k3v[k] + k4v[k]));
-    if (step % 48 === 0) { const t = step * h, closed = strike.q(t); for (let k = 0; k < n; k++) { scale = Math.max(scale, Math.abs(q[k])); maxErr = Math.max(maxErr, Math.abs(q[k] - closed[k])); } }
-  }
-  const relative = maxErr / scale;
-  console.log(`classical-damping approximation vs direct damped ODE (0.6 s, 9 coordinates): max |Δq| / max |q| = ${relative.toExponential(3)}; discarded off-diagonal damping ${sys.dampingResidual.toExponential(3)} (relative Frobenius)`);
-  assert.ok(relative < 0.05, `closed form within 5% of the direct damped integration (got ${relative})`);
+  const integrate = (h, T, sampleEvery) => {
+    let q = new Array(n).fill(0), v = strike.qdot0Coordinates.slice(), maxErr = 0, scale = 0; const samples = [];
+    for (let step = 1; step * h <= T + 1e-12; step++) {
+      const k1q = v, k1v = acc(q, v);
+      const q2 = q.map((x, k) => x + 0.5 * h * k1q[k]), v2 = v.map((x, k) => x + 0.5 * h * k1v[k]), k2q = v2, k2v = acc(q2, v2);
+      const q3 = q.map((x, k) => x + 0.5 * h * k2q[k]), v3 = v.map((x, k) => x + 0.5 * h * k2v[k]), k3q = v3, k3v = acc(q3, v3);
+      const q4 = q.map((x, k) => x + h * k3q[k]), v4 = v.map((x, k) => x + h * k3v[k]), k4q = v4, k4v = acc(q4, v4);
+      q = q.map((x, k) => x + h / 6 * (k1q[k] + 2 * k2q[k] + 2 * k3q[k] + k4q[k])); v = v.map((x, k) => x + h / 6 * (k1v[k] + 2 * k2v[k] + 2 * k3v[k] + k4v[k]));
+      if (step % sampleEvery === 0) { const t = step * h, closed = strike.q(t); samples.push(q.slice()); for (let k = 0; k < n; k++) { scale = Math.max(scale, Math.abs(q[k])); maxErr = Math.max(maxErr, Math.abs(q[k] - closed[k])); } }
+    }
+    return { relative: maxErr / scale, samples, scale };
+  };
+  const T = 0.6, coarse = integrate(1 / 192000, T, 96), fine = integrate(1 / 384000, T, 192);   // both sampled every 0.5 ms
+  let numerical = 0; for (let i = 0; i < fine.samples.length; i++) for (let k = 0; k < n; k++) numerical = Math.max(numerical, Math.abs(fine.samples[i][k] - coarse.samples[i][k]));
+  numerical /= fine.scale;
+  console.log(`closed form vs direct damped RK4 (0.6 s, 9 coordinates): discrepancy at h = 1/192000: ${coarse.relative.toExponential(3)}; at h = 1/384000: ${fine.relative.toExponential(3)}; reference-to-reference difference ${numerical.toExponential(3)} (RK4 error dominates; approximation error ≤ finest discrepancy); discarded off-diagonal damping ${sys.dampingResidual.toExponential(3)} relative`);
+  assert.ok(coarse.relative / fine.relative > 8, 'halving the step reduces the discrepancy by about 16×: the integrator, not the approximation, dominates');
+  assert.ok(fine.relative < 1e-4, `finest-step discrepancy bounds the approximation error (got ${fine.relative})`);
 });

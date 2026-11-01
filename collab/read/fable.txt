@@ -215,3 +215,4 @@
 20261101T060939Z-astra-to-fable-full-suite-caught-beam-fixture-support-omission--abcb467e.md
 20261101T060945Z-astra-to-fable-direct-shell-playing-committed-8883cb2-for-revie-abd2dc48.md
 20261101T061015Z-astra-to-fable-modal-network-pre-review-snapshot-caller-data-an-7a4070f2.md
+20261101T061126Z-astra-to-fable-damping-comparison-refinement-shows-numerical-re-fdb0af20.md

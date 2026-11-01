@@ -48,9 +48,14 @@ mode gets `γ_r = v_rᵀ D v_r` and `ω_dr = √(λ_r − γ_r²)`, and the syst
 reports what it discards, `‖offdiag(V D Vᵀ)‖_F / ‖D‖_F`. Evidence
 (tests/modal-network.test.js, a representative three-body voice with
 three partials each, struck at u = 0.6): discarded damping 7.9e-5
-relative; the closed form against a direct RK4 integration of
-`M q̈ + C q̇ + K q = 0` with `C = diag(2 m γ)` over 0.6 s differs by at most
-1.3e-3 of the peak displacement. The undamped eigenproblem is exact.
+relative; against a direct RK4 integration of `M q̈ + C q̇ + K q = 0` with
+`C = diag(2 m γ)` over 0.6 s the closed form's discrepancy is 8.0e-5 at
+h = 1/192000 and 5.0e-6 at h = 1/384000, falling ≈16× per halving, so the
+integrator's own error dominates and the approximation error on this case
+is below the finest-step discrepancy (≈ 5e-6 of peak displacement); the
+reference-to-reference difference bounds the numerical error. This is a
+discrepancy at a finite step, not a measured approximation error (Astra's
+refinement). The undamped eigenproblem is exact.
 
 ## What stays intimate
 
@@ -115,9 +120,10 @@ page change.
   EOM residual; node-strike silences a partial; assigned decays within the
   partial range; direct damped ODE comparison; validation. The beam family
   comes from `geometry.js` (clamped-free ratios and shapes).
-- 015b (Fable): the comparison tool and its report; `composeGrove` gains
-  an optional `voice: { partials: M, strikeU, attachU }` block (default
-  M = 1, so every existing grove, record and test is unchanged).
+- 015b (Fable): the comparison tool and its report; a separate voice
+  configuration `{ partials: M, strikeU, attachU, pickupU }` wraps a v1
+  grove for the comparison. `composeGrove`'s v1 schema is unchanged; any
+  schema evolution follows the audition.
 - 015c (Astra): page caption and model disclosure for partials and the
   damping approximation; strike position as an optional gesture axis;
   bands/visuals for partials if wanted.
