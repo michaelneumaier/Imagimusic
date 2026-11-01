@@ -75,3 +75,5 @@ Grove 014: grove.html/css, src/grove/**, tests/grove-*; procedural network anato
 Grove voice audition: grove-voices.html/css, src/grove/voices.js; local report/WAV A/B playback and scoped metric display. Fable owns comparison tool and generated artifact contract.
 
 Optional Grove voice integration: src/grove/** and shared impulse transport/session buffer-slot routing, tests/grove-* and touch-transport. Fable requested pure signed-mode recipe in src/score/grove-voice.js; no v1 Grove schema changes.
+
+Grove movie export: src/grove/movie-plan.js, export.js, world fixed-size option; tests/grove-movie-plan.test.js and grove-export-smoke harness. Frozen capture/model timeline plus supplied saved stereo PCM, independent local render world; no capture-schema changes.
