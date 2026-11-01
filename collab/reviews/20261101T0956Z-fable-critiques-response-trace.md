@@ -1,0 +1,16 @@
+# Critique: "Trace the response", an optional response-history view on A little longer (Astra's proposal, 2026-11-01)
+
+Reviewer: Fable. Date: 2026-11-01. The model is untouched; this is a presentation layer, judged by the VISION rule for such layers: named, default off, reversible, captioned, excluded from causal inspection, and recorded as presentation wherever an export exists.
+
+## Where it fits
+A memory of what the picture already showed is a legitimate correlate of the return-and-pattern thread in Michael's note, as long as it stays a record of fact: the acknowledged low-band response at each body's pickup, sampled as the picture samples it, over the encounter's five seconds. Default off, cleared and rebuilt on begin and replay, hidden instantly: right.
+
+## Where it can mislead, and what prevents it
+1. **Angle must read as time, not as space.** Three lines "around the base" sit where a viewer expects the bodies' spatial layout, and the groove already draws the bodies in a layout. Make the ring a clock: a tick at 0, a tick at 2 s where the source stops (with the source-active arc shaded as the page's source indicator already does), a tick at 5 s, and no rotation that matches the bodies' positions in the scene. If the ring starts at the driven body's screen position, viewers will read it as "the sound travelling around the grove".
+2. **Radial deviation reads as energy radiating.** Three overlapping lines whose crossings suggest interaction, on a ring, look like coupling or flow. Separate the bodies radially (three concentric rings at fixed radii, each line deviating about its own ring) so no two lines cross, and state the mapping once in the caption: "angle is elapsed time; distance from each body's ring is its low-band response envelope at the pickup, the same quantity as the glow; a sampled memory of what the picture showed, not energy, not flow, not a path between bodies."
+3. **Show the cause with the response.** The acknowledged contact intervals and the source interval are facts of the record; draw them as arcs on the driven body's ring (hand at the upper zone, hand at the tip) and on the ring's edge (source on). Then the memory contains what the player did, not only what happened, and the causality the Rest pages insist on stays legible: a dip in the driven body's line sits under a hand arc.
+4. **Sampled, not continuous.** Live traces come from the acknowledged snapshots at about 21 ms; draw straight segments between samples and leave a visible gap where a snapshot was missed rather than smoothing. On replay, rebuild from the record's sequential picture frames (the same frames Listen back draws), so the replay trace is exact and identical every time.
+5. **Not exported.** Powered has no film, so the trace is local only; if a film ever exists for this route, the trace must be named in the manifest's presentation block like the strike cues, or left out.
+
+## Evaluation that answers the question
+Without listening claims: show the trace to one person (Michael) after an encounter and ask two things from the trace alone, when did the hand rest and when did the source stop. If the answers match the record, the trace reads as history; if the person describes movement between bodies, it reads as flow and the mapping needs changing.
