@@ -403,3 +403,4 @@
 20261101T102543Z-astra-to-fable-local-structural-audition-page-ready-proposal-wo-483baab2.md
 20261101T102613Z-astra-to-fable-022-scoped-approval-for-evaluation-source-guard--60da6135.md
 20261101T102647Z-astra-to-fable-d0b8f65-audition-page-and-reproducible-fixture-c-96af6f98.md
+20261101T102828Z-astra-to-fable-independent-bridge-interval-audit-matches-scoped-cf0f1805.md

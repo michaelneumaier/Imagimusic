@@ -455,7 +455,7 @@ export function bridgeEnergyExchange(record, recipe) {
   }
   const total = bridges.reduce((s, br) => s + br.activity, 0);
   return { frames, grove: canonicalGrove(g), bridges: bridges.map(br => ({ a: br.a, b: br.b, coupling: br.coupling, workOnA: br.workOnA, workOnB: br.workOnB, storageChange: -(br.workOnA + br.workOnB), finalStoredEnergy: br.lastStrain, transferAtoB: (br.workOnB - br.workOnA) / 2, activity: br.activity, share: total > 0 ? br.activity / total : 0, peakForce: br.peakForce })), total,
-    measure: 'per bridge: work done on each body by the bridge (signed), the spring storage change, the symmetric transfer estimate a → b, and activity = energy moved in or out of the two bodies through the bridge including storage cycling (mass-normalized model units); integrals by trapezoid quadrature over each continuous interval from the post-event state at frame i to the pre-event state at frame i + 1 (strikes are velocity jumps of zero duration and do no bridge work), ending at the last sampled instant (frame frames − 1) where finalStoredEnergy is evaluated; second order between events, first-order error at event boundaries only in the sense that the impulse instant is excluded exactly; the quadrature residual is measured by tests, not assumed; a measurement of the passage, not of the listener' };
+    measure: 'per bridge: work done on each body by the bridge (signed), the spring storage change, the symmetric transfer estimate a → b, and activity = energy moved in or out of the two bodies through the bridge including storage cycling (mass-normalized model units); integrals by trapezoid quadrature over each continuous interval from the post-event state at frame i to the pre-event state at frame i + 1 (strikes are velocity jumps of zero duration and do no bridge work), ending at the last sampled instant (frame frames − 1) where finalStoredEnergy is evaluated; second order between events, with impulse instants excluded exactly; the quadrature residual is measured by tests, not assumed; a measurement of the passage, not of the listener' };
 }
 
 /** A declared, bounded adaptation of a grove from one passage's bridge shares: coupling_e ← clamp(coupling_e · (1 + k · share_e)), within the
@@ -470,6 +470,7 @@ export function adaptGroveByExchange(grove, exchange, { k = 0.5 } = {}) {
   if (sum > 1 + 1e-9) throw new Error('shares must sum to at most 1.');
   if (typeof exchange.grove !== 'string') throw new Error('exchange must carry the canonical grove it was measured on.'); if (exchange.grove !== canonicalGrove(g)) throw new Error('exchange was measured on a different grove (canonical identity differs).');
   if (k === 0 || sum === 0) return validateGrove(g);   // no change, full precision preserved
-  const bridges = g.bridges.map(br => { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); return { ...br, coupling: +Math.min(hi, Math.max(lo, br.coupling * (1 + k * e.share))).toFixed(4) }; });
+  // Rounded to the generator's precision, but never below the source coupling (a positive share must not round downward) nor above the bound.
+  const bridges = g.bridges.map(br => { const e = exchange.bridges.find(x => x.a === br.a && x.b === br.b); if (e.share === 0) return { ...br }; const rounded = +Math.min(hi, Math.max(lo, br.coupling * (1 + k * e.share))).toFixed(4); return { ...br, coupling: Math.min(hi, Math.max(br.coupling, rounded)) }; });
   return validateGrove({ ...g, bridges });
 }
