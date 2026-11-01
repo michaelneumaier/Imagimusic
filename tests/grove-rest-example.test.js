@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {composeGrove} from '../src/score/grove.js';
+import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
+import {createGroveRestRecipe,composeRestPairInvitation,restInvitationRecord,validateRestAdmission} from '../src/score/grove-rest.js';
+import {prepareRestAdaptation} from '../src/grove/rest-adaptation.js';
+import {encodeRestPlayHandoff,readRestPlayHandoff} from '../src/grove/rest-play-handoff.js';
+test('prepared example stays canonical to its authored score and carries honest origin into play',()=>{
+ const text=readFileSync(new URL('../assets/examples/rest-pair-gesture.json',import.meta.url),'utf8'),fixture=JSON.parse(text);
+ const recipe=createGroveRestRecipe(composeGrove({seed:3}),DEFAULT_VOICE_CONFIG,{sampleRate:48000});
+ assert.deepEqual(fixture,restInvitationRecord(recipe,composeRestPairInvitation(recipe)));
+ validateRestAdmission(fixture,recipe);
+ const pair=prepareRestAdaptation(text);assert.deepEqual(pair.original.record,fixture);
+ assert.deepEqual(pair.changed.record.events,fixture.events);assert.deepEqual(pair.changed.record.contacts,fixture.contacts);assert.equal(pair.changed.record.outputGain,fixture.outputGain);
+ pair.preparedExample=true;
+ const id='12345678-1234-1234-1234-123456789abc',encoded=encodeRestPlayHandoff(pair,id);
+ assert.equal(readRestPlayHandoff({getItem:()=>encoded},id).origin,'prepared-example');
+ delete pair.preparedExample;
+ assert.equal(readRestPlayHandoff({getItem:()=>encodeRestPlayHandoff(pair,id)},id).origin,'saved-file');
+});

@@ -1,0 +1,117 @@
+{
+  "version": 2,
+  "kind": "imagimusic-grove-rest",
+  "grove": {
+    "bodies": [
+      {
+        "cents": 0,
+        "hz": 130.813,
+        "id": 0,
+        "mass": 0.0237
+      },
+      {
+        "cents": -34,
+        "hz": 128.269,
+        "id": 1,
+        "mass": 0.0329
+      },
+      {
+        "cents": -1.5,
+        "hz": 130.699,
+        "id": 2,
+        "mass": 0.0246
+      }
+    ],
+    "bridges": [
+      {
+        "a": 0,
+        "b": 1,
+        "coupling": 0.0039
+      },
+      {
+        "a": 1,
+        "b": 2,
+        "coupling": 0.0052
+      },
+      {
+        "a": 0,
+        "b": 2,
+        "coupling": 0.0086
+      }
+    ],
+    "cluster": {
+      "baseHz": 130.813,
+      "baseMidi": 48
+    },
+    "layout": [
+      {
+        "x": 0,
+        "z": 0.75
+      },
+      {
+        "x": -0.6495,
+        "z": -0.375
+      },
+      {
+        "x": 0.6495,
+        "z": -0.375
+      }
+    ],
+    "loss": 0.418,
+    "seed": 3,
+    "topology": "triangle",
+    "version": 1
+  },
+  "voice": {
+    "attachU": 1,
+    "family": "clamped-free",
+    "partials": 3,
+    "pickupU": 1,
+    "positions": [
+      0.3,
+      0.6,
+      1
+    ],
+    "version": 1
+  },
+  "sampleRate": 48000,
+  "outputGain": 0.45,
+  "zones": [
+    0.3,
+    0.6,
+    1
+  ],
+  "strengths": [
+    {
+      "name": "light",
+      "c": 12
+    },
+    {
+      "name": "firm",
+      "c": 60
+    }
+  ],
+  "events": [
+    {
+      "frame": 0,
+      "order": 0,
+      "body": 0,
+      "position": 1,
+      "velocity": 0.6
+    }
+  ],
+  "contacts": [
+    {
+      "body": 1,
+      "zone": 2,
+      "strength": 1,
+      "start": 100000,
+      "order": 1,
+      "end": 220000
+    }
+  ],
+  "ended": {
+    "frame": 320000,
+    "fadeFrames": 1200
+  }
+}
