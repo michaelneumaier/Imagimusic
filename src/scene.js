@@ -1,9 +1,9 @@
-import { MATERIALS, envelope } from './model.js';
-import { releaseLevel, strikerPose } from './excitation.js';
+import { MATERIALS } from './model.js';
 export const NOTE_NAMES = ['C3','E♭3','G3','B♭3','C4','E♭4','G4','B♭4'];
 
 /** Draw a frame exclusively from the supplied timeline state. */
-export function drawGarden(ctx, width, height, { time, voices, patch, dampers }) {
+export function drawGarden(ctx, width, height, { frame, patch }) {
+  const time=frame.t,voices=frame.voices.filter(v=>v.family==='garden'),dampers=new Set(frame.global.dampers?.garden??[]);
   ctx.clearRect(0, 0, width, height);
   const background = ctx.createRadialGradient(width * .5, height * .55, 0, width * .5, height * .55, width * .6);
   background.addColorStop(0, '#203b3a'); background.addColorStop(1, '#101c20');
@@ -23,10 +23,9 @@ export function drawGarden(ctx, width, height, { time, voices, patch, dampers })
     const base = height * .78 + Math.sin(index * .8) * 12;
     const length = height * (.49 - index * .027), top = base - length;
     targets.push({ x, y: top + length * .45, top, base, length });
-    const active = voices.filter(voice => voice.index === index && voice.time <= time && voice.end > time);
+    const active = voices.filter(voice => voice.slot === index && voice.age >= 0);
     const energy = Math.min(1.6, active.reduce((sum, voice) => sum +
-      voice.modes.reduce((total, mode) => total + envelope(time - voice.time, mode.decay) * mode.amplitude, 0)
-      * voice.velocity * releaseLevel(voice, time) * 3, 0));
+      voice.modes.reduce((total, mode) => total + mode.energy, 0) * 3, 0));
     energies.push(energy);
     const color = MATERIALS[patch.material].color.join(',');
     ctx.fillStyle = '#00000040'; ctx.beginPath(); ctx.ellipse(x + 15, base + 7, width * .034, 9, 0, 0, Math.PI * 2); ctx.fill();
@@ -40,7 +39,7 @@ export function drawGarden(ctx, width, height, { time, voices, patch, dampers })
       const y = top + layer * length * .155;
       const modalEnergy = active.reduce((sum, voice) => {
         const mode = voice.modes[layer];
-        return sum + (mode ? envelope(time - voice.time, mode.decay) * mode.amplitude * voice.velocity * releaseLevel(voice, time) : 0);
+        return sum + (mode?.energy ?? 0);
       }, 0);
       // Stylized energy-envelope sway, not sampled audio-frequency deflection.
       const sway = Math.sin(time * 5 + index + layer) * modalEnergy * 35;
@@ -54,10 +53,10 @@ export function drawGarden(ctx, width, height, { time, voices, patch, dampers })
       ctx.beginPath(); ctx.ellipse(x + sway, y + 7, r * .68, 4, 0, 0, Math.PI * 2); ctx.stroke();
     }
     // Each planned gesture has a visible approach, contact and recovery.
-    for (const voice of voices.filter(voice => voice.index === index && voice.end > time)) {
-      const pose = strikerPose(time, voice.time, voice.approach);
+    for (const voice of voices.filter(voice => voice.slot === index)) {
+      const pose = voice.exciter;
       if (!pose.visible) continue;
-      const strikeY = base - voice.position * length;
+      const strikeY = base - voice.exciter.pos01 * length;
       const tipX = x - radius - (1 - pose.reach) * width * .026;
       ctx.strokeStyle = '#a1ad88'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x - radius - width * .035, base + 3);
@@ -80,13 +79,14 @@ export function drawGarden(ctx, width, height, { time, voices, patch, dampers })
   return { targets, energies };
 }
 
-export function drawTine(ctx, width, height, { time, voices, patch, damped, modes }) {
+export function drawTine(ctx, width, height, { frame, patch, modes }) {
+  const time=frame.t,voices=frame.voices.filter(v=>v.family==='tine'),damped=(frame.global.dampers?.tine??[]).includes(8);
   ctx.fillStyle = '#101c20'; ctx.fillRect(0, 0, width, height);
   const left = width * .12, full = width * .73;
   const length = full * patch.geometry.lengthM / .11;
   const baseY = height * .37;
   const thickness = 3 + patch.geometry.thicknessM * 3500;
-  const active = voices.filter(voice => voice.index === 8 && voice.time <= time && voice.end > time);
+  const active = voices.filter(voice => voice.slot === 8 && voice.age >= 0);
   ctx.fillStyle = '#34483d'; ctx.fillRect(left - 24, baseY - 36, 24, 72);
   ctx.strokeStyle = '#718377'; ctx.lineWidth = 1;
   for (let y = baseY - 30; y < baseY + 36; y += 9) {
@@ -97,17 +97,16 @@ export function drawTine(ctx, width, height, { time, voices, patch, damped, mode
   for (let i = 0; i <= 100; i++) {
     const u = i / 100;
     const motion = active.reduce((sum, voice) => sum + voice.modes.reduce((energy, mode, n) =>
-      energy + (mode.shape?.(u) ?? 0) * Math.sin(time * (4 + n * .7)) * envelope(time - voice.time, mode.decay) * mode.amplitude * 45, 0)
-      * voice.velocity * releaseLevel(voice, time), 0);
+      energy + (modes[n]?.shape?.(u) ?? 0) * Math.sin(time * (4 + n * .7)) * mode.energy * 45, 0), 0);
     if (i === 0) ctx.moveTo(left, baseY); else ctx.lineTo(left + u * length, baseY + motion);
   }
   ctx.stroke(); ctx.lineCap = 'butt';
   const strikeX = left + patch.strikePosition * length;
   ctx.strokeStyle = '#d5e9a966'; ctx.setLineDash([3, 4]);
   ctx.beginPath(); ctx.moveTo(strikeX, baseY - 35); ctx.lineTo(strikeX, baseY + 24); ctx.stroke(); ctx.setLineDash([]);
-  for (const voice of voices.filter(v => v.index === 8 && v.end > time)) {
-    const pose = strikerPose(time, voice.time, voice.approach); if (!pose.visible) continue;
-    const x = left + voice.position * length, y = baseY - thickness / 2 - 5 - (1 - pose.reach) * 40;
+  for (const voice of voices.filter(v => v.slot === 8)) {
+    const pose = voice.exciter; if (!pose.visible) continue;
+    const x = left + voice.exciter.pos01 * length, y = baseY - thickness / 2 - 5 - (1 - pose.reach) * 40;
     ctx.strokeStyle = '#ac9873'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - 18, y - 32); ctx.lineTo(x, y); ctx.stroke();
     ctx.fillStyle = '#e9ddb3'; ctx.beginPath(); ctx.ellipse(x, y, 9, 5, .3, 0, Math.PI * 2); ctx.fill();
   }

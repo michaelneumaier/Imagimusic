@@ -1,3 +1,5 @@
+import { collectState } from './state.js';
+import { modalSnapshot } from './snapshots.js';
 import { storeStagePatch } from './stage/exchange.js';
 import { mountBellows } from './bellows-ui.js';
 import { DEFAULT_PATCH, makeScore, validatePatch, tineModes, TINE_INDEX } from './model.js';
@@ -147,10 +149,12 @@ new ResizeObserver(resizeTine).observe(tineCanvas);
 function draw() {
   const time = audio.time;
   voices = voices.filter(voice => voice.end > time);
-  const result = drawGarden(ctx, width, height, { time, voices, patch, dampers: audio.dampers });
+  const snapshots=voices.map(modalSnapshot);
+  const frame=collectState(time,{garden:{voices:snapshots.filter(v=>v.slot<8),dampers:[...audio.dampers].filter(slot=>slot<8)},tine:{voices:snapshots.filter(v=>v.slot===8),dampers:[...audio.dampers].filter(slot=>slot===8)},bellows:bellowsUI?.snapshot()??{voices:[]},sampleRate:audio.context?.sampleRate??48000});
+  const result = drawGarden(ctx, width, height, { frame, patch });
   targets = result.targets;
-  bellowsUI?.draw();
-  tineTarget = drawTine(tineCtx, tineWidth, tineHeight, { time, voices, patch, damped: audio.dampers.has(TINE_INDEX), modes: tinePreview });
+  bellowsUI?.draw(frame);
+  tineTarget = drawTine(tineCtx, tineWidth, tineHeight, { frame, patch, modes: tinePreview });
   document.querySelectorAll('[data-note]').forEach(button => button.classList.toggle('active', result.energies[Number(button.dataset.note)] > .12));
 }
 bellowsUI = mountBellows({ audio, getPatch: () => patch, setBellows: block => { patch = { ...patch, bellows: block }; syncUI(); }, notice, download });

@@ -1,8 +1,8 @@
-import { bellowsState } from './bellows-audio.js';
 import { voiceDynamics } from './dynamics.js';
 
 /** Independent visible chambers preserve per-voice filter/envelope causality. */
-export function drawBellows(ctx, width, height, { time, voices, patch, sampleRate = 48000 }) {
+export function drawBellows(ctx, width, height, { frame, patch, sampleRate = 48000 }) {
+  const time=frame.t,voices=frame.voices.filter(v=>v.family==='bellows');
   const bg = ctx.createLinearGradient(0, 0, 0, height);
   bg.addColorStop(0, '#19252a'); bg.addColorStop(1, '#10191d');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height);
@@ -12,14 +12,14 @@ export function drawBellows(ctx, width, height, { time, voices, patch, sampleRat
   ctx.beginPath(); ctx.moveTo(width * .04, height * .75); ctx.lineTo(width * .96, height * .75); ctx.stroke();
   for (let slot = 0; slot < 6; slot++) {
     const x = cell * (slot + .5), y = height * (.34 + Math.sin(slot * .8) * .04);
-    const voice = voices.filter(v => v.slot === slot && v.noteOn <= time && v.end > time).at(-1);
-    const state = voice ? bellowsState(voice, time, sampleRate) : voiceDynamics(time, { noteHz: 220, velocity: .8, noteOn: 0, noteOff: 0 }, patch, sampleRate);
+    const voice = voices.filter(v => v.slot === slot && v.age >= 0).at(-1);
+    const state = voice ? {...voice.modules,bellows:{fill01:voice.exciter.fill01}} : voiceDynamics(time, { noteHz: 220, velocity: .8, noteOn: 0, noteOff: 0 }, patch, sampleRate);
     states.push(state);
     const level = Math.max(0, Math.min(1, state.amp.level));
     const aperture = Math.max(0, Math.min(1, state.filter.aperture01));
     const fill = Math.max(0, Math.min(1, state.bellows.fill01));
-    const source = voice?.patch.bellows.source ?? patch.bellows.source;
-    const target = voice?.patch.bellows.lfo.target ?? patch.bellows.lfo.target;
+    const source = voice?.modules.source.kind ?? patch.bellows.source;
+    const target = voice?.modules.lfo.target ?? patch.bellows.lfo.target;
     // One air route from pressure source to filter and horn.
     ctx.strokeStyle = '#5c7062'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(x, height * .75); ctx.lineTo(x, y + radius + 24); ctx.stroke();
@@ -77,7 +77,7 @@ export function drawBellows(ctx, width, height, { time, voices, patch, sampleRat
     }
     // Each voice has its own clocked pendulum: polyphony does not share a fictional common iris.
     const anchorX = x - radius * .95, anchorY = y - radius * 1.25;
-    const fastLfo = (voice?.patch.bellows.lfo.rateHz ?? patch.bellows.lfo.rateHz) > 8;
+    const fastLfo = (voice?.modules.lfo.rateHz ?? patch.bellows.lfo.rateHz) > 8;
     const angle = fastLfo ? 0 : state.lfo.value * .65;
     const bobX = anchorX + Math.sin(angle) * radius * 1.2, bobY = anchorY + Math.cos(angle) * radius * 1.2;
     ctx.strokeStyle = '#6f9387'; ctx.lineWidth = 1;

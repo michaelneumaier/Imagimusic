@@ -1,3 +1,4 @@
+import { bellowsSnapshot } from './snapshots.js';
 import { BellowsAudio, BELLOWS_KEYS, BELLOWS_NOTES, bellowsScore, renderBellows } from './bellows-audio.js';
 import { drawBellows } from './bellows-scene.js';
 import { frequency, encodeWav } from './model.js';
@@ -109,9 +110,9 @@ export function mountBellows({ audio, getPatch, setBellows, notice, download }) 
         spec.output.textContent = spec.choices ? '' : (spec.log ? Math.round(value) : Number(value.toFixed(2))) + (spec.unit ?? '');
       }
     },
-    draw() {
-      const time = audio.time; voices = voices.filter(voice => voice.end > time);
-      drawBellows(ctx, width, height, { time, voices, patch: getPatch(), sampleRate: audio.context?.sampleRate ?? 48000 });
+    snapshot(){voices=voices.filter(voice=>voice.end>audio.time);return {voices:voices.map(bellowsSnapshot)};},
+    draw(frame) {
+      drawBellows(ctx, width, height, { frame, patch: getPatch(), sampleRate: audio.context?.sampleRate ?? 48000 });
     },
   };
 }

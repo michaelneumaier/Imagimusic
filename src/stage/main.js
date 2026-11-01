@@ -60,8 +60,8 @@ try{
 
 let renderAbort=null,lastManifest=null;
 function downloadArtifact(blob,name){const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
-$('cancel-render').onclick=()=>renderAbort?.abort();
-$('render-manifest').onclick=()=>{if(lastManifest)downloadArtifact(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),`imagimusic-render-${lastManifest.patch.seed}.json`);};
+$('cancel-render').onclick=()=>{renderAbort?.abort();$('error').textContent='Cancelling · finishing any active soundtrack step…';};
+$('render-manifest').onclick=()=>{if(lastManifest)downloadArtifact(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),`imagimusic-render-${lastManifest.instrument.seed}.json`);};
 $('movie').onclick=async()=>{
   if(renderAbort||!world)return;stop();renderAbort=new AbortController();
   for(const id of ['perform','seek','view','movie'])$(id).disabled=true;

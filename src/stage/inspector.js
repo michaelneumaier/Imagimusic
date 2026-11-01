@@ -1,5 +1,5 @@
 import * as T from '../../vendor/three/build/three.module.js';
-import { explainBinding, resolveField } from '../bindings.js';
+import { explainBinding } from '../bindings.js';
 
 export function mountInspector({world,canvas,bindings,getPatch}) {
   const select=document.getElementById('inspect-binding'),heading=document.getElementById('inspect-title'),note=document.getElementById('inspect-note'),value=document.getElementById('inspect-value'),inputs=document.getElementById('inspect-inputs');
@@ -7,7 +7,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
   const ray=new T.Raycaster(),point=new T.Vector2();
   world.garden.forEach((body,i)=>{body.root.userData.bindingTarget=`garden/slot${i}`;body.layers.forEach((shell,n)=>shell.userData.bindingParam=`mode${n}`);body.striker.userData.bindingParam='striker';});
   world.choir.forEach((body,i)=>{body.root.userData.bindingTarget=`bellows/slot${i}`;body.chamber.userData.bindingParam='aperture';body.bellows.userData.bindingParam='fill';body.horn.userData.bindingParam='level';body.pendulum.userData.bindingParam='swing';body.fastArc.userData.bindingParam='fast';});
-  world.tine.root.userData.bindingTarget='tine/slot8';world.tine.beam.userData.bindingParam='deflection';
+  world.tine.root.userData.bindingTarget='tine/slot8';world.tine.beam.userData.bindingParam='deflection';world.tine.striker.userData.bindingParam='reach';
   function choose(target,param){
     const choices=bindings.filter(b=>b.target===target);if(!choices.length)return;
     select.replaceChildren();for(const binding of choices){const option=document.createElement('option');option.value=binding.id;option.textContent=binding.param;select.append(option);}
@@ -31,12 +31,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     note.textContent=`${detail.label.toUpperCase()} · ${detail.note}`;
     const result=Array.isArray(detail.value)&&detail.value.length>8?`[${detail.value.length} sampled deflections]`:format(detail.value);
     value.textContent=`${detail.field} → ${detail.param}: ${result}`;
-    const [family,slotName]=current.target.split('/'),slot=Number(slotName.slice(4));
-    const voices=lastFrame.voices.filter(v=>v.family===family&&v.slot===slot&&v.age>=0);
-    inputs.textContent=current.inputs.map(path=>{
-      const input=path.startsWith('voice.')?[...new Set(voices.map(v=>resolveField(v,path.slice(6))))]:resolveField(getPatch(),path);
-      return path+' = '+format(input);
-    }).join('\n');
+    inputs.textContent=detail.inputs.map(input=>input.path+' = '+format(input.value)).join('\n');
   }
   return {update(frame){lastFrame=frame;render();}};
 }
