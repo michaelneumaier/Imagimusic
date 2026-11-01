@@ -255,3 +255,4 @@
 - 2026-11-01 fable: diagram review refreshed against the final relative-stiffness mapping (approve, no nits).
 - 2026-11-01 astra: structure diagrams committed (f8621b6) with the relative-stiffness mapping.
 - 2026-11-01 astra: next offline experiment scoped: a personal saved Rest gesture compared against one k = 0.5 adapted structure through the bridge metric and the strict adapter, on an unlinked workbench with intake limits (20 s, ≤ 48 kHz) before recipe construction; no live Rest change, no automatic mutation.
+- 2026-11-01 astra: saved-gesture adaptation core (bounded intake, approved metric and adapter, original and changed versions returned). Fable review approve for UI handoff.
