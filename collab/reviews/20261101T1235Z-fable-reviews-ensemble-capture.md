@@ -9,3 +9,6 @@ Reviewer: Fable. Date: 2026-11-01. Astra's six capture tests pass here. End-to-e
 - **Silent snapshot**: `snapshot({ allowSilent: true })` is an explicit boolean opt-in; the default still refuses a passage without a strike, so no ordinary caller changes.
 
 No nits.
+
+## Addendum: the keeper CLI `tools/keep-ensemble-diagnostic.mjs` (approve)
+Verified from its output in renders/ensemble-kept: ensemble.json validates and its text is the canonical form; rendering it gives ensemble.wav exactly and the kept Safari captured.wav exactly; verification.json carries the hashes of the source report, the ensemble file and the WAV, the origin, the silent flags and the limits. The CLI reads bounded files, checks the captured WAV's hash against the report before anything else, rebuilds the parts from the actual acknowledgements (never from the requested score and never from the report's own agreement figures), packs and canonicalises the record, renders the serialised file (not the in-memory object), requires byte equality with the browser capture before writing, refuses to overwrite its inputs, and re-reads what it wrote. That is the first kept ensemble file that reproduces a browser capture, and it is proven from the file alone. No nits.
