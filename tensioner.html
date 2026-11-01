@@ -2,8 +2,8 @@
 <header><a href="index.html">imagimusic <span>FM TENSIONER / STUDY 02</span></a><a href="stage.html">The Conservatory ↗</a></header><main>
 <div class="intro"><div><p class="eyebrow">FROM PITCH MOTION TO TIMBRE</p><h1>A changing voice.</h1></div><p>One oscillator changes another’s frequency.<br>Slow enough to follow. Fast enough to become a texture.</p></div>
 <section class="stage"><canvas id="world" aria-label="FM carrier string with a modulator wheel and interpreted control linkage"></canvas><div class="overlay"><span id="state">PREPARING STUDY</span><span>DRAG TO ORBIT · SCROLL TO EXPLORE</span></div></section>
-<section class="transport"><button id="play" class="primary" disabled>Play tone</button><button id="quiet">Quiet</button><button id="save" disabled>Save WAV</button>
-<label>Starting point <select id="preset"><option value="metal">Metallic voice</option><option value="slow">Slow vibrato</option><option value="bell">Bell-like voice</option></select></label>
+<section class="transport"><button id="play" class="primary" disabled>Play tone</button><button id="quiet">Quiet</button><button id="save" disabled>Save WAV</button><button id="save-settings" disabled>Save sound settings</button><button id="load-settings" disabled>Load sound settings</button><input id="settings-file" type="file" accept=".json,application/json" hidden><a id="sound-link" hidden>Link to this sound ↗</a>
+<label>Starting point <select id="preset"><option value="metal">Metallic voice</option><option value="slow">Slow vibrato</option><option value="bell">Bell-like voice</option><option value="custom" disabled>Custom sound</option></select></label>
 <label>Carrier <input id="carrierHz" type="range" min="80" max="800" step="1" value="220"><output id="carrierHz-value"></output></label>
 <label>Modulator ratio <input id="ratio" type="range" min=".01" max="8" step=".01" value="2"><output id="ratio-value"></output></label>
 <label>FM index <input id="index" type="range" min="0" max="8" step=".05" value="3"><output id="index-value"></output></label>
