@@ -1,4 +1,4 @@
-import {readCompositionSearch,compositionURL} from '../stage/composition-link.js';
+import {readCompositionSearch,compositionPageURL} from '../stage/composition-link.js';
 import {mountStudyInspector} from '../study-inspector.js';
 import {createWorld} from '../stage/world.js';
 import {encodeWav} from '../model.js';
@@ -29,7 +29,7 @@ function refresh({custom=true}={}){
   const candidate={...baseSettings,...Object.fromEntries(keys.map(key=>[key,Number($(key).value)]))};
   const next=api.validateTensioner(candidate,context?.sampleRate??48000);
   settings=candidate;model=api.tensionerCore(next);endS=api.tensionerEnd(model,context?.sampleRate??48000).endS;$('seek').max=endS;$('play').disabled=false;$('seek').disabled=false;$('save-settings').disabled=false;$('sound-link').hidden=false;$('sound-link').href=patchAPI.tensionerURL(location.href,settings,context?.sampleRate??48000);
-  const arrangement=readCompositionSearch(location.search);$('ensemble-link').href=compositionURL(new URL('stage.html',location.href),{...arrangement,version:2,fm:{enabled:true,settings}});$('ensemble-link').hidden=false;
+  const arrangement=readCompositionSearch(location.search);$('ensemble-link').href=compositionPageURL(location.href,'stage.html',{...arrangement,version:2,fm:{enabled:true,settings}});$('ensemble-link').hidden=false;
   $('status').textContent='Play uses these settings for the complete tone. Changing a control settles the previous sound.';
  }catch(error){$('play').disabled=true;$('seek').disabled=true;$('save-settings').disabled=true;$('sound-link').hidden=true;$('ensemble-link').hidden=true;$('status').textContent='Cannot play these settings: '+error.message;}
 }

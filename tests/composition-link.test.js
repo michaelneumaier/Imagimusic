@@ -30,3 +30,17 @@ test('FM links preserve complete sound settings and independent enable flags wit
  assert.equal(readCompositionSearch('?fmEnabled=1').fm.enabled,true);
  assert.throws(()=>readCompositionSearch('?fmEnabled=1&fm=oops'));
 });
+
+test('stage to either study and back retains the session-backed laboratory instrument',async()=>{
+ const {compositionPageURL}=await import('../src/stage/composition-link.js');
+ const {DEFAULT_TENSIONER}=await import('../src/fm.js');
+ const saved={...structuredClone(DEFAULT_COMPOSITION),version:2,fm:{enabled:true,settings:{...DEFAULT_TENSIONER,ratio:.01}}};
+ for(const page of ['loom.html','tensioner.html']){
+  const study=new URL(compositionPageURL('http://localhost/stage.html?instrument=lab',page,saved));
+  assert.equal(study.pathname,'/'+page);assert.equal(study.searchParams.get('instrument'),'lab');
+  const returned=new URL(compositionPageURL(study,'stage.html',saved));
+  assert.equal(returned.searchParams.get('instrument'),'lab');assert.deepEqual(readCompositionSearch(returned.search),saved);
+ }
+ const ordinary=new URL(compositionPageURL('http://localhost/stage.html?instrument=unknown','loom.html',saved));
+ assert.equal(ordinary.searchParams.has('instrument'),false);
+});

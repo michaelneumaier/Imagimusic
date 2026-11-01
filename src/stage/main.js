@@ -1,6 +1,6 @@
 import {DEFAULT_TENSIONER} from '../fm.js';
 import {prepareFMAudio} from './fm-audio.js';
-import {readCompositionSearch,compositionURL} from './composition-link.js';
+import {readCompositionSearch,compositionURL,compositionPageURL} from './composition-link.js';
 import {attachComposition,DEFAULT_COMPOSITION} from './composition.js';
 import {prepareLoomAudio} from './loom-audio.js';
 import { createStageFrames } from './frame.js';
@@ -54,10 +54,10 @@ $('perform').onclick=async()=>{
 };
 $('quiet').onclick=stop;
 $('loom-enabled').checked=composition.loom.enabled;
-$('loom-study').href=compositionURL(new URL('loom.html',location.href),composition);
+$('loom-study').href=compositionPageURL(location.href,'loom.html',composition);
 $('loom-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,{...composition,loom:{...composition.loom,enabled:$('loom-enabled').checked}});};
 $('fm-enabled').checked=!!composition.fm?.enabled;
-$('fm-study').href=compositionURL(new URL('tensioner.html',location.href),composition);
+$('fm-study').href=compositionPageURL(location.href,'tensioner.html',composition);
 $('fm-enabled').onchange=()=>{stop();location.href=compositionURL(location.href,{...composition,version:2,fm:{settings:composition.fm?.settings??{...DEFAULT_TENSIONER},enabled:$('fm-enabled').checked}});};
 $('seek').max=performance.duration;
 $('seek').oninput=()=>{stop();study.seek(Number($('seek').value));};

@@ -1,5 +1,5 @@
 import {mountStudyInspector} from '../study-inspector.js';
-import {readCompositionSearch,compositionURL} from '../stage/composition-link.js';
+import {readCompositionSearch,compositionPageURL} from '../stage/composition-link.js';
 import {createWorld} from '../stage/world.js';
 import {loomSceneFrame,applyLoomScene,LOOM_BINDINGS} from './scene.js';
 import {DEFAULT_LOOM,makeLoom,loomVisualEnvelope,stereoWav} from './model.js';
@@ -38,7 +38,7 @@ for(const key of ['frequency','coupling','detune','loss']){
  $(key+'-value').textContent=settings[key]+suffix;
  $(key).oninput=()=>{quiet();settings[key]=Number($(key).value);study=makeLoom(settings);$('seek').max=study.duration;passage=null;pcm=null;$('save').disabled=true;$(key+'-value').textContent=$(key).value+suffix;};
 }
-$('ensemble').onclick=()=>{quiet();location.href=compositionURL(new URL('stage.html',location.href),{...initialComposition,loom:{enabled:true,settings}});};
+$('ensemble').onclick=()=>{quiet();location.href=compositionPageURL(location.href,'stage.html',{...initialComposition,loom:{enabled:true,settings}});};
 $('save').onclick=()=>{if(!pcm)return;const url=URL.createObjectURL(new Blob([stereoWav(pcm)],{type:'audio/wav'})),a=document.createElement('a');a.href=url;a.download=`imagimusic-loom-${passage?'conversation':study.body===0?'left':'right'}.wav`;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 $('seek').max=study.duration;
 $('seek').oninput=()=>{const time=Number($('seek').value);quiet();studyTime=time;studying=true;$('status').textContent='Silent study. The picture samples the selected performance at this exact time.';};

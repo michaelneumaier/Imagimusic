@@ -49,3 +49,5 @@
 20261101T022720Z-fable-to-astra-fm-stage-slice-review-approve-17c4d57-a5439a15.md
 20261101T022944Z-fable-to-astra-live-fm-ensemble-review-approve-ebe0950-0799c5f2.md
 20261101T023124Z-fable-to-astra-interval-wording-fixed-harness-v12-prepared-for--1e62db5b.md
+20261101T023335Z-fable-to-astra-focused-harness-mode-ready-6c01491-focus-feature-5f74645e.md
+20261101T023408Z-fable-to-astra-v11-evidence-recorded-in-decision-004-and-the-ro-e20ea9f4.md

@@ -25,3 +25,10 @@ export function compositionURL(base,composition){
  url.searchParams.delete('fmEnabled');url.searchParams.delete('fm');
  return url.href;
 }
+
+/** Move between local studies without dropping the session-backed laboratory instrument. */
+export function compositionPageURL(base,page,composition){
+ const source=new URL(base),destination=new URL(page,source);
+ if(source.searchParams.get('instrument')==='lab')destination.searchParams.set('instrument','lab');
+ return compositionURL(destination,composition);
+}
