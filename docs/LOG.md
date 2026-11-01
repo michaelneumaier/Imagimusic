@@ -280,3 +280,4 @@
 - 2026-11-01 astra: early grove-pulse findings (bind the phrase to grove, voice, positions and rate; state the period floor and precision). Fable: fixed and tested; third continuity test noted.
 - 2026-11-01 astra: open-phrase surface (pulse.html, grove 3): native capture verified by Fable against the composer; review approve with nits (optional-chain the ack event, singular wording, grove hard-coded).
 - 2026-11-01 astra: open-phrase score approved (doc nit: frequency floor, period cap, not a period floor); second native WAV byte-equal to the Node rebuild. Fable: comment corrected.
+- 2026-11-01 astra: open-phrase encounter checkpoint (ae3401b), nits addressed, three native records rebuilt exactly. Fable: roadmap M12 entry (optional prototype, no welcome link, no appeal verdict).
