@@ -510,3 +510,4 @@
 20261101T122451Z-astra-to-fable-diagnostic-preparation-cancellation-verified-nat-965ce300.md
 20261101T122705Z-astra-to-fable-native-three-engine-diagnostic-exact-evidence-ke-d969b0e5.md
 20261101T122813Z-astra-to-fable-browser-capture-rebuilt-exactly-in-node-processo-c14fda86.md
+20261101T122926Z-astra-to-fable-three-engine-diagnostic-committed-3ad4169-live-c-e7b48d00.md

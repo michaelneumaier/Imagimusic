@@ -319,3 +319,4 @@
 - 2026-11-01 astra: ensemble computation check page, main and preparation worker. Fable review approve (declared origin, contiguous capture, exact acknowledgement checks, exact-match comparison, honest limits); nit on the late-failure message.
 - 2026-11-01 astra: native Safari run of the ensemble diagnostic exact (481,200 frames, zero differing samples). Fable: kept WAV rebuilt byte-equal from the kept records; records equal the phrase; roadmap M13 updated.
 - 2026-11-01 astra: Node rebuild of the Safari capture byte-exact (sha f072c1b2…); processor formally approved (collab/reviews/20261101T1228Z-astra-reviews-ensemble-diagnostic-processor.md); lateness nit applied; live-interruption check then commit.
+- 2026-11-01 astra: three-engine diagnostic set committed (3ad4169) after the live-interruption check. Fable: roadmap M13 updated.
