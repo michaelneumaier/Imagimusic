@@ -173,3 +173,36 @@ export function composeExpressiveChord({ scene = 'detachReset', smoothingSeconds
   const events = ev.map((e, i) => ({ ...e, i })).sort((a, b) => a.time - b.time || a.i - b.i).map(({ i, ...e }, order) => ({ ...e, order }));
   return validateExpressionScore({ version: EXPRESSION_VERSION, protocol: 'midi2', source: { kind: 'fixture', name: `expressive-chord:${scene}` }, events, bounds: { maxVoices: 4, maxEvents: 64 }, mapping: { version: 1, instrument: 'bellows', smoothingSeconds, neutral } });
 }
+
+// ---- the musical study (011c): stillness → change → answer → return, ~24 s, three voices ----
+// A3 (57) alone and plain; its pressure rises, then its brightness opens; E4 (64) answers by doing the opposite (bright
+// → closed) while A3 drifts up 30 cents and back; A2 (45) enters soft and still, A3 and E4 release under the sustain
+// pedal, everything returns to neutral, and the last thing heard is the plain tone an octave below the first.
+export function composeExpressiveStudy({ smoothingSeconds = 0.005 } = {}) {
+  const neutral = { brightness32: U(0.5), timbre32: U(0.5) };
+  const ev = [], add = (time, type, fields) => ev.push({ time, group: 0, channel: 0, type, ...fields });
+  const on = (time, noteNumber, velocity16) => add(time, 'noteOn', { noteNumber, velocity16, attributeType8: ATTRIBUTE_NONE, attributeData16: 0 });
+  const off = (time, noteNumber) => add(time, 'noteOff', { noteNumber, velocity16: 0, attributeType8: ATTRIBUTE_NONE, attributeData16: 0 });
+  const ramp = (t0, t1, steps, f) => { for (let i = 1; i <= steps; i++) f(t0 + (t1 - t0) * i / steps, i / steps); };
+  add(0, 'registeredController', { bank8: 0, index8: 7, data32: DEFAULT_SENSITIVITY_Q7_25 });   // ±2 HCU per-note range
+  // 1. Stillness: one plain voice.
+  on(0, 57, 0x7000);
+  // 2. Change: breath, then light, on the same voice; nothing else sounds.
+  ramp(4, 7, 6, (t, u) => add(t, 'polyPressure', { noteNumber: 57, data32: U(0.75 * u) }));
+  ramp(7, 9, 4, (t, u) => add(t, 'perNoteController', { noteNumber: 57, index8: PER_NOTE_BRIGHTNESS, data32: U(0.5 + 0.4 * u) }));
+  // 3. Answer: E4 enters bright and closes while A3 drifts up 30 cents and back (opposite motions, one mechanism).
+  add(8.999, 'perNoteController', { noteNumber: 64, index8: PER_NOTE_BRIGHTNESS, data32: U(0.95) });
+  on(9, 64, 0x5000);
+  ramp(9, 14, 5, (t, u) => add(t, 'perNoteController', { noteNumber: 64, index8: PER_NOTE_BRIGHTNESS, data32: U(0.95 - 0.45 * u) }));
+  ramp(10, 12.5, 5, (t, u) => add(t, 'perNotePitchBend', { noteNumber: 57, data32: Math.round(BEND_CENTER + (UINT32_MAX - BEND_CENTER) * 0.15 * u) }));   // +0.3 HCU at sensitivity 2
+  ramp(12.5, 15, 5, (t, u) => add(t, 'perNotePitchBend', { noteNumber: 57, data32: Math.round(BEND_CENTER + (UINT32_MAX - BEND_CENTER) * 0.15 * (1 - u)) }));
+  // 4. Return: the pedal holds A3 and E4 past their note-offs; A2 enters soft and still; expression returns to neutral.
+  add(15.5, 'controlChange', { index8: 64, data32: UINT32_MAX });
+  off(16, 57); off(16, 64); on(16, 45, 0x4000);
+  add(18, 'controlChange', { index8: 64, data32: 0 });
+  ramp(18, 20, 4, (t, u) => add(t, 'polyPressure', { noteNumber: 57, data32: U(0.75 * (1 - u)) }));
+  ramp(18, 20, 4, (t, u) => add(t, 'perNoteController', { noteNumber: 57, index8: PER_NOTE_BRIGHTNESS, data32: U(0.9 - 0.4 * u) }));
+  off(22, 45);
+  const events = ev.map((e, i) => ({ ...e, i })).sort((a, b) => a.time - b.time || a.i - b.i).map(({ i, ...e }, order) => ({ ...e, order }));
+  return validateExpressionScore({ version: EXPRESSION_VERSION, protocol: 'midi2', source: { kind: 'fixture', name: 'expressive-study' }, events, bounds: { maxVoices: 3, maxEvents: 64 }, mapping: { version: 1, instrument: 'bellows', smoothingSeconds, neutral } });
+}

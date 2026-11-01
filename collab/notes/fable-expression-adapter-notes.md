@@ -38,12 +38,13 @@ first listen I suggest a second scene, `'study'`, in the same module
    back (sensitivity 2.0, bend ±0.15 of range). The two are the same
    mechanism doing different things at once: the independence test, now
    audible.
-4. **Return (16–24 s).** A third voice on 52 (E3, the lowest) enters very
-   soft and still. The first two release (sustain pedal down from 15.5 s,
+4. **Return (16–24 s).** A third voice on 45 (A2, an octave below the
+   first) enters very soft and still. The first two release (sustain pedal down from 15.5 s,
    so their note-offs at 16 are held, pedal up at 18). All expression
    returns to neutral by 20 s; the third voice is left alone, unchanged,
    and released at 22 with its ring. The last thing heard is the plain
-   tone from the beginning, an octave lower.
+   tone from the beginning, an octave lower (A3 = 57 → A2 = 45; the answer
+   voice is E4 = 64, a fifth above A3).
 
 Why this sequence: every expression dimension is introduced alone before
 two happen together; the "answer" is a real relationship between voices

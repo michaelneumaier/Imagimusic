@@ -112,3 +112,4 @@
 - 2026-11-01 astra: listening doorway: aspect-sensitive camera zoom (presentation only) after a 400×656 Safari check cropped the pair; kept WAV (48 kHz, 1,538,705 stereo frames) byte-identical with an independent renderLoomPerformance + stereoWav render (renders/listening-close-kin.wav).
 - 2026-11-01 astra: Loom journey review approve-with-fixes (facade setting override, shallow freeze, section beats length, wording). Fable: all fixed with tests.
 - 2026-11-01 astra: listening doorway committed (fc64cc4) with validation note. Fable: roadmap M5.5 shipped.
+- 2026-11-01 astra: expressive adapter foundation (src/expressive/performance.js + audio.js, 3 tests). Fable: composeExpressiveStudy (stillness → change → answer → return, 3 voices, ≤ 64 events, ~24 s) with a test; adapter review approve; interval numbers in the note corrected (A3 57, E4 64, A2 45).

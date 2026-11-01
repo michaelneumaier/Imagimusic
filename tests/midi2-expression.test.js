@@ -107,3 +107,27 @@ test('determinism, reporting and validation', () => {
   assert.throws(() => composeExpressiveChord({ scene: 'x' }), /unknown fixture scene/);
   assert.equal(DEFAULT_SENSITIVITY_Q7_25, 2 * 2 ** 25); assert.equal(controller32ToUnit(BEND_CENTER) > 0.5 - 1e-9, true);
 });
+
+test('the musical study: stillness, change, an opposite answer, and a return to the plain tone an octave below', async () => {
+  const { composeExpressiveStudy } = await import('../src/midi2/expression.js');
+  const s = composeExpressiveStudy();
+  assert.ok(s.events.length <= 64 && s.events.filter(e => e.type === 'noteOn').length === 3);
+  assert.deepEqual(composeExpressiveStudy(), s);
+  const at = t => evaluateExpression(s, t);
+  const v = (r, n) => r.voices.find(x => x.address.noteNumber === n);
+  // stillness: one voice, neutral
+  const r2 = at(2); assert.equal(r2.voices.length, 1); assert.ok(Math.abs(v(r2, 57).brightness01 - 0.5) < 1e-9 && v(r2, 57).pressure01 === 0 && v(r2, 57).pitchHcu === 57);
+  // change: breath first, then light
+  assert.ok(v(at(7.2), 57).pressure01 > 0.74 && Math.abs(v(at(7.0), 57).brightness01 - 0.5) < 0.11);
+  assert.ok(v(at(9.5), 57).brightness01 > 0.89);
+  // answer: E4 bright then closing; A3 bends up 30 cents and back; E4's own values unaffected by A3's bend
+  const r9 = at(9.3), r14 = at(14.5); assert.ok(v(r9, 64).brightness01 > 0.9 && v(r14, 64).brightness01 < 0.55);
+  assert.ok(Math.abs(v(at(12.6), 57).pitchHcu - 57.3) < 0.02 && Math.abs(v(at(15.3), 57).pitchHcu - 57) < 0.02);
+  assert.equal(v(at(12.6), 64).pitchHcu, 64);
+  // return: sustain holds the two releases until 18; A2 enters soft and stays neutral; everything else returns to neutral by 20
+  assert.deepEqual([v(at(17), 57).gate, v(at(17), 64).gate, v(at(17), 45).gate], ['held', 'held', 'held']);
+  assert.deepEqual([v(at(18.5), 57).gate, v(at(18.5), 64).gate, v(at(18.5), 57).effectiveNoteOff], ['released', 'released', 18]);
+  const r21 = at(21); assert.ok(v(r21, 57).pressure01 < 0.01 && Math.abs(v(r21, 57).brightness01 - 0.5) < 0.01 && Math.abs(v(r21, 45).brightness01 - 0.5) < 1e-9 && v(r21, 45).pressure01 === 0 && v(r21, 45).pitchHcu === 45);
+  assert.equal(v(at(23), 45).gate, 'released'); assert.equal(v(at(23), 45).effectiveNoteOff, 22);
+  assert.equal(at(30).reported.unsupported.length, 0);
+});
