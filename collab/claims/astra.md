@@ -107,3 +107,5 @@ Powered encounter input: src/grove/powered-gesture.js and tests/grove-powered-ge
 
 Powered sustained picking: optional acceptHit/change hooks in src/grove/interaction.js and tests/grove-interaction.test.js; existing strike/Rest callers unchanged, captured pointer motion reports local height or temporary off-shell lift.
 Powered preparation worker: src/grove/powered-prepare-worker.js, builds only two c1 zones (27 combined states), fixed2s source and5s encounter at actual context sample rate; draft API consumer awaiting Fable's handoff.
+Powered audio-thread processor: src/grove/powered-processor.js, powered-worklet.js, tests/grove-powered-processor.test.js; shared affine engine, sample-acknowledged contact/Quiet scheduling, explicit source cutoff and appended fade. Draft record integration awaits Fable zero-length-force policy.
+Powered real-browser parity: tests/grove-powered-audio.html/js; OfflineAudioContext at48/44.1kHz, actual late MessagePort input, exact stereo samples and Quiet endpoint with downloadable hashes.
