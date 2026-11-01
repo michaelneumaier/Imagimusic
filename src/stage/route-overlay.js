@@ -3,10 +3,15 @@ import * as T from '../../vendor/three/build/three.module.js';
 /** Inspection annotations only: never modify instrument materials or musical state. */
 export function createRouteOverlay(world) {
   const group=new T.Group();group.name='Inspection annotations';world.scene.add(group);
-  let links=[],boxes=[];
+  let links=[],boxes=[],selection=null;
+  function settings(binding,patch,frame){
+    const slot=Number(binding.target.split('/slot')[1]);
+    const voice=frame?.voices.filter(v=>v.family==='bellows'&&v.slot===slot&&v.age>=0).sort((a,b)=>a.age-b.age)[0];
+    return voice?.modules.lfo??patch.bellows.lfo;
+  }
   function clear(){
     for(const child of [...group.children]){group.remove(child);child.geometry?.dispose();child.material?.dispose();}
-    links=[];boxes=[];
+    links=[];boxes=[];selection=null;
   }
   function outline(object){
     if(!object)return;
@@ -17,8 +22,9 @@ export function createRouteOverlay(world) {
     const material=modulation?new T.LineDashedMaterial({color:0xb8d69a,dashSize:.09,gapSize:.055,depthTest:false}):new T.LineBasicMaterial({color:0xe9db95,depthTest:false});
     const line=new T.Line(geometry,material);line.renderOrder=21;line.raycast=()=>{};group.add(line);links.push({a,b,line});
   }
-  function select(binding,patch){
+  function select(binding,patch,frame){
     clear();if(!binding)return '';
+    const lfo=settings(binding,patch,frame);selection={binding,patch,key:JSON.stringify([lfo.target,lfo.rateHz])};
     const [family,slotText]=binding.target.split('/'),slot=Number(slotText.slice(4));
     if(family==='bellows'){
       const body=world.choir[slot];
@@ -27,8 +33,8 @@ export function createRouteOverlay(world) {
       const envelope=['fill','level','aperture'].includes(binding.param);
       if(envelope){outline(body.bellows);link(body.bellows,body.horn,true);if(binding.param==='aperture')link(body.bellows,body.chamber,true);}
       if(['swing','fast','aperture','level'].includes(binding.param)){
-        const pendulum=patch.bellows.lfo.rateHz>8?body.fastArc:body.pendulum;
-        const target=patch.bellows.lfo.target==='pitch'?body.source:patch.bellows.lfo.target==='amp'?body.horn:body.chamber;
+        const pendulum=lfo.rateHz>8?body.fastArc:body.pendulum;
+        const target=lfo.target==='pitch'?body.source:lfo.target==='amp'?body.horn:body.chamber;
         outline(pendulum);link(pendulum,target,true);
       }
       return 'Solid: source → filter chamber → output. Dashed: envelope or LFO control. Connections describe the synthesis model, not physical airflow.';
@@ -40,7 +46,8 @@ export function createRouteOverlay(world) {
   }
   const box=new T.Box3(),a=new T.Vector3(),b=new T.Vector3();
   function center(object,out){box.setFromObject(object);if(box.isEmpty())object.getWorldPosition(out);else box.getCenter(out);}
-  function update(){
+  function update(frame){
+    if(selection){const {binding,patch,key}=selection,lfo=settings(binding,patch,frame);if(key!==JSON.stringify([lfo.target,lfo.rateHz]))select(binding,patch,frame); }
     world.scene.updateMatrixWorld(true);
     for(const {object,helper} of boxes){helper.visible=object.visible;helper.update();}
     for(const {a:from,b:to,line} of links){

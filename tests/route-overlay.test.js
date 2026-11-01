@@ -17,6 +17,12 @@ test('inspection routes follow moving parts without mutating their materials and
   world.choir[0].horn.position.x+=2;route.update();
   assert.notDeepEqual(Array.from(modulation.geometry.attributes.position.array),prior,'amp modulation must terminate at the moving output');
   assert.deepEqual(world.choir[0].horn.material.toJSON(),before);
+  const frame={voices:[{family:'bellows',slot:0,age:.1,modules:{lfo:{target:'pitch',rateHz:2}}}]};
+  route.update(frame);
+  const voiceLink=group.children.find(c=>c.material.isLineDashedMaterial);
+  const old=Array.from(voiceLink.geometry.attributes.position.array);
+  world.choir[0].source.position.x-=1;route.update(frame);
+  assert.notDeepEqual(Array.from(voiceLink.geometry.attributes.position.array),old,'sounding pitch LFO overrides current amp patch');
   route.select({target:'garden/slot0',param:'mode2'},patch);route.update();
   assert.equal(group.children.length,3,'old choir routes were removed');
   world.garden[0].striker.visible=false;route.update();

@@ -15,7 +15,7 @@ export async function exportMovie(patch, cameraPose, {signal, onProgress=()=>{},
   if(!await canEncodeVideo('avc',{width,height,frameRate:fps}) || !await canEncodeAudio('aac',{sampleRate,numberOfChannels:1}))
     throw new Error('This browser cannot encode H.264/AAC video. Use a browser with both WebCodecs encoders.');
   const passage=createPerformance(patch,sampleRate),duration=Math.min(passage.duration,durationLimit);
-  const clock=new FrameClock({fps}),times=clock.times(duration),baseProject=createProjection(patch),direct=createDirector(passage),bindings=stageBindings({camera:true});
+  const clock=new FrameClock({fps}),times=clock.times(duration),baseProject=createProjection(patch,{performance:passage}),direct=createDirector(passage),bindings=stageBindings({camera:true,performers:true});
   const project=frame=>{const result=baseProject(frame);result.stage.camera=direct(frame.t,cameraPose.mode??'manual',cameraPose);return result;};
   let stopped=false;
   function check(){if(stopped||signal?.aborted)throw new DOMException('Movie render cancelled.','AbortError');}

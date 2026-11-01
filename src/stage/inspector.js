@@ -6,7 +6,7 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
   const select=document.getElementById('inspect-binding'),heading=document.getElementById('inspect-title'),note=document.getElementById('inspect-note'),value=document.getElementById('inspect-value'),inputs=document.getElementById('inspect-inputs');
   const route=createRouteOverlay(world),routeNote=document.getElementById('inspect-route');
   let current=null,lastFrame=null,down=null;
-  function showRoute(){routeNote.textContent=route.select(current,getPatch());}
+  function showRoute(){routeNote.textContent=route.select(current,getPatch(),lastFrame);}
   document.getElementById('inspect-clear').onclick=()=>{route.clear();routeNote.textContent='Route hidden. Select a part to trace its connections.';};
   const ray=new T.Raycaster(),point=new T.Vector2();
   world.garden.forEach((body,i)=>{body.root.userData.bindingTarget=`garden/slot${i}`;body.layers.forEach((shell,n)=>shell.userData.bindingParam=`mode${n}`);body.striker.userData.bindingParam='striker';});
@@ -37,5 +37,5 @@ export function mountInspector({world,canvas,bindings,getPatch}) {
     value.textContent=`${detail.field} → ${detail.param}: ${result}`;
     inputs.textContent=detail.inputs.map(input=>input.path+' = '+format(input.value)).join('\n');
   }
-  return {update(frame){lastFrame=frame;render();route.update();}};
+  return {update(frame){lastFrame=frame;render();route.update(frame);}};
 }
