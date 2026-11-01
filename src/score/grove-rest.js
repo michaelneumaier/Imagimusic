@@ -4,7 +4,7 @@
 // (Taylor to 24 terms after scaling to ‖·‖₁ ≤ 0.5) and floating-point roundoff; there is no time-stepping approximation.
 import { createGroveVoice, voiceSystem, grovePans, DEFAULT_VOICE_CONFIG } from './grove-voice.js';
 import { stateStepper, strikeImpulse, contactDamping } from '../coupling.js';
-import { REST_RECIPE_VERSION, contactStateKey, createRestEngine, renderRestPassage } from '../rest/engine.js';
+import { REST_RECIPE_VERSION, contactStateKey, createRestEngine, renderRestPassage, visualFromState } from '../rest/engine.js';
 
 /** Two rest strengths, viscous coefficients in N·s/m per unit shape, stated as choices, not measurements of any hand. */
 export const REST_STRENGTHS = Object.freeze({ light: 12, firm: 60 });
@@ -137,4 +137,17 @@ export function restRecordStates(record, recipe, { every = 1024 } = {}) {
   return { frames, every, checkpoints: checkpoints.length,
     /** Mass-normalized state at the start of `frame` (after all events before it; before the events of `frame` itself). */
     stateAt: frame => { if (!Number.isInteger(frame) || frame < 0 || frame > frames) throw new Error('frame out of range.'); return replay(frame).state; } };
+}
+
+/** The picture of a Rest record at any time, in any order (checkpointed): the same fields the voice session's visual gives, plus contacts. */
+export function restRecordVisual(record, recipe, { every = 1024 } = {}) {
+  const states = restRecordStates(record, recipe, { every }), sr = recipe.sampleRate;
+  return { frames: states.frames, visual(time) {
+    if (!Number.isFinite(time) || time < 0) throw new Error('Invalid visual time');
+    const frame = Math.min(states.frames, Math.floor(time * sr));
+    const key = contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= frame && frame < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+    const v = visualFromState(recipe, states.stateAt(frame), key);
+    const fade = record.ended ? Math.max(0, Math.min(1, 1 - (frame - record.ended.frame) / record.ended.fadeFrames)) : 1;
+    return { time, envelope: v.envelope.map(x => x * fade), lowBand: true, contacts: v.contacts, strikes: fade ? record.events.filter(e => frame >= e.frame && frame < e.frame + 0.3 * sr).map(e => ({ ...e, strikeU: recipe.positions[e.position], age: (frame - e.frame) / sr })) : [] };
+  } };
 }

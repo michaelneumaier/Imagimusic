@@ -11,6 +11,7 @@ import {createGroveVoiceSession} from '../src/grove/voice-session.js';
 import {renderGroveBank} from '../src/grove/performance.js';
 import {renderVoiceBank} from '../src/grove/voice-performance.js';
 import {mixImpulseRecording} from '../src/touch/session.js';
+import {createGroveRestRecipe, renderRestRecord} from '../src/score/grove-rest.js';
 import {createGroveMoviePlan} from '../src/grove/movie-plan.js';
 import {stereoWav} from '../src/loom/model.js';
 
@@ -19,6 +20,11 @@ const floatBytes = channel => { const b = Buffer.alloc(channel.length * 4); for 
 
 /** Rebuild the soundtrack from a capture exactly as the page does: session → bank → mix. */
 export function rebuildGrovePcm(capture) {
+  if (capture.kind === 'imagimusic-grove-rest') {
+    // A Rest record: the exact model through the shared engine, from a recipe prepared for the record's grove, voice and rate.
+    const recipe = createGroveRestRecipe(capture.grove, capture.voice, { sampleRate: capture.sampleRate });
+    return renderRestRecord(capture, recipe);
+  }
   const rich = capture.kind === 'imagimusic-grove-voice';
   const session = rich ? createGroveVoiceSession({grove: capture.grove, voice: capture.voice}, capture.sampleRate) : createGroveSession(capture.grove, capture.sampleRate);
   for (const event of capture.events) if (!session.strike(event).accepted) throw new Error('capture event not admitted on rebuild');

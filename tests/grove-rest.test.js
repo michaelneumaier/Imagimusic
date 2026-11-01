@@ -144,3 +144,20 @@ test('the picture from a state equals the bank route picture with no rests, and 
   assert.deepEqual(v.contacts, [null, { zone: 2, strength: 1 }, null]); assert.ok(v.lowBand && v.envelope.length === 3);
   assert.deepEqual(parseContactKey('-|21|00'), [null, { zone: 2, strength: 1 }, { zone: 0, strength: 0 }]);
 });
+
+test('a Rest record rebuilds in the verifier path and its picture reports contacts, cues and the Quiet fade at any time', async () => {
+  const { rebuildGrovePcm } = await import('../tools/verify-grove-movie.mjs');
+  const { renderRestRecord, restRecordVisual, REST_RECORD_KIND } = await import('../src/score/grove-rest.js');
+  const grove = composeGrove({ seed: 11 }), sr = 8000, recipe = createGroveRestRecipe(grove, DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const record = { version: 2, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: sr, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
+    events: [{ frame: 0, order: 0, body: 1, position: 2, velocity: 0.7 }, { frame: 3000, order: 2, body: 0, position: 0, velocity: 0.5 }], contacts: [{ body: 1, zone: 2, strength: 1, start: 1200, end: 4000, order: 1 }], ended: { frame: 5000, fadeFrames: 200 } };
+  const a = rebuildGrovePcm(record), b = renderRestRecord(record, recipe);
+  assert.equal(a.channels[0].length, 5200); assert.ok(a.channels.every((c, ch) => c.every((v, i) => v === b.channels[ch][i])), 'the verifier rebuild is the record renderer');
+  const pic = restRecordVisual(record, recipe, { every: 512 });
+  const at = t => pic.visual(t);
+  assert.deepEqual(at(0.2).contacts, [null, { zone: 2, strength: 1 }, null]); assert.deepEqual(at(0.6).contacts, [null, null, null]);
+  assert.ok(at(0.2).envelope[1] < 0.5 * at(0.1).envelope[1], 'the rested shell falls under the hand');
+  assert.ok(at(0.01).strikes.length === 1 && at(0.01).strikes[0].strikeU === 1 && at(0.5).strikes.length === 0 && at(0.39).strikes[0].body === 0);
+  assert.ok(at(0.64).envelope.every(v => v === 0) && at(0.63).envelope.some(v => v > 0), 'Quiet fade reaches zero at ended + fade');
+  const first = at(0.3).envelope, again = at(0.3).envelope; assert.deepEqual(first, again);
+});

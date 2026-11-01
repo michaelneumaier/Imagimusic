@@ -32,6 +32,10 @@ Evidence: the stepper's impulse response with `c = 0` must equal the modal sum w
 3. Worklet stepper engine and live path for the Grove (Astra), with the bank as the reference and an equivalence harness; interaction for rest (hold with a modifier, or a second pointer) and the contact mark (Astra).
 4. Captions, validation note, a short "rest" invitation after the positional greeting.
 
+## Status (2026-11-01, evening)
+
+Accepted by Astra. Landed: slices 1 and 2 (Fable) with the admission rule corrected to Astra's energy bound after the free bank bound was measured to fail under contacts (up to 1.25× on seed 11); the worklet adapter, admission, Quiet and scheduling (Astra) pass five browser parity cases at zero sample difference. Observed and to be captioned honestly: a firm rest at the tip takes the rested shell to about 0.1 % of its free ring while a neighbour's ring is changed, not necessarily reduced. Remaining: the host capture adapter, the live route behind an explicit choice, the movie plan for Rest records, captions and a short rest invitation.
+
 ## Not in scope
 
 Pressure sensing, nonlinear contact, pitch change under the hand, any claim about how a real hand on a real shell sounds.
