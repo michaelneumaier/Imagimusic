@@ -11,7 +11,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 11;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 12;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -194,11 +194,16 @@ await check('Shipping default: featured FM tensioner (composition v2), alone and
     assert(s.peak > .01 && s.peak < 1, `${name}: peak outside range ${s.peak}`);
     assert(s.last50msPeak < 1e-3, `${name}: non-silent tail ${s.last50msPeak}`);
     assert(Math.abs(a.length / 48000 - composed.duration) < 1 / 48000 + 1e-9, `${name}: length does not match composed duration`);
-    const base = await renderPerformanceAudio(createPerformance(DEFAULT_PATCH, 48000), 48000);
+    // Contribution reference: the SAME composition with only the FM tone disabled, so the Loom's own contribution
+    // (when enabled) is in both renders. Asserted: nothing differs before the entrance; something does after it.
+    const reference = attachComposition(createPerformance(DEFAULT_PATCH, 48000), { ...composition, fm: { ...composition.fm, enabled: false } });
+    const ref = await renderPerformanceAudio(reference, 48000);
     const entrance = Math.round(composed.fm.time * 48000); let before = 0, after = 0;
-    for (let i = Math.max(0, entrance - 4800); i < entrance; i++) before = Math.max(before, Math.abs(a[i] - (base[i] ?? 0)));
-    for (let i = entrance; i < Math.min(a.length, entrance + 48000); i++) after = Math.max(after, Math.abs(a[i] - (base[i] ?? 0)));
-    out[name] = { ...s, composedDuration: composed.duration, fmEntranceSeconds: composed.fm.time, fmDurationSeconds: composed.fm.duration, maxDiffVsBaseBeforeEntrance: before, maxDiffVsBaseAfterEntrance: after };
+    for (let i = 0; i < Math.min(entrance, ref.length); i++) before = Math.max(before, Math.abs(a[i] - ref[i]));
+    for (let i = entrance; i < Math.min(a.length, entrance + 48000); i++) after = Math.max(after, Math.abs(a[i] - (ref[i] ?? 0)));
+    assert(before === 0, `${name}: differs from the FM-disabled reference before the entrance (max ${before})`);
+    assert(after > 1e-3, `${name}: no FM contribution after the entrance (max ${after})`);
+    out[name] = { ...s, composedDuration: composed.duration, fmEntranceSeconds: composed.fm.time, fmDurationSeconds: composed.fm.duration, maxDiffVsFmDisabledBeforeEntrance: before, maxDiffVsFmDisabledAfterEntrance: after };
   }
   return out;
 });

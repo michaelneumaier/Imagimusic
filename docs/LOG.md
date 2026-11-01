@@ -68,3 +68,5 @@
 - 2026-11-01 fable: proposal 005 consolidated (level+flatness mist, model-gated formants, Praat window note, targets gated on reference setup, gesture table, woven spectrum first); harness v11 featured-FM rows; FM foundation review approve.
 - 2026-11-01 astra: featured FM joined to the shared stage timeline, export and verifier (7f4fa44); scene parity 379/379. Fable review approve.
 - 2026-11-01 astra: playable FM ensemble (fm-audio.js, stage toggle, links, inspector/route); Safari combined passage played through. Fable review approve.
+- 2026-11-01 astra: approved the FM convergence test as scoped evidence; v11 running; live readout carries positiveInstantaneousFrequency.
+- 2026-11-01 fable: measured interval stated explicitly (0.05–0.55 s); harness v12 compares FM contribution against the same composition with FM disabled (asserted silent before entrance, positive after).

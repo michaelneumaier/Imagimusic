@@ -164,7 +164,7 @@ test('full-passband residual: 48 kHz (and 44.1 kHz) renders vs equivalently filt
     // Target, stated honestly: within 6 dB of the pipeline's own floor, or below −50 dB absolute.
     assert.ok(residual < -50 || residual < floor + 6, `${name}: residual ${residual.toFixed(1)} dB vs floor ${floor.toFixed(1)} dB`);
   }
-  console.log(`fm full-passband residuals (dB, RMS re signal, first ${0.6} s, after equivalent lowpass at 0.4·rate):`, JSON.stringify(report));
+  console.log('fm full-passband residuals (dB, RMS re signal, interior 0.05–0.55 s of a 0.6 s render, after equivalent lowpass at 0.4·rate):', JSON.stringify(report));
 });
 
 test('fade and finite end: sample-aligned end, last sample exactly zero, Float32 render equals fround(sample)', () => {

@@ -15,7 +15,9 @@
 // The gate is measured, in tests/fm.test.js: (a) predicted-component magnitudes at 48 kHz vs decimated 192 kHz
 // (−122 dB re peak at carrier 1200 / ratio 2 / index 3) and (b) a FULL-PASSBAND time-domain residual after both
 // rates pass an equivalent linear-phase lowpass at 0.4·rate with matched delay (sees folded energy between bins and
-// phase errors): measured 2026-11-01, RMS re signal over the first 0.6 s, pipeline floor on a pure tone in brackets:
+// phase errors): measured 2026-11-01, RMS re signal over the interior interval 0.05–0.55 s of a 0.6 s render (the
+// 50 ms margins exclude onset and filter edges; neither the onset nor the final fade is measured), pipeline floor on a
+// pure tone in brackets:
 // default 220/2/3 −154 dB (−158), low f_m 220/0.01/3 −154 dB (−158), default at 44.1 kHz −154 dB (−154),
 // near the screening boundary 1500/4/0.7 −87 dB (−158). Target: below −50 dB or within 6 dB of the floor.
 // These are the measured cases; no input set is promised alias-free.
