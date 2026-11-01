@@ -191,3 +191,24 @@ export function restInvitationRecord(recipe, invitation) {
   return validateRestRecord({ version: REST_RECORD_VERSION, kind: REST_RECORD_KIND, grove: recipe.grove, voice: recipe.voice, sampleRate: recipe.sampleRate, outputGain: recipe.outputGain, zones: recipe.zones, strengths: recipe.strengths.map(s => s.name),
     events, contacts: contacts.sort((a, b) => a.start - b.start || a.order - b.order), ended }, recipe);
 }
+
+/** Every picture frame of a record at a fixed rate in one sequential pass (O(samples)), identical to sampling restRecordVisual at i/fps;
+ *  the exact terminal frame is appended. For a worker preparing a replay picture, this is far cheaper than per-frame checkpoint replay. */
+export function restRecordPictureFrames(record, recipe, { fps = 60 } = {}) {
+  if (!Number.isInteger(fps) || fps < 1 || fps > 240) throw new Error('fps must be an integer in 1..240.');
+  validateRestRecord(record, recipe);
+  const sr = recipe.sampleRate, frames = restRecordLength(record, recipe), engine = createRestEngine(recipe), out = [];
+  const byFrame = new Map(); for (const k of record.events) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
+  const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  const snapshot = (frame, time) => { const v = visualFromState(recipe, engine.state, keyAt(frame)); const fade = record.ended ? Math.max(0, Math.min(1, 1 - (frame - record.ended.frame) / record.ended.fadeFrames)) : 1;
+    return { time, envelope: v.envelope.map(x => x * fade), lowBand: true, contacts: v.contacts, strikes: fade ? record.events.filter(e => frame >= e.frame && frame < e.frame + 0.3 * sr).map(e => ({ ...e, strikeU: recipe.positions[e.position], age: (frame - e.frame) / sr })) : [] }; };
+  const count = Math.ceil(frames / sr * fps); let next = 0;
+  for (let i = 0; i <= frames; i++) {
+    while (next < count && Math.min(frames, Math.floor(next / fps * sr)) === i) { out.push(snapshot(i, next / fps)); next++; }
+    if (i === frames) break;
+    const due = byFrame.get(i); if (due) for (const k of due) engine.strike(k.position, k.body, k.velocity);
+    engine.setContacts(keyAt(i)); engine.step();
+  }
+  out.push(snapshot(frames, frames / sr));
+  return { fps, duration: frames / sr, frames: out };
+}

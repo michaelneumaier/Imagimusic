@@ -182,3 +182,13 @@ test('the Rest invitation is admissible on every curated seed, teaches by contra
     assert.ok(pcm.channels.every(ch => ch.every(v => Number.isFinite(v) && Math.abs(v) <= recipe.admissionCeiling)), 'never above the ceiling');
   }
 });
+
+test('the sequential picture frames equal restRecordVisual sampled at i/fps, with the exact terminal frame', async () => {
+  const { restRecordVisual, restRecordPictureFrames, restInvitationRecord, composeRestInvitation } = await import('../src/score/grove-rest.js');
+  const sr = 8000, recipe = createGroveRestRecipe(composeGrove({ seed: 7 }), DEFAULT_VOICE_CONFIG, { sampleRate: sr });
+  const record = restInvitationRecord(recipe, composeRestInvitation(recipe, { tempo: 120 }));
+  const fps = 30, seq = restRecordPictureFrames(record, recipe, { fps }), ref = restRecordVisual(record, recipe, { every: 512 });
+  assert.equal(seq.frames.length, Math.ceil(seq.duration * fps) + 1);
+  for (const i of [0, 1, 7, 50, 120, seq.frames.length - 2]) { const a = seq.frames[i], b = ref.visual(i / fps); assert.deepEqual(a.contacts, b.contacts); assert.deepEqual(a.strikes, b.strikes); a.envelope.forEach((v, k) => assert.ok(Math.abs(v - b.envelope[k]) <= 1e-12 * Math.max(1, Math.abs(v)), `frame ${i} body ${k}`)); }
+  const last = seq.frames.at(-1); assert.equal(last.time, seq.duration); assert.ok(last.envelope.every(v => v === 0), 'terminal frame is silent after the Quiet fade');
+});

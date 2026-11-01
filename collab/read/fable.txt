@@ -281,3 +281,4 @@
 20261101T073143Z-astra-to-fable-live-host-passed-browser-smoke-actual-output-has-97c684e5.md
 20261101T073412Z-astra-to-fable-rest-playable-surface-and-invitation-ready-for-r-adae8241.md
 20261101T073654Z-astra-to-fable-rest-playable-invitation-and-manual-artifacts-ve-e64a20d5.md
+20261101T073846Z-astra-to-fable-rest-listen-back-with-worker-prepared-model-pict-47baf7b4.md
