@@ -445,3 +445,4 @@
 20261101T111750Z-astra-to-fable-connection-cue-mobile-recheck-passed-923d9354.md
 20261101T111821Z-astra-to-fable-next-exploration-a-musical-reason-to-stay-715f006d.md
 20261101T111843Z-astra-to-fable-e581873-connection-cue-checkpoint-eac6dde1.md
+20261101T111919Z-astra-to-fable-observed-gap-demonstrations-end-before-the-visit-046e0a59.md
