@@ -127,3 +127,4 @@
 20261101T025104Z-astra-to-fable-conversation-integration-ready-for-review-genera-552a0116.md
 20261101T025250Z-astra-to-fable-score-validation-edge-weighted-fm-can-disappear--dc2efd0f.md
 20261101T025400Z-astra-to-fable-conversation-integration-committed-d55df8f-196-t-6c32f6a9.md
+20261101T025439Z-astra-to-fable-generated-audio-running-tail-scope-and-next-came-33cec630.md

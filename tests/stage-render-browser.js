@@ -17,7 +17,7 @@ async function check(name, run) {
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
 const twiceFull = async (patch, options) => compareRenders(await render(patch, options), await render(patch, options), 48000);
-export const HARNESS_VERSION = 14;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 15;   // bump on every change to the experiments so reports are comparable
 // From v7 the renderer's default lifecycle is 'outlive-render' (decision 004). Every negative-control row below
 // passes sourceLifetime: 'as-live' explicitly so the controls keep measuring the behavior they were designed to
 // expose; they are reported under "negative control" names and never asserted. Shipping assertions use the default.
@@ -232,17 +232,18 @@ await check('Generated phrase: composeConversation presets through createScorePe
   for (const [name, controls] of presets) for (const rate of rates) {
     const score = composeConversation(controls), passage = createScorePerformance(DEFAULT_PATCH, score, composition, rate);
     const a = await renderPerformanceAudio(passage, rate), b = await renderPerformanceAudio(passage, rate);
-    const r = compareRenders(a, b, rate); let peak = 0, tail = 0; const tailStart = a.length - Math.round(rate * 0.05);
-    for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (!Number.isFinite(v)) throw new Error(`${name} @ ${rate}: non-finite PCM at ${i}`); peak = Math.max(peak, v); if (i >= tailStart) tail = Math.max(tail, v); }
+    const r = compareRenders(a, b, rate); let peak = 0, tail = 0, tail500 = 0; const tailStart = a.length - Math.round(rate * 0.05), tail500Start = a.length - Math.round(rate * 0.5);
+    for (let i = 0; i < a.length; i++) { const v = Math.abs(a[i]); if (!Number.isFinite(v)) throw new Error(`${name} @ ${rate}: non-finite PCM at ${i}`); peak = Math.max(peak, v); if (i >= tailStart) tail = Math.max(tail, v); if (i >= tail500Start) tail500 = Math.max(tail500, v); }
     const label = `generated phrase: ${name} @ ${rate} Hz`;
     matrix[label] = r;
     assert(r.identical, `${label}: not identical, max ${r.maxDiff} at ${r.atSeconds}s`);
     assert(peak > .01 && peak < 1, `${label}: peak outside range ${peak}`);
     assert(tail < 1e-3, `${label}: non-silent tail ${tail}`);
+    assert(tail500 < 1e-3, `${label}: final 0.5 s above -60 dBFS (peak ${tail500}; proposal 008 settling criterion)`);
     assert(Math.abs(a.length / rate - passage.duration) < 1 / rate + 1e-9, `${label}: length does not match assembled duration`);
     const last = lastOnsetSeconds(score);
     assert(passage.events.every(e => e.voice.noteOn <= last + 1e-9) && (passage.loom?.events ?? []).every(e => e.time <= last + 1e-9), `${label}: an onset inside the hold`);
-    out[label] = { peak, last50msPeak: tail, seconds: a.length / rate, assembledDuration: passage.duration, lastOnsetSeconds: last, scheduledEvents: passage.events.length, loomStrikes: (passage.loom?.events ?? []).length, fmEntranceSeconds: passage.fm?.time ?? null };
+    out[label] = { peak, last50msPeak: tail, last500msPeak: tail500, last500msPeakDb: tail500 > 0 ? 20 * Math.log10(tail500) : -Infinity, seconds: a.length / rate, assembledDuration: passage.duration, lastOnsetSeconds: last, scheduledEvents: passage.events.length, loomStrikes: (passage.loom?.events ?? []).length, fmEntranceSeconds: passage.fm?.time ?? null };
   }
   return out;
 });
