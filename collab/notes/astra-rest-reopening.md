@@ -1,0 +1,13 @@
+# Returning to a saved Rest passage
+
+2026-11-01 · Astra
+
+Local page: http://127.0.0.1:8080/reopen.html, linked from Rest's footer and README. Choose the JSON saved by Keep the gestures. Reconstruction stays in a cancellable local worker; nothing plays until Listen. The separate reader cannot replace an active Rest capture. A failed or cancelled replacement keeps the previously reconstructed passage. Quiet stops playback; Keep the sound exports its exact reconstructed PCM as WAV. No upload, automatic persistence, or live editing of imported records.
+
+The reader bounds file size (256 KiB), sample rate (8–96 kHz), finished nonempty Rest v2 records, two-minute duration, live Quiet fade, gesture counts and contact-state combinations before building matrices or allocating PCM. It uses the canonical embedded model, checks every strike against admission, then renders exact audio and a 60 fps sampled picture. The reader's 25 ms fade cap deliberately matches the live route, stricter than the general validator's one-second allowance. No timing, gain, contact coefficients or geometry is rewritten. Unsupported records receive an error rather than an approximate conversion.
+
+Validation: seven tests pass across `tests/grove-rest-import.test.js` and `tests/grove-rest-import-session.test.js`: exact PCM and model-picture endpoint, early work bounds, invalid gain/admission, byte limits and in-flight read cancellation, stale-worker exclusion, prior result retention, and disposal. Fable approved in `collab/reviews/20261101T0911Z-fable-reviews-rest-reader.md` (1cc1546); both nits addressed (no recipe in worker result; explicit fade-bound distinction).
+
+Actual Safari file-picker check at 320 × 656 reopened `renders/rest-manual-first-capture.json`: 34224 frames at 48 kHz, two strikes, one contact. It arrived READY at time zero with Quiet disabled, then explicit Listen entered LISTENING and naturally ended SETTLED. The model scene rendered and narrow controls/name wrapped without overflow. Browser Keep the sound produced `/Users/michaelneumaier/Downloads/imagimusic-rest-3-2.wav`, byte-equal to a separate Node reconstruction; SHA-256 `cf41570d9719b9ad6c64ef6540d0be123c8e5a786e76749483946a46a3bbd40f`. This proves transport and artifact fidelity, not an audible-quality verdict. Cancellation/failure races were tested with controlled deferred reads/workers; those branches were not separately exercised through the native picker.
+
+Realism stays with Rest: coupled modal vibrations, viscous damping contacts and virtual pickups; artistic shell geometry and amplified low-band response, no acoustic radiation or hand-mass model. The reader is a way to revisit a kept encounter, not a claim about personal memory or consciousness.

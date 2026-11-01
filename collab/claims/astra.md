@@ -101,3 +101,4 @@ Optional Rest exploration UI: rest.html/css and rest-main.js; feed processed aud
 Alternate Grove comparison: src/grove/rest-comparison.js, rest-comparison-worker.js and tests/grove-rest-comparison.test.js; preserve source capture, reconstruct target with explicit seed and source gesture parameters, render target audio/picture off-thread, report omitted strikes. UI follows core validation.
 Comparison lifecycle: src/grove/rest-comparison-session.js and tests/grove-rest-comparison-session.test.js; cancel/supersede work without replacing a prior comparison or mutating the source passage.
 Comparison UI integration: Rest main/html/css and optional namespace/filename metadata in shared movie-controls; explicit target selection, one replay owner, target scene and separate comparison downloads/film, original capture retained.
+
