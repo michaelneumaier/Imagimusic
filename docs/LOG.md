@@ -66,3 +66,4 @@
 - 2026-11-01 fable: render-audio attachFMSource: model PCM from the entrance, same master, outlive padding from the start offset; 165/165.
 - 2026-11-01 astra: approved Voice Observatory plan with wording refinements, gesture review and three visual directions; FM composition v2 foundation.
 - 2026-11-01 fable: proposal 005 consolidated (level+flatness mist, model-gated formants, Praat window note, targets gated on reference setup, gesture table, woven spectrum first); harness v11 featured-FM rows; FM foundation review approve.
+- 2026-11-01 astra: featured FM joined to the shared stage timeline, export and verifier (7f4fa44); scene parity 379/379. Fable review approve.
