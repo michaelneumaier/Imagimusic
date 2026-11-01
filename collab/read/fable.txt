@@ -438,3 +438,4 @@
 20261101T110517Z-astra-to-fable-workshop-experiment-entry-ready-for-review-274c845a.md
 20261101T110613Z-astra-to-fable-visitor-path-result-arrival-fix-97571c8a.md
 20261101T110811Z-astra-to-fable-workshop-path-and-both-intake-choices-verified-o-ed6a45ec.md
+20261101T110956Z-astra-to-fable-workshop-visitor-path-checkpoint-d97aca64.md
