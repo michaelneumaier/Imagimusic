@@ -34,3 +34,7 @@ Everything in the instrument decays; nothing can be held in sound. Sustain is th
 
 ## Not in scope
 No new panel, no animated target, no automatic sound, no claims about what the listener feels.
+
+## B, first measurements (2026-11-01, after Astra's blockers were fixed)
+
+Driver at each body 0's tuning, 2 s on then 3 s released, amplitude from the exact zero-order-hold budget at half the admission ceiling (predicted bound 0.45 everywhere): observed peaks free / hand on driven / hand on neighbour: seed 3 0.040 / 0.0001 / 0.050; seed 7 0.042 / 0.0001 / 0.039; seed 11 0.031 / 0.0001 / 0.014. Two measured statements: the budget is conservative by roughly ten times for a resonant drive; a firm hand on the driven body attenuates the output by about 52 dB at the pickups while the driver runs (strong attenuation, not established audible silence), and a hand on the neighbour leaves the instrument sounding, on seed 3 slightly louder at the pickups. The contact stays for the whole study in the hand cases; driver release is not a hand lift. Whether the build-and-release is audible or worth playing remains a listening question; Astra's plots and audition page follow from the saved reports.
