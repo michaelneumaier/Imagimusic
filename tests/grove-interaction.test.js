@@ -33,3 +33,17 @@ test('strike position is measured in shell-local height and snapped only to expl
  assert.ok(groveHitAt(scene,camera,canvas,110,100).positionU<.5);assert.ok(groveHitAt(scene,camera,canvas,110,140).positionU>.5);
  assert.deepEqual([0,.25,.6,.95,1].map(u=>groveStrikeZone(u)),[0,0,1,2,2]);assert.throws(()=>groveStrikeZone(NaN),/Invalid/);
 });
+
+
+test('optional sustained contact tracks local position, lifts off-shell, and restores on reentry',()=>{
+ const {scene,camera,canvas,emit}=fixture(),controls={enabled:true},changes=[];let starts=0,ends=0,playable=true;
+ const bound=bindGrovePlaying({canvas,controls,getScene:()=>scene,camera,canPlay:()=>playable,start:()=>starts++,finish:()=>ends++,change:(body,id,hit)=>changes.push({body,id,u:hit?.positionU??null})});
+ emit('pointerdown');emit('pointermove',{clientY:100});emit('pointermove',{clientY:140});emit('pointermove',{clientX:10,clientY:20});emit('pointermove');
+ assert.equal(starts,1);assert.equal(ends,0);assert.ok(changes[0].u<.5);assert.ok(changes[1].u>.5);assert.equal(changes[2].u,null);assert.equal(changes[3].u,.5);assert.equal(controls.enabled,false);
+ playable=false;emit('pointermove');assert.equal(ends,1);assert.equal(controls.enabled,true);emit('pointerup');assert.equal(ends,1);bound.dispose();
+});
+test('an excluded shell remains available to orbit and has no playing cursor',()=>{
+ const {scene,camera,canvas,emit}=fixture(),controls={enabled:true};let starts=0;
+ const bound=bindGrovePlaying({canvas,controls,getScene:()=>scene,camera,canPlay:()=>true,acceptHit:hit=>hit.body===1,start:()=>starts++,finish:()=>{}});
+ emit('pointermove');assert.equal(canvas.style.cursor,'');assert.equal(emit('pointerdown').stopped,undefined);assert.equal(controls.enabled,true);assert.equal(starts,0);bound.dispose();
+});

@@ -10,15 +10,17 @@ export function groveHitAt(scene,camera,canvas,clientX,clientY){
 export const groveBodyAt=(...args)=>groveHitAt(...args)?.body??null;
 /** Three explicit control zones, not a claim about the shell's acoustic geometry. */
 export function groveStrikeZone(u,positions=[.3,.6,1]){if(!Number.isFinite(u)||u<0||u>1||!positions.length||positions.some(p=>!Number.isFinite(p)||p<0||p>1))throw new Error('Invalid strike position');return positions.reduce((best,p,i)=>Math.abs(p-u)<Math.abs(positions[best]-u)?i:best,0);}
-/** Captured gestures cannot orbit the camera; cancellation never strikes. */
-export function bindGrovePlaying({canvas,controls,getScene,camera,canPlay,start,finish}){
+/** Captured gestures cannot orbit the camera; cancellation never strikes.
+ * Optional change reports movement on the originally captured shell (null off-shell),
+ * allowing sustained contacts to move/lift without beginning a new excitation. */
+export function bindGrovePlaying({canvas,controls,getScene,camera,canPlay,start,finish,acceptHit=()=>true,change=null}){
  const pointers=new Map();let orbitActive=false;
  const orbitStart=()=>{orbitActive=true;},orbitEnd=()=>{orbitActive=false;};
  controls.addEventListener?.('start',orbitStart);controls.addEventListener?.('end',orbitEnd);
  function reset(){const pending=[...pointers];pointers.clear();for(const [id,body] of pending){finish(body,`scene-${id}`,true);if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);}controls.enabled=true;canvas.style.cursor='';}
  function down(event){
   if(event.button!==0||!canPlay()||orbitActive)return;
-  const hit=groveHitAt(getScene(),camera,canvas,event.clientX,event.clientY);if(!hit)return;const {body}=hit;
+  const hit=groveHitAt(getScene(),camera,canvas,event.clientX,event.clientY);if(!hit||!acceptHit(hit))return;const {body}=hit;
   event.preventDefault();event.stopImmediatePropagation();
   if([...pointers.values()].includes(body))return;
   pointers.set(event.pointerId,body);controls.enabled=false;canvas.setPointerCapture(event.pointerId);start(body,`scene-${event.pointerId}`,{positionU:hit.positionU});
@@ -30,7 +32,7 @@ export function bindGrovePlaying({canvas,controls,getScene,camera,canPlay,start,
   if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);
  }
  const cancel=e=>end(e,true),up=e=>end(e,false);
- const move=e=>{if(pointers.has(e.pointerId)){e.preventDefault();e.stopImmediatePropagation();return;}canvas.style.cursor=canPlay()&&groveBodyAt(getScene(),camera,canvas,e.clientX,e.clientY)!==null?'pointer':'';};
+ const move=e=>{if(pointers.has(e.pointerId)){if(change&&!canPlay()){end(e,true);return;}e.preventDefault();e.stopImmediatePropagation();if(change){const body=pointers.get(e.pointerId),hit=groveHitAt(getScene(),camera,canvas,e.clientX,e.clientY);change(body,`scene-${e.pointerId}`,hit?.body===body?hit:null);}return;}const hit=canPlay()?groveHitAt(getScene(),camera,canvas,e.clientX,e.clientY):null;canvas.style.cursor=hit&&acceptHit(hit)?'pointer':'';};
  for(const [type,handler] of [['pointerdown',down],['pointerup',up],['pointercancel',cancel],['lostpointercapture',cancel],['pointermove',move]])canvas.addEventListener(type,handler,{capture:true});
  return {reset,dispose(){reset();controls.removeEventListener?.('start',orbitStart);controls.removeEventListener?.('end',orbitEnd);for(const [type,handler] of [['pointerdown',down],['pointerup',up],['pointercancel',cancel],['lostpointercapture',cancel],['pointermove',move]])canvas.removeEventListener(type,handler,{capture:true});}};
 }

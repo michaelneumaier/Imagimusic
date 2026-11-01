@@ -103,3 +103,7 @@ Comparison lifecycle: src/grove/rest-comparison-session.js and tests/grove-rest-
 Comparison UI integration: Rest main/html/css and optional namespace/filename metadata in shared movie-controls; explicit target selection, one replay owner, target scene and separate comparison downloads/film, original capture retained.
 
 
+Powered encounter input: src/grove/powered-gesture.js and tests/grove-powered-gesture.test.js; single active contact across overlapping pointer/keyboard holds, explicit lift/reset, model-independent command emitter. Future powered worklet/host remain Astra-owned, pending Fable engine contract.
+
+Powered sustained picking: optional acceptHit/change hooks in src/grove/interaction.js and tests/grove-interaction.test.js; existing strike/Rest callers unchanged, captured pointer motion reports local height or temporary off-shell lift.
+Powered preparation worker: src/grove/powered-prepare-worker.js, builds only two c1 zones (27 combined states), fixed2s source and5s encounter at actual context sample rate; draft API consumer awaiting Fable's handoff.
