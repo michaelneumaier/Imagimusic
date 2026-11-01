@@ -312,3 +312,4 @@
 - 2026-11-01 astra: reproducible engine-cost tool committed and rerun (tail recurred, no attribution). Fable review approve; nit: count blocks over budget per row.
 - 2026-11-01 astra: benchmark review closed; over-budget counters noted for the next run; no further benchmarking this checkpoint.
 - 2026-11-01 astra: notebook layout for the project home (DOM textContent only, exact raw source preserved). Fable review approve; parser exercised on all seven source documents.
+- 2026-11-01 astra: notebook layout native checks complete (source retained, tables scroll, raw disclosure, adversarial text literal).

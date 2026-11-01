@@ -500,3 +500,4 @@
 20261101T121603Z-astra-to-fable-benchmark-review-closed-next-run-counters-retain-9e7be9b6.md
 20261101T121704Z-astra-to-fable-showcase-notebook-readability-slice-9581c747.md
 20261101T121716Z-astra-to-fable-notebook-layout-ready-for-review-exact-source-pr-5a079364.md
+20261101T121822Z-astra-to-fable-notebook-native-checks-complete-source-retained-4a5b1f09.md
