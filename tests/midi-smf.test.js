@@ -109,7 +109,7 @@ test('rejects what the format forbids and what this importer bounds, each with a
   rejects(file(header(1, 2, 96), track(eot(0))), /Header says 2 tracks but the file holds 1/);
   rejects(file(header(0, 1, 96), track(ev(0, 0x90, 60, 1))), /no End of Track/);
   rejects(file(header(0, 1, 96), track(eot(0), ev(0, 0x90, 60, 1))), /data after the End of Track/);
-  rejects(file(header(0, 1, 96), [...str('MTrk'), ...u32(50), 0, 0xFF, 0x2F, 0]), /Truncated file/);
+  rejects(file(header(0, 1, 96), [...str('MTrk'), ...u32(50), 0, 0xFF, 0x2F, 0]), /Truncated data/);
   rejects(file(header(0, 1, 96), track([0x81, 0x80, 0x80, 0x80, 0x00, 0xFF, 0x2F, 0])), /longer than four bytes/);
   rejects(file(header(0, 1, 96), track(ev(0, 0xF8), eot(0))), /not a valid MIDI File event/);
   rejects(file(header(0, 1, 96), track(meta(0, 0x51, [1, 2]), eot(0))), /shorter than the 3 bytes/);
@@ -135,4 +135,66 @@ test('validateNoteList rejects tampered seconds, unknown keys and disorder; cano
   assert.throws(() => validateNoteList(mutate(c => { c.notes[0].velocity = 0; })), /velocity/);
   assert.equal(canonicalNoteList(list), canonicalNoteList(JSON.parse(canonicalNoteList(list))));
   assert.deepEqual(Object.keys(JSON.parse(canonicalNoteList(list))), Object.keys(JSON.parse(canonicalNoteList(list))).slice().sort());
+});
+
+// ---- after Astra's review of 5c0b4ef (collab/reviews/20261101T0440Z-astra-reviews-smf-parser.md) ----
+test('every decoded event counts toward the event bound, retained or ignored; limits must be bounded integers', () => {
+  const many = [0, 0xC0, 1]; for (let i = 1; i < 65537; i++) many.push(0, 1); many.push(...eot(0));
+  assert.throws(() => parseSMF(file(header(0, 1, 96), chunk('MTrk', many))), /More than 65536 events/);
+  const some = [0, 0xC0, 1]; for (let i = 1; i < 10; i++) some.push(0, 1); some.push(...eot(0));
+  const list = parseSMF(file(header(0, 1, 96), chunk('MTrk', some)));
+  assert.equal(list.eventCount, 11); assert.equal(list.ignored.programChange, 10);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxEvents: NaN } }), /Limit maxEvents/);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxEvents: Infinity } }), /Limit maxEvents/);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxNotes: 0 } }), /Limit maxNotes/);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { maxDenominatorExponent: 8 } }), /maxDenominatorExponent/);
+  assert.throws(() => parseSMF(SPEC_EXAMPLE, { limits: { bogus: 1 } }), /Unknown limit/);
+  assert.throws(() => validateNoteList(parseSMF(SPEC_EXAMPLE), { limits: { maxEvents: 3 } }), /eventCount/);
+});
+
+test('parser and validator agree on the cumulative tick bound; ignored events still own a stable position in the shared order', () => {
+  const ticks = []; for (let i = 0; i < 65; i++) ticks.push(0xFF, 0xFF, 0xFF, 0x7F, 0xC0, 1); ticks.push(...eot(0));
+  const long = parseSMF(file(header(0, 1, 96), chunk('MTrk', ticks)));
+  assert.equal(long.endTick, 65 * 0x0FFFFFFF); validateNoteList(long);
+  const f = file(header(0, 1, 10), track(ev(0, 0xC0, 1), ev(0, 0x90, 60, 90), ev(5, 0xC0, 2), ev(5, 0x80, 60, 0), eot(0)));
+  const list = parseSMF(f);
+  assert.deepEqual([list.notes[0].noteId, list.notes[0].offEventOrder, list.eventCount], [1, 3, 5], 'program changes occupy positions 0 and 2');
+});
+
+test('payload reads are bounded by the track chunk, not the file', () => {
+  // A track whose last event needs two data bytes but the chunk ends after one; the bytes of the next chunk must not be consumed.
+  const bad = file(header(1, 2, 96), chunk('MTrk', [0, 0x90, 60]), track(eot(0)));
+  assert.throws(() => parseSMF(bad), /runs past the end of the track 0 chunk/);
+  const badMeta = file(header(1, 2, 96), chunk('MTrk', [0, 0xFF, 0x06, 10, 65]), track(eot(0)));
+  assert.throws(() => parseSMF(badMeta), /runs past the end of the track 0 chunk/);
+});
+
+test('zero gates are warned for every closure kind; a zero numerator is malformed', () => {
+  const sameTick = parseSMF(file(header(0, 1, 10), track(ev(0, 0x90, 60, 90), ev(0, 0x90, 60, 70), ev(0, 0x80, 60, 0), eot(0))));
+  assert.deepEqual(sameTick.warnings.map(w => w.kind).sort(), ['retrigger', 'zeroGate', 'zeroGate']);
+  const atEot = parseSMF(file(header(0, 1, 10), track(ev(0, 0x90, 60, 90), eot(0))));
+  assert.deepEqual(atEot.warnings.map(w => w.kind).sort(), ['danglingOn', 'zeroGate']);
+  assert.throws(() => parseSMF(file(header(0, 1, 96), track(meta(0, 0x58, [0, 2, 24, 8]), eot(0)))), /numerator 0/);
+});
+
+test('validator rejects the adversarial records from the review', () => {
+  const base = parseSMF(file(header(0, 1, 96), track(ev(0, 0xB0, 64, 127), ev(0, 0x90, 60, 100), ev(96, 0x80, 60, 0), eot(0))));
+  validateNoteList(base);
+  const rejects = (name, f, re) => { const c = structuredClone(base); f(c); assert.throws(() => validateNoteList(c), re, name); };
+  rejects('sustain eventOrder NaN', c => { c.sustain[0].eventOrder = NaN; }, /sustain entry|increasing/);
+  rejects('off before on', c => { c.notes[0].offEventOrder = 0; }, /later event than the note-on/);
+  rejects('negative ignored count', c => { c.ignored.programChange = -1; }, /non-negative integer/);
+  rejects('extra ignored key', c => { c.ignored.extra = 'bad'; }, /unsupported field/);
+  rejects('controller key out of range', c => { c.ignored.controllers[128] = 1; }, /0\.\.127/);
+  rejects('warning malformed', c => { c.warnings.push({ kind: 'invented', noteId: Infinity, detail: {} }); }, /warning/);
+  rejects('warning unresolved reference', c => { c.warnings.push({ kind: 'zeroGate', noteId: 99, detail: 'x' }); }, /does not resolve/);
+  rejects('duplicate channels', c => { c.tracks[0].channels = [0, 0]; }, /sorted unique/);
+  rejects('note channel not on its track', c => { c.tracks[0].channels = [1]; c.sustain[0].channel = 1; }, /not declared on its track/);
+  rejects('track index mismatch', c => { c.tracks[0].index = 1; }, /index must equal position/);
+  rejects('tempo eventOrder beyond eventCount', c => { c.tempoMap.push({ tick: 0, usPerQuarter: 500000, eventOrder: 50 }); }, /tempo entry|increasing/);
+  rejects('marker eventOrder not integer', c => { c.markers.push({ tick: 0, seconds: 0, text: 'm', eventOrder: 1.5 }); }, /marker/);
+  rejects('time signature numerator 0', c => { c.timeSignatures.push({ tick: 0, numerator: 0, denominator: 4, clocksPerClick: 24, thirtySecondsPerQuarter: 8, eventOrder: 1 }); }, /time signature/);
+  rejects('notes not an array', c => { c.notes = {}; }, /must be an array/);
+  rejects('too many warnings', c => { c.warnings = new Array(70000).fill({ kind: 'zeroGate', noteId: c.notes[0].noteId, detail: 'x' }); }, /at most/);
+  assert.equal(JSON.parse(canonicalNoteList(base)).eventCount, 4);
 });

@@ -96,3 +96,4 @@
 - 2026-11-01 astra: seed controls committed (8f98fb8). Fable: pointed Astra to 010 rev. 2 (25387d9) and the spec-sources note.
 - 2026-11-01 michael (via astra): tie in MIDI 2.0; Astra note collab/notes/astra-midi2-direction.md, values boundary src/midi2/values.js (f51d001); SMF spec retrieved and read (RP-001). Fable: src/midi/smf.js parser + validator + canonical form, 7 tests from hand-built bytes incl. the spec example; suite 215/215.
 - 2026-11-01 fable: proposal 011 expressive bodies (MIDI 2.0 expression event model from M2-104-UM 7.4.x and App. A–C); proposal 010 rev. 3 (parser built; pedal/gate/window policies per Astra review); roadmap M4 in progress, M4.5 planning.
+- 2026-11-01 astra: SMF parser review (event-limit bypass, validator strictness, tick bound, chunk-local reads, zero-gate normalization, numerator 0). Fable: all fixed with regression tests (12 parser tests; suite 223/223); Astra audit repro all rejected/validated.
