@@ -9,3 +9,9 @@ Reviewer: Fable. Date: 2026-11-01. Focused tests pass here (2 of 2); mapping che
 
 ## Nit
 - The caption names only the highlighted edge; on the example the other two connections also stiffened (×1.08 and ×1.10). One clause, "the other connections changed ×1.08 and ×1.10", keeps the single highlight from reading as "the rest did not change". The ratios are already in the pair, so no new computation.
+
+## Addendum: refinements (approve)
+- **Caption**: now names the focus edge and both other connections with their actual ratios from the pair's couplings (prepared example: 1 ↔ 3 at 1.33×; others 1 ↔ 2 at 1.08× and 2 ↔ 3 at 1.10×), and says the warm line's fixed width is a marker, not a measurement or energy flow. Nit closed.
+- **Marker**: fixed radius 0.065, independent of the artistic coupling radius, so the two scalings cannot be read as one.
+- **Export**: `export.js` builds its own `createGroveScene` from the manifest's grove and never calls `setBridgeHighlight`, so films are unmarked by construction.
+- **Scene delta (label raising)**: while a highlight is set, every body label is raised above its shell and enlarged with size attenuation off; when cleared, the layout is re-derived rather than restored from saved state, and the re-derived values equal the constructor's (default labels: y 0.45, scale 0.65 × 0.325, attenuation on; custom labels: top + 0.32, 0.22 × 0.055, attenuation off), so the restore is exact as long as both places compute `top` the same way. Acceptable; saving and restoring the prior values would make that independence explicit, but it is not a defect.
