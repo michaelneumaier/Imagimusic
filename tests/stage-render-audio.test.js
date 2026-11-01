@@ -83,6 +83,37 @@ test('an attached Loom duet plays its deterministic stereo PCM through the same 
   assert.equal(g2.scheduled.length, base.events.length, 'the three families are scheduled exactly as before');
 });
 
+test('a featured FM tensioner plays its model PCM from its entrance through the same master, padded past the render under outlive', async () => {
+  const { DEFAULT_TENSIONER, validateTensioner, tensionerCore, tensionerEnd, renderTensioner } = await import('../src/fm.js');
+  const base = createPerformance(DEFAULT_PATCH);
+  assert.equal(buildPerformanceGraph(new Context(), base).fm, null);
+  const core = tensionerCore(validateTensioner(DEFAULT_TENSIONER)), time = 0.35 + 8 * (60 / DEFAULT_PATCH.tempo), end = tensionerEnd(core, 48000);
+  const fm = { settings: DEFAULT_TENSIONER, core, time, endS: end.endS, duration: time + end.samples / 48000, sampleRate: 48000 };
+  const featured = { ...base, fm, composition: { fmMixGain: 0.6 }, duration: Math.max(base.duration, fm.duration) };
+  const ctx = new Context(), graph = buildPerformanceGraph(ctx, featured, { sourceLifetime: 'outlive-render', renderEnd: featured.duration });
+  assert.ok(graph.fm); assert.equal(graph.fm.mixGain, 0.6); assert.equal(graph.fm.buffer.numberOfChannels, 1);
+  const expected = renderTensioner(core, 48000);
+  assert.equal(graph.fm.samples, expected.length);
+  assert.equal(graph.fm.paddedLength, Math.ceil((featured.duration + 1 - time) * 48000) + 1, 'padding counts from the start offset');
+  const data = graph.fm.buffer.getChannelData(0);
+  assert.deepEqual(data.subarray(0, expected.length), expected); assert.ok(data.subarray(expected.length).every(v => v === 0));
+  assert.ok(Math.abs(graph.fm.source.startTime - time) < 1e-12); assert.equal(graph.fm.source.stopTime, featured.duration + 1);
+  assert.ok(graph.fm.gain.connections.includes(graph.master) && graph.fm.source.connections.includes(graph.fm.gain));
+  assert.equal(graph.fm.source.onended, null);
+  // The buffer actually outlives the render from its start offset.
+  assert.ok(time + graph.fm.paddedLength / 48000 > featured.duration + 1);
+  const asLive = buildPerformanceGraph(new Context(), featured);
+  assert.equal(asLive.fm.paddedLength, asLive.fm.samples); assert.ok(Math.abs(asLive.fm.source.stopTime - (time + expected.length / 48000 + 0.01)) < 1e-12);
+  assert.equal(buildPerformanceGraph(new Context(), { ...featured, composition: undefined }).fm.mixGain, 1);
+  assert.throws(() => buildPerformanceGraph(new Context(), { ...featured, fm: { ...fm, time: -1 } }), /fm\.time/);
+  // Loom and FM can coexist on one master.
+  const { createLoomPerformance } = await import('../src/loom/performance.js');
+  const both = { ...featured, loom: createLoomPerformance({}, [{ time: 0.35, body: 0, velocity: 0.8 }]) };
+  const g2 = buildPerformanceGraph(new Context(), both); assert.ok(g2.loom && g2.fm);
+  // At a different context rate the PCM is rendered at that rate.
+  const g44 = buildPerformanceGraph(new Context(44100), featured); assert.equal(g44.fm.samples, renderTensioner(core, 44100).length);
+});
+
 test('renderPerformanceAudio defaults to outlive-render with the passage duration as renderEnd; as-live stays an explicit control', async () => {
   const performance = createPerformance(DEFAULT_PATCH);
   let seen = null;

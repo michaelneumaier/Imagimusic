@@ -16,7 +16,34 @@ import { InstrumentAudio } from '../audio.js';
 import { createBellowsGraph, applyBellowsSchedule } from '../bellows-audio.js';
 import { voiceDynamics } from '../dynamics.js';
 import { renderLoomPerformance } from '../loom/performance.js';
-import { LOOM_MIX_GAIN } from './composition.js';
+import * as composition from './composition.js';
+import { renderTensioner } from '../fm.js';
+const { LOOM_MIX_GAIN } = composition;
+
+// Optional featured FM tensioner (Astra's composition v2 contract, 2026-11-01). performance.fm =
+// { settings, core, time, endS, duration, sampleRate }: one tone entering at `time` on the passage clock. Its PCM is
+// renderTensioner(core, context.sampleRate), the same function the live worker runs, played from a mono
+// AudioBufferSource started at fm.time into a mix gain (composition.js FM_MIX_GAIN once it exists, else 1) and the
+// SAME master → compressor. Under the outlive policy the buffer is zero-padded so that, counting from its start
+// offset, it cannot run out before stopAt (a buffer source finishes when its buffer ends); as-live keeps the natural
+// length. Mono stays mono: the engine's channel handling at the master is the same path live playback uses.
+export function attachFMSource(context, master, performance, { stopAt = null, mixGain } = {}) {
+  const fm = performance.fm;
+  if (!fm) return null;
+  if (!Number.isFinite(fm.time) || fm.time < 0) throw new Error('performance.fm.time must be a finite non-negative passage time.');
+  const pcm = renderTensioner(fm.core, context.sampleRate);
+  const samples = pcm.length;
+  const length = stopAt === null ? samples : Math.max(samples, Math.ceil((stopAt - fm.time) * context.sampleRate) + 1);
+  const buffer = context.createBuffer(1, length, context.sampleRate);
+  buffer.copyToChannel(pcm, 0);                                              // bytes beyond `samples` stay zero
+  const source = context.createBufferSource(); source.buffer = buffer;
+  const gain = context.createGain(); gain.gain.value = mixGain ?? fm.mixGain ?? performance.composition?.fmMixGain ?? composition.FM_MIX_GAIN ?? 1;
+  source.connect(gain).connect(master);
+  source.start(fm.time);
+  const naturalEnd = fm.time + samples / context.sampleRate;
+  source.stop(stopAt ?? naturalEnd + 0.01);
+  return { source, gain, buffer, samples, paddedLength: length, time: fm.time, naturalEnd, mixGain: gain.gain.value };
+}
 
 // Optional Loom duet (Astra's composition contract, 2026-11-01). When `performance.loom` is attached, its
 // deterministic stereo PCM (renderLoomPerformance at the context's sample rate, the same function the live page's
@@ -123,7 +150,9 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
   // Optional Loom duet: its PCM is already deterministic; it joins the same master and obeys the same stop policy.
   const loom = attachLoomSource(context, master, performance, { stopAt: outlive ? stopAt : null });
   if (loom && keepNodes) loom.source.onended = null;
-  return { master, limiter, garden, scheduled, loom, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
+  const fm = attachFMSource(context, master, performance, { stopAt: outlive ? stopAt : null });
+  if (fm && keepNodes) fm.source.onended = null;
+  return { master, limiter, garden, scheduled, loom, fm, options: { lookahead, families: [...families], compressor, keepNodes, sourceLifetime, stopAt } };
 }
 
 // Default lifecycle for renders is 'outlive-render' (decision 004, 2026-11-01): verified bit-identical repeated

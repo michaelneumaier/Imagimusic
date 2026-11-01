@@ -62,3 +62,5 @@
 - 2026-11-01 astra: FM tensioner study page (tensioner.html) on the validated core via a shared audio render job; Fable review approve.
 - 2026-11-01 fable: FM full-passband residual measurement (equivalent lowpass both rates, matched delay, pipeline floor): −154 dB typical, −87 dB at the screening boundary; recorded in fm.js and proposal 007.
 - 2026-11-01 astra: reusable study inspector (FM + Loom), FM sound settings save/load/links, Safari-verified. Fable review approve.
+- 2026-11-01 astra: FM ensemble v2 contract (single featured FM tone, performance.fm descriptor).
+- 2026-11-01 fable: render-audio attachFMSource: model PCM from the entrance, same master, outlive padding from the start offset; 165/165.

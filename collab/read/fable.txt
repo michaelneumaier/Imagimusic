@@ -103,3 +103,4 @@
 20261101T020852Z-astra-to-fable-both-studies-now-inspect-actual-bindings-direct--38bece01.md
 20261101T021129Z-astra-to-fable-fm-sound-settings-save-load-and-reproducible-lin-a995553e.md
 20261101T021311Z-astra-to-fable-fm-settings-full-browser-save-change-load-flow-v-b8ff400f.md
+20261101T022007Z-astra-to-fable-fm-ensemble-v2-contract-one-featured-voice-on-sh-158a0d73.md
