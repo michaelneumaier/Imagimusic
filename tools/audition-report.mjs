@@ -53,23 +53,47 @@ const report = {
 const peakOf = (s, k) => Math.max(...s.map(p => p[k] ?? 0));
 report.conversation.settling = {modeledIntensityPeak: peakOf(report.conversation.series, 'modeledIntensity'), modeledIntensityAtHoldEnd: report.conversation.series.find(p => p.t >= report.conversation.lastOnset + score.hold)?.modeledIntensity ?? null, loomEnvelopePeak: peakOf(report.conversation.series, 'loomEnvelope'), loomEnvelopeAtHoldEnd: report.conversation.series.find(p => p.t >= report.conversation.lastOnset + score.hold)?.loomEnvelope ?? null};
 
-// SVG: two stacked panels (legacy, conversation), three labeled series each, section bands on the conversation.
-const W = 1200, H = 260, pad = 50, tMax = Math.max(legacy.duration, conversation.duration);
-const x = t => pad + (t / tMax) * (W - 2 * pad), y = (v, top, max) => top + H - pad - (v / max) * (H - 2 * pad);
-const path = (series, key, top, max, color) => `<path fill="none" stroke="${color}" stroke-width="1.5" d="${series.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p[key] ?? 0, top, max).toFixed(1)}`).join(' ')}"/>`;
-const panel = (name, data, top, bands) => {
+// SVG layout: for each passage a series panel (three labeled lines) and an onsets-per-bar panel (bars on a scale
+// shared by both passages); time ticks every 5 s on every panel; the legend is stacked, one line per series, so
+// nothing overflows the 1200 px width. Normalization disclosures stay with each series.
+const W = 1200, padL = 60, padR = 30, SH = 220, BH = 120, gap = 16, legendH = 54, titleH = 30;
+const tMax = Math.max(legacy.duration, conversation.duration), barSeconds = 4 * 60 / tempo;
+const maxBars = Math.max(report.legacy.onsetsPerBar.length, report.conversation.onsetsPerBar.length), maxCount = Math.max(1, ...report.legacy.onsetsPerBar, ...report.conversation.onsetsPerBar);
+const x = t => padL + (t / tMax) * (W - padL - padR);
+const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const text = (xx, yy, str, extra = '') => `<text x="${xx}" y="${yy}" ${/font-size/.test(extra) ? '' : 'font-size="12" '}font-family="system-ui" ${extra}>${esc(str)}</text>`;
+const ticks = (top, height) => { let o = ''; for (let s = 0; s <= tMax; s += 5) o += `<line x1="${x(s).toFixed(1)}" y1="${top}" x2="${x(s).toFixed(1)}" y2="${top + height}" stroke="#dde" stroke-width="1"/>` + text(x(s).toFixed(1), top + height + 14, s + ' s', 'text-anchor="middle" fill="#667"'); return o; };
+const line = (series, key, top, height, max, color) => `<path fill="none" stroke="${color}" stroke-width="1.5" d="${series.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${(top + height - ((p[key] ?? 0) / max) * height).toFixed(1)}`).join(' ')}"/>`;
+let y = 0, body = '';
+const BAND_FILLS = ['#eef3ff', '#eefbee', '#fff0ee'];
+const sectionBands = (top, height) => score.sections.map((s, i) => { const a = 0.35 + s.beats[0] * 60 / tempo, b = 0.35 + s.beats[1] * 60 / tempo; return `<rect x="${x(a).toFixed(1)}" y="${top}" width="${(x(b) - x(a)).toFixed(1)}" height="${height}" fill="${BAND_FILLS[i % BAND_FILLS.length]}"/>` + text(x(a) + 4, top + 14, `${s.id} (${s.cadence}), bars ${s.beats[0] / 4 + 1}–${s.beats[1] / 4}`, 'fill="#667"'); }).join('');
+const passagePanel = (name, data, scored) => {
   const maxLoom = Math.max(1e-9, peakOf(data.series, 'loomEnvelope')), maxFm = Math.max(1e-9, peakOf(data.series, 'fmAmplitude'));
-  return `${bands}<text x="${pad}" y="${top + 24}" font-size="16" font-family="system-ui">${name}: ${data.events} compiled events, ${data.loomStrikes} Loom strikes, duration ${data.duration.toFixed(1)} s · onsets per bar ${data.onsetsPerBar.join(' ')}</text>
-<line x1="${pad}" y1="${top + H - pad}" x2="${W - pad}" y2="${top + H - pad}" stroke="#889"/>
-${path(data.series, 'modeledIntensity', top, 1, '#2a7')}${path(data.series, 'loomEnvelope', top, maxLoom, '#c63')}${path(data.series, 'fmAmplitude', top, maxFm, '#36c')}
-<text x="${pad}" y="${top + H - pad + 18}" font-size="12" font-family="system-ui" fill="#2a7">green: out.modeledIntensity (garden + tine + bellows only, modeled, 0–1)</text>
-<text x="${pad + 430}" y="${top + H - pad + 18}" font-size="12" font-family="system-ui" fill="#c63">orange: Loom envelope (Loom only, normalized to its peak ${maxLoom.toExponential(2)})</text>
-<text x="${pad + 850}" y="${top + H - pad + 18}" font-size="12" font-family="system-ui" fill="#36c">blue: FM amplitude (FM only, normalized to ${maxFm.toFixed(3)})</text>`;
+  body += text(padL, y + 20, `${name}: ${data.events} compiled events, ${data.loomStrikes} Loom strikes, FM entrance ${data.fmEntrance.toFixed(2)} s, duration ${data.duration.toFixed(1)} s`, 'font-size="15"');
+  y += titleH;
+  // series panel
+  body += scored ? sectionBands(y, SH) : '';
+  body += ticks(y, SH) + `<line x1="${padL}" y1="${y + SH}" x2="${W - padR}" y2="${y + SH}" stroke="#889"/>`;
+  body += line(data.series, 'modeledIntensity', y, SH, 1, '#2a7') + line(data.series, 'loomEnvelope', y, SH, maxLoom, '#c63') + line(data.series, 'fmAmplitude', y, SH, maxFm, '#36c');
+  y += SH + 20;
+  body += text(padL, y + 12, 'green: out.modeledIntensity, garden + tine + bellows only, a modeled number (sum of voice levels, soft-clipped), scale 0–1', 'fill="#2a7"');
+  body += text(padL, y + 28, `orange: Loom envelope, Loom only, normalized to this passage's own peak ${maxLoom.toExponential(2)}`, 'fill="#c63"');
+  body += text(padL, y + 44, `blue: FM tensioner amplitude, FM only, normalized to this passage's own peak ${maxFm.toFixed(3)}`, 'fill="#36c"');
+  y += legendH;
+  // onsets-per-bar panel, shared scale
+  body += text(padL, y + 12, `onsets per bar (all families counted once at onset; shared scale, max ${maxCount})`, 'fill="#334"');
+  y += 16;
+  body += scored ? sectionBands(y, BH).replace(/<text[^>]*>[^<]*<\/text>/g, '') : '';
+  body += ticks(y, BH) + `<line x1="${padL}" y1="${y + BH}" x2="${W - padR}" y2="${y + BH}" stroke="#889"/>`;
+  data.onsetsPerBar.forEach((c, i) => { const a = x(0.35 + i * barSeconds), b = x(0.35 + (i + 1) * barSeconds), h = (c / maxCount) * (BH - 14); body += `<rect x="${(a + 1).toFixed(1)}" y="${(y + BH - h).toFixed(1)}" width="${Math.max(1, b - a - 2).toFixed(1)}" height="${h.toFixed(1)}" fill="#557"/>` + text(((a + b) / 2).toFixed(1), (y + BH - h - 3).toFixed(1), c, 'text-anchor="middle" fill="#334"'); });
+  y += BH + 24 + gap;
 };
-const bands = score.sections.map((s, i) => { const a = 0.35 + s.beats[0] * 60 / tempo, b = 0.35 + s.beats[1] * 60 / tempo; return `<rect x="${x(a).toFixed(1)}" y="${H}" width="${(x(b) - x(a)).toFixed(1)}" height="${H}" fill="${['#eef', '#efe', '#fee'][i]}"/><text x="${(x(a) + 4).toFixed(1)}" y="${H + 40}" font-size="12" font-family="system-ui" fill="#667">${s.id} (${s.cadence}) bars ${s.beats[0] / 4 + 1}–${s.beats[1] / 4}</text>`; }).join('');
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${2 * H + 30}" font-family="system-ui"><rect width="100%" height="100%" fill="#fff"/>
-<text x="${pad}" y="${2 * H + 20}" font-size="12" fill="#667">Audition evidence, seed ${seed}, ${tempo} BPM, ${character} / density ${density}; sampled at ${fps} fps from the same frames the stage draws; no combined visible-intensity figure is computed. Time axis 0–${tMax.toFixed(1)} s.</text>
-${panel('Legacy seeded passage', report.legacy, 0, '')}${panel('Conversation in three movements', report.conversation, H, bands)}</svg>`;
+passagePanel('Legacy seeded passage', report.legacy, false);
+passagePanel('Conversation in three movements', report.conversation, true);
+body += text(padL, y + 8, `Audition evidence, seed ${seed}, ${tempo} BPM, ${character} / density ${density}, both children enabled; series sampled at ${fps} fps from the same frames the stage draws.`, 'fill="#667"');
+body += text(padL, y + 24, `No combined visible-intensity figure is computed or claimed. Time axis 0–${tMax.toFixed(1)} s on every panel.`, 'fill="#667"');
+y += 40;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${y}" viewBox="0 0 ${W} ${y}"><rect width="100%" height="100%" fill="#fff"/>${body}</svg>`;
 writeFileSync(out + '.json', JSON.stringify(report, null, 1));
 writeFileSync(out + '.svg', svg);
 console.log(`legacy: ${report.legacy.events} events, ${report.legacy.loomStrikes} Loom, FM at ${report.legacy.fmEntrance?.toFixed(3)}, ${report.legacy.duration.toFixed(2)} s, onsets/bar ${report.legacy.onsetsPerBar.join(',')}`);

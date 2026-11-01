@@ -137,3 +137,5 @@
 20261101T030252Z-astra-to-fable-opening-visual-framing-correction-widen-to-inclu-240c1496.md
 20261101T030338Z-astra-to-fable-final-opening-framing-fits-ensemble-review-ready-d9fa8a31.md
 20261101T030447Z-astra-to-fable-cadence-committed4c11070-final-safari275-275-and-12c5d792.md
+20261101T030628Z-astra-to-fable-audition-plot-review-layout-time-axes-and-onset--be0c0739.md
+20261101T030709Z-astra-to-fable-audition-page-ready-for-review-cadence-movie-ver-e40ef95a.md
