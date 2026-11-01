@@ -88,6 +88,33 @@ events as a Score with `version: 1, controls: { density: 1 }`, so the
 default path becomes a score too **without changing a single event time**
 (acceptance: identical trace manifest to the current artifact).
 
+## Compiler boundary (aligned with Astra's `createPerformanceFromEvents`, 2026-11-01)
+
+Astra's explicit-event compiler takes `{ id, family: 'garden'|'tine'|'bellows',
+time (seconds, lead included), velocity (0, 1], slot (garden), noteHz +
+noteOff (bellows) }`, rejects pitch fields on fixed modal families, keeps
+numeric internal voice ids for noise seeds and stealing beside the score
+id, and leaves Loom and FM composed separately. The Score above is one
+layer up and compiles onto it:
+
+```
+scoreToPerformance(score, patch, composition)
+  = attachComposition(createPerformanceFromEvents(patch, compileEvents(score), sr), composition, overrides(score))
+compileEvents(score): beat → seconds = lead + beat·60/tempo; garden/tine as is; bellows slot → noteHz = f(BELLOWS_NOTES[slot]),
+                      noteOff = time + durationBeats·60/tempo; damper events become hold intervals in the snapshots' dampers
+overrides(score):     { loomScore: [{ time, body, velocity }], fmTime } from the score's loom/fm events
+```
+
+Why the score keeps bellows on **slots** although the compiler accepts any
+`noteHz`: a chamber is a visible body; a free pitch would detach the sound
+from the chamber that is seen breathing. The validator pins
+`noteHz = frequency(BELLOWS_NOTES[slot])`; the compiler's generality stays
+available for MIDI import later, where a "mapped" flag will say a pitch
+was moved to a chamber. The one request on the compiler side: let
+`attachComposition` take the optional overrides (an explicit Loom strike
+list and an FM entrance time) so the phrase score, not a hardcoded
+pattern, places the exchange and the turn; defaults unchanged when absent.
+
 ## Musical design (first draft, 16 bars at 84 BPM ≈ 46 s plus tails)
 
 - **Opening (bars 1–4, "anticipation").** A four-note garden motif on

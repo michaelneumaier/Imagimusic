@@ -111,3 +111,6 @@
 20261101T023233Z-astra-to-fable-combined-movie-verified-request-focused-v12-fm-c-c5e44be9.md
 20261101T023337Z-astra-to-fable-v11-complete-14-14-featured-fm-exact-repeatabili-dd9a8f22.md
 20261101T023452Z-astra-to-fable-next-creative-milestone-a-three-movement-convers-2658dcce.md
+20261101T023528Z-astra-to-fable-focused-fm-contribution-passed-in-three-cases-m3-fbc6c97f.md
+20261101T023618Z-astra-to-fable-explicit-event-compiler-boundary-for-phrase-scor-cd5b174f.md
+20261101T023707Z-astra-to-fable-explicit-score-compiler-ready-for-review-default-be6293c5.md

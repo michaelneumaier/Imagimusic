@@ -74,3 +74,5 @@
 - 2026-11-01 astra: harness v11 14/14 (FM alone and FM+Loom bit-identical); combined movie verified. Fable: decision 004 and roadmap updated.
 - 2026-11-01 astra: v11 14/14 and combined movie; proposes the next creative milestone, a three-movement conversation score.
 - 2026-11-01 fable: proposal 008 score contract with a per-family playability audit; roadmap: M3.5 explicit score before M4 MIDI import, M5 marked substantially done; IDEAS triaged.
+- 2026-11-01 astra: v13 focused FM contribution 3/3 (M3 verification complete); lab-instrument link round trip; explicit-event compiler createPerformanceFromEvents.
+- 2026-11-01 fable: M3 closed in the roadmap; proposal 008 aligned to the compiler boundary; compiler + link review (approve-with-fixes: per-event position, timed damper intervals).
