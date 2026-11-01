@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGroveVoice, validateVoiceConfig, canonicalVoiceConfig, groveVoiceEnvelope, grovePans, voiceBufferIndex, DEFAULT_VOICE_CONFIG, PICKUP_LEVEL, GAIN_CEILING } from '../src/score/grove-voice.js';
+import { createGroveVoice, validateVoiceConfig, canonicalVoiceConfig, groveVoiceEnvelope, grovePans, voiceBufferIndex, DEFAULT_VOICE_CONFIG, VOICE_BOUNDS, PICKUP_LEVEL, GAIN_CEILING } from '../src/score/grove-voice.js';
 import { composeGrove, groveSystem, GROVE_SEEDS } from '../src/score/grove.js';
 import { networkPickupScale, networkPickupModes } from '../src/coupling.js';
 import { createGroveInstrument, grovePerformanceFrame } from '../src/grove/performance.js';
@@ -47,4 +47,7 @@ test('voice configuration validation and canonical form', () => {
   bad(c => { c.positions = [0.25]; }, /positions\[0\]/); bad(c => { c.positions = [0.6, 0.3]; }, /strictly increasing/); bad(c => { c.positions = []; }, /positions must hold/);
   bad(c => { c.attachU = 2; }, /attachU/); bad(c => { c.extra = 1; }, /unsupported field/); bad(c => { c.version = 2; }, /version/);
   assert.throws(() => createGroveVoice(composeGrove({ seed: 7 }), { ...DEFAULT_VOICE_CONFIG, positions: [0.5, 0.5] }), /strictly increasing/);
+  assert.throws(() => createGroveVoice(composeGrove({ seed: 7 }), { ...DEFAULT_VOICE_CONFIG, attachU: 0 }), /node of the fundamental shape/);
+  assert.throws(() => { VOICE_BOUNDS.positionRange[0] = 0; }, TypeError, 'bounds are deep-frozen');
+  assert.throws(() => { VOICE_BOUNDS.partials.push(9); }, TypeError);
 });

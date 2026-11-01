@@ -16,7 +16,7 @@ import { validateGrove, canonicalGrove, groveRingSeconds } from './grove.js';
 export const VOICE_VERSION = 1;
 export const VOICE_FAMILIES = Object.freeze(['clamped-free']);
 export const DEFAULT_VOICE_CONFIG = Object.freeze({ version: VOICE_VERSION, family: 'clamped-free', partials: 3, attachU: 1, pickupU: 1, positions: Object.freeze([0.3, 0.6, 1]) });   // reconciled with Astra 062221Z: the lower bound, the measured default, the tip
-export const VOICE_BOUNDS = Object.freeze({ partials: [1, 4], positions: [1, 5], positionRange: [0.3, 1] });   // below 0.3 the clamped-free shapes vanish: a touch there would be nearly silent at any force
+export const VOICE_BOUNDS = Object.freeze({ partials: Object.freeze([1, 4]), positions: Object.freeze([1, 5]), positionRange: Object.freeze([0.3, 1]) });   // below 0.3 the clamped-free shapes vanish: a touch there would be nearly silent at any force
 export const PICKUP_LEVEL = 0.19, GAIN_CEILING = 0.45, LOW_BAND_FACTOR = 1.5;
 
 const finite = (v, name) => { if (typeof v !== 'number' || !Number.isFinite(v)) throw new Error(`${name} must be a finite number.`); return v; };
@@ -40,6 +40,8 @@ export function canonicalVoiceConfig(c) { const sort = v => Array.isArray(v) ? v
 function partialFamily(config) {
   const set = modesOf({ kind: 'beam', support: 'clamped-free', material: GEOMETRY_MATERIALS.steel, lengthM: 0.065, thicknessM: 0.001, widthM: 0.01 }, { count: config.partials });
   const ratios = set.freqsHz.map(f => f / set.freqsHz[0]), tip = set.weightsAt(config.attachU)[0];
+  // A bridge attached where the fundamental shape vanishes could not couple the fundamentals at all (and the normalization would divide by zero): reject it as a configuration error.
+  if (!(Math.abs(tip) > 1e-3)) throw new Error(`attachU = ${config.attachU} is a node of the fundamental shape (|φ₁| = ${Math.abs(tip).toExponential(2)}); the bridge could not couple the bodies there. Use attachU ≥ 0.3.`);
   return { ratios, shape: u => set.weightsAt(u), attachFundamental: tip, formula: set.meta.formula };
 }
 
