@@ -10,7 +10,7 @@ async function check(name, run) {
 }
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
-export const HARNESS_VERSION = 3;   // bump on every change to the experiments so reports are comparable
+export const HARNESS_VERSION = 4;   // bump on every change to the experiments so reports are comparable
 const environment = { harnessVersion: HARNESS_VERSION, userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
 let passage = null;
 
@@ -92,6 +92,27 @@ await check('Fixed-topology control: per-voice renders summed in JS, twice, vs t
   const out = { voices: voices.length, seconds: span, perVoiceRendersIdentical: first.perVoiceIdentical && second.perVoiceIdentical, worstPerVoiceDiff: Math.max(first.worstPerVoiceDiff, second.worstPerVoiceDiff),
     jsSumRunToRun: compareRenders(first.sum, second.sum, 48000), singleGraphRunToRun: compareRenders(g1, g2, 48000), jsSumVsSingleGraph: compareRenders(first.sum, g1, 48000) };
   matrix['control: per-voice JS sum run-to-run'] = out.jsSumRunToRun; matrix['control: single graph (same voices) run-to-run'] = out.singleGraphRunToRun; matrix['control: JS sum vs single graph'] = out.jsSumVsSingleGraph;
+  return out;
+});
+// Source-finish experiments (v4). Observation from v3: every 6 s control was identical, and the lone strike's
+// residual began at 10.03 s, which is when that strike's shortest mode stops (onset 0.35 s + 9.65 s lifetime).
+// Prediction if source finishing is the cause: (1) the lone strike over 12 s drifts from ~10.0 s; (2) with sources
+// never stopped it is identical over 12 s; (3) with damping = 1 (modes stop within ~2.3 s) a 6 s render drifts;
+// (4) the garden over 12 s drifts when stopped and not when never stopped. Each row is rendered twice.
+await check('Source-finish experiments: stopped vs never-stopped over 12 s; first finish moved inside 6 s', async () => {
+  const base = createPerformance(DEFAULT_PATCH, 48000), first = base.snapshots.garden.voices[0];
+  const span12 = 12, garden12 = base.snapshots.garden.voices.filter(v => v.noteOn < span12);
+  const mk = (voices, duration, patch = base.patch) => ({ ...base, patch, events: voices.map(voice => ({ family: 'garden', voice })), duration, snapshots: { garden: { voices, dampers: [] } } });
+  const twice = async (p, options) => compareRenders(await renderPerformanceAudio(p, 48000, options), await renderPerformanceAudio(p, 48000, options), 48000);
+  const loneStopped = await twice(mk([first], span12), { compressor: false });
+  const loneNever = await twice(mk([first], span12), { compressor: false, neverStop: true });
+  const gardenStopped = await twice(mk(garden12, span12), { compressor: false });
+  const gardenNever = await twice(mk(garden12, span12), { compressor: false, neverStop: true });
+  const damped = createPerformance({ ...DEFAULT_PATCH, damping: 1 }, 48000), dFirst = damped.snapshots.garden.voices[0];
+  const dp = { ...damped, events: [{ family: 'garden', voice: dFirst }], duration: 6, snapshots: { garden: { voices: [dFirst], dampers: [] } } };
+  const earlyFinish = await twice(dp, { compressor: false }), earlyNever = await twice(dp, { compressor: false, neverStop: true });
+  const out = { firstModeStopsAt: first.noteOn + Math.min(...first.modes.map(m => m.decay * 9)), loneStopped12s: loneStopped, loneNeverStopped12s: loneNever, gardenStopped12s: gardenStopped, gardenNeverStopped12s: gardenNever, dampedFirstModeStopsAt: dFirst.noteOn + Math.min(...dFirst.modes.map(m => m.decay * 9)), dampedLoneStopped6s: earlyFinish, dampedLoneNeverStopped6s: earlyNever };
+  Object.assign(matrix, { 'finish: lone strike 12 s, stopped': loneStopped, 'finish: lone strike 12 s, never stopped': loneNever, 'finish: garden 12 s, stopped': gardenStopped, 'finish: garden 12 s, never stopped': gardenNever, 'finish: damped lone strike 6 s, stopped': earlyFinish, 'finish: damped lone strike 6 s, never stopped': earlyNever });
   return out;
 });
 await check('WAV resolution: every variant identical after 16-bit quantization (WAV path only; AAC takes float32 and is lossy)', async () => {

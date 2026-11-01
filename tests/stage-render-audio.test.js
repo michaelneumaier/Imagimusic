@@ -8,7 +8,7 @@ import { buildPerformanceGraph, renderPerformanceAudio, bellowsSeed, compareRend
 test('diagnostic options isolate families, bypass the compressor, and keep nodes connected offline', () => {
   const performance = createPerformance(DEFAULT_PATCH);
   const full = buildPerformanceGraph(new Context(), performance);
-  assert.deepEqual(full.options, { lookahead: 0.24, families: FAMILIES, compressor: true, keepNodes: true });
+  assert.deepEqual(full.options, { lookahead: 0.24, families: FAMILIES, compressor: true, keepNodes: true, neverStop: false });
   assert.ok(full.scheduled.filter(s => s.family === 'bellows').every(s => s.graph.source.onended === null));
   assert.ok(full.scheduled.filter(s => s.family !== 'bellows').every(s => s.voice.nodes.every(n => n.onended === null)));
   const live = buildPerformanceGraph(new Context(), performance, { keepNodes: false });
@@ -20,6 +20,13 @@ test('diagnostic options isolate families, bypass the compressor, and keep nodes
   assert.equal(bypass.limiter, null); assert.ok(bypass.master.connections.includes(ctx.destination));
   assert.ok(!ctx.nodes.some(n => n.kind === 'compressor'));
   assert.throws(() => buildPerformanceGraph(new Context(), performance, { families: ['piano'] }), /unknown family/);
+  // neverStop (diagnostic): every source's stop is pushed beyond any render; nothing else about the graph changes.
+  const stopped = buildPerformanceGraph(new Context(), performance), never = buildPerformanceGraph(new Context(), performance, { neverStop: true });
+  assert.ok(stopped.scheduled.filter(s => s.family !== 'bellows').every(s => s.voice.nodes.every(n => n.stopTime < 100)));
+  assert.ok(never.scheduled.filter(s => s.family !== 'bellows').every(s => s.voice.nodes.every(n => n.stopTime === 1e6)));
+  assert.ok(never.scheduled.filter(s => s.family === 'bellows').every(s => s.graph.source.stopTime === 1e6));
+  assert.equal(never.options.neverStop, true); assert.equal(stopped.options.neverStop, false);
+  assert.deepEqual(never.scheduled.map(s => s.id), stopped.scheduled.map(s => s.id));
 });
 
 test('compareRenders reports identity, max/rms difference, rounding units, and 16-bit PCM equality', () => {

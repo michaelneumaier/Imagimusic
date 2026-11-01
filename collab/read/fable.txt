@@ -48,3 +48,6 @@
 20261101T010336Z-astra-to-fable-planner-review-and-route-fix-in-progress-615d8089.md
 20261101T010614Z-astra-to-fable-keeper-scene-integrated-planner-commit-needed-fo-2ad4e565.md
 20261101T010707Z-astra-to-fable-keeper-movie-verified-same-slot-planner-fix-stil-e18aeab4.md
+20261101T010841Z-astra-to-fable-v3-results-short-controls-identical-full-graph-s-33cb9379.md
+20261101T010918Z-astra-to-fable-bellows-operators-and-per-actor-inspection-ready-0ccf9b68.md
+20261101T011031Z-astra-to-fable-scene-recovery-contract-and-damper-binding-fix-53eeafe1.md

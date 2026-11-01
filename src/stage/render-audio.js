@@ -31,7 +31,14 @@ export const bellowsSeed = (patch, voice) => (patch.seed + voice.id * 997) >>> 0
 //              pressure, so nothing is disconnected until the render is done.
 export const FAMILIES = ['garden', 'tine', 'bellows'];
 
-export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD, families = FAMILIES, compressor = true, keepNodes = true } = {}) {
+//   neverStop  DIAGNOSTIC ONLY: re-schedules every source's stop far beyond the render so no source finishes during
+//              it. When a source finishes, the engine disables its output on a main-thread-timed path and the mix
+//              bookkeeping changes at a scheduler-dependent quantum; this option tests whether run-to-run drift
+//              begins with the first finish. It leaves a residual tone at the envelope's final ramp value, so it is
+//              not a rendering mode.
+export const NEVER_STOP_TIME = 1e6;
+
+export function buildPerformanceGraph(context, performance, { lookahead = SCHEDULE_LOOKAHEAD, families = FAMILIES, compressor = true, keepNodes = true, neverStop = false } = {}) {
   if (!context || typeof context.createGain !== 'function') throw new Error('buildPerformanceGraph needs an AudioContext-like context.');
   if (!performance || !Array.isArray(performance.events) || !performance.patch) throw new Error('performance must have events and patch (see createPerformance).');
   for (const f of families) if (!FAMILIES.includes(f)) throw new Error(`unknown family '${f}'.`);
@@ -60,19 +67,19 @@ export function buildPerformanceGraph(context, performance, { lookahead = SCHEDU
         gain.setValueAtTime(voiceDynamics(at, voice, patch, sampleRate).amp.level, at);
         gain.linearRampToValueAtTime(0, voice.end);
       }
-      graph.source.start(voice.noteOn); graph.source.stop(voice.end + 0.01);
+      graph.source.start(voice.noteOn); graph.source.stop(neverStop ? NEVER_STOP_TIME : voice.end + 0.01);
       if (keepNodes) graph.source.onended = null;
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: voice.end, seed, stolenAt: voice.stolenAt, graph });
     } else {
       const live = garden.strike(voice.slot, patch, voice.velocity, voice.noteOn, voice.position);
-      if (live && keepNodes) for (const node of live.nodes) node.onended = null;
+      if (live) for (const node of live.nodes) { if (keepNodes) node.onended = null; if (neverStop) node.stop(NEVER_STOP_TIME); }
       scheduled.push({ family, id: voice.id, slot: voice.slot, noteOn: voice.noteOn, end: live ? live.end : null, voice: live, skipped: !live });
     }
   }
-  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes } };
+  return { master, limiter, garden, scheduled, options: { lookahead, families: [...families], compressor, keepNodes, neverStop } };
 }
 
-export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes } = {}) {
+export async function renderPerformanceAudio(performance, sampleRate = 48000, { OfflineContext = globalThis.OfflineAudioContext, lookahead, families, compressor, keepNodes, neverStop } = {}) {
   if (typeof OfflineContext !== 'function') throw new Error('OfflineAudioContext is not available in this environment; render in a browser (tests/stage-render-browser.html).');
   if (!Number.isFinite(sampleRate) || sampleRate <= 0) throw new Error('sampleRate must be positive.');
   if (!performance || !Number.isFinite(performance.duration) || performance.duration <= 0) throw new Error('performance.duration must be positive.');
@@ -83,6 +90,7 @@ export async function renderPerformanceAudio(performance, sampleRate = 48000, { 
   if (families !== undefined) options.families = families;
   if (compressor !== undefined) options.compressor = compressor;
   if (keepNodes !== undefined) options.keepNodes = keepNodes;
+  if (neverStop !== undefined) options.neverStop = neverStop;
   const graph = buildPerformanceGraph(context, performance, options);
   // Hold a strong reference to every scheduled node until rendering resolves. A finished source with no JS
   // reference may be garbage-collected by the engine at a collector-dependent moment, and whether a silent,

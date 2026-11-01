@@ -30,3 +30,5 @@
 - 2026-11-01 fable: compareRenders gains rounding-unit and 16-bit PCM metrics; summation-order experiments in harness; roadmap: slice A done, voice track planning-only.
 - 2026-11-01 astra: route overlay, camera director (0b83583), keeper-rig arm solver, performer design note; fresh Safari matrix REFUTES the rounding-floor diagnosis (drift back at 2.3e-5, 274 PCM16 samples differ).
 - 2026-11-01 fable: retracted the summation-order closure claim; harness v3 (local-level ULPs, engine floor, choir by source, per-voice JS-sum control, versioned reports); performer planner proposal 006 + src/perform/planner.js (6 tests); route-overlay and camera reviews.
+- 2026-11-01 astra: Keepers integrated live+export (2eca102), bellows crosshead operators, per-actor inspector, damper bindings; v3 report: all 6 s controls identical, lone-strike residual begins at 10.03 s.
+- 2026-11-01 fable: planner previousEventId for continuity; Keeper review (approve-with-fixes); harness v4 source-finish experiments (stopped vs never-stopped over 12 s, first finish moved inside 6 s).
