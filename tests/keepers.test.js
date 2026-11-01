@@ -23,3 +23,21 @@ test('Keeper hands coincide with each assigned strike and seek without history',
  applyKeepers(world,sample(2));assert.equal(world.scene.children.length,count);
  world.scene.updateMatrixWorld(true);for(const body of world.keepers.values())assert.ok(body.hand.matrixWorld.elements.every(Number.isFinite));
 });
+
+test('pump crossheads stay on actual bellows lids through attack, sustain, release and idle',async()=>{
+ const {createProjection,stageBindings,applyStage}=await import('../src/stage/projection.js');
+ const {collectState}=await import('../src/state.js');
+ const {gardenBody,choirBody,tineBody}=await import('../src/stage/bodies.js');
+ const passage=createPerformance(DEFAULT_PATCH),project=createProjection(DEFAULT_PATCH,{performance:passage});
+ const world={scene:new T.Scene(),garden:Array.from({length:8},(_,i)=>gardenBody(i)),choir:Array.from({length:6},(_,i)=>choirBody(i)),tine:tineBody()};
+ world.choir.forEach((body,i)=>{body.root.position.fromArray(stagePosition('bellows',i));world.scene.add(body.root);});
+ const first=passage.snapshots.bellows.voices[0];
+ for(const t of [0,first.noteOn+.01,first.noteOn+.2,first.noteOff+.1,passage.duration]){
+  const frame=project(collectState(t,passage.snapshots));applyStage(frame,stageBindings({performers:true}),world);world.scene.updateMatrixWorld(true);
+  for(let slot=0;slot<6;slot++){
+   const top=new T.Box3().setFromObject(world.choir[slot].bellows).max.y;
+   const bottom=new T.Box3().setFromObject(world.keepers.get(`bellows/${slot}`).hand).min.y;
+   assert.ok(Math.abs(top-bottom)<1e-7,`lid contact at ${t}, slot ${slot}`);
+  }
+ }
+});

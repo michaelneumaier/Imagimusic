@@ -15,3 +15,5 @@ Procedural camera direction: src/stage/director.js, layout.js, world/projection/
 Keeper scene foundation: src/stage/keeper-rig.js, tests/keeper-rig.test.js. Pure two-link articulation, endpoint-preserving reach checks; planner remains Fable-owned.
 
 Keeper integration: src/stage/keepers.js, projection/main/export, stage.html, tests/keepers.test.js; Fable owns src/perform planner.
+
+Bellows pump operators and per-actor inspection: keepers/projection/inspector, tests/keepers.test.js.

@@ -1,4 +1,4 @@
-import { createKeeperProjection,KEEPER_BINDING,applyKeepers } from './keepers.js';
+import { createKeeperProjection,KEEPER_BINDING,applyKeepers,pumpOperators } from './keepers.js';
 import { CAMERA_BINDING } from './director.js';
 import { stageInputsFor } from '../bindings-catalog.js';
 import { aperture01 } from '../dynamics.js';
@@ -21,10 +21,12 @@ export function createProjection(patch,{performance}={}) {
     const bellows=Array.from({length:6},(_,slot)=>{
       const voices=frame.voices.filter(v=>v.family==='bellows'&&v.slot===slot&&v.age>=0).sort((a,b)=>a.age-b.age);
       const v=voices[0];
-      return {fill:v?.exciter.fill01??1,aperture:v?.modules.filter.aperture01??aperture01(patch.bellows.cutoffHz),level:v?.level??0,
+      return {voiceId:v?.id??null,phase:v?.modules.env.stage??'rest',fill:v?.exciter.fill01??1,aperture:v?.modules.filter.aperture01??aperture01(patch.bellows.cutoffHz),level:v?.level??0,
         fast:patch.bellows.lfo.rateHz>8,swing:patch.bellows.lfo.rateHz>8?0:(v?.modules.lfo.value??0)*.65,resonance:v?.modules.filter.resonance??patch.bellows.resonance};
     });
-    return {...frame,stage:{garden,tine,bellows,...(keepers?{performers:keepers(frame.t)}:{})}};
+    const performers=keepers?keepers(frame.t):null;
+    if(performers)performers.actors.push(...pumpOperators(bellows));
+    return {...frame,stage:{garden,tine,bellows,...(performers?{performers}:{})}};
   };
 }
 function modalSlot(frame,family,slot){
