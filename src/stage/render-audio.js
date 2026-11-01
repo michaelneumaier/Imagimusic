@@ -109,19 +109,30 @@ export function ulp32(x) {
 }
 
 /**
- * Compare two renders. Besides max/RMS difference and where the largest difference sits, report the difference in
- * float32 rounding units at that sample (summation-order noise shows up as a few units) and whether the two renders
- * are identical after 16-bit PCM quantization (the format every export actually ships), with the count of samples
- * that differ by one 16-bit step.
+ * Compare two renders. Besides max/RMS difference and where the largest difference sits, report:
+ *  - maxUlps32: the largest difference measured in float32 rounding units of the LOCAL signal level (the peak
+ *    magnitude within ±window samples), so a near-zero sample next to a loud one is not counted as thousands of
+ *    units; quietMaxDiff reports the raw largest difference where the local level is below `quiet`.
+ *  - pcm16Identical / pcm16Differing / pcm16MaxStep: equality after 16-bit quantization. This is the resolution
+ *    of the WAV export (encodeWav). It is NOT the MP4 path: the AAC encoder receives float32 and is lossy, so for
+ *    video the comparable statement is only the float32 metrics above plus the trace manifest.
+ * `identical` is bit-for-bit float32 equality and is reported separately from every tolerance.
  */
-export function compareRenders(a, b, sampleRate = 48000) {
+export function compareRenders(a, b, sampleRate = 48000, { window = 128, quiet = 1e-3 } = {}) {
   const n = Math.min(a.length, b.length);
-  let max = 0, at = -1, sum = 0, maxUlps = 0, pcmDiffering = 0, pcmMaxStep = 0;
+  // Local peak via a sliding window maximum of |a| (two passes keep it O(n)).
+  const local = new Float32Array(n);
+  const block = Math.max(1, window);
+  const blockMax = new Float32Array(Math.ceil(n / block));
+  for (let i = 0; i < n; i++) { const m = Math.abs(a[i]); const k = Math.floor(i / block); if (m > blockMax[k]) blockMax[k] = m; }
+  for (let i = 0; i < n; i++) { const k = Math.floor(i / block); local[i] = Math.max(blockMax[k], blockMax[k - 1] ?? 0, blockMax[k + 1] ?? 0, Math.abs(a[i]), Math.abs(b[i])); }
+  let max = 0, at = -1, sum = 0, maxUlps = 0, quietMax = 0, pcmDiffering = 0, pcmMaxStep = 0;
   for (let i = 0; i < n; i++) {
     const d = Math.abs(a[i] - b[i]); sum += d * d;
     if (d > max) { max = d; at = i; }
     if (d > 0) {
-      const u = d / ulp32(Math.max(Math.abs(a[i]), Math.abs(b[i]))); if (u > maxUlps) maxUlps = u;
+      if (local[i] < quiet) { if (d > quietMax) quietMax = d; }
+      else { const u = d / ulp32(local[i]); if (u > maxUlps) maxUlps = u; }
       const pa = Math.round(Math.max(-1, Math.min(1, a[i])) * 32767), pb = Math.round(Math.max(-1, Math.min(1, b[i])) * 32767);
       if (pa !== pb) { pcmDiffering++; pcmMaxStep = Math.max(pcmMaxStep, Math.abs(pa - pb)); }
     }
@@ -129,7 +140,7 @@ export function compareRenders(a, b, sampleRate = 48000) {
   return {
     identical: max === 0 && a.length === b.length,
     maxDiff: max, rmsDiff: Math.sqrt(sum / Math.max(1, n)), atSample: at, atSeconds: at < 0 ? null : at / sampleRate,
-    maxUlps32: maxUlps,
+    maxUlps32: maxUlps, quietMaxDiff: quietMax, ulpWindow: block, quietLevel: quiet,
     pcm16Identical: pcmDiffering === 0 && a.length === b.length, pcm16Differing: pcmDiffering, pcm16MaxStep: pcmMaxStep,
     lengths: [a.length, b.length],
   };

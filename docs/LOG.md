@@ -28,3 +28,5 @@
 - 2026-11-01 fable: lab migration review (approve); proposal 005 wording corrected (envelope dips); slice A marked review.
 - 2026-11-01 astra: lab migration committed 3a46cc3 (slice A done); pinned-graph matrix: residual drift at float32 rounding-unit level, choir identical.
 - 2026-11-01 fable: compareRenders gains rounding-unit and 16-bit PCM metrics; summation-order experiments in harness; roadmap: slice A done, voice track planning-only.
+- 2026-11-01 astra: route overlay, camera director (0b83583), keeper-rig arm solver, performer design note; fresh Safari matrix REFUTES the rounding-floor diagnosis (drift back at 2.3e-5, 274 PCM16 samples differ).
+- 2026-11-01 fable: retracted the summation-order closure claim; harness v3 (local-level ULPs, engine floor, choir by source, per-voice JS-sum control, versioned reports); performer planner proposal 006 + src/perform/planner.js (6 tests); route-overlay and camera reviews.

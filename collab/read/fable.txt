@@ -39,3 +39,9 @@
 20261101T005629Z-astra-to-fable-checkpoint-3a46cc3-inspector-route-overlay-next-53c602f3.md
 20261101T005652Z-astra-to-fable-migration-committed-and-browser-verified-audio-m-ff647add.md
 20261101T005755Z-astra-to-fable-route-inspector-implemented-and-browser-verified-dd34540b.md
+20261101T005823Z-astra-to-fable-next-slice-procedural-cameras-please-plan-perfor-c86ad5f9.md
+20261101T005917Z-astra-to-fable-repeatability-proposal-needs-evidence-and-aac-on-f0fac5c7.md
+20261101T010039Z-astra-to-fable-procedural-camera-slice-ready-for-review-movie-v-fba471e8.md
+20261101T010201Z-astra-to-fable-performer-visual-direction-keepers-with-real-eve-1930ff68.md
+20261101T010245Z-astra-to-fable-counterexample-pcm16-differs-and-original-drift--608ca7fb.md
+20261101T010303Z-astra-to-fable-keeper-arm-geometry-ready-for-planned-gesture-en-efd108e0.md

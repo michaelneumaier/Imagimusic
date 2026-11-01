@@ -10,7 +10,8 @@ async function check(name, run) {
 }
 const stats = samples => { let peak = 0, sum = 0, tail = 0; const tailStart = samples.length - 2400; for (let i = 0; i < samples.length; i++) { const v = Math.abs(samples[i]); if (!Number.isFinite(v)) throw new Error('Non-finite PCM at ' + i); peak = Math.max(peak, v); sum += v * v; if (i >= tailStart) tail = Math.max(tail, v); } return { seconds: samples.length / 48000, peak, rms: Math.sqrt(sum / samples.length), last50msPeak: tail }; };
 const render = (patch, options) => renderPerformanceAudio(createPerformance(patch, 48000), 48000, options);
-const environment = { userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
+export const HARNESS_VERSION = 3;   // bump on every change to the experiments so reports are comparable
+const environment = { harnessVersion: HARNESS_VERSION, userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency ?? null, seed: DEFAULT_PATCH.seed };
 let passage = null;
 
 await check('Passage renders finite, bounded, audible audio with a silent tail', async () => {
@@ -59,10 +60,44 @@ await check('Summation-order experiments: lone strike vs two simultaneous strike
   matrix['lone strike, no compressor'] = out.loneStrike; matrix['two simultaneous strikes, no compressor'] = out.twoSimultaneous; matrix['three simultaneous strikes, no compressor'] = out.threeSimultaneous;
   return out;
 });
-await check('All variants are identical after 16-bit PCM quantization (the shipped format)', async () => {
+// Engine floor and per-source experiments. A single OscillatorNode → GainNode → destination has exactly one input at
+// every node: if this differs between runs, the oscillator itself is nondeterministic and no mixing change helps.
+// Two oscillators into one gain is the smallest summing junction. Air-only and reed-only isolate the choir's sources.
+await check('Engine floor: one oscillator alone, two oscillators summed, choir by source', async () => {
+  const osc = async count => {
+    const run = async () => { const ctx = new OfflineAudioContext(1, 48000 * 2, 48000), g = ctx.createGain(); g.gain.value = 0.2 / count; g.connect(ctx.destination);
+      for (let k = 0; k < count; k++) { const o = ctx.createOscillator(); o.frequency.value = 220 * (k + 1) * 1.37; o.connect(g); o.start(0); o.stop(1.9); }
+      return (await ctx.startRendering()).getChannelData(0); };
+    return compareRenders(await run(), await run(), 48000);
+  };
+  const source = async kind => { const patch = structuredClone(DEFAULT_PATCH); patch.bellows.source = kind; const a = await render(patch, { families: ['bellows'] }), b = await render(patch, { families: ['bellows'] }); return compareRenders(a, b, 48000); };
+  const out = { oneOscillator: await osc(1), twoOscillatorsSummed: await osc(2), fiveOscillatorsSummed: await osc(5), choirOnlyAir: await source('air'), choirOnlyReed: await source('reed'), choirOnlySaw: await source('saw') };
+  Object.assign(matrix, { 'engine: one oscillator': out.oneOscillator, 'engine: two oscillators summed': out.twoOscillatorsSummed, 'engine: five oscillators summed': out.fiveOscillatorsSummed, 'choir only, air': out.choirOnlyAir, 'choir only, reed': out.choirOnlyReed, 'choir only, saw': out.choirOnlySaw });
+  return out;
+});
+// Fixed-topology control. Render the first seconds of the garden one voice per OfflineAudioContext (every node has a
+// single input except the five modes at the voice gain), then sum the voices in JS in a fixed order. Run twice.
+// If the per-voice renders are identical run to run, the engine's single-voice rendering is deterministic and any
+// remaining drift in the full graph comes from how it mixes many inputs; the JS sum is then a deterministic reference
+// the single-graph render can be compared against (expect float32 rounding-order differences only, if that is all).
+await check('Fixed-topology control: per-voice renders summed in JS, twice, vs the single graph', async () => {
+  const base = createPerformance(DEFAULT_PATCH, 48000), span = 6, voices = base.snapshots.garden.voices.filter(v => v.noteOn < span);
+  const one = async voice => { const p = { ...base, events: [{ family: 'garden', voice }], duration: span, snapshots: { garden: { voices: [voice], dampers: [] } } }; return renderPerformanceAudio(p, 48000, { compressor: false }); };
+  const sumAll = async () => { const acc = new Float64Array(Math.ceil(span * 48000)); let perVoiceIdentical = true; let worst = 0;
+    for (const voice of voices) { const a = await one(voice), b = await one(voice); const c = compareRenders(a, b, 48000); if (!c.identical) { perVoiceIdentical = false; worst = Math.max(worst, c.maxDiff); } for (let i = 0; i < acc.length; i++) acc[i] += a[i]; }
+    return { sum: Float32Array.from(acc), perVoiceIdentical, worstPerVoiceDiff: worst }; };
+  const first = await sumAll(), second = await sumAll();
+  const graph = { ...base, events: voices.map(voice => ({ family: 'garden', voice })), duration: span, snapshots: { garden: { voices, dampers: [] } } };
+  const g1 = await renderPerformanceAudio(graph, 48000, { compressor: false }), g2 = await renderPerformanceAudio(graph, 48000, { compressor: false });
+  const out = { voices: voices.length, seconds: span, perVoiceRendersIdentical: first.perVoiceIdentical && second.perVoiceIdentical, worstPerVoiceDiff: Math.max(first.worstPerVoiceDiff, second.worstPerVoiceDiff),
+    jsSumRunToRun: compareRenders(first.sum, second.sum, 48000), singleGraphRunToRun: compareRenders(g1, g2, 48000), jsSumVsSingleGraph: compareRenders(first.sum, g1, 48000) };
+  matrix['control: per-voice JS sum run-to-run'] = out.jsSumRunToRun; matrix['control: single graph (same voices) run-to-run'] = out.singleGraphRunToRun; matrix['control: JS sum vs single graph'] = out.jsSumVsSingleGraph;
+  return out;
+});
+await check('WAV resolution: every variant identical after 16-bit quantization (WAV path only; AAC takes float32 and is lossy)', async () => {
   const failing = Object.entries(matrix).filter(([, r]) => !r.pcm16Identical).map(([k, r]) => `${k}: ${r.pcm16Differing} samples, max step ${r.pcm16MaxStep}`);
   assert(failing.length === 0, failing.join('; '));
-  return Object.fromEntries(Object.entries(matrix).map(([k, r]) => [k, { maxUlps32: r.maxUlps32, pcm16Differing: r.pcm16Differing }]));
+  return Object.fromEntries(Object.entries(matrix).map(([k, r]) => [k, { identical: r.identical, maxUlps32: r.maxUlps32, quietMaxDiff: r.quietMaxDiff, pcm16Differing: r.pcm16Differing }]));
 });
 await check('Default full render is bit-identical across two runs', async () => {
   const r = matrix['full (default: keepNodes)']; assert(r, 'matrix did not run');
@@ -83,4 +118,4 @@ document.getElementById('summary').textContent = `${passed}/${results.length} st
 if (passage) { const button = document.getElementById('wav'); button.disabled = false; button.onclick = () => { const url = URL.createObjectURL(new Blob([encodeWav(passage, 48000)], { type: 'audio/wav' })); const a = document.createElement('a'); a.href = url; a.download = `imagimusic-stage-${DEFAULT_PATCH.seed}.wav`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }
 const reportText = JSON.stringify({ generated: new Date().toISOString(), ...environment, results, matrix }, null, 2);
 const report = document.createElement('pre'); report.textContent = reportText; document.body.append(report);
-{ const button = document.getElementById('report'); button.disabled = false; button.onclick = () => { const url = URL.createObjectURL(new Blob([reportText], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `stage-render-report-${DEFAULT_PATCH.seed}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }
+{ const button = document.getElementById('report'); button.disabled = false; const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15); button.onclick = () => { const url = URL.createObjectURL(new Blob([reportText], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `stage-render-report-v${HARNESS_VERSION}-${DEFAULT_PATCH.seed}-${stamp}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); }; }

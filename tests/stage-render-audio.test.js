@@ -24,7 +24,14 @@ test('diagnostic options isolate families, bypass the compressor, and keep nodes
 
 test('compareRenders reports identity, max/rms difference, rounding units, and 16-bit PCM equality', () => {
   const a = new Float32Array([0, 0.5, -0.25, 0.1]), b = new Float32Array([0, 0.5, -0.25, 0.1]);
-  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, maxUlps32: 0, pcm16Identical: true, pcm16Differing: 0, pcm16MaxStep: 0, lengths: [4, 4] });
+  assert.deepEqual(compareRenders(a, b, 4), { identical: true, maxDiff: 0, rmsDiff: 0, atSample: -1, atSeconds: null, maxUlps32: 0, quietMaxDiff: 0, ulpWindow: 128, quietLevel: 1e-3, pcm16Identical: true, pcm16Differing: 0, pcm16MaxStep: 0, lengths: [4, 4] });
+  // Rounding units are measured against the local level, so a tiny difference beside a loud sample is small, and a
+  // difference in a quiet stretch is reported raw instead of as thousands of units.
+  const loud = new Float32Array(300).map((_, i) => i === 150 ? 0.5 : 0), loud2 = Float32Array.from(loud); loud2[149] = 2 ** -24;
+  const near = compareRenders(loud, loud2, 1);
+  assert.ok(Math.abs(near.maxUlps32 - 1) < 1e-6 && near.quietMaxDiff === 0);
+  const silent = new Float32Array(300), silent2 = new Float32Array(300); silent2[10] = 1e-7;
+  const q = compareRenders(silent, silent2, 1); assert.equal(q.maxUlps32, 0); assert.equal(q.quietMaxDiff, Math.fround(1e-7));
   const c = new Float32Array([0, 0.5, -0.2, 0.1]), r = compareRenders(a, c, 4);
   assert.equal(r.identical, false); assert.ok(Math.abs(r.maxDiff - 0.05) < 1e-7); assert.equal(r.atSample, 2); assert.equal(r.atSeconds, 0.5);
   assert.equal(r.pcm16Identical, false); assert.equal(r.pcm16Differing, 1); assert.ok(r.pcm16MaxStep > 1000);

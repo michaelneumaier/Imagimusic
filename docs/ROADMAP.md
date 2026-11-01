@@ -72,9 +72,11 @@ Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir
 - [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
   - [x] offline passage audio through the live graph: src/stage/render-audio.js (Fable), node tests with mocks + tests/stage-render-browser.html for real OfflineAudioContext evidence
   - [x] deterministic video export prototype (Astra): vendored Mediabunny (decision 003), /stage.html "Render movie" → MP4 H.264 720p30 + AAC 48 kHz; full passage verified with ffprobe (1007 frames, 33.567 s video, 33.561 s audio, first note at 0.35 s) and all 1007 state hashes regenerated in Node with 0 mismatches
-  - [ ] audio repeatability: disconnect timing and node collection eliminated (drift 2.3e-5 → 6e-8); what remains is single float32 rounding units where voices overlap (summation-order noise inside the engine's mixing; choir-only bit-identical). Harness now reports rounding units and 16-bit PCM equality; decision pending on the repeatability contract (see collab/messages 2026-11-01)
+  - [ ] audio repeatability: OPEN. Run-to-run drift of the full-passage offline render varies between harness runs (6e-8 in one, 2.3e-5 with 274 PCM16-differing samples in the next), so the cause is timing-dependent and not yet identified; earlier closure claim retracted. Harness v3 adds an engine-floor baseline, choir-by-source rows, and a fixed-topology control (per-voice renders summed in JS). No tolerance contract until the cause is found; a shared deterministic mixing topology (live and offline) is an allowed fix.
+  - [ ] performer planner: proposal docs/proposals/006-performer-planner.md, pure src/perform/planner.js (actors spawned by the score, poses as functions of t, unplanned events reported never hidden); Astra keeper rig + scene integration next
+  - [x] procedural camera director (Astra 0b83583; Fable review approve)
+  - [x] inspector route overlay (Astra 5dea2c5; Fable review approve-with-fixes)
   - [x] manifest consolidation on src/stage/manifest.js; export/inspector review fixes applied (Astra 3a46cc3)
-  - [ ] inspector route overlay (Astra, in progress)
   - [ ] performer actor, three procedural cameras, route highlight in the inspector
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
