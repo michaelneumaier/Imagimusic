@@ -147,3 +147,6 @@ Open-phrase preparation: src/grove/pulse-prepare-worker.js; keep measured phrase
 Open-phrase listening evidence: tools/render-open-phrase-study.mjs and local renders/open-phrase-study; fixed opening and neighbor answer at three declared delays, equal gain/common ending, exact record/WAV reconstruction, no scoring or appeal claims.
 Recurrence audition: tools/render-open-phrase-recurrence.mjs and shared tools/open-phrase-player.mjs; matched one/two-cycle opening and same delayed answer, explicit differing opening lengths, local reproducible artifacts only.
 Optional listening note: tools/open-phrase-player.mjs; collapsed free-text note for the whole study, explicit local text download with selected-example context, no rating, network submission or automatic storage.
+Harmonic ensemble audition: tools/render-harmonic-groves.mjs and local renders/harmonic-groves; three separately validated whole-cluster instruments, matched histories unison/triad, fixed1/3mixgain, per-part evidence and shared listening player. No cross-grove coupling or playback-rate transposition.
+
+- Harmonic study link wording: tools/open-phrase-player.mjs optional escaped playLinkLabel, preserving existing studies default.
