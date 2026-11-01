@@ -168,3 +168,5 @@ Reader discovery: project-catalog.js and reopen.html cross-link; collab/notes/as
 Experimental ensemble host: src/grove/ensemble-host.js, ensemble-prepare-worker.js, ensemble-render-worker.js, tests/grove-ensemble-host.test.js. Shared context, acknowledged live capture, lifecycle and worker keeping; not a performance clearance.
 
 Experimental playing surface: ensemble.html, ensemble.css, src/grove/ensemble-main.js.
+
+Hold lifecycle verification: src/grove/hold-control.js, tests/grove-hold-control.test.js and ensemble-main.js integration. Distinct pointer/key/assistive ownership and cancellation, not audio acknowledgement state.

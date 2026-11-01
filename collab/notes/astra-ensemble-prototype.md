@@ -32,3 +32,25 @@ and sticky Begin/Quiet added after the first inspection.
 Next: broader native lifecycle and keyboard/multipointer checks; sustained
 output-side measurement with full visuals/input; deliberate listening feedback.
 Short native captures do not replace those gates. Keep local; do not publish.
+
+
+## Hold lifecycle follow-up after usage reset
+
+The shared hold-control helper now owns distinct pointer, keyboard and assistive
+sources. Four deterministic tests cover overlap, last-owner release, capture
+loss, focus loss, failed capture acquisition, disabled/repeated input, reset
+and disposal. This is source-level event coverage, not real multitouch evidence.
+Fable approved in collab/reviews/20261101T1259Z-fable-reviews-hold-control.md.
+
+Native Safari on resumption: Begin followed immediately by Escape cancelled
+preparation; Begin stayed enabled and play/hold controls disabled. Another Begin
+worked. With Soften C focused, Enter held 700 ms and released showed off; Space
+held 700 ms and released also showed off. No unwanted assistive toggle remained.
+The actual file renders/ensemble-keyboard-holds/ensemble.json validates and has
+one middle strike, three finite contact intervals (pointer, Enter, Space), two
+silent parts, and a common ending. All contacts ended before Quiet. This checks
+the real release path; it does not establish acoustic performance.
+
+Navigation to project home then Back returned a fresh idle page without playback.
+Safari did not retain the passage in back-forward cache in this run, so this is
+NOT evidence of native cache retention. Completed files remain available on disk.
