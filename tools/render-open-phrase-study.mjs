@@ -35,5 +35,5 @@ await fs.writeFile(path.join(out,'index.html'),openPhrasePlayer({
  intro:'Hear the opening alone, then the same answer placed at three different distances from its return.',
  question:'Does the return feel like a return? Does an answer join the ring, or begin something separate?',
  disclosure:'Authored listening examples on Grove 3. These delays are illustrations, not targets. The opening, answer strength, model gain and ending stay the same; the opening-only example has no answer. No listening verdict has been made.',
- cases:report.cases.map(c=>({file:c.name+'.wav',label:c.answerDelaySeconds===null?'Opening alone':'Answer after '+c.answerDelaySeconds+' seconds'}))
+ cases:report.cases.map(c=>({file:c.name+'.wav',wavSha256:c.wavSha256,label:c.answerDelaySeconds===null?'Opening alone':'Answer after '+c.answerDelaySeconds+' seconds'}))
 }));

@@ -34,6 +34,6 @@ await fs.writeFile(path.join(out,'index.html'),openPhrasePlayer({
  intro:'Compare a shorter opening with one that lets the call and answer recur once more. Then hear each with the same answer added.',
  question:'Does another recurrence make the space feel inviting, or does the shorter opening leave more room for you?',
  disclosure:'Authored examples on Grove 3. Answers arrive 0.75 seconds after the final call at the same strength. The longer opening adds one call-and-answer pair; both leave the same tail after the final call, so total lengths differ. No timing target, normalization, or listening verdict.',
- cases:report.cases.map(c=>({file:c.name+'.wav',label:(c.cycles===1?'Shorter opening':'Another recurrence')+(c.withAnswer?' + answer':' alone')}))
+ cases:report.cases.map(c=>({file:c.name+'.wav',wavSha256:c.wavSha256,label:(c.cycles===1?'Shorter opening':'Another recurrence')+(c.withAnswer?' + answer':' alone')}))
 }));
 console.log(JSON.stringify(report,null,2));

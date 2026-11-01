@@ -146,3 +146,4 @@ Open phrase encounter: pulse.html, pulse.css, src/grove/pulse-main.js; separate 
 Open-phrase preparation: src/grove/pulse-prepare-worker.js; keep measured phrase composition off the main thread and cancel it on departure.
 Open-phrase listening evidence: tools/render-open-phrase-study.mjs and local renders/open-phrase-study; fixed opening and neighbor answer at three declared delays, equal gain/common ending, exact record/WAV reconstruction, no scoring or appeal claims.
 Recurrence audition: tools/render-open-phrase-recurrence.mjs and shared tools/open-phrase-player.mjs; matched one/two-cycle opening and same delayed answer, explicit differing opening lengths, local reproducible artifacts only.
+Optional listening note: tools/open-phrase-player.mjs; collapsed free-text note for the whole study, explicit local text download with selected-example context, no rating, network submission or automatic storage.
