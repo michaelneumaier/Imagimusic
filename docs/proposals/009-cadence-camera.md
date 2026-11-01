@@ -8,11 +8,13 @@ passages (no `score`) must produce the identical pose they do today.*
 
 | Cadence | Feel | Attention lead (s) | Gesture width (s) | Ensemble prior | Offset from target (x, y, z) |
 | --- | --- | --- | --- | --- | --- |
-| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 0.9 | (8.5, h = 7.2, 11) |
+| anticipation (opening) | wide and slow; the Keeper's approach is seen, the camera does not lunge | 0.45 | 1.0 | 0.9 | (10, h = 8.2, 13); was (8.5, 7.2, 11) until visual review found the FM body clipped at the canvas bottom |
 | answer (exchange) | today's follow: leans to each attack, settles to the ensemble | 0.18 | 0.7 | 0.25 | (7, h = 6.1, 9) |
 | settling (release) | a slow pull-back to the whole stage as excitations thin | 0.10 | 1.2 | 1.0 → 2.0 with section progress | (7, h = 6.1, 9) → (10, h = 7.6, 13) with section progress |
 
-The offset's middle entry `h` is an **absolute camera height** (today's
+The table's numbers are the initial design; Astra tunes them by visual
+review in the browser and this table follows. The offset's middle entry
+`h` is an **absolute camera height** (today's
 position y is the constant 6.1, not target.y + 6.1); x and z are offsets
 from the target.
 

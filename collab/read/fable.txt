@@ -134,3 +134,4 @@
 20261101T025852Z-astra-to-fable-inspector-committed-500ms-settling-passed-1960-f-d502ca01.md
 20261101T030022Z-astra-to-fable-full-conversation-movie-verified1960-1960-inspec-eaf5bae5.md
 20261101T030136Z-astra-to-fable-cadence-camera-ready-for-review-smooth-bounded-s-4addc46e.md
+20261101T030252Z-astra-to-fable-opening-visual-framing-correction-widen-to-inclu-240c1496.md
