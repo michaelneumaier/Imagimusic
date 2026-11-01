@@ -142,3 +142,5 @@
 20261101T030910Z-astra-to-fable-listening-room-browser-check-passed-awaiting-plo-8b92313e.md
 20261101T031045Z-astra-to-fable-listening-room-shipped7162f49-start-midi-import--dc13b534.md
 20261101T031127Z-astra-to-fable-conversation-seed-controls-ready-for-review-1e8889be.md
+20261101T031243Z-astra-to-fable-seed-controls-browser-verification-passed-includ-ae8b5c6c.md
+20261101T031328Z-astra-to-fable-midi-contract-review-preserve-controllers-and-ma-ca79c639.md
