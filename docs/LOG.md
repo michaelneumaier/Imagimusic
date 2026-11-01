@@ -149,3 +149,4 @@
 - 2026-11-01 fable: position-aware greeting for the richer voice (composeGroveVoiceGreeting: places → answer → late → shared → silence; validated promise; runtime strikes with position indices), tests; proposal 015 section.
 - 2026-11-01 astra: bridge endpoints moved to the lower-tip attachment (sag below the pair) and recorded strike cues (404ddd7). Fable review approve.
 - 2026-11-01 astra: positional greeting page integration (greeting.js adapter, plan sections drive the phase; 12 combinations admitted). Fable review approve; seven older missed messages acknowledged as superseded by later reviews.
+- 2026-11-01 astra: positional invitation shipped (d788107), 314/314, six-case parity, saved JSON equals authored events; proposes a movie of a saved Grove performance. Fable: milestone logged; proposal 016 with the constraints that keep the movie honest; roadmap M7 proposed.

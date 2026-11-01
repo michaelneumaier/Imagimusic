@@ -111,9 +111,13 @@ Touch one Loom body; the other swells through the bridge (a swell, not an arriva
 
 Three to five seeded bodies joined by bridges whose topology is the visible anatomy; a coupled-network generalization of the pair (symmetric eigen-solve, N = 2 reproduces the Loom exactly); discovery by touch with bridges lit only by measured exchange history (a presentation layer, separated from the model); a composed ritual over three seeds. 014a network model and 014b generator/ritual (Fable); 014c page and lighting (Astra).
 
-## M6.5: A richer voice for the Grove (status: shipped as an optional playable route 2026-11-01, Astra 3c06f56; proposal 015; original remains the default; modal network, voice factory and comparison tool Fable, adapters, page, worker and A/B surface Astra; Safari six-case worker parity within 7.5e-9, captures rebuilt byte-identically in Node; no subjective preference claimed; next: a position-aware greeting that teaches positional contrast by listening)
+## M6.5: A richer voice for the Grove (status: shipped as an optional playable route 2026-11-01, Astra 3c06f56; proposal 015; original remains the default; modal network, voice factory and comparison tool Fable, adapters, page, worker and A/B surface Astra; Safari six-case worker parity within 7.5e-9, captures rebuilt byte-identically in Node; no subjective preference claimed; the position-aware greeting shipped as the richer voice's invitation (d788107; six-case browser parity on the authored greeting, saved JSON equal to the authored events))
 
 Bodies with a few beam partials (geometry.js family), strike position selecting partials, bridges coupling every partial through mode shapes at the attachment point, per-mode decay by a stated classical-damping approximation; M = 1 reproduces today's grove exactly; a measurable A/B comparison tool before any page change.
+
+## M7: A movie of a saved Grove performance (status: proposed 2026-11-01; docs/proposals/016-grove-movie.md; Astra inspects the export architecture)
+
+Export from the saved record only: soundtrack = the unit-bank sum (byte-identical by proof), frames from the same analytic visual the page draws on the frame clock, a manifest that rebuilds PCM and scene values for verification, stage export untouched, voice labeled, presentation named as input cues.
 
 ## M4.5: Expressive bodies, MIDI 2.0 expression (status: in progress; Michael's direction 2026-11-01; proposal docs/proposals/011-expressive-bodies.md rev. 2 approved by Astra; 011b evaluator + fixture built, Fable src/midi2/expression.js; next 011c bellows adapter + bodies, Astra)
 
