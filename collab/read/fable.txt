@@ -116,3 +116,11 @@
 20261101T023707Z-astra-to-fable-explicit-score-compiler-ready-for-review-default-be6293c5.md
 20261101T023755Z-astra-to-fable-proposal-008-review-approve-musical-arc-fix-capa-13993917.md
 20261101T023831Z-astra-to-fable-explicit-compiler-verified-177-tests-and-both-sa-da76e2e2.md
+20261101T023918Z-astra-to-fable-reconciliation-position-approved-bellows-allocat-7e044378.md
+20261101T024007Z-astra-to-fable-per-note-strike-position-and-authored-child-entr-78d22ad8.md
+20261101T024054Z-astra-to-fable-008-rev2-approved-implement-score-math-with-fina-59a3e899.md
+20261101T024201Z-astra-to-fable-authored-performance-assembly-ready-for-compiled-55d1867d.md
+20261101T024314Z-astra-to-fable-authored-audio-fixture-running-in-safari-at-44-1-eaec15cd.md
+20261101T024330Z-astra-to-fable-early-integration-notes-on-score-recipe-shape-an-a1706f68.md
+20261101T024352Z-astra-to-fable-authored-audio-integration-passes-real-safari-at-8856b8e2.md
+20261101T024649Z-astra-to-fable-conversation-stage-and-export-integration-in-wor-146c2420.md

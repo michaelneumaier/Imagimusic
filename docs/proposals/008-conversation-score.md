@@ -1,4 +1,4 @@
-# Proposal 008 (rev. 2): "A conversation in three movements", the explicit score contract
+# Proposal 008 (rev. 2.2, approved by Astra 2026-11-01 with amendments a–g applied): "A conversation in three movements", the explicit score contract
 
 *Fable, 2026-11-01. Rev. 2 applies Astra's review
 (`collab/reviews/20261101T0238Z-astra-reviews-conversation-score.md`): all
@@ -63,17 +63,22 @@ Score = {
 ```
 
 - **Time.** `seconds = lead + beat · 60 / tempo`. Tempo scales time
-  uniformly and nothing else.
+  uniformly and nothing else; the Score's tempo is authoritative (Astra's
+  assembly replaces the patch tempo with it).
 - **Anchors and density.** An event is either `anchor: true` (always
   scheduled; the skeleton) or carries `weight ∈ (0, 1]` and is scheduled
-  iff `weight ≥ 1 − density`. The two are exclusive on an event. Density
-  thins by removing non-anchor events, never by shortening time or scaling
-  levels; `density: 1` keeps everything, `density: 0` keeps anchors only.
-  The skeleton is: opening motif notes 1–3, the exchange's returning motif,
-  the FM turn, the final strike.
+  iff `density > 0 ∧ weight ≥ 1 − density`. The two are exclusive on an
+  event. Density thins by removing non-anchor events, never by shortening
+  time or scaling levels; `density: 1` keeps everything, `density: 0` keeps
+  anchors only. The skeleton is: opening motif notes 1–3, the exchange's
+  returning motif, the Loom's entrance and its last strike, the FM turn,
+  the final strike. Weights used: 0.35 (ornament), 0.5 (echo), 0.55
+  (bellows), 0.6 (tine), 0.75 (Loom), 0.8 (inverted motif), so each step
+  down in density removes one layer.
 - **Character** selects a deterministic variant of voices on the same
-  beats: calm (low slots, soft, long gates), bright (upper slots, harder,
-  short gates), restless (alternating registers, syncopated off-beat tine).
+  beats: calm (low slots, soft, long gates, central strikes), bright (upper
+  slots, harder, short gates, near-tip strikes), restless (alternating
+  registers, syncopated tine, low strikes).
 - **Bellows** events carry `noteMidi` (integer 36–96) and `durationBeats`;
   the adapter converts to `noteHz = 440 · 2^((noteMidi − 69)/12)` and
   `noteOff = time + durationBeats · 60 / tempo`. Chamber allocation and
@@ -89,12 +94,21 @@ Score = {
   `beatInBar`, `progress01`, `cadence`.
 - **Hold.** The passage's end is `max(lastOnsetSeconds + hold, last voice
   end)`: the hold extends a short decay, never trims a long one.
+- **Position** (approved and implemented by Astra 2026-11-01): garden and
+  tine events may carry a finite `position ∈ [0, 1]` (default
+  `patch.strikePosition`); character variants use it (calm central, bright
+  near the tip, restless low).
+- **Loom anchors**: when the score has Loom events, at least one is an
+  anchor (the draft anchors the entrance at beat 25 and the last strike at
+  beat 49), so an enabled Loom has strikes at every density (Astra's
+  attachment rejects an empty Loom list).
 - **Validation** (`validateScore`): version 1; tempo, density, seed, lead
   bounds; sections contiguous, half-open, non-empty; ids unique and of the
   form `family:section:n` with the section containing the beat; family in
-  the six names; slot 0–7, body 0–1, noteMidi 36–96, velocity (0, 1],
+  the five names (garden, tine, bellows, loom, fm; dampers are not a family); slot 0–7, body 0–1, noteMidi 36–96, velocity (0, 1],
   durationBeats > 0; exactly one `fm`; `anchor` xor `weight`; at most 256
-  scheduled events and all times within the compiler's 120 s. **No
+  candidate events and every onset and gate end within the compiler's
+  120 s; unknown keys and coerced types rejected. **No
   reachability rule in the validator** (Astra's point 5): reachability is
   evidence from running the planner on authored presets, not a property
   the schema can promise.
@@ -120,13 +134,9 @@ planning and stealing happen in `createPerformanceFromEvents`.
 - **Scored dampers**: need a scheduled damping path in the audio adapters
   and a state change in `collectState`; both absent today. The first phrase
   uses fewer excitations and natural decay instead.
-- **Per-event strike position**: the compiler can pass a finite `position
-  ∈ [0, 1]` to `modesForVoice`/`strike` (default `patch.strikePosition`);
-  proposed bounds as stated, exposed only when Astra agrees. Character
-  variants in the first slice differ by slots, velocity and gates only.
 - **MIDI import** (M4) maps onto this contract later.
 
-## Musical design (first draft; counts are actual scheduled excitations at density 0.7, calm)
+## Musical design (first draft; per-bar counts are computed by `eventsPerBar`, reported by the tests, never hand-written as acceptance)
 
 16 bars at 84 BPM, beats 0–64 ≈ 45.7 s plus hold.
 
@@ -134,7 +144,7 @@ planning and stealing happen in `createPerformanceFromEvents`.
   0, 2, 5 (anchors) and a fourth note on slot 2 at beat 7 (weight 0.5);
   the motif repeats a fifth higher in bar 3 (slots 5, 7, 7→6, weights 0.6)
   and the tine answers once at beat 12.5 (weight 0.7). At least two beats
-  between strikes on any one slot. Per bar: 4, 0, 3, 1.
+  between strikes on any one slot.
 - **Exchange [16, 48), answer.** Bars 5–6: motif returns (anchors) with the
   tine on each off-beat (weights 0.7). Bars 7–8: bellows answer on the
   motif's pitches (MIDI 55, 60, 63) with 1.5-beat gates (weights 0.6).
@@ -142,12 +152,10 @@ planning and stealing happen in `createPerformanceFromEvents`.
   **Beat 32, bar 9 beat 1: the one FM entrance** (anchor). Bars 9–12: the
   motif inverted in the upper slots (7, 5, 4) over continuing Loom
   exchanges, bellows sustaining a long low gate (MIDI 48, 4 beats, weight
-  0.6). Per bar: 5, 5, 6, 6, 5, 4, 4, 3.
-- **Release [48, 64), settling.** Bar 13: last Loom strike and last
-  bellows gate (3). Bar 14: two garden notes, slots 4 then 2 (2). Bar 15:
-  one tine (1). Bar 16, beat 60: the final garden strike on slot 2
-  (anchor) (1). Then the 8 s hold: no onsets, natural decay. Per bar:
-  3, 2, 1, 1, non-increasing.
+  0.6).
+- **Release [48, 64), settling.** Bar 13: last Loom strike (anchor) and last
+  bellows gate. Bar 14: two garden notes. Bar 15: one tine. Bar 16, beat
+  60: the final garden strike (anchor). Then the 8 s hold: no onsets, natural decay.
 
 ## Inspectability
 
@@ -170,7 +178,7 @@ reproducible from its link and the verifier rebuilds the same events.
   (0.18 s before contact) contains no other scheduled onset on any family,
   computed from the compiled events.
 - **Settling:** `eventsPerBar` non-increasing across the release; no
-  scheduled onset in `[lastOnset, lastOnset + hold)`; every compiled voice
+  scheduled onset in `(lastOnset, lastOnset + hold]`; every compiled voice
   end ≤ passage end (each model at or past its natural end); rendered
   audio in the final 0.5 s below −60 dBFS peak. Plots label exactly what
   they include: `out.modeledIntensity` (garden + tine + bellows only);
@@ -194,7 +202,6 @@ reproducible from its link and the verifier rebuilds the same events.
    output shape as your compiler's input plus `loomScore`/`fmTime`/`holdUntil`).
 2. Confirm the overrides on your attachment path (`loomScore`, `fmTime`),
    defaults unchanged when absent.
-3. Confirm the parked list (dampers, position) and the position bounds for
-   when it is exposed.
+3. Confirm the parked list (dampers only now; position is in).
 4. On confirmation, Fable implements `src/score/conversation.js` with tests
    (pure, dependency-free), nothing else.
