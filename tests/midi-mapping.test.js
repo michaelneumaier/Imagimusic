@@ -79,9 +79,9 @@ test('window policies: before, active-at-start, after, clipped gate, preserved s
   const atEnd = notes(fileFrom([on(5, 60), off(5, 60)]));
   const r2 = compileImportedScore(imported(atEnd, plan([{ track: 0, channel: 'all', family: 'bellows', sustainPedal: false }], { window: { startSeconds: 1, endSeconds: 5 } })), DEFAULT_PATCH).report;
   assert.deepEqual([r2.rows[0].class, r2.rows[0].reason], ['excluded', 'afterWindow']);
-  const lastSample = notes(fileFrom([on(4.995, 60), off(4.995, 60)]));   // onset one microsecond before the window end: no sample fits
+  const lastSample = notes(fileFrom([on(4.995, 60), off(4.995, 60)]));   // onset one microsecond before the window end: one sample capped to the window
   const r3 = compileImportedScore(imported(lastSample, plan([{ track: 0, channel: 'all', family: 'bellows', sustainPedal: false }], { window: { startSeconds: 1, endSeconds: 4.995001 } })), DEFAULT_PATCH, 48000).report;
-  assert.deepEqual([r3.rows[0].class, r3.rows[0].reason], ['dropped', 'noRepresentableGate']);
+  assert.equal(r3.rows[0].class, 'exact'); assert.ok(r3.rows[0].to.gateSeconds > 0 && r3.rows[0].to.gateSeconds <= 1e-6 + 1e-12, 'a positive sub-sample gate survives, capped by the window');
   assert.equal(report.counts.total, list.notes.length); assert.equal(Object.values(report.counts).reduce((a, b) => a + b, 0) - report.counts.total, report.counts.total);
 });
 
@@ -123,4 +123,23 @@ test('the report describes the actual compiled result: chamber stealing, planner
   assert.equal(canon, canonicalImportedScore(JSON.parse(canon)));
   assert.throws(() => canonicalImportedScore({ ...imported(list, bellowsAll()), source: { name: 'x', bytes: 1, sha256: 'nothex' } }), /sha256/);
   assert.throws(() => canonicalImportedScore({ ...imported(list, bellowsAll()), extra: 1 }), /unsupported field/);
+});
+
+// ---- after Astra's review of 9aefff3 (collab/reviews/20261101T0453Z-astra-reviews-midi-mapping.md) ----
+test('review corrections: own-key curves, bellows range and Nyquist, no velocity floor, exclusion before assignment, per-channel pedal warning', () => {
+  const list = notes(fileFrom([on(0, 60), off(1, 60)]));
+  assert.throws(() => validateMappingPlan(plan([], { velocityCurve: 'toString' }), list), /velocityCurve/);
+  assert.throws(() => validateMappingPlan(plan([], { velocityCurve: 'constructor' }), list), /velocityCurve/);
+  const ranged = notes(fileFrom([on(0, 0), off(1, 0), on(0, 35), off(1, 35), on(0, 36), off(1, 36), on(0, 96), off(1, 96), on(0, 97), off(1, 97), on(2, 60, 1), off(3, 60)]));
+  const r = compileImportedScore(imported(ranged, plan([{ track: 0, channel: 'all', family: 'bellows', sustainPedal: false }], { velocityCurve: 'quiet' })), DEFAULT_PATCH).report;
+  assert.deepEqual([rowOf(r, 0).reason, rowOf(r, 35).reason, rowOf(r, 36).class, rowOf(r, 96).class, rowOf(r, 97).reason], ['outOfBellowsRange', 'outOfBellowsRange', 'exact', 'exact', 'outOfBellowsRange']);
+  const quiet = compileImportedScore(imported(ranged, plan([{ track: 0, channel: 'all', family: 'bellows', sustainPedal: false }], { velocityCurve: 'quiet' })), DEFAULT_PATCH).recipe;
+  assert.ok(Math.abs(quiet.events.find(e => e.id === `midi:${rowOf(r, 60).noteId}`).velocity - 0.7 / 127) < 1e-12, 'quiet attenuates velocity 1 too; no hidden floor');
+  const nyq = compileImportedScore(imported(ranged, bellowsAll(false)), DEFAULT_PATCH, 2000).report;   // Nyquist 1000 Hz: MIDI 96 (≈2093 Hz) cannot sound
+  assert.deepEqual([rowOf(nyq, 96).class, rowOf(nyq, 96).reason], ['dropped', 'aboveNyquist']);
+  const outside = compileImportedScore(imported(ranged, plan([], { window: { startSeconds: 0.6, endSeconds: 0.75 } })), DEFAULT_PATCH).report;
+  assert.equal(outside.counts.unassigned, 0); assert.equal(outside.counts.excluded, ranged.notes.length, 'a window with no onsets excludes everything; nothing blocks Use');
+  const pedals = notes(fileFrom([pedal(0, true, 0), pedal(0, true, 1), on(1, 60, 100, 0), off(2, 60, 0), on(1, 62, 100, 1), off(2, 62, 1), pedal(3, false, 0), pedal(3, false, 1)]));
+  const pr = compileImportedScore(imported(pedals, plan([{ track: 0, channel: 'all', family: 'bellows', sustainPedal: true }], { window: { startSeconds: 0.5, endSeconds: 5 } })), DEFAULT_PATCH).report;
+  assert.equal(pr.warnings.filter(w => w.kind === 'pedalHeldAtStart').length, 2, 'one warning per affected (track, channel)');
 });

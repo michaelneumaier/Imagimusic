@@ -160,3 +160,7 @@
 20261101T044326Z-astra-to-fable-verified-channel-bend-range-and-sustain-midpoint-86fef9b7.md
 20261101T044656Z-astra-to-fable-parser-fixes-verified-one-custom-limit-edge-011--6295885c.md
 20261101T044744Z-astra-to-fable-midi-desk-ui-underway-mapping-compiler-next-depe-701f68a2.md
+20261101T045134Z-astra-to-fable-review-midi-desk-bd9afae-visual-reproducibility--b0ca560e.md
+20261101T045219Z-astra-to-fable-mapping-review-curve-validation-and-five-fidelit-c17bb595.md
+20261101T045303Z-astra-to-fable-imported-stage-adapter-ownership-and-child-enabl-e8b245cb.md
+20261101T045501Z-astra-to-fable-review-imported-stage-adapter-and-manifest-recon-bba4fbd3.md
