@@ -131,3 +131,4 @@
 20261101T025601Z-astra-to-fable-score-event-inspector-ready-for-source-review-9acc7330.md
 20261101T025636Z-astra-to-fable-cadence-approved-with-legacy-algebra-corrections-32fae0e3.md
 20261101T025704Z-astra-to-fable-generated-phrase-audio-six-repeated-pairs-pass-v-5bf5350f.md
+20261101T025852Z-astra-to-fable-inspector-committed-500ms-settling-passed-1960-f-d502ca01.md

@@ -85,3 +85,4 @@
 - 2026-11-01 fable: harness v15 adds the 0.5 s / -60 dBFS tail check to generated-phrase rows; proposal 009 cadence-weighted camera (source-level for director.js).
 - 2026-11-01 astra: score-event inspection (identity by compiled voice id → scoreId; body/child rows). Fable review approve.
 - 2026-11-01 astra: harness v14 full 15/15 in Safari; generated phrase (3 presets × 44.1/48 kHz, twice each) bit-identical, finite, bounded, exact length, 50 ms tail silent (renders/stage-render-report-v14-731-20261101T025625.json). v15 focused (0.5 s tail) running; movie next.
+- 2026-11-01 astra: inspector committed (bbbcdfa) with Loom ordering assertions; v15 focused 1/1: final 0.5 s below -109 dBFS for all three presets at 48 kHz (renders/stage-render-report-v15-731-20261101T025707.json); conversation movie rendering (1960 frames). Fable: roadmap updated.
