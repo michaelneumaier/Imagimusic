@@ -1,3 +1,4 @@
+import {restInstrumentIdentity} from './rest-instrument-identity.js';
 import {createRestImportSession} from './rest-import-session.js';
 import {createGroveReplay} from './replay.js';
 import {createGroveWorld} from './world.js';
@@ -14,8 +15,10 @@ function sync(){
  $('cancel').hidden=!busy;$('listen').disabled=!ready||busy||replay.state==='preparing';$('save').disabled=!ready||busy;$('quiet').disabled=!['playing','preparing','suspended'].includes(replay.state);
 }
 function show(result){
- shown=result;$('passage').hidden=false;$('name').textContent=result.name;$('identity').textContent=`GROVE ${result.record.grove.seed} · REOPENED`;
+ const identity=restInstrumentIdentity(result.record);
+ shown=result;$('passage').hidden=false;$('name').textContent=result.name;$('identity').textContent=`${identity.label}${identity.defaultVoice?'':' · SAVED VOICE'} · REOPENED`;
  $('facts').textContent=`${result.picture.duration.toFixed(2)} seconds · ${result.record.events.length} strikes · ${result.record.contacts.length} resting contact${result.record.contacts.length===1?'':'s'}`;
+ $('play').hidden=!identity.canOpenCurated;
  $('play').href=`rest.html?seed=${result.record.grove.seed}`;
  if(!world)try{world=createGroveWorld($('world'));}catch{$('world').hidden=true;$('phase').textContent='The 3D view is unavailable. Sound playback is still available.';}
  if(world){if(sculpture){world.scene.remove(sculpture.root);sculpture.dispose();}sculpture=createGroveScene(result.record.grove);world.scene.add(sculpture.root);}
