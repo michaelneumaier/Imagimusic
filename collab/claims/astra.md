@@ -122,3 +122,4 @@ Return/first-use follow-up: reopen-main.js persisted-page cancellation and repla
 Rest cached return: contact-host park/newPassage renewal, rest-main persisted lifecycle, focused host tests; retain only finished captures, completed comparisons/films and scene, cancel pending jobs.
 Grove film cached return: main.js keeps completed movie URLs/listeners on persisted departure, cancels pending movie work; existing quiet/stop behavior remains. Current Listen/Touch/Expressive handlers do not dispose their transports.
 Adaptation prototype review: collab/reviews/*astra* and local renders/bridge-metric-review counterexample; independent spring-power identity audit and experience constraints, no edits to Fable's model prototype.
+Variant audition boundary: src/grove/rest-variant.js and tests/grove-rest-variant.test.js; explicit target Grove, strict all-gesture preservation, record-only reconstruction; experiment adapter only, no production UI yet.

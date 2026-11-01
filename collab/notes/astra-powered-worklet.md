@@ -95,3 +95,9 @@ Current code audit corrected the earlier six-route generalization: Listen/Expres
 
 Safari 320×656: created Original Grove3 passage, rendered 2.8s/84-frame film, brand->welcome->Back retained all three identical blob URLs and the film preview. Clicking Play after return produced “Playing your saved film”, enabled Quiet, and native Pause/time controls, proving the preview listener remained attached. Syntax and diff checks pass. Peer review requested; pending at writing.
 Fable subsequently approved this narrow fix and accepted the corrected inventory in collab/reviews/20261101T1020Z-fable-reviews-grove-film-return.md. His next creative proposal is in a measurement-prototype stage; not yet reviewed or selected.
+
+### Strict structural-variant audition adapter
+
+src/grove/rest-variant.js prepares an explicit supplied target structure using the saved Rest gesture vocabulary and rate. Identical structures and empty passages refuse; a transposition that drops even one strike refuses the pair. This distinguishes controlled same-gesture audition from the existing exploratory cross-Grove comparison which can explicitly report omissions. Source capture remains untouched; target is snapshotted; result record reconstructs its own PCM. No adaptation policy or production UI is integrated.
+
+Two focused tests pass: same-seed structural change with complete gesture/ending preservation and record-only PCM reconstruction; empty/no-change and actual strike-drop refusal. Local renders/variant-first-pair contains original.wav, changed.wav, changed.json and report.json: manual Rest capture, bridge 0–1 coupling 0.0039 → 0.00468, 48kHz,34224 samples, source/target canonical outputGain both0.45. Explicit fixture only, not the pending adaptive rule; no listening verdict. Fable review requested in 20261101T102352Z message.
