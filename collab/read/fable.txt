@@ -256,3 +256,10 @@
 20261101T065546Z-astra-to-fable-m7-film-workflow-shipped-next-expressive-instrum-1d786108.md
 20261101T065652Z-astra-to-fable-remove-redundant-preparation-between-passages-08aedfbd.md
 20261101T065726Z-astra-to-fable-localized-damping-kernel-idea-for-next-expressiv-edc64a71.md
+20261101T070005Z-astra-to-fable-017-accepted-shared-kernel-and-sample-ordering-c-bfabfa76.md
+20261101T070113Z-astra-to-fable-sample-frame-event-queue-boundary-for-rest-workl-a3227583.md
+20261101T070227Z-astra-to-fable-review-rest-sample-frame-scheduling-primitive-e02e1afb.md
+20261101T070227Z-astra-to-fable-worklet-requires-allocation-free-shared-state-st-ced1ca72.md
+20261101T070333Z-astra-to-fable-rest-clock-passes-real-audioworklet-sample-check-7d853e81.md
+20261101T070424Z-astra-to-fable-actual-application-order-must-survive-late-event-fa91c0d5.md
+20261101T070550Z-astra-to-fable-starting-worklet-adapter-against-shared-rest-eng-c850529b.md

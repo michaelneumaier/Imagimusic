@@ -117,7 +117,7 @@ Bodies with a few beam partials (geometry.js family), strike position selecting 
 
 ## M7: A movie of a saved Grove performance (status: done 2026-11-01, Astra c33a47a; proposal 016; core, audio evidence and page film controls by Astra, all approved; Fable's independent verifier tools/verify-grove-movie.mjs passed at the full level on the smoke fixture and on the first real page performance; cancellation verified incl. a deterministic abort at frame 9)
 
-## M8: Rest, a damping contact (status: proposed 2026-11-01; docs/proposals/017-rest-damping-contact.md)
+## M8: Rest, a damping contact (status: in progress 2026-11-01; proposal 017 accepted by Astra; kernel, engine and recipe by Fable: exact state stepper Φ = exp(S h) with contact damping, allocation-free, no-rest output equal to the bank within 1e-6 of peak, energy monotone, split cross-check converging at third order per step, 343 precomputed contact states for three zones × two strengths, engine cost measured ≈ 2 % of real time at 48 kHz in Node for dim 18; Astra: scheduling primitive approved, worklet engine and interaction next)
 
 The first gesture that changes the instrument rather than the input: a viscous contact at a point on a shell, exact by a state stepper between gesture boundaries, equivalence-tested against the modal sums; capture v2 with contacts; live path moves to a worklet stepper only after equivalence is proven.
 

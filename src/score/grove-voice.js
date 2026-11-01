@@ -48,14 +48,19 @@ function partialFamily(config) {
 /** Equal-power stereo pans from normalized layout.x, scaled 1/√N (the Grove's stated pickup convention, not radiation). */
 export const grovePans = grove => grove.layout.map(({ x }) => [Math.cos((x + 1) * Math.PI / 4) / Math.sqrt(grove.bodies.length), Math.sin((x + 1) * Math.PI / 4) / Math.sqrt(grove.bodies.length)]);
 
-/** Build the voice. Pure; returns deep-frozen data; no sample rate anywhere. */
-export function createGroveVoice(grove, config = DEFAULT_VOICE_CONFIG) {
-  const g = JSON.parse(canonicalGrove(grove)), c = JSON.parse(canonicalVoiceConfig(config)), n = g.bodies.length;
+/** The modal network of a canonical grove under a canonical voice config (deterministic; rebuilt on demand, e.g. for the Rest recipe). */
+export function voiceSystem(g, c) {
   const family = partialFamily(c);
   const bodies = g.bodies.map(b => ({ mass: b.mass, frequencies: family.ratios.map(r => b.hz * r), decayRates: family.ratios.map(r => g.loss * r), shape: family.shape }));
   // Bridge stiffness exactly as groveSystem states it (coupling · m_a · ω_a²), divided by the attachment shape squared so partials: 1 reproduces today's Grove.
   const edges = g.bridges.map(e => ({ a: e.a, b: e.b, kc: e.coupling * g.bodies[e.a].mass * (2 * Math.PI * g.bodies[e.a].hz) ** 2 / (family.attachFundamental * family.attachFundamental), ua: c.attachU, ub: c.attachU }));
-  const system = modalNetwork({ bodies, edges }), pans = grovePans(g);
+  return { system: modalNetwork({ bodies, edges }), family };
+}
+
+/** Build the voice. Pure; returns deep-frozen data; no sample rate anywhere. */
+export function createGroveVoice(grove, config = DEFAULT_VOICE_CONFIG) {
+  const g = JSON.parse(canonicalGrove(grove)), c = JSON.parse(canonicalVoiceConfig(config)), n = g.bodies.length;
+  const { system, family } = voiceSystem(g, c), pans = grovePans(g);
   const strikes = c.positions.map(u => g.bodies.map((_, b) => system.strike(b, u, 1)));
   // One pickup scale over every position × struck body × pickup body.
   let peak = 1e-300;

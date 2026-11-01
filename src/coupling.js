@@ -322,3 +322,113 @@ export function modalNetwork({ bodies: input, edges = [] } = {}) {
   };
   return system;
 }
+
+// ---- state stepper with contact damping (proposal 017: Rest) ----
+// Coordinates: mass-normalized displacement y = √m · q over all modal coordinates of a modalNetwork, state x = [y; ẏ].
+// Free dynamics: ÿ = −A y − C_free ẏ with C_free = Vᵀ diag(2γ_r) V, i.e. exactly the classical-damping model the modal sums use,
+// so with no contact the stepper and the modal sums are the same model. A rest adds a viscous point contact on one body:
+// force −c · (wᵀ q̇_b) · w on that body's partials, w = φ_b(u); in mass-normalized coordinates that is C_touch = (c / m_b) · w wᵀ.
+// Between gesture boundaries the system is linear and time-invariant, so x(t + h) = exp(S h) x(t) exactly; Φ = exp(S h) is
+// computed once per sample rate by scaling and squaring, and stepping is one matrix-vector product per sample.
+export const CONTACT_MAX_DAMPING = 1e6;
+
+const matMul = (P, Q, n) => { const R = new Float64Array(n * n); for (let i = 0; i < n; i++) for (let k = 0; k < n; k++) { const p = P[i * n + k]; if (p === 0) continue; for (let j = 0; j < n; j++) R[i * n + j] += p * Q[k * n + j]; } return R; };
+/** exp(M) for a dense n×n matrix by scaling and squaring with a Taylor series (‖M/2^s‖₁ ≤ 0.5, 24 terms). */
+export function matrixExponential(M, n) {
+  let norm = 0; for (let j = 0; j < n; j++) { let s = 0; for (let i = 0; i < n; i++) s += Math.abs(M[i * n + j]); norm = Math.max(norm, s); }
+  if (!Number.isFinite(norm)) throw new RangeError('matrix is not finite.');
+  const s = norm > 0.5 ? Math.ceil(Math.log2(norm / 0.5)) : 0, scale = 2 ** -s;
+  const X = Float64Array.from(M, v => v * scale);
+  let result = new Float64Array(n * n), term = new Float64Array(n * n);
+  for (let i = 0; i < n; i++) { result[i * n + i] = 1; term[i * n + i] = 1; }
+  for (let k = 1; k <= 24; k++) { term = matMul(term, X, n); for (let i = 0; i < n * n; i++) term[i] /= k; for (let i = 0; i < n * n; i++) result[i] += term[i]; }
+  for (let i = 0; i < s; i++) result = matMul(result, result, n);
+  return result;
+}
+
+/** The contact damping matrix (mass-normalized, n×n) of a rest on `body` at position `u` with viscous coefficient c (N·s/m). */
+export function contactDamping(network, { body, u, c }) {
+  const { n, sizes, offsets, snapshot } = network;
+  if (!Number.isInteger(body) || body < 0 || body >= network.bodies) throw new Error(`contact body must be 0..${network.bodies - 1}.`);
+  if (!Number.isFinite(u) || u < 0 || u > 1) throw new Error('contact position must be in [0, 1].');
+  if (!Number.isFinite(c) || c < 0 || c > CONTACT_MAX_DAMPING) throw new Error(`contact damping must be in [0, ${CONTACT_MAX_DAMPING}].`);
+  const w = snapshot[body].shape(u); if (!Array.isArray(w) || w.length !== sizes[body] || !w.every(Number.isFinite)) throw new Error('shape must return one finite weight per partial.');
+  const C = new Float64Array(n * n), scale = c / snapshot[body].mass, o = offsets[body];
+  for (let j = 0; j < sizes[body]; j++) for (let k = 0; k < sizes[body]; k++) C[(o + j) * n + (o + k)] = scale * w[j] * w[k];
+  return C;
+}
+
+/** The free damping matrix the modal sums imply: C_free = Vᵀ diag(2γ) V in mass-normalized coordinates. */
+export function freeDamping(network) {
+  const { n, vectors, gammas } = network, C = new Float64Array(n * n);
+  for (let r = 0; r < n; r++) for (let i = 0; i < n; i++) { const vi = 2 * gammas[r] * vectors[r][i]; if (vi === 0) continue; for (let j = 0; j < n; j++) C[i * n + j] += vi * vectors[r][j]; }
+  return C;
+}
+
+/** Φ = exp(S h) for S = [[0, I], [−A, −(C_free + Σ contacts)]], h = 1/sampleRate; returns { phi, n, dim: 2n, step(x) }. */
+export function stateStepper(network, { contacts = [], sampleRate } = {}) {
+  if (!Number.isInteger(sampleRate) || sampleRate < 1000 || sampleRate > 384000) throw new Error('sampleRate must be an integer in 1000..384000.');
+  const { n, A } = network, dim = 2 * n, h = 1 / sampleRate, C = freeDamping(network);
+  for (const contact of contacts) { const Ct = contactDamping(network, contact); for (let i = 0; i < n * n; i++) C[i] += Ct[i]; }
+  // Balance the state so displacement and velocity rows have similar scale (ẏ ~ ω y): x_b = [y; ẏ/ω₀] with ω₀ = √‖A‖₁.
+  // That keeps ‖S h‖ near ω_max h instead of ω_max² h, so far fewer squarings and far less roundoff; Φ is mapped back.
+  let aNorm = 0; for (let j = 0; j < n; j++) { let c = 0; for (let i = 0; i < n; i++) c += Math.abs(A[i][j]); aNorm = Math.max(aNorm, c); }
+  const w0 = Math.sqrt(aNorm) || 1, S = new Float64Array(dim * dim);
+  for (let i = 0; i < n; i++) { S[i * dim + (n + i)] = h * w0; for (let j = 0; j < n; j++) { S[(n + i) * dim + j] = -A[i][j] * h / w0; S[(n + i) * dim + (n + j)] = -C[i * n + j] * h; } }
+  const phiB = matrixExponential(S, dim), phi = new Float64Array(dim * dim);
+  for (let i = 0; i < dim; i++) for (let j = 0; j < dim; j++) phi[i * dim + j] = phiB[i * dim + j] * (i < n ? 1 : w0) / (j < n ? 1 : w0);
+  /** Allocation-free: writes Φ x into out (caller-owned, must not alias x). */
+  const stepInto = (x, out) => { if (out === x) throw new Error('stepInto: out must not alias x.'); for (let i = 0; i < dim; i++) { let s = 0; const row = i * dim; for (let j = 0; j < dim; j++) s += phi[row + j] * x[j]; out[i] = s; } return out; };
+  const step = x => stepInto(x, new Float64Array(dim));
+  return Object.freeze({ phi, n, dim, sampleRate, contacts: Object.freeze(contacts.map(c => Object.freeze({ ...c }))), step, stepInto });
+}
+
+/** The mass-normalized state the modal sums give at time t for strikes [{ body, u, J, time }] (bodies at rest before the first). */
+export function stateAt(network, strikes, t) {
+  const { n, vectors, gammas, omegaD } = network, x = new Float64Array(2 * n);
+  for (const k of strikes) {
+    const tau = t - k.time; if (tau < 0) continue;
+    const { coeff } = network.strike(k.body, k.u, k.J);
+    for (let r = 0; r < n; r++) {
+      const e = coeff[r] * Math.exp(-gammas[r] * tau), s = Math.sin(omegaD[r] * tau), c = Math.cos(omegaD[r] * tau), qr = e * s, qdr = e * (omegaD[r] * c - gammas[r] * s);
+      for (let i = 0; i < n; i++) { x[i] += qr * vectors[r][i]; x[n + i] += qdr * vectors[r][i]; }
+    }
+  }
+  return x;
+}
+
+/** The impulse a strike adds to the mass-normalized velocity: Δẏ = J · φ_b(u) / √m_b on the struck body's partials. */
+export function strikeImpulse(network, { body, u, J = 1 }) {
+  const { n, sizes, offsets, snapshot } = network, d = new Float64Array(2 * n), w = snapshot[body].shape(u);
+  for (let j = 0; j < sizes[body]; j++) d[n + offsets[body] + j] = J * w[j] / Math.sqrt(snapshot[body].mass);
+  return d;
+}
+
+/** Free response from a state under the classical damping: x(τ) by modal sums, exact for τ ≥ 0 (used after a hand lifts). */
+export function freeResponseFromState(network, x0) {
+  const { n, vectors, gammas, omegaD } = network;
+  const q0 = vectors.map(v => { let s = 0; for (let i = 0; i < n; i++) s += v[i] * x0[i]; return s; }), qd0 = vectors.map(v => { let s = 0; for (let i = 0; i < n; i++) s += v[i] * x0[n + i]; return s; });
+  return tau => {
+    const x = new Float64Array(2 * n);
+    for (let r = 0; r < n; r++) {
+      const e = Math.exp(-gammas[r] * tau), s = Math.sin(omegaD[r] * tau), c = Math.cos(omegaD[r] * tau), b = (qd0[r] + gammas[r] * q0[r]) / omegaD[r];
+      const qr = e * (q0[r] * c + b * s), qdr = e * (qd0[r] * c - (omegaD[r] * q0[r] + gammas[r] * b) * s);
+      for (let i = 0; i < n; i++) { x[i] += qr * vectors[r][i]; x[n + i] += qdr * vectors[r][i]; }
+    }
+    return x;
+  };
+}
+
+/** Displacement of body b at pickup position p from a state: Σ_j φ_bj(p) y_j / √m_b. */
+export function statePickup(network, x, body, p) {
+  const { sizes, offsets, snapshot } = network, w = snapshot[body].shape(p); let s = 0;
+  for (let j = 0; j < sizes[body]; j++) s += w[j] * x[offsets[body] + j];
+  return s / Math.sqrt(snapshot[body].mass);
+}
+
+/** Mechanical energy of a state: ½ ẏᵀẏ + ½ yᵀ A y (mass-normalized), non-increasing under any non-negative damping. */
+export function stateEnergy(network, x) {
+  const { n, A } = network; let e = 0;
+  for (let i = 0; i < n; i++) { e += 0.5 * x[n + i] * x[n + i]; for (let j = 0; j < n; j++) e += 0.5 * x[i] * A[i][j] * x[j]; }
+  return e;
+}
