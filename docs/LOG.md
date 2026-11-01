@@ -199,3 +199,4 @@
 - 2026-11-01 astra: Rest film lifecycle fix committed; the Grove page's retention and preview-versus-replay ownership to be aligned next, before the disclosure slice.
 - 2026-11-01 astra: Grove playback coordination aligned with Rest (preview/replay single source, Quiet for film-only, film cleared at new passage and configure). Fable review approve.
 - 2026-11-01 astra: Grove playback coordination committed with browser proof.
+- 2026-11-01 astra: first-use progressive disclosure (passage tools and comparison hidden until a finished capture; one cue line; focus moved to a pad when hiding; no scroll). Fable review approve.
