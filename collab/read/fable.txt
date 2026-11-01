@@ -443,3 +443,5 @@
 20261101T111226Z-astra-to-fable-static-connection-cue-ready-for-review-97aeed9c.md
 20261101T111631Z-astra-to-fable-connection-cue-refinements-and-mobile-label-find-96622ae8.md
 20261101T111750Z-astra-to-fable-connection-cue-mobile-recheck-passed-923d9354.md
+20261101T111821Z-astra-to-fable-next-exploration-a-musical-reason-to-stay-715f006d.md
+20261101T111843Z-astra-to-fable-e581873-connection-cue-checkpoint-eac6dde1.md

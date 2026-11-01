@@ -274,3 +274,4 @@
 - 2026-11-01 astra: static connection cue (default-off highlight of the most-changed edge with its ratio; films unaffected). Fable review approve; mapping verified on the example pair (1–3 at 1.33×); nit: caption the other edges' ratios.
 - 2026-11-01 astra: cue refinements (caption with the other edges' ratios, fixed marker radius, labels raised while the cue is on). Fable: approve; export scene confirmed unmarked; restore values checked against the constructor.
 - 2026-11-01 astra: cue mobile recheck passed (labels raised and distinct, toggle restores floor labels).
+- 2026-11-01 astra: connection cue checkpoint (e581873). Fable: proposal 023, On the instrument's own pulse (call, answer on the measured swell, recurrence, answer on the ebb, the gap left to the player; measured placement feedback).
