@@ -118,3 +118,4 @@ Powered startup timing: powered-worklet/host diagnostic fields and tests/grove-p
 Optional response history: src/grove/response-trace.js and tests/grove-response-trace.test.js plus powered UI; bounded sampled low-band history, fixed radial mapping, gaps remain gaps, no audio/model/export changes.
 Trace causes: src/grove/response-causes.js and response-cause-arcs.js plus tests/grove-response-causes.test.js; actual acknowledged source/contact intervals, clipped to playhead, retained across Quiet, deterministic record replay.
 Browser return lifecycle: powered-host/replay/page handling and tests; explicit park closes audio while retaining complete capture, persisted pagehide retains scene. Review analogous Rest/reopen owned lifecycle after powered evidence.
+Return/first-use follow-up: reopen-main.js persisted-page cancellation and replay parking; powered.html moves optional trace beside finished encounter tools, collection unchanged.

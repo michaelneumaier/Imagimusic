@@ -33,7 +33,8 @@ $('quiet').onclick=()=>{replay.stop();status('Quiet. Your reopened passage is st
 $('save').onclick=()=>{const result=session.result;if(!result)return;const url=URL.createObjectURL(new Blob([stereoWav(result.pcm)],{type:'audio/wav'})),a=document.createElement('a');a.href=url;a.download=`imagimusic-rest-${result.record.grove.seed}.wav`;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();if(session.state==='preparing')$('cancel').click();replay.stop();status('Quiet. Nothing is playing.');}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)replay.stop();});
-window.addEventListener('pagehide',()=>{operation++;session.dispose();replay.dispose();sculpture?.dispose();world?.dispose();});
+window.addEventListener('pagehide',event=>{operation++;if(event.persisted){session.cancel();replay.park();return;}session.dispose();replay.dispose();sculpture?.dispose();world?.dispose();});
+window.addEventListener('pageshow',event=>{if(event.persisted){sync();status(session.result?'Your passage is here. Listen when you’re ready.':'Welcome back. Choose a gesture file when you’re ready.');}});
 function draw(){
  if(shown&&world){const time=played===shown?replay.time():0,frame=restReplayFrame(shown.picture,time),contacts=frame.contacts??[];applyGroveScene(sculpture,frame,shown.record.grove.bodies.map((_,i)=>contacts[i]?contacts[i].strength===1?1:.4:0),shown.record.grove.bodies.map((_,i)=>contacts[i]?shown.record.zones[contacts[i].zone]:undefined));world.render();$('phase').textContent=`${replay.state==='playing'?'LISTENING':replay.state==='ended'?'SETTLED':replay.state==='suspended'?'PAUSED':'READY'} · ${time.toFixed(1)} / ${shown.picture.duration.toFixed(1)} s`;}
  requestAnimationFrame(draw);
