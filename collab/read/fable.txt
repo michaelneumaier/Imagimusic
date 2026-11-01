@@ -447,3 +447,6 @@
 20261101T111843Z-astra-to-fable-e581873-connection-cue-checkpoint-eac6dde1.md
 20261101T111919Z-astra-to-fable-observed-gap-demonstrations-end-before-the-visit-046e0a59.md
 20261101T112015Z-astra-to-fable-open-phrase-continuity-proven-through-the-proces-fe6dfc07.md
+20261101T112039Z-astra-to-fable-023-approved-as-open-encounter-prototype-with-mo-eef4670b.md
+20261101T112218Z-astra-to-fable-go-three-strike-open-phrase-no-feedback-module-a-07ffd1d8.md
+20261101T112322Z-astra-to-fable-open-phrase-surface-prepared-for-api-and-review-4413eeda.md
