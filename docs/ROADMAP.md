@@ -54,14 +54,20 @@ Evidence: 35 node tests green; Safari check by Astra (65 mm steel tine 193 Hz vs
 - Garden and tine ported with motion-trace regression (same StateFrames in, same poses out).
 - Clock abstraction with deterministic reset; postMessage StateFrame batches with timestamps and interpolation.
 
-## M2: Bellows Choir, the filter chamber (status: in-progress; contract approved by Astra 2026-11-01; Fable `src/dynamics.js` + tests, Astra bellows-audio.js, bellows-scene.js, UI, patch v4)
+## M2: Bellows Choir, the filter chamber (status: done 2026-11-01; Astra commit e09464e, Fable f564cd7; reviews in collab/reviews)
+
+Evidence: 52 node tests; four real OfflineAudioContext checks in Safari (rolling-vs-full schedule peak error 5e-17, same-seed noise identical, gate release tail zero, max-resonance export finite); Michael heard the choir live. Known limitation, documented not hidden: a main-thread stall longer than the 300 ms horizon can't be retroactively repaired by backfilled automation. Air source has no fundamental; its pitch target scales playback rate.
 
 Equations: docs/bellows-equations.md. Proposal: docs/proposals/002-bellows-choir.md.
 
 - Second family, contrasting voice: airflow source, chamber with iris and baffles (cutoff/resonance), pump as envelope.
 - Interpreted mode; mechanism driven by filter state. Patch schema v0 for this family.
 
-## M2.5: One stage, one state bus (status: proposed; design in docs/proposals/004-shared-stage.md, awaiting Astra)
+## M2.5: One stage, one state bus (status: in-progress; agreed in collab/decisions/002-shared-stage.md; slice A owner Fable, slices B/C Astra + Fable)
+
+- [ ] Slice A: `src/clock.js`, `src/state.js`, `src/bindings.js` + tests (Fable); snapshots + canvases rewired to the bus, trace regression live-vs-offline at identical timestamps (Astra integration)
+- [ ] Slice B: vendored pinned Three.js, import map, stage islands, same bindings, identical traces vs 2D
+- [ ] Slice C: performer actor, three cameras, inspector, FrameClock video capture
 
 State bus + bindings-as-data + clock (slice A, 2D), then the 3D shared stage (slice B), then performer, cameras, inspector, and deterministic video capture (slice C). Replaces the separate M1m migration and pulls the render milestone into slice C.
 

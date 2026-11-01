@@ -15,3 +15,5 @@
 - 2026-11-01 fable: src/dynamics.js (Bellows Choir control model: linear ADSR, onset-relative LFO, cutoff/pitch/amp mappings, noteOn-anchored schedule) + 11 tests; docs/bellows-equations.md; M1b marked done as bounded linear-modal proof; M2 in progress.
 - 2026-11-01 astra: Bellows Choir integrated (bellows-audio/scene/ui, patch v4), real OfflineAudioContext browser checks pass, Michael listening live.
 - 2026-11-01 fable: Bellows review (approve-with-fixes, rolling-window gap); proposal 004 shared stage / state bus / bindings / clock; roadmap M2.5 added, M1m superseded.
+- 2026-11-01 astra: M2 committed e09464e, 52 tests, review fixes landed, Michael hears the choir.
+- 2026-11-01 fable: decision 002 (shared stage) agreed; slice A modules clock/state/bindings written, tests in progress; M2 marked done.
