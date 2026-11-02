@@ -60,7 +60,12 @@ export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
 /** Amplified response envelopes animate shell width and light, never edge flow. */
 /** Rim radius of the played-now dot: just outside the strike ring (torus radius 0.65), scaled with it. */
 export const STRIKE_DOT_RADIUS=.74;
-export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[],{distinguishRemembered=false}={}){
+/** Floor halo opacity: the same low-band envelope, one fixed constant for every family and body. Baseline gain 2 is the picture as it has always
+ * been; the opt-in gain 10 ("Follow the ring", Astra's page option) caps at an envelope of 0.065, just above the largest peak the page's own
+ * strike produces (0.061, which reads 0.76), so nothing is normalised per body. Opacity only: no radius, colour or motion change. */
+export const HALO_OPACITY_BASE=.15,HALO_OPACITY_CAP=.65,HALO_GAIN_BASELINE=2,HALO_GAIN_FOLLOW=10;
+export const haloOpacity=(level,followRing=false)=>HALO_OPACITY_BASE+Math.min(HALO_OPACITY_CAP,Math.max(0,level)*(followRing?HALO_GAIN_FOLLOW:HALO_GAIN_BASELINE));
+export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[],{distinguishRemembered=false,followRing=false}={}){
  const markers=groveStrikeMarkers(strikes,scene.bodies.length);
  for(const [i,body] of scene.bodies.entries()){
   const level=Math.max(0,envelope[i]??0),pulse=Math.min(.2,level*.6);
@@ -68,6 +73,6 @@ export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],posit
   const marker=markers[i];body.strike.visible=!!marker;body.strike.material.opacity=marker?.opacity??0;body.strike.position.y=marker?(0.5-marker.u)*2.6*body.spec.scale[1]:0;body.strike.scale.setScalar(marker?.scale??1);
   const dot=distinguishRemembered&&marker&&!marker.remembered;body.strikeDot.visible=!!dot;body.strikeDot.material.opacity=dot?marker.opacity:0;body.strikeDot.position.set(STRIKE_DOT_RADIUS*(marker?.scale??1),body.strike.position.y,0);
   body.form.scale.set(body.spec.scale[0]*(1+pulse),body.spec.scale[1],body.spec.scale[2]*(1+pulse));
-  body.shell.material.emissiveIntensity=.025+Math.min(.7,level*2);body.core.material.emissiveIntensity=.1+Math.min(1.2,level*3);body.halo.material.opacity=.15+Math.min(.65,level*2);
+  body.shell.material.emissiveIntensity=.025+Math.min(.7,level*2);body.core.material.emissiveIntensity=.1+Math.min(1.2,level*3);body.halo.material.opacity=haloOpacity(level,followRing);
  }
 }

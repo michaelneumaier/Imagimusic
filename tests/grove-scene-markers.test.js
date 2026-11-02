@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 // The grove scene draws body labels on a canvas; under Node a minimal stand-in is enough, since nothing here renders.
 globalThis.document ??= { createElement: () => ({ width: 0, height: 0, getContext: () => ({ font: '', fillStyle: '', textAlign: '', fillText() {} }) }) };
-const { createGroveScene, applyGroveScene, STRIKE_DOT_RADIUS } = await import('../src/grove/scene.js');
+const { createGroveScene, applyGroveScene, STRIKE_DOT_RADIUS, haloOpacity } = await import('../src/grove/scene.js');
 const { composeGrove } = await import('../src/score/grove.js');
 
 const pose = scene => scene.bodies.map(b => [b.form.scale.x, b.strike.visible, b.strike.material.opacity, b.strike.position.y, b.strike.scale.x, b.gesture.visible]);
@@ -35,4 +35,21 @@ test('with the option on, only a newly played strike gets the rim dot, following
   assert.equal(played.strike.visible, true);
   applyGroveScene(scene, { strikes: [] }, [], [], { distinguishRemembered: true });
   assert.equal(played.strikeDot.visible, false, 'gone with the ring');
+});
+
+test('Follow the ring: off is the baseline halo mapping on every route; on changes only the halo gain to a fixed function of the envelope', () => {
+  const baseline = level => 0.15 + Math.min(0.65, level * 2);
+  const off = createGroveScene(composeGrove({ seed: 3 })), on = createGroveScene(composeGrove({ seed: 7 })), levels = [0, 0.0107, 0.03, 0.061, 0.2];
+  for (const level of levels) {
+    applyGroveScene(off, { envelope: [level, level, level], strikes }, [], [], { distinguishRemembered: true });
+    assert.deepEqual(off.bodies.map(b => b.halo.material.opacity), [baseline(level), baseline(level), baseline(level)], 'byte-identical baseline when the option is absent or false');
+    applyGroveScene(off, { envelope: [level, level, level], strikes }, [], [], { followRing: false });
+    assert.equal(off.bodies[0].halo.material.opacity, baseline(level));
+  }
+  const everything = s => s.bodies.map(b => [b.form.scale.x, b.shell.material.emissiveIntensity, b.core.material.emissiveIntensity, b.halo.scale.x, b.halo.material.color.getHex(), b.strike.visible, b.strikeDot.visible]);
+  applyGroveScene(on, { envelope: [0.061, 0.0107, 0.03], strikes }, [], [], { followRing: false }); const before = everything(on);
+  applyGroveScene(on, { envelope: [0.061, 0.0107, 0.03], strikes }, [], [], { followRing: true });
+  assert.deepEqual(everything(on), before, 'nothing but the halo opacity changes');
+  assert.deepEqual(on.bodies.map(b => +b.halo.material.opacity.toFixed(3)), [0.76, 0.257, 0.45], 'one fixed constant: 0.15 + min(0.65, level × 10)');
+  assert.equal(haloOpacity(0.065, true), 0.8, 'the cap begins at an envelope of 0.065'); assert.equal(haloOpacity(1, true), 0.8); assert.equal(haloOpacity(-1, true), 0.15);
 });
