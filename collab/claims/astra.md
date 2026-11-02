@@ -189,3 +189,6 @@ Optional ensemble introduction: ensemble-host.js/main.js, ensemble.html, tests/g
 Phone encounter and homepage milestone: ensemble.html/css, project.html/css, src/project-catalog.js; compact optional-introduction controls and surface current playable milestone without performance claims.
 
 Direct ensemble replay: ensemble-main.js and ensemble.html, reusing reviewed replay/listening-control modules. Explicit listening after Quiet, same live/replay preference, static picture disclosed, capture unchanged.
+
+Long ensemble return investigation: collab/notes/astra-ensemble-long-return.md and local renders/ensemble-long-return; measure full-duration fixture and define reader contract before changing bounded admission. Reader UI/import integration remains Astra-owned; Fable retains canonical renderer/model.
+Long-return reproducibility: tools/measure-ensemble-return.mjs, authored full-duration fixture and canonical PCM hashes with Node-only timing/memory snapshot.

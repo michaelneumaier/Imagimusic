@@ -1,0 +1,84 @@
+# Returning to a full ensemble passage
+
+2026-11-02 · Astra · investigation, not an expanded reader release
+
+The live ensemble ends automatically at 120 seconds from its first accepted
+gesture, followed by a 25 ms fade. Its reader currently refuses any total
+length over 30 seconds. A visitor can therefore keep a valid passage which the
+linked reader refuses. Direct Listen back now works during the same visit,
+but does not resolve returning later from a gesture file.
+
+## Admission contract proposed to Fable
+
+Accept an ending frame through REST_MAX_SECONDS * sampleRate, plus the
+canonical ending fade. A limit of 120 seconds on the total would still reject
+the automatic ending. Preserve strict identity/admission, 256 KiB file bounds,
+and 8–48 kHz for this first extension. Explicitly retain the sample-rate/file
+limitations in page copy; do not claim every possible live record is admitted.
+No resampling, tail truncation, synthetic silence or schema change.
+
+Preparation remains in a worker which Cancel opening terminates. A previous
+successful result remains available if replacement fails or is cancelled.
+Playback still requires Listen. On long reconstructions, the page should say
+that preparation can take time and Cancel leaves the previous passage intact.
+
+## Resource concern
+
+renderEnsembleRecord currently retains all three stereo Float32 part buffers
+and the stereo mix. At 120.025 seconds / 48 kHz, those buffers alone require
+184,358,400 bytes (about 175.8 MiB), before recipe banks, engine allocations,
+worker overhead, a previous reader result or the playback AudioBuffer copy.
+The worker transfers only the final mix; this does not reduce its render peak.
+
+A requested model-side investigation is a mix-only renderer that advances the
+three existing engines on one clock and retains only the final mix. It must
+retain the exact Float32 part rounding, fade multiplication and Float64 sum
+order; the current full renderer remains a reference for equivalence. This is
+an implementation hypothesis, not a completed optimization or API agreement.
+
+## Evidence produced
+
+Local renders/ensemble-long-return/ contains authored fixtures derived from
+the existing short demonstration with their ending extended to 120 seconds,
+plus the 25 ms fade. They are not recordings of a human playing for two minutes.
+The reproducible tool composes the authored gestures independently at each
+sample rate; it does not resample a saved recording. The earlier ad-hoc 8 kHz
+probe retimed those same gesture frames. The 48 kHz fixture preserves the
+original gesture frames.
+
+The 8 kHz fixture renders 960,200 frames in approximately 3.76 seconds in Node
+on this development machine. Retained part-and-mix PCM is 30,726,400 bytes.
+Detailed process memory is in probe-8k.json; it is a post-render process
+snapshot, not a measured memory peak. These timings do not establish browser,
+phone or realtime performance. Browser cancellation and full-duration opening
+remain to be checked once a bounded implementation is agreed and built.
+
+## Experience after this repair
+
+The musical reason to preserve return is that an unhurried passage can remain
+recognizable across visits. This supports recurrence and personal meaning
+without claiming the instrument remembers a person or interprets a mental
+state. Fable has been asked for a concrete musical exploration that deepens
+attention/recurrence without adding a large control panel. The existing
+optional introduction should remain optional and clearly authored.
+
+Reproduce in separate Node processes:
+
+```sh
+node tools/measure-ensemble-return.mjs 8000
+node tools/measure-ensemble-return.mjs 48000
+```
+
+The tool writes ensemble-8k.json / ensemble-48k.json and corresponding
+-report.json files with canonical record and native-endian Float32 channel
+hashes. It reports render-only elapsed time separately from recipe preparation.
+The first reproducible 8 kHz run took 2.93 seconds; the initial ad-hoc probe's
+3.76 seconds included subsequent canonicalization. Neither is a browser claim.
+Fable review was requested; no review response is claimed here.
+
+The reproducible 48 kHz run took 12.25 seconds for rendering alone and retained
+184,358,400 bytes of part/mix PCM. Canonical record SHA-256:
+a83589be256d67e7908e9a65ef140506772b57307d0e7a47a5cd82bbd3dfaeea.
+Channel hashes and process snapshots are preserved in ensemble-48k-report.json.
+The earlier 15.75-second ad-hoc run included canonicalization after rendering;
+do not compare those durations as repeated measurements of the same scope.

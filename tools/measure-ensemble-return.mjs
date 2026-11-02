@@ -1,0 +1,29 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {composeGrove} from '../src/score/grove.js';
+import {retuneGroveCluster} from '../src/score/grove-tuning.js';
+import {DEFAULT_VOICE_CONFIG} from '../src/score/grove-voice.js';
+import {createGroveRestRecipe} from '../src/score/grove-rest.js';
+import {composeEnsemblePhrase,ensembleRecords} from '../src/score/grove-ensemble.js';
+import {ensembleRecordFromParts,canonicalEnsembleRecord,renderEnsembleRecord} from '../src/score/grove-ensemble-record.js';
+import {REST_MAX_SECONDS} from '../src/rest/limits.js';
+
+// Each invocation is a fresh process: do not infer memory peaks from these snapshots.
+const sampleRate=Number(process.argv[2]??48000),out=process.argv[3]??'renders/ensemble-long-return';
+if(![8000,48000].includes(sampleRate))throw new Error('Choose 8000 or 48000 Hz.');
+const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+const recipes=[48,51,55].map(note=>createGroveRestRecipe(retuneGroveCluster(composeGrove({seed:3}),note),DEFAULT_VOICE_CONFIG,{sampleRate}));
+const phrase=composeEnsemblePhrase(recipes,{together:false,velocity:.5});
+const parts=ensembleRecords(recipes,phrase);
+for(const part of parts)part.ended.frame=REST_MAX_SECONDS*sampleRate;
+const record=ensembleRecordFromParts(parts),source=canonicalEnsembleRecord(record)+'\n';
+const before=process.memoryUsage(),start=performance.now(),pcm=renderEnsembleRecord(record),elapsedMs=performance.now()-start,after=process.memoryUsage();
+const frames=pcm.channels[0].length;
+if(frames!==record.ended.frame+record.ended.fadeFrames)throw new Error('Unexpected rendered length.');
+const report={version:1,description:'Authored short demonstration with ending extended to the live duration limit; no live/device recording.',node:process.version,sampleRate,frames,duration:frames/sampleRate,renderElapsedMs:elapsedMs,recordSha256:sha(source),channelSha256:pcm.channels.map(ch=>sha(new Uint8Array(ch.buffer,ch.byteOffset,ch.byteLength))),retainedPcmBytes:[...pcm.channels,...pcm.parts.flatMap(p=>p.channels)].reduce((sum,ch)=>sum+ch.byteLength,0),memoryBefore:before,memoryAfter:after,limits:'Node-only elapsed time and process snapshots, not browser/phone/realtime performance or peak memory. Three part buffers and one mix remain live in memoryAfter. PCM hashes use native-endian Float32 bytes. This sparse fixture is not a worst-case contact/event workload.'};
+await fs.mkdir(out,{recursive:true});
+const stem=`ensemble-${sampleRate/1000}k`;
+await fs.writeFile(path.join(out,stem+'.json'),source);
+await fs.writeFile(path.join(out,stem+'-report.json'),JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report,null,2));
