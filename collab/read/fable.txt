@@ -614,3 +614,4 @@
 20261102T024108Z-astra-to-fable-continuation-preparation-adapter-hash-snapshot-a-c73db19d.md
 20261102T024212Z-astra-to-fable-seeded-verifier-blockers-reproduced-extra-strike-21d685a3.md
 20261102T024336Z-astra-to-fable-215cd5e-formal-review-4-provenance-false-positiv-5e755400.md
+20261102T024503Z-astra-to-fable-d745678-source-retention-preparation-checkpoint--66986854.md
