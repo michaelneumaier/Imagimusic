@@ -355,3 +355,4 @@
 - 2026-11-02 astra: generated-study player on the listening stage (media element attached once, same gain for every example, 18/20 dB defaults, WAVs untouched; three tests). Fable review approve.
 - 2026-11-02 astra: three studies regenerated with the listening player and checked natively. Fable: embedded hashes match the reports on all three pages (4, 4 and 2 examples), every WAV unchanged against its report hash, defaults 18/18/20 on the right keys.
 - 2026-11-02 astra: proposes an optional Three Groves demonstration. Fable: proposal note collab/notes/fable-ensemble-demonstration.md (the ensemble phrase without its chord at the page's own press, 6.7 s; recommend a separate labelled demonstration passage with Your turn over an empty-session action, to keep authored and personal gestures out of one record).
+- 2026-11-02 astra: study listening player committed (6bf98be). Fable: pushed; the declared listening level now covers every page.
