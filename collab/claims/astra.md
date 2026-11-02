@@ -391,3 +391,5 @@ Touch history diagnostic: tests/touch-history-diagnostic.html/js and history-wor
 Touch history comparison: src/touch/history-comparison.js, history-comparison-worker.js, tests/touch-history-comparison.test.js, and owned diagnostic UI. Shared duration/ceiling, explicit settings/pickup scaling, original retained; no audio or production integration.
 
 Optional circular history diagnostic: src/touch/history-layout.js, tests/touch-history-layout.test.js and owned diagnostic. Same samples/shared axes/strike breaks; named static time-circle alternative, strips default, no product promotion or audio changes.
+
+Live Touch still-picture choice: touch.html/css and src/touch/main.js. Match replay's explicit listening preference, initially respecting reduced motion; retain sound, gestures and keyboard/pad feedback while hiding body/striker animation.

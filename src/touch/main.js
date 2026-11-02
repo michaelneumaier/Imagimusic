@@ -7,6 +7,9 @@ import {loomSceneFrame,applyLoomScene} from '../loom/scene.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),pads=[$('left'),$('right')],held=new Map();
 let world,settings,stillAt=0,lastPhase='',lastGesture=null,connectionPending=false;
+$('still-picture').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function describeView(){const still=$('still-picture').checked;$('world').setAttribute('aria-label',still?'A still view of two connected bodies.':'Two coupled resonators: the body’s width and glow follow its modeled vibration envelope.');$('view-note').textContent=still?'A still view. Sound, gestures and pad feedback are unchanged.':'Width and glow follow the modeled response.';}
+$('still-picture').onchange=describeView;describeView();
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
 function controls({state,recording}){
  const playable=!connectionPending&&['ready','playing'].includes(state),has=!!recording?.events.length;
@@ -70,7 +73,7 @@ $('score').onclick=()=>download(JSON.stringify(transport.recording(),null,2),'ap
 const requested=new URLSearchParams(location.search).get('bridge');if(['close-kin','distant-cousins','tight-weave'].includes(requested))$('bridge').value=requested;configure();
 try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();}catch(error){$('world').hidden=true;status('The 3D view is unavailable; the pads can still play the connection.');}
 function draw(){
- const t=transport.time();if(world){const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const frame=transport.session?.visual(t)??{time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]};applyLoomScene(loomSceneFrame(frame,settings,{active:true}),world.loom);world.render();}
+ const t=transport.time();if(world){const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const still=$('still-picture').checked;const resting={time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]};const frame=still?resting:transport.session?.visual(t)??resting;applyLoomScene(loomSceneFrame(frame,settings,{active:!still}),world.loom);world.render();}
  for(const [body,hold] of held)pads[body].style.setProperty('--hold',`${holdVelocity(performance.now()-hold.start)*100}%`);
  const phase=transport.state==='ended'?'QUIET':lastGesture&&t<stillAt?'LISTEN ACROSS THE CONNECTION':transport.state==='preparing'?'PREPARING':transport.state==='idle'?'READY WHEN YOU ARE':'STILL';if(phase!==lastPhase){$('phase').textContent=phase;lastPhase=phase;}
  requestAnimationFrame(draw);
