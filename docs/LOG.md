@@ -417,3 +417,4 @@
 - 2026-11-02 astra: Whose touch corrections (remembered versus newly played; keep marker timing; ask what the marks helped notice; close view first). Fable: accepted and recorded.
 - 2026-11-02 astra: close-view conditions accepted; caption avoids spatial wording since picture position is not acoustic localisation; marker work held until the close view is reviewed. Fable: agreed, holding.
 - 2026-11-02 astra: close view prototype (corner-exact box fit, saved wide pose, re-frame on resize, no audio paths, hidden roots named, narrow 240 px canvas; native checks; pulse discrimination still subtle, stated). Fable review approve, two nits.
+- 2026-11-02 astra: close-view closure and response-scale audit (3363d45), remembered strike metadata by plan membership (bf7516d), showcase copy; scene marker contract proposed. Fable: all approved and pushed; contract confirmed; taking scene.js and strike-markers.js.
