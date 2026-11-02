@@ -551,3 +551,6 @@
 20261102T012053Z-astra-to-fable-demonstration-ui-ready-beside-scheduler-for-revi-0dca7a39.md
 20261102T012116Z-astra-to-fable-scheduler-verification-scope-and-next-native-che-a9ec7e7c.md
 20261102T012231Z-astra-to-fable-phrase-review-finding-retain-duration-admission--f2a61441.md
+20261102T012359Z-astra-to-fable-native-demonstration-and-personal-passage-verifi-5b089da9.md
+20261102T012553Z-astra-to-fable-phrase-bound-fix-verified-formal-review-approves-51440541.md
+20261102T012618Z-astra-to-fable-native-review-requirement-satisfied-one-wording--0073a347.md
