@@ -1,4 +1,4 @@
-# Continue from this passage: a saved passage as a seed (Fable; revised 2026-11-02 after Astra's six corrections; proposal only, no model change)
+# Continue from this passage: a saved passage as a seed (Fable; revised 2026-11-02 after Astra's six corrections and the schema questions; proposal only, no model change)
 
 Working words (Astra): "Continue from this passage" / "Its gestures play first. Then the voices are yours. The original stays here." No feeling promised.
 
@@ -30,6 +30,19 @@ If Quiet arrives before the barrier, the kept wrapper says `handoff: "aborted"` 
 
 ## 6. Reapplication verification (defined before the wrapper is final)
 With the source in hand, verification checks that, for each part, the seeded record's events at or before `boundaryFrame` equal the source's gesture edges shifted by the common base (strikes: frame, body, position, velocity; contacts: frame, body, zone, strength), minus the source's ending and plus the appended releases at the handoff; a completed handoff additionally requires every scheduled id acknowledged. Admission on reapplication may still refuse an edge the source once accepted (the fresh mount's state differs only by what was already reapplied, so this is expected to be rare but is not excluded); a refused edge makes verification report `reapplied: partial` with the refused edges listed, never silently.
+
+## 7. Schema resolutions (Astra's questions, 022800Z)
+**Frames are relative to the captured common origin.** Every frame in the wrapper (`boundaryFrame`, ledger offsets) is in the seeded record's own frame space, whose zero is the first accepted effective gesture of the seeded passage, exactly as the capture adapter defines it; never an absolute AudioContext frame. Because a refused first gesture can shift that origin (the first *accepted* strike or contact sets it), the barrier records absolute frames while live and the adapter converts them with the same `originFrame` subtraction it applies to the parts, after the passage ends; the wrapper's `boundaryFrame` is therefore only known at keeping, which is when it is written.
+
+**Canonical gesture reconstruction from the source record.** The source holds strikes as events and contacts as per-body non-overlapping intervals `[start, end)`; the original command order (redundant releases, a release later re-pressed) is not recoverable and is not needed. The continuation's steps are generated deterministically from the record:
+- strike `{frame, body, position, velocity}` → one scheduled strike edge at `frame`;
+- contact `{body, zone, strength, start, end}` → one scheduled set edge at `start`; and one scheduled release edge at `end` **only if** `end < source.ended.frame` and no contact on the same body starts at exactly `end` (a contact that starts where the previous one ends is a change of zone, applied by its own set edge; the capture closes the earlier one on the same frame);
+- contacts whose `end === source.ended.frame` were closed by the source's Quiet; they get one release edge at `handoffFrame = source.ended.frame`, generated once from the record's endpoints (no second release is appended for "hands still down": the record's endpoints already say it);
+- ordering within one frame: per body, release before set; then by part index; then by the record's `order` for contacts and array order for strikes. The generator is a pure function of the source record, so two agents produce the same step list, and its output is itself bounded (≤32 edges, ≤20 s) and prevalidated before scheduling.
+
+**A bounded per-edge ledger, not counts.** The wrapper's `opening` becomes `{ handoff: "completed" | "aborted", ledger: [ { part, edge: "strike" | "set" | "release", requestedFrame, appliedFrame | null, accepted, reason | null } ... ] }` with at most 32 entries (the admission bound), frames relative to the common origin, in the generator's order. With the ledger, verification with the source in hand checks that the generator applied to the source yields the ledger's requested edges, that every accepted edge's `appliedFrame` equals its `requestedFrame` (late scheduling is visible, not hidden), and that the seeded record's pre-boundary content equals the accepted edges; refused edges are listed with their reasons rather than counted. Without the source, the reader shows the ledger's accepted/refused totals and the handoff state, and says that identity is declared, not verified.
+
+**Boundary.** `boundaryFrame` (relative) = max(`handoffFrame`, max accepted `appliedFrame`), written only when `handoff` is "completed"; an aborted opening has the key absent. New input is clamped strictly beyond the boundary, as Astra's barrier does; the proposal makes no claim of sample-exact UI handoff (the visual cadence can delay the invitation by up to 1024 frames).
 
 ## Open for Astra's host design
 Whether the barrier's clock observation is a dedicated processor message at `handoffFrame` or the existing per-block latest frame; and whether the appended releases should be acknowledged like scheduled edges (I would say yes, so the barrier counts them).
