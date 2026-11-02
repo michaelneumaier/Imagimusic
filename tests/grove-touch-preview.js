@@ -9,9 +9,11 @@ let world,scene,session,time=0,before=false,playing=false,origin=0,animation;
 function stop(){playing=false;$('play').textContent='Play picture';}
 function show(){
  const frame=before?{envelope:[0,0,0],strikes:[]}:session.visual(time);
- applyGroveScene(scene,frame,[],[],{followRing:$('follow-ring').checked});
+ const mapping=$('ring-mapping').value;
+ applyGroveScene(scene,frame,[],[],{followRing:mapping==='amplified'});
+ if(mapping==='gentle')for(const [i,body] of scene.bodies.entries()){const level=Math.max(0,frame.envelope[i]??0);body.halo.material.opacity=.15+.65*level/(level+.1);}
  $('time').value=String(time);$('time-label').value=time.toFixed(2);
- $('status').textContent=`Grove ${$('seed').value} · ${$('voice').selectedOptions[0].textContent} · body ${Number($('body').value)+1} · strength ${$('velocity').value} · ${before?'before touch':time.toFixed(2)+' s after touch'} · ${playing?'playing picture':'frozen'} · silent.`;
+ $('status').textContent=`Grove ${$('seed').value} · ${$('voice').selectedOptions[0].textContent} · body ${Number($('body').value)+1} · strength ${$('velocity').value} · ${before?'before touch':time.toFixed(2)+' s after touch'} · ${playing?'playing picture':'frozen'} · ${$('ring-mapping').selectedOptions[0].textContent} · silent.`;
  $('levels').textContent='Model envelope, bodies 1 / 2 / 3: '+frame.envelope.map(v=>v.toFixed(6)).join(' / ');
 }
 function choose(){
@@ -26,7 +28,7 @@ for(const id of ['seed','voice','body','velocity'])$(id).onchange=choose;
 $('time').oninput=()=>{stop();before=false;time=Number($('time').value);show();};
 $('rest').onclick=()=>{stop();before=true;show();};
 $('restart').onclick=()=>{stop();before=false;time=0;show();};
-$('follow-ring').onchange=show;
+$('ring-mapping').onchange=show;
 $('play').onclick=()=>{if(playing){stop();show();return;}if(time>=4||before)time=0;before=false;origin=performance.now()-time*1000;playing=true;$('play').textContent='Pause picture';show();};
 function draw(now){if(playing){time=Math.min(4,(now-origin)/1000);if(time>=4)stop();show();}if(!document.hidden)world.render();animation=requestAnimationFrame(draw);}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(scene)show();}});
