@@ -297,3 +297,5 @@ Inverse spatial mount: src/inverse/spatial-view.js and tests/inverse-spatial-vie
 Inverse spatial discovery: project.html and src/project-catalog.js; extend the existing workshop entry and history, link the evidence note without a duplicate catalog card.
 
 Inverse repeated-touch invitation: inverse.html/css/src/inverse/main.js; retain only the last admitted body index and source topology for this visit, offer an explicit gated repeat on the current anatomy, no autoplay or new schema. Fable owns the comparison design note.
+
+Inverse view continuity: src/inverse/spatial-view.js, tests/inverse-spatial-view.test.js and main.js; preserve body/overview choice across successful mounts, map bridge views by unordered endpoints, disclose fallback for absent connections, retain prior view/fallback on failed mount.

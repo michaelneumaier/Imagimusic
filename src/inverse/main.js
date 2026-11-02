@@ -126,9 +126,12 @@ function configureViews(){
  $('spatial-view').replaceChildren();
  const choices=[['playing','Bodies and connections'],['overview','Whole support'],...instrument.grove.bodies.map((_,i)=>['body:'+i,'Body '+(i+1)]),...instrument.grove.bridges.map((edge,i)=>['bridge:'+i,`Connection ${edge.a+1}–${edge.b+1}`])];
  for(const [value,label] of choices){const option=document.createElement('option');option.value=value;option.textContent=label;$('spatial-view').append(option);}
+ $('spatial-view').value=spatial.view;
  $('connection').textContent='Tap a connection to inspect what it joins.';viewCaption();
 }
 function viewCaption(){
+ const missing=spatial?.fallback;
+ if(missing){$('view-caption').textContent=`This anatomy has no connection ${missing.a+1}–${missing.b+1}. Showing all bodies and connections instead. The camera stays fixed during a response.`;return;}
  $('view-caption').textContent=$('spatial-view').value==='playing'?'All three bodies and their connections. Ornamental supports may be cropped; the camera stays fixed during a response.':$('spatial-view').value==='overview'?'Whole support. The camera stays fixed while the instrument responds.':'Fixed close view. Other bodies or ornamental supports may be outside the picture; all three numbered controls remain below.';
 }
 $('spatial-view').onchange=()=>{tap?.cancel();spatial?.select($('spatial-view').value);viewCaption();};
