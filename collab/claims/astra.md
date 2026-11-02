@@ -234,3 +234,5 @@ Family geometry exploration: tests/grove-family-preview.html/js and own family n
 Family framing checks: tests/grove-view-framing.test.js, extend actual maximum-response bounds check across the candidate seeds before choosing runtime families.
 Family encounter transaction: src/grove/ensemble-family-mount.js, tests/grove-ensemble-family-mount.test.js, ensemble.html/css and ensemble-main.js; staged visual replacement with successful mount, pending selection isolated, remembered opening uses source groves.
 Family showcase: project.html and src/project-catalog.js; optional family discovery invitation and linked implementation/evidence note, retain remembered-passage entry path.
+Family listening audit: tools/verify-ensemble-family-study.mjs and own review; independently check curated anatomy, identical gesture vocabulary/timing, silent parts, report identities and exact block-mix WAVs before catalog inclusion. Fable owns producer.
+Family-study discovery: src/project-catalog.js, tools/prepare-project-home.mjs and project.html; seventh generated study and direct home invitation after independent artifact audit.

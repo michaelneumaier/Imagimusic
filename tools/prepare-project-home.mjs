@@ -9,7 +9,8 @@ const studies=[
  ['Three Groves','renders/harmonic-groves','tools/render-harmonic-groves.mjs'],
  ['A passage returns','renders/ensemble-return-study','tools/render-ensemble-return-study.mjs'],
  ['A memory, then an answer','renders/ensemble-continuation-study','tools/render-ensemble-continuation-study.mjs'],
- ['One Grove, three bodies','renders/ensemble-body-study','tools/render-ensemble-body-study.mjs']
+ ['One Grove, three bodies','renders/ensemble-body-study','tools/render-ensemble-body-study.mjs'],
+ ['The same touch, three families','renders/ensemble-family-study','tools/render-ensemble-family-study.mjs']
 ];
 const args=process.argv.slice(2);
 if(args.some(arg=>arg!=='--check'))throw new Error('Usage: node tools/prepare-project-home.mjs [--check]');
