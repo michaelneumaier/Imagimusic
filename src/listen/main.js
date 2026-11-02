@@ -8,7 +8,7 @@ import {stereoWav} from '../loom/model.js';
 import {createListeningTransport} from './transport.js';
 const $=id=>document.getElementById(id);
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-let still=reduced.matches,selected,passage,world,chapterIndex=-2;
+let still=reduced.matches,selected,passage,world,chapterIndex=-2,lastPlayingLink=null;
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
 const transport=createListeningTransport({createContext:()=>new AudioContext(),prepare:createLoomRenderJob,onChange:({state})=>{
  $('listen').textContent=state==='preparing'?'Cancel':state==='playing'?'Pause':state==='ended'?'Listen again ↗':state==='paused'?'Continue ↗':'Listen ↗';
@@ -32,12 +32,16 @@ function choose(id){
  selected=getLoomJourney(id);passage=createLoomPerformance(selected.settings,selected.score);transport.select(passage.duration);chapterIndex=-2;
  $('seek').max=passage.duration;$('seek').value=0;
  for(const button of $('passages').children)button.setAttribute('aria-pressed',String(button.dataset.journey===id));
- const url=new URL(location.href);url.searchParams.set('study',id);history.replaceState(null,'',url);
+ const url=new URL(location.href);url.searchParams.set('study',id);url.searchParams.delete('at');history.replaceState(null,'',url);
  $('explore').href=compositionPageURL(location.href,'loom.html',{version:1,loom:{enabled:true,settings:selected.settings}});
- const playing=new URL('touch.html',location.href);playing.searchParams.set('bridge',selected.id);
- for(const link of document.querySelectorAll('[data-play-connection]')){link.href=playing.href;link.textContent=`Play ${selected.title} ↗`;}
+ lastPlayingLink=null;updatePlayingLinks();
  $('model-detail').textContent=`This passage holds the connection fixed: ${selected.settings.frequency} Hz base tuning, ${selected.settings.detune} cents detuning, coupling ${selected.settings.coupling}, loss ${selected.settings.loss}/s. Changes between studies affect the actual sound model. Camera movement changes framing only.`;
  status(`${selected.title}. Press Listen. Headphones reveal the stereo space; Escape brings Quiet.`);
+}
+function updatePlayingLinks(){
+ const position=Math.floor(transport.time()*10)/10,key=`${selected.id}:${position}`;if(key===lastPlayingLink)return;lastPlayingLink=key;
+ const playing=new URL('touch.html',location.href);playing.searchParams.set('bridge',selected.id);playing.searchParams.set('fromStudy',selected.id);playing.searchParams.set('listenAt',String(position));
+ for(const link of document.querySelectorAll('[data-play-connection]')){link.href=playing.href;link.textContent=`Play ${selected.title} ↗`;}
 }
 $('listen').onclick=async()=>{
  if(['playing','preparing'].includes(transport.state)){transport.stop();return;}
@@ -60,7 +64,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)transport.s
 window.addEventListener('pagehide',()=>transport.stop());
 let requested=new URLSearchParams(location.search).get('study');
 if(!LOOM_JOURNEYS.some(item=>item.id===requested))requested=LOOM_JOURNEYS[0].id;
+const returnPosition=Number(new URLSearchParams(location.search).get('at'));
 choose(requested);
+if(Number.isFinite(returnPosition)&&returnPosition>0&&returnPosition<passage.duration){const returnURL=new URL(location.href);returnURL.searchParams.set('at',String(returnPosition));history.replaceState(null,'',returnURL);transport.seek(returnPosition);status(`${selected.title}. Your listening place is ${format(returnPosition)}. Press Listen to continue from here, or use the timeline to begin elsewhere.`);updatePlayingLinks();}
 try{
  world=createWorld($('world'));
  for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
@@ -68,7 +74,7 @@ try{
  world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();motion();
 }catch(error){$('world').hidden=true;status('The 3D view is unavailable here. You can still listen to every passage.',true);}
 function draw(){
- const time=transport.time();
+ const time=transport.time();updatePlayingLinks();
  if(world){
   const aspect=$('world').clientWidth/Math.max(1,$('world').clientHeight),zoom=Math.min(1,aspect/1.5);
   if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}

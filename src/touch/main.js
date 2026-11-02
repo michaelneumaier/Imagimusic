@@ -22,7 +22,9 @@ const refreshControls=()=>controls({state:transport.state,recording:transport.re
 function configure(){
  const journey=getLoomJourney($('bridge').value);settings=journey.settings;
  const listening=new URL('listen.html',location.href);listening.searchParams.set('study',journey.id);
- for(const link of document.querySelectorAll('[data-listen-connection]'))link.href=listening.href;
+ const origin=new URLSearchParams(location.search),at=Number(origin.get('listenAt'));
+ if(origin.get('fromStudy')===journey.id&&Number.isFinite(at)&&at>0)listening.searchParams.set('at',String(at));
+ for(const link of document.querySelectorAll('[data-listen-connection]')){link.href=listening.href;if(!link.classList.contains('brand'))link.textContent=listening.searchParams.has('at')?'Return to your listening place ↗':'Listen to this connection ↗';}
  const peaks=[0,1].map(body=>answerPeak(settings,body));
  $('model-detail').textContent=`This connection uses ${settings.frequency} Hz base tuning, ${settings.detune} cents detuning, coupling ${settings.coupling}, and loss ${settings.loss}/s. A unit left touch gives the other body its first drawn envelope maximum at ${peaks[0].swellSeconds?.toFixed(3)??'no distinct'} seconds, about ${(peaks[0].ratio*100).toFixed(0)}% of the struck body’s first peak (2 ms measurement grid). This is a swell, not sound arriving after a delay.`;
  const url=new URL(location.href);url.searchParams.set('bridge',$('bridge').value);history.replaceState(null,'',url);stillAt=0;lastGesture=null;

@@ -32,3 +32,10 @@ test('quiet during the attack releases from the scheduled ramp value without jum
  const f=fixture();f.transport.select(3);const playing=f.transport.play({});await Promise.resolve();f.jobs[0].resolve(f.pcm);await playing;
  f.context.currentTime=.01;f.transport.stop();assert.ok(Math.abs(f.gainValues.at(-1).value-.2)<1e-12);assert.equal(f.gainValues.at(-1).time,.01);
 });
+
+test('a restored listening place remains silent until explicit play and starts at that offset',async()=>{
+ const f=fixture();f.transport.select(3);f.transport.seek(1.2);
+ assert.equal(f.transport.state,'idle');assert.equal(f.transport.time(),1.2);assert.equal(f.jobs.length,0);assert.equal(f.nodes.length,0);
+ const playing=f.transport.play({});await Promise.resolve();f.jobs[0].resolve(f.pcm);await playing;
+ assert.equal(f.nodes[0].started[1],1.2);assert.equal(f.transport.state,'playing');
+});
