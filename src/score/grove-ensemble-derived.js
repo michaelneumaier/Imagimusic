@@ -39,8 +39,11 @@ export function validateDerivedEnsemble(wrapper, { admission = true } = {}) {
 }
 
 /** Rotate each voice's gesture history to the next instrument (rotation 1 only). Resolves to a validated wrapper; the source is untouched. */
-export async function rotateEnsembleVoices(source, { rotation = 1 } = {}) {
+export async function rotateEnsembleVoices(input, { rotation = 1 } = {}) {
   if (rotation !== 1) throw new Error('only rotation 1 is supported for rotate-voices in this version.');
+  // Snapshot before the first await (Astra's finding): the hash and the histories must describe one and the same source even if the caller
+  // mutates its object while the digest is pending.
+  const source = structuredClone(input);
   validateEnsembleRecord(source, { admission: false });
   const canonicalSha256 = await canonicalEnsembleSha256(source), parts = source.parts, n = parts.length;
   // Vocabulary must match between a history's source part and its destination part: body count, voice, zones, strengths (name and coefficient),
@@ -59,7 +62,8 @@ export async function rotateEnsembleVoices(source, { rotation = 1 } = {}) {
 export function canonicalDerivedEnsemble(wrapper) { validateDerivedEnsemble(wrapper); return stable({ kind: wrapper.kind, version: wrapper.version, derivedFrom: wrapper.derivedFrom, ensemble: JSON.parse(canonicalEnsembleRecord(wrapper.ensemble)) }); }
 
 /** With the source in hand: recompute the derivation and compare identities. Resolves to { verified: true } or rejects with the first mismatch. */
-export async function verifyDerivedEnsemble(wrapper, source) {
+export async function verifyDerivedEnsemble(wrapperInput, sourceInput) {
+  const wrapper = structuredClone(wrapperInput), source = structuredClone(sourceInput);   // one coherent pair across the awaits
   validateDerivedEnsemble(wrapper);
   const hash = await canonicalEnsembleSha256(source); if (hash !== wrapper.derivedFrom.canonicalSha256) throw new Error('the given source is not the declared source (canonical hash differs).');
   const recomputed = await rotateEnsembleVoices(source, { rotation: wrapper.derivedFrom.rotation });

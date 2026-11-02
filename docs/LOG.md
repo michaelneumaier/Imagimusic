@@ -372,3 +372,4 @@
 - 2026-11-02 astra: home copy edits for Listen back and the full-duration return. Fable: included in the reader review (approve).
 - 2026-11-02 astra: full-duration reader committed (dcf563a). Fable: pushed; roadmap M13 updated.
 - 2026-11-02 fable: derived ensemble model committed (grove-ensemble-derived.js: platform Web Crypto fingerprint, async rotation and verification, strict wrapper validation, own-property operation lookup; three tests incl. the kept demonstration rotated). Astra's return session (160128e) reviewed: approve; pushed.
+- 2026-11-02 astra: return preparation adapter and worker, import parse split, authored return study (native checked); finding: snapshot the source across the async hash. Fable: fixed with a mutation-during-await test; adapters and study verified and approved.

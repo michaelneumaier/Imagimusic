@@ -54,3 +54,10 @@ test('the kept native demonstration rotates and re-admits', { skip: !existsSync(
   assert.equal(derived.ensemble.parts[1].record.events.length, source.parts[0].record.events.length); assert.equal(derived.ensemble.parts[1].record.contacts.length, source.parts[0].record.contacts.length);
   assert.equal((await verifyDerivedEnsemble(derived, source)).verified, true); renderEnsembleRecord(derived.ensemble);
 });
+
+test('mutation during the await cannot split the declared source from the moved histories', async () => {
+  const source = ensembleRecordFromParts(ensembleRecords(recipes, composeEnsemblePhrase(recipes, { together: false, velocity: 0.5 }))), snapshot = structuredClone(source);
+  const pending = rotateEnsembleVoices(source); source.parts[0].record.events[0].velocity = 0.4;                       // mutate while the digest is pending
+  const derived = await pending; assert.equal((await verifyDerivedEnsemble(derived, snapshot)).verified, true, 'hash and histories both describe the pre-mutation source');
+  const pendingVerify = verifyDerivedEnsemble(derived, snapshot); snapshot.parts[1].record.events[0].velocity = 0.4; assert.equal((await pendingVerify).verified, true, 'verification uses its own snapshot of the pair');
+});
