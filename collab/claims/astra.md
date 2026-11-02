@@ -173,3 +173,6 @@ Hold lifecycle verification: src/grove/hold-control.js, tests/grove-hold-control
 
 Listening-level prototype: src/grove/listening-level.js, tests/grove-listening-level.test.js, ensemble-host.js and ensemble.html/main.js. Explicit playback-only gain with sample ceiling; canonical capture/render unchanged.
 Listening graph browser diagnostic: tests/listening-level.html and tests/listening-level-browser.js; muted offline Web Audio verification of gain/ceiling at 0 and20dB.
+
+Rest/reopen listening integration: contact-host.js, replay.js, listening-control.js, rest-main.js/rest.html, reopen-main.js/reopen.html, ensemble-reopen-main.js/ensemble-reopen.html and focused host/replay/control tests. Explicit opt-in stage leaves other routes unchanged.
+Interim listening-level disclosure: pulse.html, powered.html, grove.html and adapt.html until their paired live/replay integration.\n

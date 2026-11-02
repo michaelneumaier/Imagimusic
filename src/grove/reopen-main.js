@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {restInstrumentIdentity} from './rest-instrument-identity.js';
 import {createRestImportSession} from './rest-import-session.js';
 import {createGroveReplay} from './replay.js';
@@ -9,7 +10,7 @@ const $=id=>document.getElementById(id);
 let world=null,sculpture=null,shown=null,played=null,operation=0;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const session=createRestImportSession({onChange:sync});
-const replay=createGroveReplay({onChange:({state})=>{sync();if(state==='ended')status('Your passage has settled. You can listen again.');if(state==='suspended')status('Audio was interrupted. Listen restarts the passage.');}});
+const replay=createGroveReplay({listeningDb:18,onChange:({state})=>{sync();if(state==='ended')status('Your passage has settled. You can listen again.');if(state==='suspended')status('Audio was interrupted. Listen restarts the passage.');}});
 function sync(){
  const busy=session.state==='preparing',ready=!!session.result;
  $('cancel').hidden=!busy;$('listen').disabled=!ready||busy||replay.state==='preparing';$('save').disabled=!ready||busy;$('quiet').disabled=!['playing','preparing','suspended'].includes(replay.state);
@@ -43,3 +44,5 @@ function draw(){
  requestAnimationFrame(draw);
 }
 sync();draw();
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[replay],defaultDb:18,storageKey:'imagimusic-rest-listening-db'});

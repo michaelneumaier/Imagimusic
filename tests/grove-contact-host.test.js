@@ -42,3 +42,14 @@ test('park discards incomplete passage and invalidates pending preparation',asyn
  const opening=host.enable(grove);host.park();assert.equal(pending[0].signal.aborted,true);pending[0].resolve({recipe});await opening;assert.equal(nodes.length,0);assert.equal(host.state,'idle');assert.equal(host.recording(),null);
  const next=host.enable(grove);pending[1].resolve({recipe});await next;const stale=nodes[0].port.onmessage;host.park();stale({data:{type:'error',generation:nodes[0].options.processorOptions.generation,message:'stale'}});assert.equal(host.state,'idle');assert.equal(host.recording(),null);assert.equal(host.recipe,null);host.dispose();
 });
+test('opt-in listening stage preserves captured records and restores the selected level after parking',async()=>{
+ const stages=[];
+ const {host,nodes}=fixture({listeningDb:18,createListeningStage:(_,options)=>{const stage={initial:options.db,input:{},output:{connect(){}},levels:[],setDb(db){this.levels.push(db);},dispose(){this.disposed=true;}};stages.push(stage);return stage;}});
+ await host.enable(grove);finish(nodes[0]);const record=host.recording();host.setListeningDb(6);assert.deepEqual(host.recording(),record);assert.equal(stages[0].initial,18);assert.deepEqual(stages[0].levels,[6]);
+ host.park();assert.equal(stages[0].disposed,true);await host.newPassage();assert.equal(stages[1].initial,6);host.dispose();assert.equal(stages[1].disposed,true);
+});
+test('a failed listening-stage connection is retried instead of silently bypassed',async()=>{
+ let attempts=0,disposed=0;
+ const {host}=fixture({listeningDb:18,createListeningStage:()=>({input:{},output:{connect(){if(attempts++===0)throw new Error('connect failed');}},setDb(){},dispose(){disposed++;}})});
+ await assert.rejects(host.enable(grove),/connect failed/);assert.equal(disposed,1);await host.enable(grove);assert.equal(host.state,'ready');assert.equal(attempts,2);host.dispose();
+});

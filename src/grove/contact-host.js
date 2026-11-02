@@ -1,3 +1,4 @@
+import {createListeningLevel,listeningGain} from './listening-level.js';
 import {REST_QUIET_FADE_SECONDS} from '../rest/limits.js';
 import {DEFAULT_VOICE_CONFIG} from '../score/grove-voice.js';
 import {visualFromState} from '../rest/engine.js';
@@ -6,9 +7,12 @@ import {restWorkerJob} from './contact-job.js';
 const prepare=(data,options)=>restWorkerJob(new URL('./contact-prepare-worker.js',import.meta.url),data,options);
 const render=(data,options)=>restWorkerJob(new URL('./contact-render-worker.js',import.meta.url),data,options);
 /** Live shared-engine host. Only processed acknowledgements become recorded gestures. */
-export function createRestHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-grove-contact',options),prepareRecipe=prepare,renderRecord=render,onChange=()=>{},onDecision=()=>{}}={}){
+export function createRestHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-grove-contact',options),prepareRecipe=prepare,renderRecord=render,createListeningStage=createListeningLevel,listeningDb=null,onChange=()=>{},onDecision=()=>{}}={}){
  let context,node,recipe,capture,abort,token=0,sequence=0,state='idle',failure=null,latest=null,ending=null,pcm=null,rendering=null;
- let strikes=[];
+ let strikes=[],listening=null;
+ if(listeningDb!==null)listeningGain(listeningDb);
+ function ensureListening(){if(context&&!listening&&listeningDb!==null){const next=createListeningStage(context,{db:listeningDb});try{next.output.connect(context.destination);}catch(error){next.dispose();throw error;}listening=next;}}
+ function setListeningDb(db){listeningGain(db);listeningDb=db;const had=!!listening;ensureListening();listening?.setDb(db);if(node&&!had&&listening){node.disconnect();node.connect(listening.input);}}
  const emit=()=>onChange({state,error:failure,stats:capture?.stats??null});
  function detach(){if(node){node.port.onmessage=null;node.onprocessorerror=null;node.disconnect();node.port.close();node=null;}}
  function fail(error){failure=error;state='error';detach();abort?.abort();emit();}
@@ -28,9 +32,10 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
   }catch(error){fail(error);}
  }
  function mount(){
+  ensureListening();
   const own=token;capture=createRestCapture(recipe,{generation:String(own)});sequence=0;latest=ending=pcm=rendering=null;strikes=[];
   node=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{recipe,generation:String(own),snapshots:true}});
-  node.port.onmessage=({data})=>consume(data,own);node.onprocessorerror=()=>{if(own===token)fail(new Error('Rest audio processor failed'));};node.connect(context.destination);state=context.state==='running'?'ready':'suspended';emit();
+  node.port.onmessage=({data})=>consume(data,own);node.onprocessorerror=()=>{if(own===token)fail(new Error('Rest audio processor failed'));};node.connect(listening?.input??context.destination);state=context.state==='running'?'ready':'suspended';emit();
  }
  async function enable(grove,voice=DEFAULT_VOICE_CONFIG){
   token++;const own=token;abort?.abort();detach();abort=new AbortController();failure=null;recipe=capture=null;latest=null;state='preparing';emit();
@@ -68,9 +73,9 @@ export function createRestHost({createContext=()=>new AudioContext(),createNode=
  }
  function park(){
   const complete=state==='ended';token++;abort?.abort();abort=new AbortController();detach();rendering=null;failure=null;latest=ending=null;strikes=[];
-  const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
+  listening?.dispose();listening=null;const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
   if(!complete)recipe=capture=pcm=null;state=complete?'ended':'idle';emit();
  }
- function dispose(){token++;abort?.abort();detach();if(context){context.onstatechange=null;context.close();context=null;}state='disposed';}
- return {enable,send,schedule,quiet,resume,newPassage,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
+ function dispose(){token++;abort?.abort();detach();listening?.dispose();listening=null;if(context){context.onstatechange=null;context.close();context=null;}state='disposed';}
+ return {enable,send,schedule,setListeningDb,quiet,resume,newPassage,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipe(){return recipe;},get stats(){return capture?.stats??null;}};
 }

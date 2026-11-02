@@ -37,3 +37,32 @@ No subjective claim about audibility is inferred from the successful controls.
 Next: phone listening feedback and single-instrument/replay integration at a
 declared common level; an optional listening-copy export requires an explicit
 policy and different filename. No saved WAV was silently replaced.
+
+
+## Rest and saved-reader integration
+
+Rest now explicitly configures +18 dB for both live host and replay; the
+single-passage reader uses the same preference key. The ensemble reader uses
++20 dB and the ensemble preference key. A shared control restores one validated
+value, updates every audio target on its page together, and tolerates disabled
+or corrupt localStorage. Other unconfigured host/replay callers retain a null
+bypass. Pulse, Powered, Grove and Adapt carry interim original-level wording
+until their matched live/replay paths are integrated.
+
+The added stages dispose on park and rebuild with the chosen level in a new
+context. Failed stage connections dispose the partial stage and retry rather
+than quietly bypassing it. Sixteen host/replay/control tests pass, including
+unchanged source PCM/records, stored preference validation, lifecycle cleanup
+and explicit failure/retry. Fable initial review approved in
+collab/reviews/20261102T0100Z-fable-reviews-rest-listening-stage.md; the small
+failure/retry follow-up was sent separately for inspection.
+
+Native Safari: Rest Enter, authored invitation, automatic Quiet, Listen back
+and natural replay completion all succeeded. The disclosure showed +18 dB for
+both paths. The saved-file reader initialized silently and also showed +18 dB.
+The downloaded invitation record and WAV are kept in renders/rest-listening-level.
+Independent canonical reconstruction equals the WAV byte-for-byte: 961200frames
+at48k, six strikes and three contacts, SHA-256
+885180a02657ddc0a81ed1401fbea3273752bb88aa15d40812f6f8334423a831.
+The download is original-level model sound, not captured boosted output.
+This does not establish comfort or audibility on a phone.

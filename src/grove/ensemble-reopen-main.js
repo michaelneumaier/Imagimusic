@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {restInstrumentIdentity} from './rest-instrument-identity.js';
 import {createRestImportSession} from './rest-import-session.js';
 import {restWorkerJob} from './contact-job.js';
@@ -7,7 +8,7 @@ const $=id=>document.getElementById(id);
 let operation=0;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const session=createRestImportSession({prepare:(data,options)=>restWorkerJob(new URL('./ensemble-import-worker.js',import.meta.url),data,options),onChange:sync});
-const replay=createGroveReplay({onChange:({state})=>{sync();if(state==='ended')status('The ensemble has settled. You can listen again.');if(state==='suspended')status('Audio was interrupted. Listen restarts the ensemble.');}});
+const replay=createGroveReplay({listeningDb:20,onChange:({state})=>{sync();if(state==='ended')status('The ensemble has settled. You can listen again.');if(state==='suspended')status('Audio was interrupted. Listen restarts the ensemble.');}});
 function sync(){const busy=session.state==='preparing',ready=!!session.result;$('cancel').hidden=!busy;$('listen').disabled=!ready||busy||replay.state==='preparing';$('save').disabled=!ready||busy;$('quiet').disabled=!['playing','preparing','suspended'].includes(replay.state);}
 function show(result){
  $('passage').hidden=false;$('name').textContent=result.name;
@@ -25,3 +26,5 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){operation+
 window.addEventListener('pagehide',event=>{operation++;if(event.persisted){session.cancel();replay.park();}else{session.dispose();replay.dispose();}});
 window.addEventListener('pageshow',event=>{if(event.persisted){sync();status(session.result?'Your ensemble is here. Listen when you are ready.':'Choose a saved ensemble.');}});
 sync();
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[replay],defaultDb:20,storageKey:'imagimusic-ensemble-reopen-listening-db'});

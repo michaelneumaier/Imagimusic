@@ -14,3 +14,14 @@ test('deferred audio resumes inside the gesture and Quiet cancels preparation wi
 test('parking releases the old audio context and a new user playback creates another',async()=>{
  const a=fixture(),b=fixture();let created=0,closed=0;a.context.close=b.context.close=async()=>{closed++;};const player=createGroveReplay({createContext:()=>++created===1?a.context:b.context});await player.play(a.pcm);player.park();assert.equal(player.state,'idle');assert.equal(closed,1);assert.equal(a.context.onstatechange,null);await player.play(b.pcm);assert.equal(created,2);assert.equal(b.sources.length,1);assert.equal(player.state,'playing');player.dispose();
 });
+test('declared replay listening stage is downstream of unchanged PCM and survives park as a preference only',async()=>{
+ const {context,pcm,copies}=fixture(),stages=[],before=structuredClone(pcm);context.close=async()=>{};
+ const player=createGroveReplay({createContext:()=>context,listeningDb:18,createListeningStage:(_,options)=>{const stage={initial:options.db,input:{},output:{connect(){}},setDb(db){this.db=db;},dispose(){this.disposed=true;}};stages.push(stage);return stage;}});
+ await player.play(pcm);player.setListeningDb(9);assert.equal(stages[0].db,9);assert.deepEqual(pcm,before);assert.deepEqual(copies[0][1],[...pcm.channels[0]]);
+ player.park();assert.equal(stages[0].disposed,true);await player.play(pcm);assert.equal(stages[1].initial,9);player.dispose();assert.equal(stages[1].disposed,true);
+});
+test('failed listening-stage setup can retry without silently playing the unboosted path',async()=>{
+ const {context,pcm,sources}=fixture();context.close=async()=>{};let attempts=0,disposed=0;
+ const player=createGroveReplay({createContext:()=>context,listeningDb:18,createListeningStage:()=>({input:{},output:{connect(){if(attempts++===0)throw new Error('connect failed');}},setDb(){},dispose(){disposed++;}})});
+ await assert.rejects(player.play(pcm),/connect failed/);assert.equal(sources.length,0);assert.equal(disposed,1);await player.play(pcm);assert.equal(player.state,'playing');assert.equal(typeof context.onstatechange,'function');player.dispose();
+});
