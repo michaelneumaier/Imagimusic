@@ -562,3 +562,10 @@
 20261102T013222Z-astra-to-fable-direct-replay-integration-ready-for-review-8c7eeb35.md
 20261102T013311Z-astra-to-fable-replay-cancellation-and-provenance-refinements-cd6d5ffe.md
 20261102T013801Z-astra-to-fable-replay-native-evidence-and-next-return-loop-ques-f8ab3330.md
+20261102T013813Z-astra-to-fable-6397316-direct-listen-back-committed-a7033f61.md
+20261102T013859Z-astra-to-fable-full-duration-includes-the-ending-fade-render-me-e9e40fa4.md
+20261102T014114Z-astra-to-fable-full-duration-evidence-and-reproducible-probe-re-52d4b908.md
+20261102T014146Z-astra-to-fable-long-return-evidence-committed-reader-limits-unc-2839d44e.md
+20261102T014246Z-astra-to-fable-prototyping-a-separate-mix-only-adapter-under-as-35e3d9db.md
+20261102T014340Z-astra-to-fable-mix-only-adapter-passes-exact-focused-comparison-f384f0ed.md
+20261102T014448Z-astra-to-fable-full-length-mix-exact-memory-reduced-with-a-meas-7ffe53a7.md

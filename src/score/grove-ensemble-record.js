@@ -12,8 +12,12 @@ export const ENSEMBLE_MIX_ARITHMETIC = 'Float32(engine sample) Ã— common fade â†
 const stable = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
 const keysExactly = (obj, keys, what) => { if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error(`${what} must be an object.`); for (const k of Object.keys(obj)) if (!keys.includes(k)) throw new Error(`${what} has an unknown field ${k}.`); for (const k of keys) if (!(k in obj)) throw new Error(`${what} is missing ${k}.`); };
 
-/** Validate an ensemble record and return the three recipes (one per part). Throws on anything outside the contract. */
-export function validateEnsembleRecord(record) {
+/** Validate an ensemble record and return the three recipes (one per part). Throws on anything outside the contract.
+ *  `admission: false` skips the per-part admission simulation (structure, identity, bounds and the common ending are still checked); use it only
+ *  when the caller will simulate the parts itself and check each strike's candidate bound against recipe.admissionCeiling as it goes, which the
+ *  mix-only renderer can do in its single pass, so a full-length record is simulated once rather than twice. */
+export function validateEnsembleRecord(record, { admission = true } = {}) {
+  if (typeof admission !== 'boolean') throw new Error('admission must be a boolean.');
   keysExactly(record, ['version', 'kind', 'sampleRate', 'mixGain', 'mixArithmetic', 'ended', 'parts'], 'EnsembleRecord');
   if (record.version !== ENSEMBLE_RECORD_VERSION || record.kind !== ENSEMBLE_RECORD_KIND) throw new Error('not an ensemble record (version 1).');
   if (record.mixGain !== ENSEMBLE_MIX_GAIN) throw new Error('ensemble mix gain is fixed at 1/3.');
@@ -29,7 +33,7 @@ export function validateEnsembleRecord(record) {
     if (part.index !== i) throw new Error(`parts[${i}].index must be ${i}.`); if (typeof part.silent !== 'boolean') throw new Error(`parts[${i}].silent must be a boolean.`);
     if (!part.record || part.record.kind !== REST_RECORD_KIND) throw new Error(`parts[${i}].record must be a Rest record.`);
     const recipe = recipeForRecord(part.record);                     // full Rest validation: identity, bounds, order, unknown fields, limits
-    validateRestAdmission(part.record, recipe);                      // conservative admission on its own instrument
+    if (admission) validateRestAdmission(part.record, recipe);       // conservative admission on its own instrument (or deferred to the caller's pass)
     if (part.record.sampleRate !== record.sampleRate) throw new Error(`parts[${i}]: sample rate differs from the ensemble.`);
     if (stable(part.record.voice) !== stable(record.parts[0].record.voice)) throw new Error(`parts[${i}]: voice differs from part 0.`);
     if (stable(part.record.ended) !== stable(record.ended)) throw new Error(`parts[${i}]: ending differs from the common ending.`);

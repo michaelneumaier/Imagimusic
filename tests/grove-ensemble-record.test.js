@@ -26,6 +26,8 @@ test('ensemble record: three Rest records on one clock, validated, canonical, re
   for (let k = 0; k < 2000; k++) assert.equal(out2.channels[0][k], Math.fround(offline[0].channels[0][k] * (1 / 3) + offline[1].channels[0][k] * (1 / 3) + 0 * (1 / 3)));
   // Refusals: unknown field, wrong mix gain, altered arithmetic text, differing ending, silent flag lying, different voice, wrong part index, oversized ending.
   const bad = f => { const r = JSON.parse(JSON.stringify(record)); f(r); return r; };
+  // admission: false skips only the admission simulation; structure and identity are still enforced, and the option must be a boolean.
+  assert.equal(validateEnsembleRecord(record, { admission: false }).length, 3); assert.throws(() => validateEnsembleRecord(bad(r => { r.parts[1].silent = true; }), { admission: false }), /silent must be true exactly/); assert.throws(() => validateEnsembleRecord(record, { admission: 'no' }), /boolean/);
   assert.throws(() => validateEnsembleRecord(bad(r => { r.extra = 1; })), /unknown field/); assert.throws(() => validateEnsembleRecord(bad(r => { r.mixGain = 0.5; })), /fixed at 1\/3/);
   assert.throws(() => validateEnsembleRecord(bad(r => { r.mixArithmetic = ENSEMBLE_MIX_ARITHMETIC + ' '; })), /verbatim/); assert.throws(() => validateEnsembleRecord(bad(r => { r.parts[1].record.ended.frame += 1; })), /common ending|no gesture after Quiet|differs/);
   assert.throws(() => validateEnsembleRecord(bad(r => { r.parts[1].silent = true; })), /silent must be true exactly/); assert.throws(() => validateEnsembleRecord(bad(r => { r.parts[2].index = 1; })), /index must be 2/);

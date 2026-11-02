@@ -244,15 +244,22 @@ export function recipeForRecord(record) {
  *  audio thread used; a public record that would have been rejected live is rejected here. Returns { bounds } per strike. */
 export function validateRestAdmission(record, recipe) {
   validateRestRecord(record, recipe);
+  // One pass in the renderer's own loop shape (renderRestPassage): strikes by frame, the contact key recomputed only at contact edges, and the
+  // candidate bound taken at each strike's frame from the same trajectory the renderer follows; no output is allocated.
   const engine = createRestEngine(recipe), bounds = [];
+  const byFrame = new Map(); for (const k of record.events) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
+  const edges = new Set(); for (const c of record.contacts) { edges.add(c.start); edges.add(c.end); }
   const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = record.contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
-  let frame = 0;
-  for (const [index, k] of record.events.entries()) {
-    for (; frame < k.frame; frame++) { engine.setContacts(keyAt(frame)); engine.step(); }
-    engine.setContacts(keyAt(frame));
-    const bound = engine.candidateBound(k.position, k.body, k.velocity);
-    if (!(bound <= recipe.admissionCeiling)) throw new Error(`events[${index}] (frame ${k.frame}) would have been rejected: bound ${bound.toFixed(4)} exceeds the admission ceiling ${recipe.admissionCeiling}.`);
-    bounds.push(bound); engine.strike(k.position, k.body, k.velocity);
+  const last = record.events.length ? record.events[record.events.length - 1].frame : -1;
+  for (let i = 0; i <= last; i++) {
+    if (i === 0 || edges.has(i)) engine.setContacts(keyAt(i));
+    const due = byFrame.get(i);
+    if (due) for (const k of due) {
+      const bound = engine.candidateBound(k.position, k.body, k.velocity);
+      if (!(bound <= recipe.admissionCeiling)) throw new Error(`events[${bounds.length}] (frame ${k.frame}) would have been rejected: bound ${bound.toFixed(4)} exceeds the admission ceiling ${recipe.admissionCeiling}.`);
+      bounds.push(bound); engine.strike(k.position, k.body, k.velocity);
+    }
+    if (i < last) engine.step();
   }
   return { bounds };
 }
