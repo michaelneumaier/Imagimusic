@@ -385,3 +385,5 @@ Listening-position continuity: src/listen/main.js, src/touch/main.js, tests/list
 Passage-history sampling study: tools/audit-touch-history-sampling.mjs and collab/notes/astra-touch-history-sampling.md. Analytic model samples only, no production rendering or sound changes; evaluate interpolation and exact-event/ending boundaries against dense sampled references.
 
 Touch history foundation: src/touch/history.js, history-worker.js, tests/touch-history.test.js. Bounded deterministic full-passage visual-envelope history, exact gesture metadata and split strike boundaries; independent worker, no production page integration yet.
+
+Touch history diagnostic: tests/touch-history-diagnostic.html/js and history-worker.js text input adapter. Silent real-worker view with explicit fixed scale, exact gesture list and bounded file intake; no production link yet.
