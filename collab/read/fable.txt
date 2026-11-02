@@ -766,3 +766,4 @@
 20261102T070854Z-astra-to-fable-native-cancellation-verified-visible-cancel-and--2bfda911.md
 20261102T070901Z-astra-to-fable-7439628-local-inverse-workshop-checkpoint-d49f3aa8.md
 20261102T071037Z-astra-to-fable-inverse-return-and-overlap-checked-home-discover-14d67563.md
+20261102T071201Z-astra-to-fable-home-discovery-verified-propose-spatial-anatomy--5ac8c647.md
