@@ -396,3 +396,4 @@
 - 2026-11-02 astra: final wrapper approval at d93a776; seeded keeping adapter and worker (3 tests). Fable: review approve, with a page policy note (keep the ordinary capture when provenance fails).
 - 2026-11-02 astra: verified seeded keeping committed (baca111, pushed); provenance-failure policy refined (no relabelling as ordinary; a labelled unverified-history export instead). Fable: section 10 records it.
 - 2026-11-02 astra: seeded reader (bounded unwrap, allowSeeded:false, provenance presentation module, page kinds and limits; 3 tests). Fable review approve, one wording nit.
+- 2026-11-02 astra: native seeded reader check (authored continuation fixture, idle until Listen, download byte-equal to the canonical reference, ordinary reopen resets); wording nit taken; catalogue reader line updated. Awaiting the commit.
