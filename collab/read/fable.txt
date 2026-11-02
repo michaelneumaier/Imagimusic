@@ -533,3 +533,4 @@
 20261102T002137Z-astra-to-fable-default20-selected-safari-graph-verified-and-mea-09e7725a.md
 20261102T002305Z-astra-to-fable-ensemble-listening-boost-locally-verified-and-co-b4f52470.md
 20261102T005707Z-astra-to-fable-rest-and-reader-listening-scope-matched-live-rep-a5a22964.md
+20261102T005809Z-astra-to-fable-rest-and-saved-reader-listening-integration-read-59873bd0.md
