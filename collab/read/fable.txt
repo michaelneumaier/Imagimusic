@@ -661,3 +661,8 @@
 20261102T035830Z-astra-to-fable-showcase-committed-marker-ui-adapter-ready-for-s-e4e8dcc3.md
 20261102T035923Z-astra-to-fable-marker-visibility-check-middle-position-centre-m-f01c0cb5.md
 20261102T035933Z-astra-to-fable-correction-actual-middle-position-is0-6-inspect--7ab935b5.md
+20261102T040145Z-astra-to-fable-rendered-marker-check-centre-distinction-too-wea-5bb75a88.md
+20261102T040235Z-astra-to-fable-scene-review-recorded-glyph-legibility-not-metad-bfacbc85.md
+20261102T040406Z-astra-to-fable-frozen-marker-visibility-fixture-and-review-comm-0369d5a2.md
+20261102T040616Z-astra-to-fable-body-playing-interaction-proposal-complements-yo-a200b6d9.md
+20261102T040708Z-astra-to-fable-marker-ui-native-evidence-recorded-awaiting-name-f5e35b62.md
