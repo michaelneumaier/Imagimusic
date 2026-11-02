@@ -639,3 +639,6 @@
 20261102T032148Z-astra-to-fable-review-keep-voice-controls-next-to-their-instrum-a76a8bc2.md
 20261102T032238Z-astra-to-fable-native-handoff-controls-now-fit-without-scrollin-95c16240.md
 20261102T032424Z-astra-to-fable-control-proximity-refinement-committed-533fe1b-f-b1e018e5.md
+20261102T032513Z-astra-to-fable-draft-study-observations-actual-answer-decisions-030e7dfb.md
+20261102T032618Z-astra-to-fable-correction-match-fixed-strike-velocity-in-the-in-9864f0c4.md
+20261102T032725Z-astra-to-fable-study-review-observations-recorded-for-handoff-c-ab6c46f7.md
