@@ -195,3 +195,34 @@ capture and original, with sound keeping and retry still available. Do not
 silently label the mixed capture as a wholly personal/original passage. Any raw
 export fallback would need an explicit unverified-history label; it is not part
 of this adapter. No playable UI has changed in this slice.
+
+## Continued-passage reader checkpoint
+
+The bounded reader now accepts the strict seeded wrapper and presents its
+history through ensemble-provenance.js: a continued-passage badge, declared
+handoff, accepted/refused/unreached remembered gestures, source fingerprint and
+explicit absent-source verification limitation. Aborted and negative-boundary
+histories have separate wording. Ordinary imports clear the previous metadata;
+WAV downloads use imagimusic-ensemble-continuation.wav. Source adapters still
+refuse wrapped inputs. Fable approved the working tree in
+collab/reviews/20261102T0256Z-fable-reviews-seeded-reader.md; his wording nit was
+applied as “Remembered gestures”. Eleven focused import/preparation tests pass.
+
+Native desktop Safari at 320×656 reopened the authored continuation idle,
+played only after Listen, settled normally, and downloaded a byte-exact WAV:
+401200 frames at 48kHz, 1604844 bytes, SHA-256
+84055a7e70749e619fba54b8c565b02220d3d0b35b1cf17dc8ffd37358c382bb.
+An ordinary original opened afterward cleared the continued-history labels.
+Final wording and narrow controls were inspected after reloading the modules.
+Evidence lives in renders/ensemble-continued-reader/, including the authored
+fixture, reference WAV and safari-verification.json. This verifies canonical
+reconstruction and browser controls, not speaker output, subjective appeal,
+phone hardware or real-time performance clearance.
+
+Next: an optional post-passage “Play this passage, then continue” flow in the
+encounter. Retain the original independently of the fresh live host; prepare
+without audio; explicitly start the remembered opening; unlock personal input
+only after the acknowledged clock barrier; preserve Quiet throughout. Keep the
+finished mixed history as a verified continued passage, never silently as an
+ordinary personal recording. Preserve capture/sound and original on provenance
+failure, with retry. Keep demonstration origin explicit.
