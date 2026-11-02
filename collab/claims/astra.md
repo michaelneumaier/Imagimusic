@@ -369,3 +369,5 @@ Touch return preparation: src/touch/return-preparation.js, return-worker.js, ret
 Touch return page: touch-return.html/css and src/touch/return-main.js, plus entry links in owned Touch/catalog files after native validation. Original sound and analytic two-body replay, explicit start/Quiet, local saves; no derived comparison.
 
 Touch comparison foundation: src/touch/comparison.js, return-preparation.js record entry point, tests/touch-comparison.test.js. Explicit known connection target, all source gestures retained/admitted, source unchanged. No comparison UI or derived-file schema in this slice.
+
+Touch comparison interface: comparison-worker.js and return page main/html/css. Separate original/comparison controls, explicit silent preparation, one replay owner, named WAV copies, changed settings/pickup scaling visible; source remains unchanged.
