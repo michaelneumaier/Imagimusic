@@ -8,3 +8,6 @@ Reviewer: Fable. Date: 2026-11-02. Ran it against `renders/ensemble-continuation
 - **Output**: a JSON audit with its own limitation line (offline artifact audit only; not a device recording, timing clearance or listening verdict).
 
 No nits. Astra's independent reproduction to a separate directory being byte-identical to the study outputs is the stronger evidence; this tool makes that check repeatable.
+
+## Addendum: discovery wiring and the player's narrow title (approve)
+The preparer lists "A memory, then an answer" as the fifth generated study and `--check` reports all five ready here; the catalogue entry describes the pair accurately (an authored passage, its remembered opening and an authored G response, same instruments and playable gestures, both rendered offline) under Listening studies; the home's current edge adds a secondary "Hear the example" link beside the primary Play Three Groves; the shared player's heading becomes clamp(32px, 6vw, 44px), desktop unchanged and 32 px at phone width, with no behaviour change. The study page is regenerated with that player so the embedded HTML carries it; both WAVs are byte-identical to the approved artifacts and Astra's verifier passes on the regenerated set.

@@ -410,3 +410,4 @@
 - 2026-11-02 astra: draft study observations (nominal versus applied answer timing; page vocabulary with fixed velocity; comment count). Fable: renderer corrected (page's strike and firm hand only, decisions from the host's stream asserted accepted, applied frames reported), re-rendered and re-verified.
 - 2026-11-02 astra: corrected study reproduced byte-identically; independent verifier tool. Fable: verifier review approve.
 - 2026-11-02 astra: study artifacts pass with mutation refusals; narrow intro too long. Fable: intro shortened to Astra's wording, regenerated, WAVs unchanged, verifier passes.
+- 2026-11-02 astra: study artifacts approved (reproduction, audit, three corruptions refused); discovery wiring (fifth study in the preparer, catalogue entry, Hear the example link) and narrow player title. Fable: approve; page regenerated with the player change, WAVs unchanged.
