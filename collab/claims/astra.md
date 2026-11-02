@@ -377,3 +377,5 @@ Home living overview: project.html current edge, roadmap/history and source-note
 Touch return portable chosen version: touch-return.html, src/touch/return-main.js and tests/touch-comparison.test.js. Save shown version as existing standalone v1 gestures, explicitly without original/comparison history; preserve source separately.
 
 Touch return still-picture choice: owned return HTML/CSS/main. Respect reduced-motion preference on initial load and allow explicit opt-in/out; static resting model picture, unchanged playback and exports, accurate caption.
+
+Independent duration audit: tools/audit-sound-study-duration.mjs and collab/notes/astra-sound-duration-audit.md. Read-only import of Fable's estimator; paired actual truncated samples versus full recording at identical spectral windows, with explicit available durations and source hash. No estimator or production edits.
