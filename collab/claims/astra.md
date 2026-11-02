@@ -232,3 +232,5 @@ Direct-body hit selection: src/grove/body-picking.js and tests/grove-body-pickin
 
 Family geometry exploration: tests/grove-family-preview.html/js and own family notes; silent production-scene diagnostic across candidate seeds and actual ensemble views before any live chooser integration.
 Family framing checks: tests/grove-view-framing.test.js, extend actual maximum-response bounds check across the candidate seeds before choosing runtime families.
+Family encounter transaction: src/grove/ensemble-family-mount.js, tests/grove-ensemble-family-mount.test.js, ensemble.html/css and ensemble-main.js; staged visual replacement with successful mount, pending selection isolated, remembered opening uses source groves.
+Family showcase: project.html and src/project-catalog.js; optional family discovery invitation and linked implementation/evidence note, retain remembered-passage entry path.

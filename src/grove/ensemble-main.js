@@ -1,3 +1,4 @@
+import {mountEnsembleFamily} from './ensemble-family-mount.js';
 import {bindBodyTap} from './body-tap.js';
 import {createBodyPicker} from './body-picking.js';
 import {Box3} from '../../vendor/three/build/three.module.js';
@@ -9,14 +10,18 @@ import {createGroveReplay} from './replay.js';
 import {bindListeningControl} from './listening-control.js';
 import {composeEnsemblePhrase} from '../score/grove-ensemble.js';
 import {bindHoldControl} from './hold-control.js';
-import {composeGrove} from '../score/grove.js';
+import {composeGrove,GROVE_SEEDS} from '../score/grove.js';
 import {retuneGroveCluster} from '../score/grove-tuning.js';
 import {canonicalEnsembleRecord} from '../score/grove-ensemble-record.js';
 import {createEnsembleHost} from './ensemble-host.js';
 import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
 import {stereoWav} from '../loom/model.js';
-const $=id=>document.getElementById(id),groves=[48,51,55].map(note=>retuneGroveCluster(composeGrove({seed:3}),note)),keys=['a','s','d'],holdControls=[],held=[false,false,false],reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const $=id=>document.getElementById(id),keys=['a','s','d'],holdControls=[],held=[false,false,false],reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const familyNames={3:'Pair and neighbour · 3',7:'Chain · 7',11:'Close triangle · 11'};
+const familyGroves=seed=>[48,51,55].map(note=>retuneGroveCluster(composeGrove({seed}),note));
+let groves=familyGroves(3);
+const familyName=()=>familyNames[groves[0].seed]??`Family ${groves[0].seed}`;
 let bodyTap=null,selectedPart=null,world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const active=()=>!demonstration&&(!continued||host.continuation?.state==='completed')&&!busy&&!quietWanted&&['ready','playing'].includes(host.state);
@@ -29,6 +34,9 @@ function cancelContinuation(){if(continuationPreparing()){continuationSource.can
 const returnStatus=text=>{$('return-status').textContent=text;};
 function cancelReturn(){if(returnPreparing()){returnSession.cancel();returnStatus('Preparation cancelled. The original passage stays here.');}}
 function sync(){
+ $('family-select').disabled=busy||saving||returnPreparing()||continuationPreparing()||keepPreparing()||replayActive()||['ready','playing','ending','preparing','suspended'].includes(host.state);
+ $('family-current').textContent='Family: '+familyName();$('keeping-family').textContent='Played with '+familyName()+'.';
+ const pending=Number($('family-select').value);$('family-pending').textContent=pending===groves[0].seed?'':`Next: ${familyNames[pending]}. Begin starts a new passage; this one is unchanged.`;
  $('begin').disabled=busy||saving||continuationPreparing()||keepPreparing()||['ready','playing','ending','preparing'].includes(host.state);$('begin').textContent=demonstration?'Your turn ↗':host.hasRecording?'Begin again ↗':'Begin ↗';
  $('demonstration').disabled=$('begin').disabled;
  $('passage-kind').textContent=continued?'A REMEMBERED OPENING, THEN YOUR RESPONSE':demonstration?'AUTHORED DEMONSTRATION':'YOUR OWN FIRST TOUCH';
@@ -134,7 +142,7 @@ $('continuation-play').onclick=async()=>{
  const source=continuationSource.source;if(!source||continued||busy||saving||continuationPreparing()||keepPreparing()||replayActive())return;
  const own=++operation;cancelReturn();stopListening();releaseAll();busy=true;quietWanted=false;held.fill(false);status('Preparing the same instruments for your remembered passage…');sync();
  try{
-  await host.enable(groves);
+  await mountFamily(source.record.parts.map(part=>part.record.grove),own);
   if(own!==operation||host.state!=='ready')return;
   if(host.recipes[0].sampleRate!==source.prepared.plan.sampleRate)throw new Error('The audio sample rate changed. The original is kept here; begin a fresh passage at this rate.');
   continued=true;demonstration=false;handoffShown=false;continuationKeep.clear();
@@ -167,9 +175,13 @@ function clearOwners(){holdControls.forEach(control=>control.reset());}
 function releaseAll(){holdControls.forEach(control=>control.release());}
 async function begin(asDemonstration=false){
  const own=++operation;cancelContinuation();cancelReturn();stopListening();releaseAll();busy=true;quietWanted=false;held.fill(false);status('Preparing three voices…');sync();
- try{await host.enable(groves);if(own===operation&&host.state==='ready'){
+ try{
+  const seed=Number($('family-select').value);if(!GROVE_SEEDS.includes(seed))throw new Error('Choose one of the available families.');
+  const mounted=await mountFamily(familyGroves(seed),own);
+  if(mounted&&own===operation){
    continued=false;handoffShown=false;continuationSource.clear();continuationKeep.clear();$('continuation-details').open=false;continuationStatus('Prepare first, then choose when to play.');
    demonstration=asDemonstration;
+   if(host.state==='suspended'){status('The new instruments are ready, but audio was interrupted. Quiet ends this passage; Begin starts afresh.');return;}
    if(demonstration){
     const phrase=composeEnsemblePhrase(host.recipes,{together:false,velocity:.5});
     const steps=phrase.parts.flatMap(part=>part.commands.filter(command=>command.kind!=='quiet'||part.index===0).map(command=>({part:part.index,time:command.frame/phrase.sampleRate,command}))).sort((a,b)=>a.time-b.time);
@@ -180,6 +192,7 @@ async function begin(asDemonstration=false){
  catch(error){if(own===operation)status(error.message+(host.hasRecording?' Your previous passage is still available.':''),true);}
  finally{if(own===operation){busy=false;sync();}}
 }
+$('family-select').onchange=sync;
 $('begin').onclick=()=>begin(false);
 $('demonstration').onclick=()=>begin(true);
 $('quiet').onclick=()=>{if(continuationPreparing()||keepPreparing()){cancelContinuation();sync();return;}if(returnPreparing()){cancelReturn();status('Return preparation cancelled. The original passage is unchanged.');sync();return;}if(replayActive()){const wasReturn=listeningReturn;operation++;stopListening();host.park();status(wasReturn?'Listening stopped. The original and its return are unchanged.':demonstration?'Listening stopped. The demonstration is unchanged.':'Listening stopped. Your passage is unchanged.');sync();return;}releaseAll();quietWanted=true;if(busy){operation++;busy=false;}host.quiet();if(host.state==='idle'){quietWanted=false;status('Preparation cancelled. Begin whenever you are ready.');}sync();};
@@ -201,7 +214,7 @@ window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAni
 try{world=createGroveWorld($('world'));world.controls.enabled=false;scenes=groves.map((grove,i)=>{const scene=createGroveScene(grove);scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);world.scene.add(scene.root);return scene;});world.camera.position.set(0,3.7,10.8);world.camera.lookAt(0,1.4,0);}catch{$('world').hidden=true;$('picture-note').textContent='The 3D view is unavailable. Labelled controls and sound are still available.';}
 // Preserve the scene's ordinary floor labels; close views lift the same numbers
 // above their actual bodies at a readable, screen-relative size. Sound is unchanged.
-const ordinaryLabels=scenes.map(scene=>scene.bodies.map(({label})=>({position:label.position.clone(),scale:label.scale.clone(),sizeAttenuation:label.material.sizeAttenuation})));
+let ordinaryLabels=scenes.map(scene=>scene.bodies.map(({label})=>({position:label.position.clone(),scale:label.scale.clone(),sizeAttenuation:label.material.sizeAttenuation})));
 function labelBodies(part){
  scenes.forEach((scene,i)=>scene.bodies.forEach(({label,spec},b)=>{
   const saved=ordinaryLabels[i][b],close=i===part;
@@ -211,16 +224,16 @@ function labelBodies(part){
   label.material.needsUpdate=true;
  }));
 }
-const pickBody=world?createBodyPicker({canvas:$('world'),camera:world.camera,scenes,selectedPart:()=>selectedPart}):()=>null;
+let pickBody=world?createBodyPicker({canvas:$('world'),camera:world.camera,scenes,selectedPart:()=>selectedPart}):()=>null;
 bodyTap=bindBodyTap($('world'),{
- pick:pickBody,enabled:()=>selectedPart!==null&&active()&&!!world,
+ pick:event=>pickBody(event),enabled:()=>selectedPart!==null&&active()&&!!world,
  onTap:({part,body})=>{if(part===selectedPart&&active())host.send(part,{kind:'strike',body,position:1,velocity:.5});}
 });
 const markerOptions={distinguishRemembered:false};
 $('distinguish-remembered').onchange=()=>{markerOptions.distinguishRemembered=$('distinguish-remembered').checked;$('marker-caption').hidden=!markerOptions.distinguishRemembered;};
 const widePictureNote=$('picture-note').textContent;
 const viewNames=['C','E-flat','G'];
-function chooseView(part){
+function chooseView(part,{scroll=true}={}){
  if(!world)return;
  bodyTap?.cancel();
  try{
@@ -243,9 +256,38 @@ function chooseView(part){
  $('world').setAttribute('aria-label',part===null?'Three separate Groves: C, E-flat and G':`Close view of ${viewNames[part]}; all three Groves remain audible`);
  $('view-together').setAttribute('aria-pressed',String(part===null));
  viewNames.forEach((_,i)=>$('view-'+i).setAttribute('aria-pressed',String(part===i)));
+ if(!scroll)return;
  const arrival=part===null?$('world'):$('view-caption');arrival.focus({preventScroll:true});arrival.scrollIntoView({block:'start',behavior:'instant'});
  }catch(error){$('picture-note').textContent='The close view could not open: '+error.message;}
 }
 if(world&&scenes.length===3&&!$('world').hidden){$('view-choices').hidden=false;$('view-together').onclick=()=>chooseView(null);viewNames.forEach((_,i)=>$('view-'+i).onclick=()=>chooseView(i));}
 function draw(){if(world&&!document.hidden){const frames=host.visual();scenes.forEach((scene,i)=>{const frame=frames[i],recipe=host.recipes?.[i],contacts=frame.contacts??[];applyGroveScene(scene,{...frame,...(reduced.matches?{envelope:[]}: {})},groves[i].bodies.map((_,b)=>contacts[b]?contacts[b].strength===1?1:.4:0),groves[i].bodies.map((_,b)=>contacts[b]?recipe?.zones[contacts[b].zone]:undefined),markerOptions);});world.render();}animation=requestAnimationFrame(draw);}
 sync();draw();
+
+function prepareFamilyPicture(nextGroves){
+ if(!world||$('world').hidden)return null;
+ const nextScenes=[];
+ try{
+  for(const [i,grove] of nextGroves.entries()){
+   const scene=createGroveScene(grove);nextScenes.push(scene);
+   scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);
+  }
+  const labels=nextScenes.map(scene=>scene.bodies.map(({label})=>({position:label.position.clone(),scale:label.scale.clone(),sizeAttenuation:label.material.sizeAttenuation})));
+  const picker=createBodyPicker({canvas:$('world'),camera:world.camera,scenes:nextScenes,selectedPart:()=>selectedPart});
+  return {scenes:nextScenes,labels,picker,dispose(){nextScenes.forEach(scene=>scene.dispose());}};
+ }catch(error){nextScenes.forEach(scene=>scene.dispose());throw error;}
+}
+function installFamilyPicture(picture,nextGroves){
+ bodyTap?.cancel();groves=nextGroves;
+ if(picture){
+  world.setFocus(null);
+  const previous=scenes;previous.forEach(scene=>world.scene.remove(scene.root));
+  scenes=picture.scenes;ordinaryLabels=picture.labels;pickBody=picture.picker;
+  scenes.forEach(scene=>world.scene.add(scene.root));
+  chooseView(selectedPart,{scroll:false});previous.forEach(scene=>scene.dispose());
+ }
+ sync();
+}
+function mountFamily(nextGroves,own){
+ return mountEnsembleFamily({host,groves:nextGroves,preparePicture:prepareFamilyPicture,installPicture:installFamilyPicture,isCurrent:()=>own===operation});
+}

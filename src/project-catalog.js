@@ -5,7 +5,7 @@ const entries=[
  ['The Grove','grove.html','Encounters','Playable','Strike a body in a coupled instrument and watch its modeled response.'],
  ['Rest','rest.html','Encounters','Playable','Strike, damp, and release. Keep a passage as gestures, sound, or a film.'],
  ['Leave room','pulse.html','Experiments','Prototype','An authored opening leaves the instrument ringing for your own answer.'],
- ['Three Groves — experimental','ensemble.html','Experiments','Prototype','Play three voices. “Look closer” reveals three numbered bodies to play within one Grove; all three instruments remain audible. “Begin with a memory” lets a short passage open a new response. Keep performances or make a return through other voices. Device output and performance remain unevaluated.'],
+ ['Three Groves — experimental','ensemble.html','Experiments','Prototype','Play three voices. “Meet another family” offers three generated anatomies for a fresh passage. “Look closer” reveals three numbered bodies to play within one Grove; all three instruments remain audible. “Begin with a memory” lets a short passage open a new response. Keep performances or make a return through other voices. Device output and performance remain unevaluated.'],
  ['A powered encounter','powered.html','Experiments','Prototype','Supply a bounded source, rest a hand, and observe the release. Optional traces reveal the model’s response.'],
  ['A gesture, another answer','adapt.html','Experiments','Prototype','Use saved gestures or a prepared example to change connection strengths, compare, and play either structure.'],
  ['Resonator garden','index.html','Instruments','Playable','The original laboratory: instrument controls, a physical tine, and interpreted synthesizer mechanisms.'],
