@@ -74,3 +74,20 @@ test('newly played authored demonstration strikes are not labelled remembered',a
  assert.equal(host.visual()[0].strikes[0].remembered,false);
  host.quiet();until(()=>host.state==='ended');host.dispose();
 });
+
+test('connected body choices survive the remembered opening, live answer and exact kept sound',async()=>{
+ const {host,until,verify}=fixture();await host.enable([grove,grove,grove]);
+ host.scheduleContinuation([{part:0,frame:0,command:{kind:'strike',body:1,position:1,velocity:.5}}],{handoffFrame:500});
+ assert.equal(host.send(0,{kind:'strike',body:2,position:1,velocity:.5}).reason,'continuation');
+ until(()=>host.continuation.state==='completed');
+ assert.equal(host.visual()[0].strikes[0].body,1);
+ assert.equal(host.visual()[0].strikes[0].remembered,true);
+ assert.equal(host.send(0,{kind:'strike',body:2,position:1,velocity:.5}).queued,true);
+ until(()=>host.visual()[0].strikes.some(s=>s.body===2&&!s.remembered));
+ assert.equal(host.stats[0].strikes,2);
+ host.quiet();until(()=>host.state==='ended');
+ const record=verify();
+ assert.deepEqual(record.parts[0].record.events.map(e=>e.body),[1,2]);
+ assert.ok(record.parts[0].record.events[1].frame>500);
+ host.dispose();
+});

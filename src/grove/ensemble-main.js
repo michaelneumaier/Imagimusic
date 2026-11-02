@@ -15,7 +15,7 @@ import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),groves=[48,51,55].map(note=>retuneGroveCluster(composeGrove({seed:3}),note)),keys=['a','s','d'],holdControls=[],held=[false,false,false],reduced=matchMedia('(prefers-reduced-motion: reduce)');
-let world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
+let selectedPart=null,world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const active=()=>!demonstration&&(!continued||host.continuation?.state==='completed')&&!busy&&!quietWanted&&['ready','playing'].includes(host.state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
@@ -34,7 +34,7 @@ function sync(){
  $('gestures').textContent=demonstration?'Keep demonstration gestures ↓':'Keep gestures ↓';$('sound').textContent=continued?'Keep continued sound ↓':demonstration?'Keep demonstration sound ↓':'Keep sound ↓';
  $('quiet').disabled=!busy&&!returnPreparing()&&!continuationPreparing()&&!keepPreparing()&&!replayActive()&&!['ready','playing','suspended','preparing'].includes(host.state);
  $('listen-back').disabled=!host.hasRecording||busy||saving||returnPreparing()||continuationPreparing()||keepPreparing()||replay.state==='preparing';$('listen-back').textContent=demonstration?'Hear the demonstration again ↗':'Listen back ↗';
- for(let i=0;i<3;i++){$('strike-'+i).disabled=!active();$('hold-'+i).disabled=!active();$('hold-'+i).setAttribute('aria-pressed',String(held[i]));}
+ for(let i=0;i<3;i++){$('body-strike-'+i).disabled=selectedPart===null||!active();$('strike-'+i).disabled=!active();$('hold-'+i).disabled=!active();$('hold-'+i).setAttribute('aria-pressed',String(held[i]));}
  $('keeping').hidden=!host.hasRecording;$('gestures').disabled=busy||saving||continued;$('gestures').hidden=continued;$('sound').disabled=busy||saving||returnPreparing()||replayActive();
  const result=returnSession?.result,locked=busy||saving||returnPreparing();
  $('return-details').hidden=continued;
@@ -182,6 +182,7 @@ $('begin').onclick=()=>begin(false);
 $('demonstration').onclick=()=>begin(true);
 $('quiet').onclick=()=>{if(continuationPreparing()||keepPreparing()){cancelContinuation();sync();return;}if(returnPreparing()){cancelReturn();status('Return preparation cancelled. The original passage is unchanged.');sync();return;}if(replayActive()){const wasReturn=listeningReturn;operation++;stopListening();host.park();status(wasReturn?'Listening stopped. The original and its return are unchanged.':demonstration?'Listening stopped. The demonstration is unchanged.':'Listening stopped. Your passage is unchanged.');sync();return;}releaseAll();quietWanted=true;if(busy){operation++;busy=false;}host.quiet();if(host.state==='idle'){quietWanted=false;status('Preparation cancelled. Begin whenever you are ready.');}sync();};
 for(let i=0;i<3;i++){
+ $('body-strike-'+i).onclick=()=>{if(selectedPart!==null&&active())host.send(selectedPart,{kind:'strike',body:i,position:1,velocity:.5});};
  $('strike-'+i).onclick=()=>{if(active())host.send(i,{kind:'strike',body:0,position:1,velocity:.5});};
  holdControls.push(bindHoldControl($('hold-'+i),{enabled:active,onChange:down=>{
   const recipe=host.recipes?.[i];if(recipe)host.send(i,{kind:'contact',body:0,zone:down?recipe.zones.length-1:null,...(down?{strength:recipe.strengths.findIndex(s=>s.name==='firm')}:{})});
@@ -196,6 +197,18 @@ function park(){operation++;cancelContinuation();sourceSoundController?.abort();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});
 window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAnimationFrame(animation);holdControls.forEach(control=>control.dispose());host.dispose();replay.dispose();returnSession.dispose();continuationSource.dispose();continuationKeep.dispose();scenes.forEach(scene=>scene.dispose());world?.dispose();}});
 try{world=createGroveWorld($('world'));world.controls.enabled=false;scenes=groves.map((grove,i)=>{const scene=createGroveScene(grove);scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);world.scene.add(scene.root);return scene;});world.camera.position.set(0,3.7,10.8);world.camera.lookAt(0,1.4,0);}catch{$('world').hidden=true;$('picture-note').textContent='The 3D view is unavailable. Labelled controls and sound are still available.';}
+// Preserve the scene's ordinary floor labels; close views lift the same numbers
+// above their actual bodies at a readable, screen-relative size. Sound is unchanged.
+const ordinaryLabels=scenes.map(scene=>scene.bodies.map(({label})=>({position:label.position.clone(),scale:label.scale.clone(),sizeAttenuation:label.material.sizeAttenuation})));
+function labelBodies(part){
+ scenes.forEach((scene,i)=>scene.bodies.forEach(({label,spec},b)=>{
+  const saved=ordinaryLabels[i][b],close=i===part;
+  label.position.copy(saved.position);label.scale.copy(saved.scale);
+  label.material.sizeAttenuation=close?false:saved.sizeAttenuation;
+  if(close){label.position.y=spec.position[1]+spec.scale[1]*1.3+.32;label.scale.set(.56,.28,1);}
+  label.material.needsUpdate=true;
+ }));
+}
 const markerOptions={distinguishRemembered:false};
 $('distinguish-remembered').onchange=()=>{markerOptions.distinguishRemembered=$('distinguish-remembered').checked;$('marker-caption').hidden=!markerOptions.distinguishRemembered;};
 const widePictureNote=$('picture-note').textContent;
@@ -211,6 +224,11 @@ function chooseView(part){
   scenes.forEach((scene,i)=>scene.root.visible=i===part);
   $('picture-note').textContent=`${viewNames[part]}, close. ${viewNames.filter((_,i)=>i!==part).join(' and ')} are hidden from this view. Internal connections belong to this Grove only.`;
  }
+ selectedPart=part;labelBodies(part);
+ $('body-controls').hidden=part===null;
+ $('body-controls-title').textContent=part===null?'':`Play a body of ${viewNames[part]}`;
+ for(let b=0;b<3;b++)$('body-strike-'+b).setAttribute('aria-label',`Play ${String(b+1).padStart(2,'0')}${part===null?'':` of ${viewNames[part]}`}`);
+ sync();
  $('view-caption').hidden=part===null;
  $('view-caption').textContent=part===null?'':`Looking at ${viewNames[part]}. All three voices remain audible.`;
  $('world').dataset.close=String(part!==null);
