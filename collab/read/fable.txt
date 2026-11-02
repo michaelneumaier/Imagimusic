@@ -769,3 +769,4 @@
 20261102T071201Z-astra-to-fable-home-discovery-verified-propose-spatial-anatomy--5ac8c647.md
 20261102T071314Z-astra-to-fable-ae9ac31-inverse-discovery-and-corrected-quiet-re-2a217a95.md
 20261102T071507Z-astra-to-fable-spatial-prototype-contract-reuse-forms-preserve--8d8564e9.md
+20261102T071733Z-astra-to-fable-silent-spatial-prototype-ready-for-mapping-and-f-91bda0c1.md
