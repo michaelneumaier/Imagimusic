@@ -7,7 +7,7 @@ const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
-let lastTouch=null,mountedTopology=null,mountedReport=null;
+let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function restore(){example.slice(0,3).forEach((f,i)=>$('f'+i).value=f);$('decay').value=example[3];$('base').value='48';}
@@ -29,6 +29,11 @@ function cancel(message='Preparation cancelled. Previous results and instrument 
 }
 $('cancel').onclick=()=>{if(busy)cancel();};
 addEventListener('keydown',event=>{if(event.key==='Escape'&&busy){event.preventDefault();cancel();}});
+$('listening-level').oninput=()=>{
+ const next=Number($('listening-level').value);
+ try{transport?.setListeningLevel(next);listeningLevel=next;$('level-label').textContent=next===0?'Muted':next+'×';$('listening-level').setAttribute('aria-valuetext',next===0?'Muted, zero times':next+' times');}
+ catch(error){$('listening-level').value=listeningLevel;$('gesture').textContent=error.message;}
+};
 $('quiet').onclick=()=>{transport?.quiet();$('gesture').textContent='Quiet. You can choose another anatomy.';controls();};
 $('example').onclick=restore;
 $('search-form').onsubmit=async event=>{
@@ -64,7 +69,7 @@ async function prepare(candidate,card){
  if(busy||state().active)return;
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent=`Preparing the ${candidate.topology} at your audio context’s sample rate…`;
  try{
-  if(!context){context=new AudioContext();transport=createInverseTransport(context);context.onstatechange=()=>controls();}
+  if(!context){context=new AudioContext();transport=createInverseTransport(context);transport.setListeningLevel(listeningLevel);context.onstatechange=()=>controls();}
   const prepared=await jobs.run({kind:'candidate',grove:candidate.grove,sampleRate:context.sampleRate});
   if(token!==generation)return;
   await ensureSpatial();

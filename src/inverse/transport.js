@@ -1,14 +1,26 @@
 import {createInverseInstrument, INVERSE_SINGLE_STRIKE_PEAK_BOUND} from './instrument.js';
 export const INVERSE_MAX_STRIKES=8;
+export const INVERSE_MAX_LISTENING_LEVEL=4;
+export const INVERSE_LEVEL_RAMP_SECONDS=.03;
 /** Caller resumes its AudioContext through an explicit user gesture. Preparing
  * or mounting a candidate never resumes the context or schedules a sound. */
 export function createInverseTransport(context){
  let mounted=null,disposed=false;
- const active=new Set();
+ const active=new Set(),output=context.createGain();output.gain.value=1;output.connect(context.destination);
+ let listeningLevel=1,ramp={from:1,to:1,start:0,end:0};
+ const levelAt=time=>time>=ramp.end?ramp.to:time<=ramp.start?ramp.from:ramp.from+(ramp.to-ramp.from)*(time-ramp.start)/(ramp.end-ramp.start);
  const retire=entry=>{if(!active.delete(entry))return;entry.node.onended=null;entry.node.disconnect();};
  const prune=()=>{for(const entry of active)if(context.currentTime>=entry.end)retire(entry);};
  const live=()=>{if(disposed)throw new Error('Instrument transport is disposed.');};
  return {
+  get listeningLevel(){return listeningLevel;},
+  setListeningLevel(level){
+   live();if(!Number.isFinite(level)||level<0||level>INVERSE_MAX_LISTENING_LEVEL)throw new RangeError('Listening level must be within 0..4.');
+   prune();const now=context.currentTime,instant=!active.size||context.state!=='running',from=instant?level:levelAt(now);
+   output.gain.cancelScheduledValues(now);output.gain.setValueAtTime(from,now);
+   if(!instant)output.gain.linearRampToValueAtTime(level,now+INVERSE_LEVEL_RAMP_SECONDS);
+   ramp={from,to:level,start:now,end:instant?now:now+INVERSE_LEVEL_RAMP_SECONDS};listeningLevel=level;
+  },
   mount(prepared){
    live();prune();if(active.size)throw new Error('Let the instrument finish or choose Quiet before changing it.');
    const instrument=createInverseInstrument(prepared.grove,{sampleRate:context.sampleRate});
@@ -31,7 +43,7 @@ export function createInverseTransport(context){
    if(context.state!=='running')throw new Error('Start listening before striking.');
    prune();if(active.size>=INVERSE_MAX_STRIKES)return false;
    const node=context.createBufferSource(),start=context.currentTime;
-   node.buffer=mounted.buffers[body];node.connect(context.destination);
+   node.buffer=mounted.buffers[body];node.connect(output);
    const entry={node,body,start,end:start+mounted.instrument.duration};
    node.onended=()=>retire(entry);active.add(entry);
    try{node.start(start);}catch(error){retire(entry);throw error;}
@@ -42,6 +54,6 @@ export function createInverseTransport(context){
    return {time:now,active:active.size,strikes:[...active].map(entry=>({body:entry.body,age:Math.max(0,now-entry.start),...mounted.instrument.frame(entry.body,Math.max(0,now-entry.start))}))};
   },
   quiet(){for(const entry of [...active]){try{entry.node.stop();}finally{retire(entry);}}},
-  dispose(){if(disposed)return;this.quiet();mounted=null;disposed=true;}
+  dispose(){if(disposed)return;this.quiet();mounted=null;output.disconnect();disposed=true;}
  };
 }

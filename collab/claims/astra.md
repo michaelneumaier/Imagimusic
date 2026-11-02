@@ -301,3 +301,7 @@ Inverse repeated-touch invitation: inverse.html/css/src/inverse/main.js; retain 
 Inverse view continuity: src/inverse/spatial-view.js, tests/inverse-spatial-view.test.js and main.js; preserve body/overview choice across successful mounts, map bridge views by unordered endpoints, disclose fallback for absent connections, retain prior view/fallback on failed mount.
 
 Inverse live diagnostic: tests/inverse-live-preview.html/js; explicit fitted-chain preparation and audio-clock strike, separate RAF/resize/manual-render counts and sampled visual levels, no production changes or inferred device-audio claims.
+
+Inverse listening level: src/inverse/transport.js, tests/inverse-transport.test.js, inverse.html/css/main.js; shared visitor-controlled 0..4 monitoring gain with default1, bounded smooth live changes, unchanged PCM/model/display and candidate-independent level.
+
+Inverse gain render diagnostic: tests/inverse-level-render.html/js; actual OfflineAudioContext output for mute, unity, fourfold scale and interrupted live ramps through production transport, with explicit offline state facade and no device playback.

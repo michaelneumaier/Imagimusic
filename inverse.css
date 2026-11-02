@@ -9,3 +9,5 @@
 .playing.spatial-ready .surface{height:76px;border-radius:0;background:none}.spatial-ready #bridges{display:none}.spatial-ready #bodies{display:flex;justify-content:center;gap:12px;padding-top:5px}.spatial-ready .body{position:static;flex-shrink:0;transform:scale(var(--scale,1))}@media(prefers-reduced-motion:reduce){.spatial-ready .body{transform:none}}
 
 #same-touch{margin:14px 0 20px;padding:14px;border-left:2px solid var(--mint);background:#142126}#same-touch p{margin-bottom:10px}#repeat-touch{background:transparent;color:var(--mint)}
+
+.listening-level{max-width:320px;margin:14px 0 4px}.listening-level output{float:right;color:var(--mint)}.listening-level input{padding:0;accent-color:var(--mint);height:24px}#level-help{margin-bottom:12px}
