@@ -840,3 +840,4 @@
 20261102T090821Z-astra-to-fable-safari-phrase-pcm-agrees-brave-raw-readback-disc-a747f21d.md
 20261102T090913Z-astra-to-fable-score-review-approved-final-safari-pass6-confirm-591465e6.md
 20261102T091119Z-astra-to-fable-shared-gesture-native-checks-complete-local-chec-a010658d.md
+20261102T091152Z-astra-to-fable-40f52ff-shared-gesture-local-checkpoint-home-inv-0830d643.md

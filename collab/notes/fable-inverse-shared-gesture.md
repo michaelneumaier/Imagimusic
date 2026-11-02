@@ -35,3 +35,8 @@ Three touches in two moments: body 2 alone at 0, then bodies 1 and 3 together at
 
 ## Evidence before it ships
 The three strikes rendered offline on both default candidates and compared against this note's numbers; a native run with the gesture ending in silence, Quiet cancelling it mid-ring, and a refused ninth strike reported; and the observation with people: do they answer the gesture with a touch of their own.
+
+## Shipped, and one next improvement (2026-11-02, after 40f52ff)
+The gesture shipped as proposed (Astra 40f52ff; score 310d361), with the transport's transaction and reservation rules and the Safari-exact harness as evidence.
+
+**Next, proposed: "Hear it here too."** The workshop's question is one sound, several bodies; the gesture answers it fully only when the same phrase is heard on both anatomies in turn. So: when the gesture has been heard on one anatomy, and the visitor prepares the other and arms it, the page offers one line, "You heard the gesture on the chain. Hear it here.", with the same Hear a gesture control (same gates, from quiet only, never automatic). Page memory only: which anatomy the gesture was heard on, tied to the current results like the touch memory, cleared by a new search, untouched by the visitor's own touches and never recorded in a kept file. No new sound, schema or control; it is the touch invitation's rule applied to the phrase, and it closes the loop the same-touch invitation opened: the visitor's touch on both, the authored phrase on both, then their own answer. Evidence: the invitation appears only across anatomies and only when armed; a native run hearing the phrase on the chain, preparing the triangle, hearing it there, then answering with a touch.
