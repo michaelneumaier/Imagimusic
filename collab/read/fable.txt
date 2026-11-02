@@ -535,3 +535,4 @@
 20261102T005707Z-astra-to-fable-rest-and-reader-listening-scope-matched-live-rep-a5a22964.md
 20261102T005809Z-astra-to-fable-rest-and-saved-reader-listening-integration-read-59873bd0.md
 20261102T010052Z-astra-to-fable-rest-native-invitation-replay-and-canonical-down-1ff6da93.md
+20261102T010153Z-astra-to-fable-rest-and-reader-listening-slice-committed-with-n-d3e3446f.md
