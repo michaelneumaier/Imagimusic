@@ -57,3 +57,18 @@ test('listening gain is downstream and never changes the saved model record',asy
  host.setListeningDb(12);await host.enable(groves);complete(nodes[0]);const before=host.recording();
  host.setListeningDb(20);assert.deepEqual(host.recording(),before);assert.deepEqual(levels,[12,20]);assert.throws(()=>host.setListeningDb(21));host.dispose();
 });
+
+const opening=[{part:0,time:0,command:{kind:'strike',body:0,position:0,velocity:.5}},{part:1,time:1.25,command:{kind:'strike',body:0,position:0,velocity:.5}},{part:0,time:3,command:{kind:'quiet',fadeFrames:200}}];
+test('authored opening shares one clock, remains acknowledgement-led and can be ended early',async()=>{
+ const {host,nodes,contexts}=fixture();await host.enable(groves);const result=host.scheduleOpening(opening);assert.equal(result.queued,true);assert.equal(result.originFrame,8280);
+ assert.deepEqual(nodes[0].sent.map(m=>[m.part,m.events.map(e=>e.frame)]),[[0,[8280,32280]],[1,[18280]]]);
+ assert.equal(host.stats[0].strikes,0);assert.equal(host.hasRecording,false);
+ assert.equal(host.send(2,{kind:'strike',body:0,position:0,velocity:.5}).reason,'authored-opening');assert.equal(host.scheduleOpening(opening).reason,'not-fresh');
+ contexts[0].currentTime=1.1;assert.equal(host.quiet().queued,true);assert.equal(nodes[0].sent.at(-1).events[0].frame,9080);assert.equal(nodes[0].sent.at(-1).events[0].kind,'quiet');
+ host.park();assert.equal(contexts[0].state,'closed');await host.enable(groves);assert.equal(host.send(2,{kind:'strike',body:0,position:0,velocity:.5}).queued,true);host.dispose();
+});
+test('opening validates the entire score before posting and cannot enter a personal passage before its first ack',async()=>{
+ const {host,nodes}=fixture();await host.enable(groves);
+ for(const steps of [[],opening.slice(0,-1),[...opening,{part:2,time:4,command:{kind:'strike',body:0,position:0,velocity:.5}}],opening.map((s,i)=>i===1?{...s,part:9}:s),opening.map((s,i)=>i===1?{...s,time:NaN}:s),opening.map((s,i)=>i===2?{...s,time:21}:s)])assert.equal(host.scheduleOpening(steps).reason,'invalid-opening');
+ assert.equal(nodes[0].sent.length,0);host.send(2,{kind:'strike',body:0,position:0,velocity:.5});assert.equal(host.state,'ready');assert.equal(host.scheduleOpening(opening).reason,'not-fresh');assert.equal(nodes[0].sent.length,1);host.dispose();
+});

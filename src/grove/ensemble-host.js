@@ -11,7 +11,7 @@ const render=(data,options)=>restWorkerJob(new URL('./ensemble-render-worker.js'
 /** Experimental shared-clock host. Computation equivalence is not realtime clearance. */
 export function createEnsembleHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-grove-ensemble',options),prepareRecipes=prepare,renderRecord=render,createListeningStage=createListeningLevel,onChange=()=>{},onDecision=()=>{}}={}){
  let context=null,node=null,recipes=null,captures=null,acks=null,controller=null,generation=0,sequence=0,state='idle',error=null,latest=null,record=null,pcm=null,rendering=null,origin=null;
- let strikes=[[],[],[]],listening=null,listeningDb=20;
+ let strikes=[[],[],[]],listening=null,listeningDb=20,opening=false;
  const emit=()=>onChange({state,error,stats:captures?.map(c=>c.stats)??null,hasRecording:!!record});
  function detach(){if(!node)return;node.port.onmessage=null;node.onprocessorerror=null;node.disconnect();node.port.close();node=null;}
  function closeContext(){listening?.dispose();listening=null;const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}}
@@ -46,7 +46,7 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   }catch(cause){fail(cause);}
  }
  function mount(next){
-  recipes=next;captures=recipes.map(recipe=>createRestCapture(recipe,{generation:String(generation)}));acks=[[],[],[]];sequence=0;strikes=[[],[],[]];origin=null;latest=null;
+  recipes=next;captures=recipes.map(recipe=>createRestCapture(recipe,{generation:String(generation)}));acks=[[],[],[]];sequence=0;opening=false;strikes=[[],[],[]];origin=null;latest=null;
   const own=generation;
   const mounted=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{recipes,generation:String(own),snapshots:true,postAudio:false}});
   node=mounted;node.port.onmessage=({data})=>consume(data,own);node.onprocessorerror=()=>{if(own===generation)fail(new Error('Ensemble audio processor failed'));};node.connect(listening.input);
@@ -65,17 +65,40 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
    mount(next.recipes);
   }catch(cause){if(own!==generation)return;controller.abort();controller=new AbortController();detach();closeContext();captures=null;acks=null;rendering=null;error=cause;record=previous;pcm=previousPcm;state=previous?'ended':'error';emit();throw cause;}
  }
- function send(part,command){
-  if(!Number.isInteger(part)||part<0||part>2)throw new Error('Choose an ensemble voice from 0 to 2');
-  if(!command||typeof command!=='object')return {queued:false,reason:'invalid-command'};
+ function validCommand(part,command){
+  if(!Number.isInteger(part)||part<0||part>2||!command||typeof command!=='object')return false;
   const recipe=recipes?.[part],kind=command.kind;
   if(recipe){
    const body=Number.isInteger(command.body)&&command.body>=0&&command.body<recipe.bodies;
    const valid=kind==='quiet'?Number.isSafeInteger(command.fadeFrames)&&command.fadeFrames>0&&command.fadeFrames<=recipe.sampleRate:
     kind==='strike'?body&&Number.isInteger(command.position)&&!!recipe.strikeVectors[command.position]&&Number.isFinite(command.velocity)&&command.velocity>0&&command.velocity<=1:
     kind==='contact'?body&&(command.zone===null||(Number.isInteger(command.zone)&&command.zone>=0&&command.zone<recipe.zones.length&&Number.isInteger(command.strength)&&command.strength>=0&&command.strength<recipe.strengths.length)):false;
-   if(!valid)return {queued:false,reason:'invalid-command'};
+   return valid;
   }
+  return false;
+ }
+ /** Schedule a bounded authored example only on a fresh, unused passage.
+  * Every timestamp shares one audio-clock origin; records still use actual acks. */
+ function scheduleOpening(steps){
+  if(!node||state!=='ready'||sequence!==0||opening)return {queued:false,reason:'not-fresh'};
+  if(!Array.isArray(steps)||!steps.length||steps.length>32)return {queued:false,reason:'invalid-opening'};
+  let last=-1,quietCount=0,strikeCount=0;
+  for(const step of steps){
+   if(!step||!Number.isFinite(step.time)||step.time<0||step.time>20||step.time<last||!validCommand(step.part,step.command))return {queued:false,reason:'invalid-opening'};
+   last=step.time;if(step.command.kind==='quiet')quietCount++;if(step.command.kind==='strike')strikeCount++;
+  }
+  if(quietCount!==1||!strikeCount||steps.at(-1).command.kind!=='quiet'||steps.slice(0,-1).some(step=>step.time>=last))return {queued:false,reason:'invalid-opening'};
+  const base=Math.ceil((context.currentTime+.035)*context.sampleRate),parts=[[],[],[]];
+  for(const step of steps)parts[step.part].push({...step.command,id:`opening-${sequence++}`,frame:base+Math.round(step.time*context.sampleRate)});
+  opening=true;
+  try{parts.forEach((events,part)=>{if(events.length)node.port.postMessage({type:'events',part,events});});}
+  catch(cause){fail(cause);throw cause;}
+  return {queued:true,originFrame:base};
+ }
+ function send(part,command){
+  if(!Number.isInteger(part)||part<0||part>2)throw new Error('Choose an ensemble voice from 0 to 2');
+  if(!validCommand(part,command))return {queued:false,reason:'invalid-command'};
+  if(opening&&command.kind!=='quiet')return {queued:false,reason:'authored-opening'};
   const release=command.kind==='quiet'||(command.kind==='contact'&&command.zone===null);
   if(!node||(!['ready','playing'].includes(state)&&!(state==='suspended'&&release)))return {queued:false,reason:state};
   const event={...command,id:`gesture-${sequence++}`,frame:Math.ceil((context.currentTime+.035)*context.sampleRate)};
@@ -101,5 +124,5 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   if(state==='disposed')return;generation++;controller?.abort();controller=new AbortController();detach();closeContext();rendering=null;latest=null;strikes=[[],[],[]];captures=null;acks=null;state=record?'ended':'idle';emit();
  }
  function dispose(){park();controller?.abort();record=pcm=recipes=null;state='disposed';emit();}
- return {enable,send,quiet,setListeningDb,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipes(){return recipes;},get hasRecording(){return !!record;},get stats(){return captures?.map(c=>c.stats)??null;}};
+ return {enable,send,scheduleOpening,quiet,setListeningDb,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipes(){return recipes;},get hasRecording(){return !!record;},get stats(){return captures?.map(c=>c.stats)??null;}};
 }
