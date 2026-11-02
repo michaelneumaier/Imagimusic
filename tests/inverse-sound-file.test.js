@@ -51,3 +51,33 @@ test('selected-file reads enforce size before reading and cancellation after rea
  await assert.rejects(readInverseSoundFile({name:'changed.wav',size:bytes.byteLength+1,arrayBuffer:async()=>bytes}),/size changed/);
  const result=await readInverseSoundFile({name:'local.wav',size:bytes.byteLength,arrayBuffer:async()=>bytes});assert.equal(result.name,'local.wav');assert.equal(result.bytes,bytes);
 });
+
+function extensibleWav({validBits=24,mask=3,...options}={}){
+ const classic=wav(options),v=new DataView(classic),fmt=new Uint8Array(40),f=new DataView(fmt.buffer);
+ fmt.set(new Uint8Array(classic,20,16));f.setUint16(0,0xfffe,true);f.setUint16(16,22,true);f.setUint16(18,validBits,true);f.setUint32(20,mask,true);
+ fmt.set([options.code??1,0,0,0,0,0,16,0,128,0,0,170,0,56,155,113],24);
+ return riff([chunk('fmt ',fmt),chunk('data',new Uint8Array(classic,44,v.getUint32(40,true)))]);
+}
+test('extensible PCM preserves full precision and left-aligned valid bits without remix',()=>{
+ for(const bits of [16,24,32])for(const validBits of [1,bits-4,bits]){
+  const scale=2**(bits-1),step=2**(bits-validBits),samples=[-scale,scale-step,0,-step];
+  const r=parseInverseSound(extensibleWav({bits,validBits,channels:2,samples,mask:5}));
+  assert.deepEqual([...r.channels[0]],[-1,0]);assert.deepEqual([...r.channels[1]],[(scale-step)/scale,-step/scale]);
+  assert.equal(r.containerBits,bits);assert.equal(r.validBits,validBits);assert.equal(r.channelMask,5);assert.equal(r.extensible,true);
+ }
+ const unspecified=parseInverseSound(extensibleWav({bits:32,validBits:24,channels:1,mask:0,samples:[256,-256]}));
+ assert.deepEqual([...unspecified.channels[0]],[1/8388608,-1/8388608]);assert.equal(unspecified.channelMask,0);
+});
+test('extensible float preserves values; malformed extensions and padding are refused',()=>{
+ const base=extensibleWav({code:3,bits:32,validBits:32,channels:2,samples:[-1.5,2]});
+ assert.deepEqual(parseInverseSound(base).channels.map(c=>[...c]),[[-1.5],[2]]);
+ for(const offset of [45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]){
+  const b=base.slice(0);new Uint8Array(b)[offset]^=1;assert.throws(()=>parseInverseSound(b),/subformat/);
+ }
+ for(const [offset,value] of [[36,21],[38,0],[38,33],[38,24],[44,6]]){
+  const b=base.slice(0);new DataView(b).setUint16(offset,value,true);assert.throws(()=>parseInverseSound(b));
+ }
+ for(const mask of [1,7,0x80000001])assert.throws(()=>parseInverseSound(extensibleWav({bits:24,channels:2,mask,samples:[0,0]})),/channel mask/);
+ assert.throws(()=>parseInverseSound(extensibleWav({bits:32,validBits:24,channels:1,mask:4,samples:[257]})),/unused sample bits/);
+ assert.throws(()=>parseInverseSound(extensibleWav({code:3,bits:32,validBits:32,channels:1,mask:4,samples:[NaN]})),/non-finite/);
+});

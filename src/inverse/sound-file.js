@@ -1,5 +1,5 @@
 /** Local analysis input only. RIFF chunks follow Microsoft RIFF/WAVE layout;
- * supported subset: classic PCM 16/24/32 or IEEE float32, one/two channels.
+ * supported subset: classic or extensible PCM 16/24/32 or IEEE float32, one/two channels.
  * No resampling, mixing, gain change, playback, or interpretation of resonances.
  */
 export const SOUND_FILE_MAX_BYTES=8*1024*1024;
@@ -17,12 +17,22 @@ export function parseInverseSound(bytes){
   if(next>bytes.byteLength)fail('The WAV chunk or its padding is truncated.');
   if(id==='fmt '){
    if(format||data||size<16)fail('The WAV needs one format chunk before its audio data.');
-   const code=view.getUint16(start,true),channels=view.getUint16(start+2,true),sampleRate=view.getUint32(start+4,true),byteRate=view.getUint32(start+8,true),align=view.getUint16(start+12,true),bits=view.getUint16(start+14,true);
-   if(!((code===1&&[16,24,32].includes(bits))||(code===3&&bits===32)))fail('Use classic PCM 16/24/32-bit or 32-bit float WAV; compressed and extensible WAV are not supported yet.');
+   let code=view.getUint16(start,true);const extensible=code===0xfffe;const channels=view.getUint16(start+2,true),sampleRate=view.getUint32(start+4,true),byteRate=view.getUint32(start+8,true),align=view.getUint16(start+12,true),bits=view.getUint16(start+14,true);
+   let validBits=bits,channelMask=null;
+   if(extensible){
+    if(size!==40||view.getUint16(start+16,true)!==22)fail('Use the standard 22-byte extensible WAV extension.');
+    validBits=view.getUint16(start+18,true);channelMask=view.getUint32(start+20,true);
+    const guid=new Uint8Array(bytes,start+24,16),tail=[0,0,0,0,0,0,16,0,128,0,0,170,0,56,155,113];
+    if(![1,3].includes(guid[0])||guid.some((v,i)=>i>0&&v!==tail[i]))fail('Use uncompressed PCM or float WAV; this subformat is unsupported.');
+    code=guid[0];
+    if(validBits<1||validBits>bits||(code===3&&validBits!==32))fail('The WAV valid-bit precision is unsupported.');
+    if(channelMask!==0&&((channelMask&0xfffc0000)!==0||channelMask.toString(2).replaceAll('0','').length!==channels))fail('The WAV channel mask does not match its channels.');
+   }
+   if(!((code===1&&[16,24,32].includes(bits))||(code===3&&bits===32)))fail('Use PCM 16/24/32-bit or 32-bit float WAV; compressed formats are unsupported.');
    if(![1,2].includes(channels)||sampleRate<8000||sampleRate>96000)fail('Use mono or stereo WAV at 8–96 kHz.');
    if(align!==channels*bits/8||byteRate!==sampleRate*align)fail('The WAV sample layout is inconsistent.');
-   if(size!==16&&(size!==18||view.getUint16(start+16,true)!==0))fail('This WAV format extension is not supported.');
-   format={code,channels,sampleRate,align,bits};
+   if(!extensible&&size!==16&&(size!==18||view.getUint16(start+16,true)!==0))fail('This WAV format extension is not supported.');
+   format={code,channels,sampleRate,align,bits,validBits,channelMask,extensible};
   }else if(id==='data'){
    if(!format||data)fail('The WAV needs one audio data chunk after its format.');
    data={start,size};
@@ -45,10 +55,13 @@ export function parseInverseSound(bytes){
   else if(format.bits===16)value=view.getInt16(offset,true)/32768;
   else if(format.bits===32)value=view.getInt32(offset,true)/2147483648;
   else{let word=view.getUint8(offset)|(view.getUint8(offset+1)<<8)|(view.getUint8(offset+2)<<16);if(word&0x800000)word-=0x1000000;value=word/8388608;}
+  // Valid PCM bits are left-aligned. Refuse nonzero padding rather than silently
+  // discarding it or presenting precision that the file does not actually obey.
+  if(format.code===1&&format.validBits<format.bits&&!Number.isInteger(value*2**(format.validBits-1)))fail('The WAV contains nonzero unused sample bits.');
   if(!Number.isFinite(value))fail('The WAV contains non-finite audio samples.');
   channels[channel][frame]=value;peak=Math.max(peak,Math.abs(value));if(Math.abs(value)>=1)atOrAboveUnitySamples++;
  }
- return {channels,sampleRate:format.sampleRate,frameCount,duration,encoding:format.code===3?'float32':`pcm${format.bits}`,peak,atOrAboveUnitySamples};
+ return {channels,sampleRate:format.sampleRate,frameCount,duration,containerBits:format.bits,validBits:format.validBits,channelMask:format.channelMask,extensible:format.extensible,encoding:format.code===3?'float32':`pcm${format.bits}`,peak,atOrAboveUnitySamples};
 }
 const check=signal=>{if(signal?.aborted)throw new DOMException('Opening sound cancelled.','AbortError');};
 export async function readInverseSoundFile(file,{signal}={}){

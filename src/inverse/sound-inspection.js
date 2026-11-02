@@ -18,14 +18,14 @@ function draw(canvas,wave,range,color){
 function render(){
  $('sound').hidden=!current;if(!current)return;
  $('sound-title').textContent=current.name;
- $('description').textContent=`${current.duration.toFixed(3)} seconds · ${current.waveforms.length===1?'mono':'stereo'} · ${current.sampleRate.toLocaleString()} Hz · ${current.encoding}`;
+ $('description').textContent=`${current.duration.toFixed(3)} seconds · ${current.waveforms.length===1?'mono':'two channels'} · ${current.sampleRate.toLocaleString()} Hz · ${current.encoding}`;
  $('waveforms').replaceChildren();const range=Math.max(1,current.peak);
  for(const [index,wave] of current.waveforms.entries()){
   const figure=document.createElement('figure'),caption=document.createElement('figcaption'),canvas=document.createElement('canvas');caption.textContent=`Channel ${index+1} · ${current.frameCount.toLocaleString()} samples`;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`Channel ${index+1} sample waveform, from 0 to ${current.duration.toFixed(3)} seconds. Vertical range minus ${range} to plus ${range}.`);figure.append(caption,canvas);$('waveforms').append(figure);draw(canvas,wave,range,index===0?'#acd9bf':'#ccb4df');
  }
  $('scale').textContent=`The vertical axes use sample values; the vertical range is ±${range.toPrecision(4)} for every channel. ${current.peak===0?'This file contains only zero-valued samples.':range>1?'The view expands to include samples beyond ±1; sample values are unchanged.':'The vertical scale is fixed at ±1.'}`;
  $('details').replaceChildren();field('File size',`${current.byteLength.toLocaleString()} bytes`);field('Peak absolute sample',current.peak.toPrecision(8));field('Samples at or beyond ±1',current.atOrAboveUnitySamples.toLocaleString());
- current.waveforms.forEach((wave,i)=>{field(`Channel ${i+1} RMS`,wave.rms.toPrecision(8));field(`Channel ${i+1} mean`,wave.mean.toPrecision(8));});field('Exact-file SHA-256',current.sha256);
+ current.waveforms.forEach((wave,i)=>{field(`Channel ${i+1} RMS`,wave.rms.toPrecision(8));field(`Channel ${i+1} mean`,wave.mean.toPrecision(8));});field('WAV format',current.extensible?'Extensible':'Classic');field('Sample precision',`${current.validBits} valid bits in ${current.containerBits}-bit containers`);if(current.extensible)field('Declared channel mask',current.channelMask===0?'Unspecified':`0x${current.channelMask.toString(16).padStart(8,'0')} · file order preserved`);field('Exact-file SHA-256',current.sha256);
 }
 $('sound-file').onchange=async()=>{
  const file=$('sound-file').files?.[0];$('sound-file').value='';if(!file)return;

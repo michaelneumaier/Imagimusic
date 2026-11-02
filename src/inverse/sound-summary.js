@@ -10,5 +10,5 @@ export function summarizeInverseSound(decoded,bucketLimit=640){
   for(let i=0;i<samples.length;i++){const value=samples[i],bucket=Math.min(count-1,Math.floor(i*count/samples.length));minimum[bucket]=Math.min(minimum[bucket],value);maximum[bucket]=Math.max(maximum[bucket],value);squareSum+=value*value;sum+=value;}
   return {minimum,maximum,rms:Math.sqrt(squareSum/samples.length),mean:sum/samples.length};
  });
- return {sampleRate:decoded.sampleRate,frameCount:decoded.frameCount,duration:decoded.duration,encoding:decoded.encoding,peak:decoded.peak,atOrAboveUnitySamples:decoded.atOrAboveUnitySamples,waveforms};
+ return {sampleRate:decoded.sampleRate,frameCount:decoded.frameCount,duration:decoded.duration,encoding:decoded.encoding,containerBits:decoded.containerBits,validBits:decoded.validBits,channelMask:decoded.channelMask,extensible:decoded.extensible,peak:decoded.peak,atOrAboveUnitySamples:decoded.atOrAboveUnitySamples,waveforms};
 }

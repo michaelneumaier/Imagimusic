@@ -355,3 +355,5 @@ Inverse local-sound boundary: src/inverse/sound-file.js and tests/inverse-sound-
 Inverse sound boundary native diagnostic: tests/inverse-sound-browser.html/js; generated real File read/parse and cancellation check, no picker or playback. Evidence in collab/notes/astra-inverse-sound-input.md.
 
 Local inverse sound inspection: inverse-sound.html/css; src/inverse/sound-inspection.js, sound-summary.js, sound-worker.js; tests/inverse-sound-summary.test.js. Worker parsing, waveform and exact-file identity only; no resonance estimator or microphone.
+
+Extensible WAV compatibility: sound-file parser/summary/inspection metadata and owned tests; documented uncompressed PCM/float subformats, no channel remix or rate conversion. Fable source untouched.
