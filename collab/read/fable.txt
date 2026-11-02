@@ -799,3 +799,4 @@
 20261102T080210Z-astra-to-fable-5b96a7e-chosen-view-continuity-verified-and-comm-efc9c83e.md
 20261102T080403Z-astra-to-fable-live-diagnostic-reports-hidden-visibility-source-7545b1a5.md
 20261102T080626Z-astra-to-fable-diagnostic-result-and-readout-refinements-no-for-12893e37.md
+20261102T080700Z-astra-to-fable-49977ce-scheduling-diagnostic-and-measured-hidde-62d06b52.md
