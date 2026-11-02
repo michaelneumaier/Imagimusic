@@ -41,6 +41,8 @@ for(let i=0;i<3;i++){
   const recipe=host.recipes?.[i];if(recipe)host.send(i,{kind:'contact',body:0,zone:down?recipe.zones.length-1:null,...(down?{strength:recipe.strengths.findIndex(s=>s.name==='firm')}:{})});
  }}));
 }
+try{const saved=localStorage.getItem('imagimusic-ensemble-listening-db');if(saved!==null){const db=Number(saved);if(Number.isFinite(db)&&db>=0&&db<=20){host.setListeningDb(db);$('listening-level').value=String(db);$('listening-value').textContent='+'+db+' dB';}}}catch{}
+$('listening-level').oninput=()=>{const db=Number($('listening-level').value);host.setListeningDb(db);$('listening-value').textContent='+'+db+' dB';try{localStorage.setItem('imagimusic-ensemble-listening-db',String(db));}catch{}};
 function download(bytes,type,name){const url=URL.createObjectURL(new Blob([bytes],{type})),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 $('gestures').onclick=()=>{try{download(canonicalEnsembleRecord(host.recording())+'\n','application/json','imagimusic-ensemble.json');}catch(error){status(error.message,true);}};
 $('sound').onclick=async()=>{saving=true;sync();const own=operation;status('Rebuilding the kept sound…');try{const pcm=await host.saveAudio();if(own===operation){download(stereoWav(pcm),'audio/wav','imagimusic-ensemble.wav');status('The ensemble sound is ready to keep.');}}catch(error){if(own===operation&&error.name!=='AbortError')status(error.message,true);}finally{if(own===operation){saving=false;sync();}}};

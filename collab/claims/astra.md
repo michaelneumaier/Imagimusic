@@ -170,3 +170,6 @@ Experimental ensemble host: src/grove/ensemble-host.js, ensemble-prepare-worker.
 Experimental playing surface: ensemble.html, ensemble.css, src/grove/ensemble-main.js.
 
 Hold lifecycle verification: src/grove/hold-control.js, tests/grove-hold-control.test.js and ensemble-main.js integration. Distinct pointer/key/assistive ownership and cancellation, not audio acknowledgement state.
+
+Listening-level prototype: src/grove/listening-level.js, tests/grove-listening-level.test.js, ensemble-host.js and ensemble.html/main.js. Explicit playback-only gain with sample ceiling; canonical capture/render unchanged.
+Listening graph browser diagnostic: tests/listening-level.html and tests/listening-level-browser.js; muted offline Web Audio verification of gain/ceiling at 0 and20dB.

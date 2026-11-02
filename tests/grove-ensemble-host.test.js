@@ -8,7 +8,7 @@ import {createEnsembleHost} from '../src/grove/ensemble-host.js';
 const grove=composeGrove({seed:3}),groves=[grove,grove,grove],recipe=createGroveRestRecipe(grove,{...DEFAULT_VOICE_CONFIG,partials:1},{sampleRate:8000}),recipes=[recipe,recipe,recipe];
 function fixture(overrides={}){
  const nodes=[],contexts=[],decisions=[];
- const host=createEnsembleHost({createContext:()=>{const c={sampleRate:8000,currentTime:1,state:'suspended',destination:{},audioWorklet:{addModule:async()=>{}},async resume(){this.state='running';},async close(){this.state='closed';}};contexts.push(c);return c;},prepareRecipes:async()=>({recipes}),renderRecord:async({record})=>({pcm:renderEnsembleRecord(record)}),createNode:(_,options)=>{const n={options,sent:[],port:{postMessage:data=>n.sent.push(data),close(){n.closed=true;}},connect(){},disconnect(){n.detached=true;}};nodes.push(n);return n;},onDecision:ack=>decisions.push(ack),...overrides});
+ const host=createEnsembleHost({createListeningStage:()=>({input:{},output:{connect(){}},setDb(){},dispose(){}}),createContext:()=>{const c={sampleRate:8000,currentTime:1,state:'suspended',destination:{},audioWorklet:{addModule:async()=>{}},async resume(){this.state='running';},async close(){this.state='closed';}};contexts.push(c);return c;},prepareRecipes:async()=>({recipes}),renderRecord:async({record})=>({pcm:renderEnsembleRecord(record)}),createNode:(_,options)=>{const n={options,sent:[],port:{postMessage:data=>n.sent.push(data),close(){n.closed=true;}},connect(){},disconnect(){n.detached=true;}};nodes.push(n);return n;},onDecision:ack=>decisions.push(ack),...overrides});
  return {host,nodes,contexts,decisions};
 }
 function complete(node,{empty=false}={}){
@@ -49,4 +49,11 @@ test('invalid local gestures are refused without ending the live passage',async(
  const {host,nodes}=fixture();await host.enable(groves);
  for(const command of [null,{kind:'strike',body:99,position:0,velocity:.5},{kind:'contact',body:0,zone:999,strength:1},{kind:'quiet',fadeFrames:0},{kind:'strike',body:0,position:0,velocity:NaN}])assert.equal(host.send(0,command).reason,'invalid-command');
  assert.equal(nodes[0].sent.length,0);assert.equal(host.state,'ready');host.dispose();
+});
+
+test('listening gain is downstream and never changes the saved model record',async()=>{
+ const levels=[],stage={input:{},output:{connect(){}},setDb:db=>levels.push(db),dispose(){}};
+ const {host,nodes}=fixture({createListeningStage:(_,options)=>{levels.push(options.db);return stage;}});
+ host.setListeningDb(12);await host.enable(groves);complete(nodes[0]);const before=host.recording();
+ host.setListeningDb(20);assert.deepEqual(host.recording(),before);assert.deepEqual(levels,[12,20]);assert.throws(()=>host.setListeningDb(21));host.dispose();
 });

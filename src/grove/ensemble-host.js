@@ -1,3 +1,4 @@
+import {createListeningLevel,listeningGain} from './listening-level.js';
 import {REST_QUIET_FADE_SECONDS} from '../rest/limits.js';
 import {DEFAULT_VOICE_CONFIG} from '../score/grove-voice.js';
 import {visualFromState} from '../rest/engine.js';
@@ -8,12 +9,12 @@ import {restWorkerJob} from './contact-job.js';
 const prepare=(data,options)=>restWorkerJob(new URL('./ensemble-prepare-worker.js',import.meta.url),data,options);
 const render=(data,options)=>restWorkerJob(new URL('./ensemble-render-worker.js',import.meta.url),data,options);
 /** Experimental shared-clock host. Computation equivalence is not realtime clearance. */
-export function createEnsembleHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-grove-ensemble',options),prepareRecipes=prepare,renderRecord=render,onChange=()=>{},onDecision=()=>{}}={}){
+export function createEnsembleHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-grove-ensemble',options),prepareRecipes=prepare,renderRecord=render,createListeningStage=createListeningLevel,onChange=()=>{},onDecision=()=>{}}={}){
  let context=null,node=null,recipes=null,captures=null,acks=null,controller=null,generation=0,sequence=0,state='idle',error=null,latest=null,record=null,pcm=null,rendering=null,origin=null;
- let strikes=[[],[],[]];
+ let strikes=[[],[],[]],listening=null,listeningDb=20;
  const emit=()=>onChange({state,error,stats:captures?.map(c=>c.stats)??null,hasRecording:!!record});
  function detach(){if(!node)return;node.port.onmessage=null;node.onprocessorerror=null;node.disconnect();node.port.close();node=null;}
- function closeContext(){const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}}
+ function closeContext(){listening?.dispose();listening=null;const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}}
  function fail(cause){generation++;rendering=null;error=cause;state='error';controller?.abort();detach();closeContext();record=pcm=null;latest=null;emit();}
  function consume(message,own){
   if(own!==generation||message?.generation!==String(own))return;
@@ -48,7 +49,7 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   recipes=next;captures=recipes.map(recipe=>createRestCapture(recipe,{generation:String(generation)}));acks=[[],[],[]];sequence=0;strikes=[[],[],[]];origin=null;latest=null;
   const own=generation;
   const mounted=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{recipes,generation:String(own),snapshots:true,postAudio:false}});
-  node=mounted;node.port.onmessage=({data})=>consume(data,own);node.onprocessorerror=()=>{if(own===generation)fail(new Error('Ensemble audio processor failed'));};node.connect(context.destination);
+  node=mounted;node.port.onmessage=({data})=>consume(data,own);node.onprocessorerror=()=>{if(own===generation)fail(new Error('Ensemble audio processor failed'));};node.connect(listening.input);
   // Replace a completed passage only after the new node is successfully connected.
   record=pcm=rendering=null;state=context.state==='running'?'ready':'suspended';emit();
  }
@@ -56,7 +57,7 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   if(state==='disposed')throw new Error('Ensemble is closed');
   const previous=record,previousPcm=pcm;generation++;const own=generation;controller?.abort();detach();controller=new AbortController();error=null;latest=null;state='preparing';emit();
   try{
-   if(!context){context=createContext();context.onstatechange=()=>{if(!node||!['ready','playing','suspended'].includes(state))return;state=context.state==='running'?(origin===null?'ready':'playing'):'suspended';emit();};}
+   if(!context){context=createContext();listening=createListeningStage(context,{db:listeningDb});listening.output.connect(context.destination);context.onstatechange=()=>{if(!node||!['ready','playing','suspended'].includes(state))return;state=context.state==='running'?(origin===null?'ready':'playing'):'suspended';emit();};}
    const resumed=context.resume(),loaded=context.audioWorklet.addModule(new URL('./ensemble-worklet.js',import.meta.url));
    const prepared=prepareRecipes({groves,voice,sampleRate:context.sampleRate},{signal:controller.signal});
    const [,,next]=await Promise.all([resumed,loaded,prepared]);if(own!==generation)return;
@@ -85,6 +86,7 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   if(!context)return {queued:false,reason:state};
   return send(0,{kind:'quiet',fadeFrames:Math.max(1,Math.round(context.sampleRate*REST_QUIET_FADE_SECONDS))});
  }
+ function setListeningDb(db){listeningGain(db);listening?.setDb(db);listeningDb=db;}
  function recording(){if(!record)throw new Error(state==='error'?error?.message:'Finish a passage containing a strike or hand gesture before saving');return structuredClone(record);}
  async function saveAudio(){
   if(pcm)return pcm;if(rendering)return rendering;const kept=recording(),own=generation;
@@ -99,5 +101,5 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
   if(state==='disposed')return;generation++;controller?.abort();controller=new AbortController();detach();closeContext();rendering=null;latest=null;strikes=[[],[],[]];captures=null;acks=null;state=record?'ended':'idle';emit();
  }
  function dispose(){park();controller?.abort();record=pcm=recipes=null;state='disposed';emit();}
- return {enable,send,quiet,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipes(){return recipes;},get hasRecording(){return !!record;},get stats(){return captures?.map(c=>c.stats)??null;}};
+ return {enable,send,quiet,setListeningDb,recording,saveAudio,visual,park,dispose,get state(){return state;},get recipes(){return recipes;},get hasRecording(){return !!record;},get stats(){return captures?.map(c=>c.stats)??null;}};
 }
