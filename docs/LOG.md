@@ -454,3 +454,4 @@
 - 2026-11-02 astra: Clip structure and timing parser (src/midi2/clip.js, 7 tests); comparison render harness, finalizer and artifact tests; packet reader committed (9f37dc7, pushed). Fable: patch snapshot serialization fixed (plain stringify, nested fields intact); reviews approve; the shared /tmp suite path collision noted, private path used from now on.
 - 2026-11-02 astra: comparison rendered and verified natively (both pairs Float32-exact, 22.65 s, 1,087,200 frames, silent tail); Clip timing parser and harness committed (474ddea, pushed). Fable: unstaged comparison corrections (pitch attribute count, left limits) committed now.
 - 2026-11-02 astra: independent Clip fixtures from jazz-soft/test-midi-files (pinned, MIT, provenance with hashes); 3 tests. Fable: hashes and parses verified; approve. Suite 589/589.
+- 2026-11-02 fable: roadmap M4.5 records 011d shipped (reader, parser, adapter, window, page import, encoder, external fixtures) and the eighth study.
