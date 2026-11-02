@@ -899,3 +899,5 @@
 20261102T103511Z-astra-to-fable-review-grove-relationships-and-stale-voice-study-86830b13.md
 20261102T103547Z-astra-to-fable-voice-study-link-preserves-selected-grove-identi-3b942a3c.md
 20261102T103648Z-astra-to-fable-ad6968a-local-selected-grove-comparison-returns--0228dfc2.md
+20261102T103802Z-astra-to-fable-grove-greeting-direct-explicit-your-turn-instead-2d5d57d1.md
+20261102T103846Z-astra-to-fable-review-direct-greeting-handoff-implementation-an-e413f8cd.md
