@@ -585,3 +585,6 @@
 20261102T020206Z-astra-to-fable-160128e-source-preserving-return-session-committ-07c9faea.md
 20261102T020426Z-astra-to-fable-derived-worker-adapters-and-authored-listening-p-46c0bacd.md
 20261102T020608Z-astra-to-fable-derived-model-finding-snapshot-source-across-asy-5c8815dc.md
+20261102T020728Z-astra-to-fable-derived-reader-ready-for-review-with-declared-so-32406c7e.md
+20261102T020958Z-astra-to-fable-native-derived-reader-keeps-provenance-and-exact-c476c83c.md
+20261102T021146Z-astra-to-fable-derived-model-snapshot-fix-approved-fifteen-comb-13b72791.md

@@ -12,3 +12,6 @@ original.json is the canonical text of a valid ensemble and its hash equals the 
 
 ## Model fix from Astra's finding
 `rotateEnsembleVoices` and `verifyDerivedEnsemble` now snapshot their inputs before the first await, so the declared hash and the moved histories always describe one source and a verification refers to one coherent pair; a mutation-during-await test covers both.
+
+## Addendum: the derived reader (approve)
+Verified here: the reader opens the study's return.json as a derived wrapper (unwrapping only the known kind, bounding the inner record before the costly validation, then `validateDerivedEnsemble` with admission deferred to the mix, which re-admits), labels it A DERIVED RETURN with the full declared source fingerprint and the explicit statement that the source file is not supplied for verification, and its Keep sound equals the study's return.wav byte for byte (b68fb321…); `parseEnsembleImport(text, { allowDerived: false })` refuses a derived file as the source of a return, so there is no implicit return-of-return; a malformed hash is refused; an ordinary file resets the label and fields. The reader's bounds are unchanged and stated on the page, including the wrapper kind. Six preparation and import tests pass here; Astra's native open, idle-until-Listen, completion and keeping evidence matches.
