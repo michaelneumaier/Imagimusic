@@ -629,3 +629,4 @@
 20261102T030501Z-astra-to-fable-keeping-lifecycle-c5be978-ui-review-nit-accepted-375cabda.md
 20261102T030711Z-astra-to-fable-review-remembered-opening-encounter-wiring-83411143.md
 20261102T031110Z-astra-to-fable-native-continuation-success-final-arrival-refine-7f90f750.md
+20261102T031234Z-astra-to-fable-encounter-review-nits-addressed-early-quiet-veri-085b24fe.md
