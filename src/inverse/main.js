@@ -135,12 +135,12 @@ function renderResults(){
   $('results').append(card);
  }
 }
-async function prepare(candidate,card,index){
+async function prepare(candidate,card,index,originalRecord=null){
  if(busy||occupied()||phraseCapture.snapshot.active)return;
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent=`Preparing the ${candidate.topology} at your audio context’s sample rate…`;
  try{
   if(!context){context=new AudioContext();transport=createInverseTransport(context);transport.setListeningLevel(listeningLevel);context.onstatechange=()=>controls();}
-  const origin=report.savedRecord?reopenInverseCandidate(report.savedRecord).record:keepInverseCandidate(report,index,{at:new Date().toISOString()});
+  const origin=originalRecord??(report.savedRecord?reopenInverseCandidate(report.savedRecord).record:keepInverseCandidate(report,index,{at:new Date().toISOString()}));
   const digest=await inverseAnatomySha256(origin.grove);
   if(token!==generation)return;
   const prepared=await jobs.run({kind:'candidate',grove:candidate.grove,sampleRate:context.sampleRate});
@@ -151,9 +151,9 @@ async function prepare(candidate,card,index){
   document.querySelector('.playing').hidden=false;document.querySelector('.workshop').classList.add('has-instrument');
   const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;mountedTopology=candidate.topology;mountedReport=report;mountedAnatomy=origin;mountedDigest=digest;armed=false;repeatInvitation();
   if(spatial&&!pictureFailed){configureViews();document.querySelector('.playing').classList.add('spatial-ready');}
-  document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
-  $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
-  $('status').textContent=`${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.`;
+  document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card?.classList.add('selected');drawBodies();
+  $('identity').textContent=`${originalRecord?'Original anatomy · ':''}${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within':'outside'} ${originalRecord?'original target ':''}tolerance · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
+  $('status').textContent=`${originalRecord?'Original ':''}${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.${originalRecord?' Fit is against the phrase’s original target; your current discoveries remain below.':''}`;
   $('gesture').textContent='Choose Start listening, then touch a body or hear the shared gesture.';
   $('shared-gesture-help').textContent=`Body 2, then bodies 1 and 3 together. The same three touches on every anatomy. About ${Math.ceil(instrument.duration+.5)} seconds to settle, or choose Quiet.`;
   $('playing-title').focus({preventScroll:true});document.querySelector('.playing').scrollIntoView({block:'start'});
@@ -218,6 +218,10 @@ function phraseControls(ringing){
  $('replay-phrase').disabled=!ready||ringing||capture.active||!capture.phrase||mountedReport!==report;
  $('keep-phrase').disabled=busy||keepingPhrase||capture.active||!capture.phrase||!phraseAnatomy;
  $('forget-phrase').disabled=busy||capture.active||!capture.phrase;
+ const originalPrepared=!!capture.phrase&&mountedDigest===capture.phrase.anatomySha256&&mountedReport===report;
+ $('phrase-return').hidden=!capture.phrase;
+ $('prepare-original').disabled=busy||ringing||capture.active||!phraseAnatomy||originalPrepared;
+ $('prepare-original').textContent=originalPrepared?'Original anatomy prepared':'Prepare original anatomy';
  if(capture.active)phraseText('phrase-status',capture.count?`Remembering ${capture.count} / 8 touches. Choose Done, or keep playing within the eight-second window.`:'Ready to remember. Touch a body to begin the eight-second window.');
  $('phrase-summary').hidden=!capture.phrase;
  if(capture.phrase){
@@ -243,6 +247,16 @@ $('replay-phrase').onclick=()=>{
  if(!phrase||phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running'||mountedReport!==report)return;
  try{transport.playGesture(inversePhraseTransportEvents(phrase));phraseText('phrase-status',`Your phrase started on the ${mountedTopology}. Its touches and timing are unchanged. You can answer with your own touch.`);}
  catch(error){phraseText('phrase-status',error.message);}controls();
+};
+
+$('prepare-original').onclick=()=>{
+ if(busy||occupied()||phraseCapture.snapshot.active||!phraseAnatomy||!phraseCapture.snapshot.phrase)return;
+ if(mountedDigest===phraseCapture.snapshot.phrase.anatomySha256&&mountedReport===report)return;
+ try{
+  const opened=reopenInverseCandidate(phraseAnatomy);
+  const candidate={...opened.candidate,status:opened.candidate.status==='within-tolerance'?'accepted':'saved-outside-tolerance'};
+  prepare(candidate,null,null,opened.record);
+ }catch(error){phraseText('phrase-status','Could not return to the original anatomy: '+error.message);}
 };
 
 $('forget-phrase').onclick=()=>{
