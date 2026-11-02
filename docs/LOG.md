@@ -434,3 +434,4 @@
 - 2026-11-02 astra: family geometry diagnostic committed (d8f5e1b; five seeds at three tunings; silent). Fable review approve.
 - 2026-11-02 astra: playable family chooser (transaction helper, pending selection separate from installed groves, install only after a successful ready or suspended mount, continuation on source groves, visit-context captions; 3 tests). Fable review approve, two notes.
 - 2026-11-02 astra: family discovery copy (home invitation, notebook button, catalogue line) and native transitions (idle and ended selection, mount 7, continuation keeps the source family 7 under a pending 11, fresh Begin on 11). Fable: addendum approve.
+- 2026-11-02 fable: commit 706aa22 carries a mistyped Claude-Session trailer (one character); history is shared and pushed, so it is left as is and noted here; the correct session is https://claude.ai/code/session_016gMjgqZwEUxYoE7sy3heNt.
