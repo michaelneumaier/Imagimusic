@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createInversePhraseCapture} from '../src/inverse/phrase-capture.js';
-const options={sampleRate:8000,capturedAt:'2026-11-02T09:00:00.000Z'};
+const options={anatomySha256:'a'.repeat(64),sampleRate:8000,capturedAt:'2026-11-02T09:00:00.000Z'};
 
 test('a remembered phrase uses admitted receipt offsets; a draft and an empty finish preserve the previous phrase',()=>{
  const capture=createInversePhraseCapture();assert.equal(capture.snapshot.phrase,null);
@@ -31,6 +31,7 @@ test('eight touches finish exactly once; the inclusive eight-second boundary is 
 
 test('invalid inputs and reentrant begin do not replace or corrupt a valid draft',()=>{
  const capture=createInversePhraseCapture();
+ assert.throws(()=>capture.begin({...options,anatomySha256:'invalid'}));assert.equal(capture.snapshot.active,false);
  assert.throws(()=>capture.begin({...options,sampleRate:7999}),/sample rate/);assert.equal(capture.snapshot.active,false);
  assert.throws(()=>capture.begin({...options,capturedAt:'yesterday'}),/ISO/);
  capture.begin(options);capture.admit({body:0,time:4});

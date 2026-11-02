@@ -1,7 +1,7 @@
 import {createInverseJobs} from '../src/inverse/jobs.js';
 import {createInverseTransport} from '../src/inverse/transport.js';
 import {createInversePhraseCapture} from '../src/inverse/phrase-capture.js';
-import {inversePhraseTransportEvents} from '../src/score/grove-inverse-phrase.js';
+import {inversePhraseTransportEvents,inverseAnatomySha256} from '../src/score/grove-inverse-phrase.js';
 const rate=8000,tolerance=1e-7,button=document.querySelector('#run'),result=document.querySelector('#result');
 const assert=(yes,message)=>{if(!yes)throw new Error(message);};
 function graph(prepared){
@@ -13,7 +13,7 @@ async function captureManual(prepared){
  const {offline,transport}=graph(prepared),capture=createInversePhraseCapture(),receipts=[];
  // These are exact 128-frame render boundaries at 8 kHz, not wall-clock waits.
  const times=[.064,.432,.864],bodies=[1,0,2],pauses=times.map(t=>offline.suspend(t));
- capture.begin({sampleRate:rate,capturedAt:'2026-11-02T09:00:00.000Z'});
+ capture.begin({anatomySha256:await inverseAnatomySha256(prepared.grove),sampleRate:rate,capturedAt:'2026-11-02T09:00:00.000Z'});
  try{
   const done=offline.startRendering();
   for(let i=0;i<pauses.length;i++){

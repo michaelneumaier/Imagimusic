@@ -9,11 +9,13 @@ export function createInversePhraseCapture(){
  const finish=()=>{const changed=active&&draft!==null;if(changed)phrase=draft;close();return {changed,phrase};};
  return {
   get snapshot(){return Object.freeze({active,count:receipts.length,origin:receipts[0]?.time??null,phrase});},
-  begin({sampleRate,capturedAt}={}){
+  begin({sampleRate,capturedAt,anatomySha256}={}){
    if(active)throw new Error('A phrase is already being remembered.');
    if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>96000)throw new RangeError('Capture sample rate must be within 8000..96000.');
    if(typeof capturedAt!=='string'||Number.isNaN(Date.parse(capturedAt))||new Date(capturedAt).toISOString()!==capturedAt)throw new Error('Capture time must be an exact ISO UTC timestamp.');
-   options={sampleRate,at:capturedAt};receipts=[];draft=null;active=true;
+   const next={sampleRate,at:capturedAt,anatomySha256};
+   createInversePhrase([{body:0,time:0}],next); // Validate metadata before entering a draft.
+   options=next;receipts=[];draft=null;active=true;
   },
   admit(receipt){
    if(!active)return {captured:false,finished:false,reason:'inactive'};

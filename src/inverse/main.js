@@ -3,10 +3,11 @@ import {composeGrove,groveSystem} from '../score/grove.js';
 import {createInverseJobs} from './jobs.js';
 import {createCandidateDiagram} from './candidate-diagram.js';
 import {readInverseFile} from './read-file.js';
-import {keepInverseCandidate,canonicalInverseCandidate} from '../score/grove-inverse-kept.js';
+import {keepInverseCandidate,canonicalInverseCandidate,reopenInverseCandidate} from '../score/grove-inverse-kept.js';
 import {createInverseTransport} from './transport.js';
 import {createInversePhraseCapture} from './phrase-capture.js';
-import {inversePhraseTransportEvents} from '../score/grove-inverse-phrase.js';
+import {inversePhraseTransportEvents,inverseAnatomySha256} from '../score/grove-inverse-phrase.js';
+import {keepInversePassage,canonicalInversePassage} from '../score/grove-inverse-passage.js';
 import {INVERSE_SHARED_GESTURE_EVENTS as sharedGesture} from '../score/grove-inverse-gesture.js';
 const $=id=>document.getElementById(id),jobs=createInverseJobs();
 const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
@@ -15,7 +16,7 @@ let context=null,transport=null,instrument=null,report=null,busy=false,generatio
 const candidateButtons=[],bodyButtons=[];
 let lastGestureTopology=null;
 const phraseCapture=createInversePhraseCapture();
-let phraseTopology=null,draftTopology=null;
+let phraseTopology=null,draftTopology=null,phraseAnatomy=null,draftAnatomy=null,mountedAnatomy=null,mountedDigest=null,keepingPhrase=false;
 let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1,fileRead=null;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -72,15 +73,20 @@ $('search-form').onsubmit=async event=>{
 $('open-instrument').onchange=()=>{const file=$('open-instrument').files[0];$('open-instrument').value='';if(file)openInstrument(file);};
 async function openInstrument(file){
  if(busy||occupied()||phraseCapture.snapshot.active)return;
- const token=++generation,reader=new AbortController();fileRead=reader;busy=true;controls();$('status').textContent='Checking the kept anatomy…';
+ const token=++generation,reader=new AbortController();fileRead=reader;busy=true;controls();$('status').textContent='Checking the kept anatomy or phrase…';
  try{
   const input=await readInverseFile(file,{signal:reader.signal});if(token!==generation)return;
   const opened=await jobs.run({kind:'reopen',text:input.text});if(token!==generation)return;
   const candidate={...opened.candidate,status:opened.candidate.status==='within-tolerance'?'accepted':'saved-outside-tolerance'};
-  report={target:opened.record.target,tolerance:opened.record.tolerance,candidates:[candidate],savedRecord:opened.record};
-  lastTouch=null;lastGestureTopology=null;clearPhrase();repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  const anatomy=opened.phrase?opened.record.anatomy:opened.record;
+  // Validate and copy the phrase before replacing any existing encounter state.
+  const restored=opened.phrase?createInversePhraseCapture().restore(opened.phrase):null;
+  report={target:anatomy.target,tolerance:anatomy.tolerance,candidates:[candidate],savedRecord:anatomy};
+  lastTouch=null;lastGestureTopology=null;clearPhrase();
+  if(restored){phraseCapture.restore(restored);phraseAnatomy=anatomy;phraseTopology=anatomy.grove.topology;phraseText('phrase-status','Your phrase is here. Prepare its anatomy, then start listening when you are ready.');$('phrase-panel').open=true;}
+  repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`Opened ${input.name}. Fit recalculated from the saved instrument and target. Prepare it when you are ready to play. Any previously prepared instrument is retained.`;
- }catch(error){if(token===generation)$('status').textContent=`Could not open the anatomy: ${error.message} Previous results and instrument retained.`;}
+ }catch(error){if(token===generation)$('status').textContent=`Could not open the file: ${error.message} Previous results and instrument retained.`;}
  finally{if(token===generation){fileRead=null;busy=false;controls();}}
 }
 function keepCandidate(index){
@@ -104,25 +110,28 @@ function renderResults(){
    if(report.savedRecord){const origin=document.createElement('p');const discovery=report.savedRecord.discovery;origin.textContent=`Kept instrument. Declared discovery: seed ${discovery.seed}, ${discovery.evaluations.toLocaleString()} evaluations. Fit above is recalculated.`;card.append(origin);}
    const residual=document.createElement('p');residual.textContent=`Largest resonance error: ${candidate.residual.maxAbsCents.toFixed(4)} cents. Decay error: ${(100*Math.abs(candidate.residual.decayRelative)).toFixed(4)}%.`;card.append(residual);
    const achieved=document.createElement('p');achieved.textContent=`Resonances: ${candidate.residual.achieved.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz.`;card.append(achieved);
-   const button=document.createElement('button');button.textContent=report.savedRecord?'Prepare kept anatomy':candidate.status==='accepted'?'Prepare this anatomy':'Explore this near miss';button.onclick=()=>prepare(candidate,card);
+   const button=document.createElement('button');button.textContent=report.savedRecord?'Prepare kept anatomy':candidate.status==='accepted'?'Prepare this anatomy':'Explore this near miss';button.onclick=()=>prepare(candidate,card,index);
    const keep=document.createElement('button');keep.textContent='Keep this anatomy';keep.className='keep-anatomy';keep.onclick=()=>keepCandidate(index);
    const actions=document.createElement('div');actions.className='actions';actions.append(button,keep);card.append(actions);candidateButtons.push(button,keep);
   }
   $('results').append(card);
  }
 }
-async function prepare(candidate,card){
+async function prepare(candidate,card,index){
  if(busy||occupied()||phraseCapture.snapshot.active)return;
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent=`Preparing the ${candidate.topology} at your audio context’s sample rate…`;
  try{
   if(!context){context=new AudioContext();transport=createInverseTransport(context);transport.setListeningLevel(listeningLevel);context.onstatechange=()=>controls();}
+  const origin=report.savedRecord?reopenInverseCandidate(report.savedRecord).record:keepInverseCandidate(report,index,{at:new Date().toISOString()});
+  const digest=await inverseAnatomySha256(origin.grove);
+  if(token!==generation)return;
   const prepared=await jobs.run({kind:'candidate',grove:candidate.grove,sampleRate:context.sampleRate});
   if(token!==generation)return;
   await ensureSpatial();
   if(token!==generation)return;
   // Give the synchronous picture preflight real dimensions; roll back on a failed first mount.
   document.querySelector('.playing').hidden=false;document.querySelector('.workshop').classList.add('has-instrument');
-  const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;mountedTopology=candidate.topology;mountedReport=report;armed=false;repeatInvitation();
+  const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;mountedTopology=candidate.topology;mountedReport=report;mountedAnatomy=origin;mountedDigest=digest;armed=false;repeatInvitation();
   if(spatial&&!pictureFailed){configureViews();document.querySelector('.playing').classList.add('spatial-ready');}
   document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
   $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
@@ -169,7 +178,7 @@ function strike(body){
 }
 function phraseText(id,text){if($(id).textContent!==text)$(id).textContent=text;}
 function completePhrase(reason){
- phraseTopology=draftTopology;draftTopology=null;
+ phraseTopology=draftTopology;phraseAnatomy=draftAnatomy;draftTopology=null;draftAnatomy=null;
  const count=phraseCapture.snapshot.phrase.events.length;
  phraseText('phrase-status',`${reason} Remembered ${count} ${count===1?'touch':'touches'}. Let the sound finish or choose Quiet before replaying.`);
 }
@@ -179,41 +188,57 @@ function expirePhrase(time){
 }
 function cancelPhrase(message){
  if(!phraseCapture.snapshot.active)return;
- phraseCapture.cancel();draftTopology=null;
+ phraseCapture.cancel();draftTopology=null;draftAnatomy=null;
  phraseText('phrase-status',phraseCapture.snapshot.phrase?message:'New attempt cancelled. No phrase remembered yet.');
 }
-function clearPhrase(){phraseCapture.clear();phraseTopology=null;draftTopology=null;phraseText('phrase-status','Prepare an anatomy and start listening to begin.');}
+function clearPhrase(){phraseCapture.clear();phraseTopology=null;draftTopology=null;phraseAnatomy=null;draftAnatomy=null;phraseText('phrase-status','Prepare an anatomy and start listening to begin.');}
 function phraseControls(ringing){
  const capture=phraseCapture.snapshot,ready=!busy&&!!instrument&&armed&&context?.state==='running';
  $('remember-phrase').disabled=!ready||ringing||capture.active||mountedReport!==report;
  $('remember-phrase').textContent=capture.phrase?'Remember a new phrase':'Remember a phrase';
  $('finish-phrase').hidden=!capture.active;
- $('replay-phrase').disabled=!ready||ringing||capture.active||!capture.phrase;
+ $('replay-phrase').disabled=!ready||ringing||capture.active||!capture.phrase||mountedReport!==report;
+ $('keep-phrase').disabled=busy||keepingPhrase||capture.active||!capture.phrase||!phraseAnatomy;
  if(capture.active)phraseText('phrase-status',capture.count?`Remembering ${capture.count} / 8 touches. Choose Done, or keep playing within the eight-second window.`:'Ready to remember. Touch a body to begin the eight-second window.');
  $('phrase-summary').hidden=!capture.phrase;
  if(capture.phrase){
   const phrase=capture.phrase,sequence=phrase.events.map(event=>event.body+1).join(' → ');
-  const comparison=ready&&!ringing&&!capture.active&&mountedTopology!==phraseTopology?` Try your phrase on this ${mountedTopology}, too.`:'';
+  const comparison=ready&&mountedReport===report&&!ringing&&!capture.active&&mountedTopology!==phraseTopology?` Try your phrase on this ${mountedTopology}, too.`:'';
   phraseText('phrase-summary',`${phrase.events.length} ${phrase.events.length===1?'touch':'touches'} from the ${phraseTopology}: ${sequence}. First to last touch: ${phrase.spanSeconds.toFixed(2)} s.${comparison}`);
  }else phraseText('phrase-summary','');
 }
 $('remember-phrase').onclick=()=>{
  if(busy||occupied()||phraseCapture.snapshot.active||!instrument||!armed||context?.state!=='running'||mountedReport!==report)return;
- try{phraseCapture.begin({sampleRate:context.sampleRate,capturedAt:new Date().toISOString()});draftTopology=mountedTopology;controls();}
+ try{phraseCapture.begin({sampleRate:context.sampleRate,capturedAt:new Date().toISOString(),anatomySha256:mountedDigest});draftTopology=mountedTopology;draftAnatomy=mountedAnatomy;controls();}
  catch(error){phraseText('phrase-status',error.message);}
 };
 $('finish-phrase').onclick=()=>{
  if(!phraseCapture.snapshot.active)return;
  const result=phraseCapture.finish();
  if(result.changed)completePhrase('Phrase finished.');
- else{draftTopology=null;phraseText('phrase-status',result.phrase?'No new touches. Previous phrase retained.':'No touches to remember yet.');}
+ else{draftTopology=null;draftAnatomy=null;phraseText('phrase-status',result.phrase?'No new touches. Previous phrase retained.':'No touches to remember yet.');}
  controls();
 };
 $('replay-phrase').onclick=()=>{
  const phrase=phraseCapture.snapshot.phrase;
- if(!phrase||phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running')return;
+ if(!phrase||phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running'||mountedReport!==report)return;
  try{transport.playGesture(inversePhraseTransportEvents(phrase));phraseText('phrase-status',`Your phrase started on the ${mountedTopology}. Its touches and timing are unchanged. You can answer with your own touch.`);}
  catch(error){phraseText('phrase-status',error.message);}controls();
+};
+
+$('keep-phrase').onclick=async()=>{
+ const phrase=phraseCapture.snapshot.phrase,anatomy=phraseAnatomy,token=generation;
+ if(busy||keepingPhrase||phraseCapture.snapshot.active||!phrase||!anatomy)return;
+ keepingPhrase=true;controls();
+ try{
+  const record=await keepInversePassage(anatomy,phrase,{at:new Date().toISOString()});
+  const text=await canonicalInversePassage(record);
+  if(token!==generation||phraseCapture.snapshot.phrase!==phrase)return;
+  const url=URL.createObjectURL(new Blob([text],{type:'application/json'})),link=document.createElement('a');
+  link.href=url;link.download=`imagimusic-phrase-${anatomy.grove.topology}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  phraseText('phrase-status',`Your phrase file is ready to keep with its original ${anatomy.grove.topology} anatomy. Open it here to return later.`);
+ }catch(error){if(token===generation)phraseText('phrase-status','Could not keep the phrase: '+error.message);}
+ finally{keepingPhrase=false;controls();}
 };
 
 async function ensureSpatial(){

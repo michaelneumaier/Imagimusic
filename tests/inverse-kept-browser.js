@@ -1,6 +1,9 @@
 import {readInverseFile,INVERSE_IMPORT_MAX_BYTES} from '../src/inverse/read-file.js';
 import {createInverseJobs} from '../src/inverse/jobs.js';
 import {canonicalInverseCandidate} from '../src/score/grove-inverse-kept.js';
+import {createInversePhrase,inverseAnatomySha256} from '../src/score/grove-inverse-phrase.js';
+import {keepInversePassage,canonicalInversePassage} from '../src/score/grove-inverse-passage.js';
+import {createInversePhraseCapture} from '../src/inverse/phrase-capture.js';
 import {createInverseInstrument} from '../src/inverse/instrument.js';
 const button=document.querySelector('#run'),result=document.querySelector('#result');
 const assert=(yes,message)=>{if(!yes)throw new Error(message);};
@@ -24,6 +27,27 @@ button.onclick=async()=>{
    }
   }
   assert(maxError===0,'Prepared samples changed after reopening');checks.push('Three-strike stereo PCM equals direct saved model');
+  const phrase=createInversePhrase([{body:1,time:10},{body:0,time:10.375},{body:2,time:10.75}],{at:'2026-11-02T09:00:00.000Z',sampleRate:8000,anatomySha256:await inverseAnatomySha256(original.grove)});
+  const passage=await keepInversePassage(original,phrase,{at:'2026-11-02T09:01:00.000Z'}),passageText=await canonicalInversePassage(passage);
+  const passageInput=await readInverseFile(new File([passageText],'phrase.json',{type:'application/json'}));
+  const returned=await jobs.run({kind:'reopen',text:passageInput.text});
+  assert(await canonicalInversePassage(returned.record)===passageText,'Passage changed across File/worker boundary');
+  assert(returned.candidate.status===opened.candidate.status,'Passage fit differs');
+  assert(JSON.stringify(returned.bound)===JSON.stringify(opened.bound),'Passage bound differs');
+  const capture=createInversePhraseCapture();capture.restore(returned.phrase);
+  const restoredPhrase=capture.snapshot.phrase;
+  assert(phrase.events.length===restoredPhrase.events.length&&phrase.events.every((e,i)=>e.body===restoredPhrase.events[i].body&&e.at===restoredPhrase.events[i].at),'Restored touches changed');
+  for(const key of Object.keys(phrase).filter(k=>k!=='events'))assert(restoredPhrase[key]===phrase[key],'Restored phrase field changed: '+key);checks.push('Portable File/worker round trip, fit and restored phrase');
+  const returnedPCM=await jobs.run({kind:'candidate',grove:returned.candidate.grove,sampleRate:8000});
+  for(let b=0;b<3;b++)for(let c=0;c<2;c++){
+   const actual=returnedPCM.strikes[b].channels[c],expected=prepared.strikes[b].channels[c];assert(actual.length===expected.length,'Passage PCM length differs');
+   for(let i=0;i<expected.length;i++)assert(actual[i]===expected[i],'Passage PCM differs');
+  }checks.push('Portable anatomy prepares identical stereo PCM');
+  const mismatch=structuredClone(passage);mismatch.phrase.anatomySha256='0'.repeat(64);
+  await rejects(JSON.stringify(mismatch),'Passage origin mismatch refused');
+  const foreign=structuredClone(passage);foreign.anatomy.model.outputGain+=1;
+  await rejects(JSON.stringify(foreign),'Passage incompatible model refused');
+  assert(capture.snapshot.phrase===restoredPhrase,'Refused worker intake changed completed memory');
   const incompatible=structuredClone(original);incompatible.model.outputGain+=1;
   await rejects(JSON.stringify(incompatible),'Incompatible model refused');await rejects('{','Malformed JSON refused');
   await rejects(' '.repeat(INVERSE_IMPORT_MAX_BYTES+1),'Oversized worker input refused');
