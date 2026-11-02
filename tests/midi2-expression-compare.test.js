@@ -33,6 +33,8 @@ test('the comparison reports where the composed controls depart from note-only, 
 test('a note with a pitch attribute keeps it in the note-only score and the count says so', () => {
   const chord = composeExpressiveChord(), withAttribute = JSON.parse(canonicalExpressionScore(chord));
   const first = withAttribute.events.find(e => e.type === 'noteOn'); first.attributeType8 = 3; first.attributeData16 = 60 << 9;
-  const { score, pitchAttributesKept } = noteOnlyExpressionScore(withAttribute);
-  assert.equal(pitchAttributesKept, 1); assert.equal(score.events.find(e => e.type === 'noteOn').attributeType8, 3);
+  const { score, pitchAttributesKept, otherAttributesKept } = noteOnlyExpressionScore(withAttribute);
+  assert.equal(pitchAttributesKept, 1); assert.equal(otherAttributesKept, 0); assert.equal(score.events.find(e => e.type === 'noteOn').attributeType8, 3);
+  const manufacturer = JSON.parse(canonicalExpressionScore(chord)); manufacturer.events.find(e => e.type === 'noteOn').attributeType8 = 1;
+  const other = noteOnlyExpressionScore(manufacturer); assert.equal(other.pitchAttributesKept, 0); assert.equal(other.otherAttributesKept, 1, 'a manufacturer attribute is not counted as pitch');
 });
