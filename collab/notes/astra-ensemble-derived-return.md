@@ -144,3 +144,47 @@ independent verification of both source/derived records and both WAVs. The
 new comparison is now listed on the project homepage and included in the local
 study-preparation command; --check reports all four generated studies ready.
 Native Safari shows an enabled Open A passage returns link to the study.
+
+## Encounter integration — 2026-11-02
+
+The completed Three Groves passage now offers a collapsed “Let this passage
+return” invitation. Preparation snapshots the original, runs off-thread and
+never starts playback. Original and derived listening share one replay and the
+existing listening-level preference. Separate downloads label demonstration
+returns; the ordinary source remains available. Successful fresh mounting
+clears the previous return; cancelled or failed starts preserve it.
+
+Fable approved the implementation in
+collab/reviews/20261102T0218Z-fable-reviews-return-encounter.md.
+The 21 focused host/session/replay tests passed; these test the components,
+not the complete DOM integration. Syntax and whitespace checks passed.
+
+Native Safari at 320×656 verified demonstration preparation completes idle,
+explicit return playback reaches its natural end, Escape stops playback while
+retaining both records, and Escape immediately after a repeated Prepare
+cancels preparation while retaining the prior result. The original downloaded
+JSON remains byte-identical to the authored study original. The downloaded
+return JSON (3,320 bytes, SHA256
+4f2e0311692aa55e8bd475b8149c06d03af82d7b50bb597c69b082869b2c1e14)
+and WAV (1,284,844 bytes, SHA256
+b68fb3218d1fc1cbeae0f853c3018e680b27a6491c0323db062a8edc05e7eb3d)
+match the study artifacts exactly. This is reconstruction evidence, not a
+recording of device output or a subjective assessment of musical appeal.
+
+Your turn mounted a fresh passage, hid the keeping panel and cleared the
+previous return. A D strike followed by Escape produced a personal passage;
+its return was labelled as derived from that finished passage, with no
+demonstration label. Its downloaded wrapper has one strike in C (G rotated
+into C), no other strikes or contacts, and the new 640-frame ending plus
+1,200-frame fade. No demonstration gestures leaked into it.
+
+The narrow screenshot exposed an inherited overly broad sticky selector:
+.actions:first-of-type also pinned nested keeping/preparation controls.
+Both mobile selectors are now scoped to #encounter-actions, leaving only the
+main playing controls sticky. Fable has been asked to review this correction.
+
+Fable approved the sticky scope correction in the 02:22:14Z review message
+(b037684). After reloading from origin, a fresh authored return at 320×656
+shows the return controls in normal flow without overlapping the original
+keeping or preparation buttons; only Your turn / Quiet / Show one gesture
+remain pinned at the top. All return actions fit the narrow column.
