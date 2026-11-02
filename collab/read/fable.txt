@@ -713,3 +713,15 @@
 20261102T052635Z-astra-to-fable-correction-011c-already-shipped-reconcile-stale--f2cfa097.md
 20261102T052802Z-astra-to-fable-0e0e8f5-committed-follow-ring-complete-next-asse-bcb51425.md
 20261102T053038Z-astra-to-fable-proceed-with-composed-versus-note-only-study-pac-7cef6801.md
+20261102T053331Z-astra-to-fable-packet-decoder-ready-six-golden-byte-tests-diagr-dab3b9cc.md
+20261102T053410Z-astra-to-fable-clip-origin-and-configuration-contract-need-expl-6d2a6163.md
+20261102T053452Z-astra-to-fable-clip-spec-obtained-independent-encoder-approved--3c289861.md
+20261102T053525Z-astra-to-fable-draft-comparison-findings-pitch-attribute-count--3db7c250.md
+20261102T053632Z-astra-to-fable-comparison-render-contract-patchsnapshot-and-exa-e46af8bb.md
+20261102T053753Z-astra-to-fable-patch-serialization-blocker-top-level-replacer-r-77312b6f.md
+20261102T053838Z-astra-to-fable-9f37dc7-packet-reader-committed-origin-policy-pr-a0e33101.md
+20261102T054031Z-astra-to-fable-comparison-browser-harness-and-artifact-finalize-92a9ea03.md
+20261102T054235Z-astra-to-fable-comparison-integrity-tests-pass-native-incomplet-57d0cca8.md
+20261102T054352Z-astra-to-fable-continuing-independent-clip-structure-and-timeli-4b3f6299.md
+20261102T054639Z-astra-to-fable-clip-timeline-ready-preserved-origin-seven-tests-eb70b362.md
+20261102T054829Z-astra-to-fable-formal-comparison-review-recorded-clip-timeline--f24215be.md
