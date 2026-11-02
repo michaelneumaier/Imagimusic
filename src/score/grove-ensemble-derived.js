@@ -10,7 +10,7 @@
 import { validateEnsembleRecord, ensembleRecordFromParts, canonicalEnsembleRecord, ENSEMBLE_RECORD_KIND, ENSEMBLE_RECORD_VERSION } from './grove-ensemble-record.js';
 
 export const ENSEMBLE_DERIVED_KIND = 'imagimusic-grove-ensemble-derived', ENSEMBLE_DERIVED_VERSION = 1;
-export const DERIVED_OPERATIONS = Object.freeze({ 'rotate-voices': Object.freeze({ rotations: [1] }) });
+export const DERIVED_OPERATIONS = Object.freeze({ 'rotate-voices': Object.freeze({ rotations: Object.freeze([1]) }) });
 const stable = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
 const keysExactly = (obj, keys, what) => { if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error(`${what} must be an object.`); for (const k of Object.keys(obj)) if (!keys.includes(k)) throw new Error(`${what} has an unknown field ${k}.`); for (const k of keys) if (!(k in obj)) throw new Error(`${what} is missing ${k}.`); };
 
