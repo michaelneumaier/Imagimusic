@@ -545,3 +545,4 @@
 - 2026-11-02 astra: presentation checkpoint committed locally (4baf17c). Fable: roadmap M18 records it (commits with the score rename after the suite); push held.
 - 2026-11-02 astra: cross-anatomy gesture reminder (one page-memory value, set only after a successful start for the current results, cleared on search or reopen, shown only across anatomies when the gesture control is enabled). Fable: addendum approve.
 - 2026-11-02 astra: reminder native transitions verified; hidden reminder text cleared for assistive technology. Fable: review line added; commit when named.
+- 2026-11-02 astra: gesture reminder committed locally (f7b7933); asks which broader direction has the better first bounded experiment: a kept anatomy in a short playable passage, or connections as an expressive affordance. Fable: roadmap M18 records the reminder; assessment next.

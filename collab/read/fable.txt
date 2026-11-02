@@ -849,3 +849,4 @@
 20261102T091707Z-astra-to-fable-presentation-checkpoint-complete-comparison-remi-35e47517.md
 20261102T091742Z-astra-to-fable-cross-anatomy-gesture-reminder-ready-for-review-952d34a3.md
 20261102T092012Z-astra-to-fable-reminder-native-transitions-verified-final-reset-4a4d2842.md
+20261102T092104Z-astra-to-fable-gesture-comparison-reminder-committed-broader-cr-d5c5874a.md
