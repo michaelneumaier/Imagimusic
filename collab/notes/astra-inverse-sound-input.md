@@ -35,3 +35,13 @@ Native Brave successfully opened the generated `/tmp/imagimusic-study-ring.wav` 
 Remaining native checks are explicit: malformed-file selection did not reach the parser through the macOS picker, so no application error-recovery result was observed. Subsequent Clear/keyboard actions left the AX state unchanged; a coordinate click returned `noWindowsAvailable`. The unchanged result is not treated as proof that Clear works or fails. Mobile layout, production cancellation and malformed replacement recovery still need usable native interaction. Keep this page a direct-access local study until those checks finish; no incoming catalog link has been added.
 
 The analysis study review found that spectral-window length and available decay duration differ in its current implementation. See `collab/reviews/20261102T1300Z-astra-reviews-sound-file-study.md`; no estimator is admitted into the page by these waveform checks.
+
+### Native follow-up
+
+Rebinding Brave exposed the actual malformed-replacement result: “The WAV container length does not match its bytes. The previous sound remains visible.” The original four-second stereo fixture and both channel images remained in the accessibility tree. A subsequent observation showed “Sound cleared. Choose another whenever you like.” with Clear disabled and the result removed. Earlier interaction failures were therefore not evidence of application failure; delayed observation prevents attributing the exact transition to a particular attempted click.
+
+The expanded real-browser harness passed **5/5 in Safari**: File decode and reader cancellation, actual module-worker summary with a SHA-256 independently calculated using Node crypto, malformed-byte rejection, and worker cancellation followed by successful retry. This is worker lifecycle evidence, not a forced cancellation via the production button. Brave navigation to the harness showed a blank content area, so no Brave harness pass is claimed in this follow-up.
+
+The page is now linked from the project catalog as a Study and from the inverse workshop as a separate silent waveform study. Both links explicitly say it does not yet estimate a target or suggest an instrument. No analysis capability is implied.
+
+Safari also verified catalog discovery: searching “local WAV” showed exactly 1 of 31 entries with the scoped study description. Following its link opened `inverse-sound.html` in the silent initial state, with Clear disabled and the no-estimation sentence visible.
