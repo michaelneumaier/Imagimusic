@@ -267,3 +267,9 @@ Expressive close view: expressive.html/css/main.js and src/expressive/view-frami
 Expressive view controller tests: tests/expressive-view-framing.test.js; camera fit, stable view between animation frames, hidden picture-body selection and return of orbit limits. Injected boxes until Fable's full-response bounds handoff.
 
 Home attention paths: project.html/project.css/src/project-catalog.js; two concise routes in current-edge panel, optional existing memory instructions, expressive close-view discovery and accurate notebook/history. No welcome-page, model or peer docs edits.
+
+Inverse-network feasibility probe: tools/probe-inverse-network.mjs and collab/notes/astra-inverse-network-probe.md; constructive ambiguity example using unchanged coupledNetwork, exact shared target pickup and withheld gesture comparisons. No optimizer, runtime or acoustic-body claim; Fable owns independent assessment.
+
+Network ambiguity audition: tools/render-inverse-network-study.mjs, generated renders/inverse-network-study; render the probe's admitted networks under identical target and withheld impulses, shared scale/fade, hashed source report and PCM artifacts. Explicit listening only, no catalog integration or Grove-voice substitution.
+
+Native media diagnostic: tests/inverse-network-media.html; explicit local WAV playback with observable metadata/events to distinguish Safari native-control display from a real load failure. No production player change until observed evidence.

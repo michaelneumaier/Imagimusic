@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Network audition media diagnostic</title><style>body{font:16px system-ui;max-width:750px;margin:30px auto;padding:20px}button{padding:15px}pre{white-space:pre-wrap}</style><h1>Network audition media diagnostic</h1><p>Explicit playback of the generated withheld gesture. Uses the production listening stage at +18 dB. Reports media events, not device output or listening quality.</p><button id="start">Play the local WAV</button><audio controls preload="none"></audio><pre id="state">Not started.</pre><script type="module">
+import {createMediaListening} from '../src/grove/media-listening.js';
+const audio=document.querySelector('audio'),state=document.getElementById('state'),events=[];
+const player=createMediaListening(audio,{db:18});
+function show(type){events.push(type);state.textContent=JSON.stringify({event:type,duration:audio.duration,currentTime:audio.currentTime,paused:audio.paused,ended:audio.ended,readyState:audio.readyState,networkState:audio.networkState,error:audio.error?{code:audio.error.code,message:audio.error.message}:null,events:events.slice(-20)},null,2);}
+for(const event of ['loadstart','loadedmetadata','loadeddata','canplay','playing','waiting','stalled','pause','ended','error','timeupdate'])audio.addEventListener(event,()=>show(event));
+document.getElementById('start').onclick=()=>{audio.src='../renders/inverse-network-study/withheld-plus-30.wav';player.play().then(()=>show('play promise fulfilled'),error=>show('play rejected: '+error.message));};
+window.addEventListener('pagehide',()=>player.pause());
+</script></html>
