@@ -25,3 +25,13 @@ Julius O. Smith's [frequency-resolution discussion](https://dsprelated.com/freeb
 Chowdhury, Canfield-Dafilou and Rau's [Water Bottle Synthesis with Modal Signal Processing](https://rau.mit.edu/papers/DAFx2020_Chowdhury_Canfield-Dafilou_Rau.pdf) separates modal frequency selection, decay estimation and complex-amplitude fitting. Its measurement conditions and analysis choices are not automatically transferable to arbitrary visitor recordings or the Grove's closely clustered modes. We use that separation of questions, not a claim that the same method recovers our targets.
 
 Additional verification: an independently generated Python `wave` stereo PCM24 file decoded exact endpoints and signed one-LSB samples at 48 kHz. Native Brave loaded `tests/inverse-sound-browser.html` and reported PASS 2/2: a real browser File containing generated stereo WAV bytes went through the selected-file reader and parser; cancellation during its asynchronous read refused the result. This harness does not exercise a native picker or estimate resonances.
+
+## Samples-only inspection page
+
+`inverse-sound.html` now offers a selected local WAV, worker parsing, separate channel min/max interval plots on a shared sample-value scale, per-channel RMS/mean, exact-byte SHA-256, and Clear/cancel lifecycle controls. It does not play sound, infer resonances or submit a target. Fable reviewed the parser in 3593030 and the page in 4c8827a, both approve.
+
+Native Brave successfully opened the generated `/tmp/imagimusic-study-ring.wav` through the real file picker: 4.000 seconds, stereo, 8,000 Hz, PCM16, 32,000 frames. The two plotted channels visibly differ, with the second quieter and faster-decaying. This is a synthetic fixture, not a recorded instrument. Two summary tests cover all-frame bucket coverage, stereo differences, mean/RMS, silence and bounded bucket count; combined parser/summary tests pass 8/8.
+
+Remaining native checks are explicit: malformed-file selection did not reach the parser through the macOS picker, so no application error-recovery result was observed. Subsequent Clear/keyboard actions left the AX state unchanged; a coordinate click returned `noWindowsAvailable`. The unchanged result is not treated as proof that Clear works or fails. Mobile layout, production cancellation and malformed replacement recovery still need usable native interaction. Keep this page a direct-access local study until those checks finish; no incoming catalog link has been added.
+
+The analysis study review found that spectral-window length and available decay duration differ in its current implementation. See `collab/reviews/20261102T1300Z-astra-reviews-sound-file-study.md`; no estimator is admitted into the page by these waveform checks.

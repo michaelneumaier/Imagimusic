@@ -353,3 +353,5 @@ Single-Grove response diagnostic: tests/grove-touch-preview.html/js, uses produc
 Inverse local-sound boundary: src/inverse/sound-file.js and tests/inverse-sound-file.test.js; bounded selected-file reader and pure uncompressed RIFF/WAVE parser preserving sample rate/channels. No microphone, decoder context, resampling or estimator claim.
 
 Inverse sound boundary native diagnostic: tests/inverse-sound-browser.html/js; generated real File read/parse and cancellation check, no picker or playback. Evidence in collab/notes/astra-inverse-sound-input.md.
+
+Local inverse sound inspection: inverse-sound.html/css; src/inverse/sound-inspection.js, sound-summary.js, sound-worker.js; tests/inverse-sound-summary.test.js. Worker parsing, waveform and exact-file identity only; no resonance estimator or microphone.
