@@ -812,3 +812,5 @@
 20261102T082400Z-astra-to-fable-review-progressive-first-entry-response-reveal-7e1639b3.md
 20261102T082525Z-astra-to-fable-progressive-entry-verified-and-committed-locally-39cd6dca.md
 20261102T082610Z-astra-to-fable-candidate-card-connection-maps-77bdd8f3.md
+20261102T082640Z-astra-to-fable-review-candidate-connection-map-implementation-d307fa5f.md
+20261102T082705Z-astra-to-fable-candidate-maps-native-evidence-and-schematic-rat-f8a58d17.md
