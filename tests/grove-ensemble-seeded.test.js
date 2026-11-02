@@ -127,3 +127,20 @@ test('provenance cannot be padded: an extra same-frame strike, an extra contact 
   validateSeededEnsemble(swapped); assert.equal((await verifySeededEnsemble(swapped, source)).instrumentsMatch, false, 'another instrument on part 0 is not the source\'s');
   await assert.rejects(seedEnsembleRecord({ source, continuation: c, ensemble: swapped.ensemble }), /instrument differs/);
 });
+
+test('capture edges: a contact set applied on the Quiet frame of an aborted opening leaves no interval and still verifies; an inverted per-part ledger is refused', async () => {
+  const source = await keepSource(), plan = continuationPlan(source, { sampleRate: 8000 });
+  const { host, block, until, verify } = fixture(); await host.enable([grove, grove, grove]);
+  host.scheduleContinuation(planSteps(plan), { handoffFrame: plan.handoffFrame }); block(2); host.quiet(); until(() => host.state === 'ended');
+  const wrapper = await seedEnsembleRecord({ source, continuation: host.continuation, ensemble: verify(host.continuation.originFrame) }); host.dispose();
+  const w = structuredClone(wrapper), set = w.opening.ledger.findIndex(e => e.edge === 'set'), ended = w.opening.ledger[set].requestedFrame + 64;   // the set is applied late, on the frame Quiet lands
+  const ending = { frame: ended, fadeFrames: w.ensemble.ended.fadeFrames }; w.ensemble.ended = ending; for (const part of w.ensemble.parts) part.record.ended = { ...ending };
+  w.opening.ledger = w.opening.ledger.map((e, i) => i < set ? e : i === set ? { ...e, appliedFrame: ended, accepted: true, reason: null } : { ...e, appliedFrame: null, accepted: null, reason: null });
+  w.opening.effective = w.opening.ledger.some(e => e.accepted && e.edge !== 'release'); w.ensemble.parts[0].record.contacts = [];          // the capture drops the zero-length interval
+  validateSeededEnsemble(w); const report = await verifySeededEnsemble(w, source);
+  assert.deepEqual([report.contentMatches, report.partial, report.timingChanged], [true, true, true]);
+  const inverted = structuredClone(wrapper), onPart0 = inverted.opening.ledger.map((e, i) => [e, i]).filter(([e]) => e.part === 0 && e.accepted !== null).map(([, i]) => i);
+  if (onPart0.length >= 2) { const [a, b] = onPart0; [inverted.opening.ledger[a].appliedFrame, inverted.opening.ledger[b].appliedFrame] = [inverted.opening.ledger[b].appliedFrame + 1, inverted.opening.ledger[a].appliedFrame];
+    inverted.opening.ledger[b].requestedFrame = Math.min(inverted.opening.ledger[b].requestedFrame, inverted.opening.ledger[b].appliedFrame);
+    assert.throws(() => validateSeededEnsemble(inverted), /ordered queue/); }
+});

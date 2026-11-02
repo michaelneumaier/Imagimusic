@@ -48,6 +48,9 @@ export function validateSeededEnsemble(wrapper, { admission = true } = {}) {
     if (entry.accepted && (entry.edge === 'strike' || entry.edge === 'set')) effective = true;
   });
   if (o.effective !== effective) throw new Error('opening.effective must be true exactly when an accepted strike or contact set exists in the ledger.');
+  // Edges were posted together through each part's ordered queue, so on one part an earlier planned edge cannot apply after a later one.
+  const lastApplied = [null, null, null];
+  o.ledger.forEach((entry, i) => { if (entry.accepted === null) return; if (lastApplied[entry.part] !== null && entry.appliedFrame < lastApplied[entry.part]) throw new Error(`opening.ledger[${i}]: applied before an earlier planned edge on the same part, which the ordered queue cannot do.`); lastApplied[entry.part] = entry.appliedFrame; });
   if (o.handoff === 'completed' && (!signed(o.boundaryFrame) || o.boundaryFrame < maxApplied)) throw new Error('opening.boundaryFrame must be a signed safe integer at or after every applied frame.');
   return validateEnsembleRecord(wrapper.ensemble, { admission });
 }
@@ -109,7 +112,9 @@ function expectedRememberedContent(wrapper, plan) {
     else close(part, cmd.body, f);
   }
   const ended = wrapper.ensemble.ended.frame;
-  return parts.map(part => ({ events: part.events, contacts: part.contacts, open: [...part.open.values()].map(o => wrapper.opening.handoff === 'aborted' ? { ...o, end: ended } : o) }));
+  // When the handoff was aborted, Quiet closed the open contacts at the ending; the capture keeps only intervals of positive length (frame > start).
+  if (wrapper.opening.handoff === 'aborted') return parts.map(part => ({ events: part.events, contacts: part.contacts, open: [...part.open.values()].filter(o => ended > o.start).map(o => ({ ...o, end: ended })) }));
+  return parts.map(part => ({ events: part.events, contacts: part.contacts, open: [...part.open.values()] }));
 }
 const eventKey = x => `${x.frame}:${x.body}:${x.position}:${x.velocity}`, contactKey = x => `${x.start}:${x.end}:${x.body}:${x.zone}:${x.strength}`;
 const sortedKeys = (list, key) => list.map(key).sort();
