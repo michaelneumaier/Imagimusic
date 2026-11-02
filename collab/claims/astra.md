@@ -237,3 +237,7 @@ Family showcase: project.html and src/project-catalog.js; optional family discov
 Family listening audit: tools/verify-ensemble-family-study.mjs and own review; independently check curated anatomy, identical gesture vocabulary/timing, silent parts, report identities and exact block-mix WAVs before catalog inclusion. Fable owns producer.
 Family-study discovery: src/project-catalog.js, tools/prepare-project-home.mjs and project.html; seventh generated study and direct home invitation after independent artifact audit.
 Listening-to-playing bridge: tools/open-phrase-player.mjs optional selected-case link; src/grove/ensemble-family-arrival.js, ensemble-main.js and focused parser tests for curated query arrival, silent until explicit Begin. Fable owns family-study link metadata.
+Family response diagnostic: tools/sample-family-picture-response.mjs and tests/grove-response-preview.html/js; sample actual authored family-study records into silent frozen/playable visual inspection, without scene-source or audio changes.
+
+Follow-the-ring encounter: ensemble.html and ensemble-main.js; default-off visual option, near-picture response caption and explicit reduced-motion status. No host/audio/record changes.
+Follow-the-ring discovery: project.html current-edge sentence and notebook link; no extra catalog card.

@@ -233,7 +233,14 @@ bodyTap=bindBodyTap($('world'),{
  pick:event=>pickBody(event),enabled:()=>selectedPart!==null&&active()&&!!world,
  onTap:({part,body})=>{if(part===selectedPart&&active())host.send(part,{kind:'strike',body,position:1,velocity:.5});}
 });
-const markerOptions={distinguishRemembered:false};
+const markerOptions={distinguishRemembered:false,followRing:false};
+function syncResponseCaption(){
+ const enabled=markerOptions.followRing;
+ $('response-caption').hidden=!enabled;
+ $('response-caption').textContent=reduced.matches?'Follow the ring — response animation is off for reduced motion.':'Follow the ring — floor rings show amplified low-band response. Sound is unchanged.';
+}
+$('follow-ring').onchange=()=>{markerOptions.followRing=$('follow-ring').checked;syncResponseCaption();};
+reduced.addEventListener('change',syncResponseCaption);
 $('distinguish-remembered').onchange=()=>{markerOptions.distinguishRemembered=$('distinguish-remembered').checked;$('marker-caption').hidden=!markerOptions.distinguishRemembered;};
 const widePictureNote=$('picture-note').textContent;
 const viewNames=['C','E-flat','G'];

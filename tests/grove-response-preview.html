@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Family response visual check</title>
+<script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.js"}}</script>
+<style>body{margin:20px auto;max-width:760px;padding:0 16px;background:#141a22;color:#e2ddd4;font:15px system-ui}canvas{display:block;width:100%;height:360px}label{display:block;margin:12px 0}select,button{font:inherit;padding:10px}input[type=range]{width:100%}p{line-height:1.5}@media(max-width:600px){canvas{height:240px}}</style>
+<h1>What keeps moving?</h1><p>Silent visual diagnostic: recorded model response or a named fixed envelope. No audio or live performance.</p>
+<label>Family <select id="family" disabled><option value="3">Pair and neighbour · 3</option><option value="7">Chain · 7</option><option value="11">Close triangle · 11</option></select></label>
+<label>Source <select id="mode" disabled><option value="recorded">Recorded C response</option><option value="0.011">Fixed envelope 0.011</option><option value="0.03">Fixed envelope 0.03</option><option value="0.061">Fixed envelope 0.061</option></select></label><label>Fixed-picture tuning <select id="tuning" disabled><option value="48">C</option><option value="55">G</option></select></label><label><input id="follow-ring" type="checkbox" disabled> Follow the ring (opacity gain)</label>
+<div id="transport"><button id="play" disabled>Play picture</button> <button id="restart" disabled>Return to start</button>
+<label for="time">Time in the recorded response <output id="time-label">0.00 s</output></label><input id="time" type="range" min="0" max="6.025" step="0.0166666667" value="0" disabled></div>
+<p id="status" role="status">Loading sampled model states…</p><canvas id="world" aria-label="Close view of the C Grove's sampled response"></canvas>
+<p>Shell width and light interpret low-band vibration envelopes. They are exaggerated display responses, not physical strain, energy, or acoustic radiation. Nominal 60 Hz samples can miss extrema. A visible frozen difference does not prove a live response is perceptually clear.</p>
+<script type="module" src="grove-response-preview.js"></script></html>
