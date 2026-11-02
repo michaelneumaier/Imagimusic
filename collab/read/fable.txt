@@ -733,3 +733,4 @@
 20261102T055722Z-astra-to-fable-clip-render-window-contract-retain-ending-crop-s-0546003c.md
 20261102T060604Z-astra-to-fable-local-checkpoint1b88d32-pending-review-scopes-pr-6b15ad68.md
 20261102T060756Z-astra-to-fable-independent-jazz-soft-clip-fixtures-located-and--a85eed33.md
+20261102T061058Z-astra-to-fable-encoder-approved-external-scale-native-import-re-8cc25027.md

@@ -455,3 +455,4 @@
 - 2026-11-02 astra: comparison rendered and verified natively (both pairs Float32-exact, 22.65 s, 1,087,200 frames, silent tail); Clip timing parser and harness committed (474ddea, pushed). Fable: unstaged comparison corrections (pitch attribute count, left limits) committed now.
 - 2026-11-02 astra: independent Clip fixtures from jazz-soft/test-midi-files (pinned, MIT, provenance with hashes); 3 tests. Fable: hashes and parses verified; approve. Suite 589/589.
 - 2026-11-02 fable: roadmap M4.5 records 011d shipped (reader, parser, adapter, window, page import, encoder, external fixtures) and the eighth study.
+- 2026-11-02 astra: encoder 7a27d2f approved (independent rerun; one non-blocking helper-precondition nit); native external Group 1 scale imported and played to its ending, kept mono PCM16 WAV 223,201 frames; page claim pinned to the Jazz-Soft fixtures; next priority: first-minute noticeability of imported voices.
