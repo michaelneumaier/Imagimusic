@@ -359,3 +359,5 @@ Local inverse sound inspection: inverse-sound.html/css; src/inverse/sound-inspec
 Extensible WAV compatibility: sound-file parser/summary/inspection metadata and owned tests; documented uncompressed PCM/float subformats, no channel remix or rate conversion. Fable source untouched.
 
 Listening-to-touch continuity: listen.html/src/listen/main.js and touch.html/src/touch/main.js; carry the selected journey through existing study/bridge query parameters, explicit silent entry, no model or transport changes.
+
+Touch staged connection choice: owned main/html UI; quiet and preserve current passage when selecting another connection, replace only on explicit Enter. Shared transport remains unchanged.
