@@ -77,7 +77,7 @@ $('listen').onclick=async()=>{
  if(busy||!instrument)return;
  const token=generation;
  try{await context.resume();if(token!==generation)return;armed=context.state==='running';$('gesture').textContent=context.state==='running'?'Touch a body. Let its response unfold.':'Listening is still suspended. Choose Start listening to retry.';}
- catch(error){$('gesture').textContent='Could not start listening: '+error.message;}
+ catch(error){if(token!==generation)return;$('gesture').textContent='Could not start listening: '+error.message;}
  controls();
 };
 function strike(body){
@@ -105,6 +105,11 @@ function tick(){
  });
  raf=requestAnimationFrame(tick);
 }
-addEventListener('pagehide',()=>{cancel('Preparation cancelled while leaving the page.');transport?.quiet();armed=false;context?.suspend();cancelAnimationFrame(raf);});
+addEventListener('pagehide',()=>{
+ const wasBusy=busy;cancel(wasBusy?'Preparation cancelled while leaving the page.':'Listening paused while away. Prepared instrument and results retained.');
+ transport?.quiet();armed=false;context?.suspend();
+ $('gesture').textContent=instrument?'Quiet. Choose Start listening before touching a body again.':'Search, then choose an anatomy to prepare it.';
+ cancelAnimationFrame(raf);
+});
 addEventListener('pageshow',()=>{cancelAnimationFrame(raf);tick();});
 controls();

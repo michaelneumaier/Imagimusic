@@ -283,3 +283,5 @@ Inverse playing transport: src/inverse/transport.js and tests/inverse-transport.
 Inverse native preparation diagnostic: tests/inverse-worker-browser.html; explicit silent real module-worker search, cancellation and candidate PCM transfer verification. Browser result is separate from audio-device evidence.
 
 Inverse workshop encounter: inverse.html/inverse.css/src/inverse/main.js; authored editable resonance target, bounded cancellable search, explicit candidate preparation and listening, touchable three-mass schematic, visible fit and realism limits. No solver/model edits or publishing.
+
+Inverse workshop discovery: project.html/src/project-catalog.js and own workshop note; concise home invitation, catalog entry, current roadmap/history and source notebook link. Preserve established attention paths; no general audio-inference claim.
