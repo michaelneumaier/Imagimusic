@@ -72,3 +72,44 @@ export function visualFromState(recipe, state, contactKey) {
   }
   return { envelope: re.map((x, b) => Math.hypot(x, im[b])), lowBand: true, contacts: parseContactKey(contactKey), interpretation: v.interpretation };
 }
+
+/** A sequential block renderer for one part: the same trajectory and samples as renderRestPassage (strikes by frame, the contact key
+ *  recomputed only at contact edges, Float32 samples), delivered in caller-sized blocks into a scratch buffer so a mixer can combine several
+ *  parts without holding any part in full. With `admissionCeiling`, each strike's candidate bound is checked against it before the strike is
+ *  applied, exactly as validateRestAdmission does, and a refusal throws before the block is returned. A failure is terminal: the renderer refuses
+ *  every later call, because the engine state and the scratch prefix are already partly advanced. Earlier blocks and the partial scratch exist in
+ *  the caller's hands; on any failure the caller must discard every block and the scratch and must not publish a completed passage. The ending
+ *  fade is not applied here; a mixer applies it as renderRestRecord does (Float32 store, then × fade stored again).
+ *  Blocks must be requested in order from frame 0; the renderer keeps the engine state between calls. One engine per renderer keeps the hot
+ *  loop monomorphic, which is why a mixer should drive three renderers in turn rather than three engines in one loop. */
+export function createRestPassageRenderer(recipe, { strikes = [], contacts = [], frames, admissionCeiling = null } = {}) {
+  if (!Number.isInteger(frames) || frames < 0) throw new Error('frames must be a non-negative integer.');
+  if (admissionCeiling !== null && !(Number.isFinite(admissionCeiling) && admissionCeiling > 0)) throw new Error('admissionCeiling must be null or a positive number.');
+  const engine = createRestEngine(recipe), sample = new Float64Array(recipe.channels), channels = recipe.channels;
+  const byFrame = new Map(); for (const k of strikes) { if (!byFrame.has(k.frame)) byFrame.set(k.frame, []); byFrame.get(k.frame).push(k); }
+  const edges = new Set(); for (const c of contacts) { edges.add(c.start); edges.add(c.end); }
+  const keyAt = i => contactStateKey(Array.from({ length: recipe.bodies }, (_, b) => { const c = contacts.find(c => c.body === b && c.start <= i && i < c.end); return c ? { zone: c.zone, strength: c.strength } : null; }));
+  let position = 0, admitted = 0, failed = null; const bounds = [];
+  return {
+    get frames() { return frames; }, get position() { return position; }, get bounds() { return bounds.slice(); }, get failed() { return failed !== null; },
+    /** Render frames [from, to) into out (Float32Array per channel, length ≥ to − from). `from` must equal the current position. */
+    render(from, to, out) {
+      if (failed) throw new Error(`renderer failed earlier (${failed.message}); discard its output.`);
+      if (from !== position || !Number.isInteger(to) || to < from || to > frames) throw new Error('blocks must be rendered in order within the passage.');
+      if (!Array.isArray(out) || out.length !== channels || out.some(o => !(o instanceof Float32Array) || o.length < to - from)) throw new Error('out must hold one Float32Array per channel of at least the block length.');
+      try {
+      for (let i = from; i < to; i++) {
+        const due = byFrame.get(i);
+        if (due) for (const k of due) {
+          if (admissionCeiling !== null) { const bound = engine.candidateBound(k.position, k.body, k.velocity); if (!(bound <= admissionCeiling)) throw new Error(`events[${admitted}] (frame ${k.frame}) would have been rejected: bound ${bound.toFixed(4)} exceeds the admission ceiling ${admissionCeiling}.`); bounds.push(bound); }
+          engine.strike(k.position, k.body, k.velocity); admitted++;
+        }
+        if (i === 0 || edges.has(i)) engine.setContacts(keyAt(i));
+        engine.read(sample); const o = i - from; for (let ch = 0; ch < channels; ch++) out[ch][o] = sample[ch];
+        engine.step();
+      }
+      } catch (error) { failed = error; throw error; }
+      position = to; return to - from;
+    },
+  };
+}

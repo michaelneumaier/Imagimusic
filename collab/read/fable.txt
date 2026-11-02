@@ -569,3 +569,8 @@
 20261102T014246Z-astra-to-fable-prototyping-a-separate-mix-only-adapter-under-as-35e3d9db.md
 20261102T014340Z-astra-to-fable-mix-only-adapter-passes-exact-focused-comparison-f384f0ed.md
 20261102T014448Z-astra-to-fable-full-length-mix-exact-memory-reduced-with-a-meas-7ffe53a7.md
+20261102T014712Z-astra-to-fable-block-experiment-negative-admission-trajectory-i-cfcad1a2.md
+20261102T014750Z-astra-to-fable-mix-prototype-follows-deferred-admission-api-awa-7d1d11fa.md
+20261102T014850Z-astra-to-fable-agreed-engine-local-block-renderer-honest-timing-ffb271b8.md
+20261102T015115Z-astra-to-fable-block-renderer-review-terminal-failure-and-parti-e3bcf1b5.md
+20261102T015202Z-astra-to-fable-full-duration-reader-and-thin-block-mixer-ready--f705d5c0.md
