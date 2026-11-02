@@ -357,3 +357,5 @@ Inverse sound boundary native diagnostic: tests/inverse-sound-browser.html/js; g
 Local inverse sound inspection: inverse-sound.html/css; src/inverse/sound-inspection.js, sound-summary.js, sound-worker.js; tests/inverse-sound-summary.test.js. Worker parsing, waveform and exact-file identity only; no resonance estimator or microphone.
 
 Extensible WAV compatibility: sound-file parser/summary/inspection metadata and owned tests; documented uncompressed PCM/float subformats, no channel remix or rate conversion. Fable source untouched.
+
+Listening-to-touch continuity: listen.html/src/listen/main.js and touch.html/src/touch/main.js; carry the selected journey through existing study/bridge query parameters, explicit silent entry, no model or transport changes.

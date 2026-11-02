@@ -15,7 +15,7 @@ const transport=createListeningTransport({createContext:()=>new AudioContext(),p
  $('save').disabled=!transport.pcm;
  if(state==='preparing')status('Preparing this passage…');
  else if(state==='playing')status('Follow either body. Quiet pauses the passage; the timeline lets you return to a moment.');
- else if(state==='ended')status('Let the silence stay a moment. Listen again, or choose another passage.');
+ else if(state==='ended')status('Let the silence stay a moment. Listen again, play this connection yourself, or choose another passage.');
  else if(state==='idle')status('Ready when you are. Press Listen to begin.');
  else if(state==='paused')status('Paused. Continue from here, or choose a moment on the timeline.');
 }});
@@ -34,6 +34,8 @@ function choose(id){
  for(const button of $('passages').children)button.setAttribute('aria-pressed',String(button.dataset.journey===id));
  const url=new URL(location.href);url.searchParams.set('study',id);history.replaceState(null,'',url);
  $('explore').href=compositionPageURL(location.href,'loom.html',{version:1,loom:{enabled:true,settings:selected.settings}});
+ const playing=new URL('touch.html',location.href);playing.searchParams.set('bridge',selected.id);
+ for(const link of document.querySelectorAll('[data-play-connection]')){link.href=playing.href;link.textContent=`Play ${selected.title} ↗`;}
  $('model-detail').textContent=`This passage holds the connection fixed: ${selected.settings.frequency} Hz base tuning, ${selected.settings.detune} cents detuning, coupling ${selected.settings.coupling}, loss ${selected.settings.loss}/s. Changes between studies affect the actual sound model. Camera movement changes framing only.`;
  status(`${selected.title}. Press Listen. Headphones reveal the stereo space; Escape brings Quiet.`);
 }
