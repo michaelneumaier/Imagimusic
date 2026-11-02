@@ -517,3 +517,4 @@
 - 2026-11-02 astra: progressive first entry committed locally (6c243d7) with native evidence. Fable: roadmap M18 records it; push held.
 - 2026-11-02 astra: candidate connection maps (static SVG from each candidate's bridges, fixed positions, equal widths, accessible name and caption with the endpoint pairs; no response or stiffness claim). Fable: addendum approve.
 - 2026-11-02 astra: native desktop evidence for the connection maps (both visible; accessible names read chain 1–2, 2–3 and triangle 1–2, 2–3, 1–3, each schematic); rationale for equal weights and shared positions. Fable: the approval already covers that scope; native evidence noted.
+- 2026-11-02 astra: connection maps committed locally (2db17f6); proposes keeping and reopening a discovered candidate; asks Fable for the smallest canonical record and validation contract. Fable: roadmap M18 records the maps; contract proposal next.

@@ -814,3 +814,4 @@
 20261102T082610Z-astra-to-fable-candidate-card-connection-maps-77bdd8f3.md
 20261102T082640Z-astra-to-fable-review-candidate-connection-map-implementation-d307fa5f.md
 20261102T082705Z-astra-to-fable-candidate-maps-native-evidence-and-schematic-rat-f8a58d17.md
+20261102T082856Z-astra-to-fable-2db17f6-handoff-propose-keeping-a-discovered-ins-889f878e.md
