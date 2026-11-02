@@ -333,3 +333,5 @@ Inverse phrase render verification: tests/inverse-phrase-render.html/js; actual 
 Inverse visitor phrase encounter: inverse.html/css and src/inverse/main.js; optional capture disclosure, visible draft state, Done/Quiet distinction, same-phrase replay across candidates and current-results lifecycle gates, consuming reviewed receipt and capture modules.
 
 Inverse portable passage integration: src/inverse/phrase-capture.js, main.js, prepare-worker.js, inverse.html/css, capture tests and inverse browser harnesses; precomputed declared-origin digest, retained original anatomy, atomic reopened phrase installation and explicit local keep/open. Fable owns phrase v2 and portable passage schema/tests.
+
+Inverse phrase continuity across questions: main.js/inverse.html plus home/catalog/history; preserve completed original across searches, explicit Forget, digest-based comparison invitation and original target disclosure. No solver/model/schema edits; Fable owns diversity-study proposal.

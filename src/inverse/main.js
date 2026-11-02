@@ -64,7 +64,8 @@ $('search-form').onsubmit=async event=>{
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent='Searching two possible layouts. You can cancel while it works…';
  try{
   const next=await jobs.run({kind:'search',target,options:{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
-  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;clearPhrase();repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  if(phraseCapture.snapshot.phrase)phraseText('phrase-status','Your phrase is retained with its original anatomy. Prepare a new result to try the same touches there.');
   $('status').textContent=`${next.candidates.filter(c=>c.status==='accepted').length} layouts within tolerance. ${next.work.evaluations.toLocaleString()} evaluations in ${((performance.now()-started)/1000).toFixed(1)} s. ${next.bound.impossibleWithinTolerance?'This target exceeds the equal-mass family’s frequency-ratio bound, even with tolerance.':next.work.exhausted?next.verdict:'This bounded search does not establish uniqueness or a global optimum.'}`;
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
@@ -199,12 +200,13 @@ function phraseControls(ringing){
  $('finish-phrase').hidden=!capture.active;
  $('replay-phrase').disabled=!ready||ringing||capture.active||!capture.phrase||mountedReport!==report;
  $('keep-phrase').disabled=busy||keepingPhrase||capture.active||!capture.phrase||!phraseAnatomy;
+ $('forget-phrase').disabled=busy||capture.active||!capture.phrase;
  if(capture.active)phraseText('phrase-status',capture.count?`Remembering ${capture.count} / 8 touches. Choose Done, or keep playing within the eight-second window.`:'Ready to remember. Touch a body to begin the eight-second window.');
  $('phrase-summary').hidden=!capture.phrase;
  if(capture.phrase){
   const phrase=capture.phrase,sequence=phrase.events.map(event=>event.body+1).join(' → ');
-  const comparison=ready&&mountedReport===report&&!ringing&&!capture.active&&mountedTopology!==phraseTopology?` Try your phrase on this ${mountedTopology}, too.`:'';
-  phraseText('phrase-summary',`${phrase.events.length} ${phrase.events.length===1?'touch':'touches'} from the ${phraseTopology}: ${sequence}. First to last touch: ${phrase.spanSeconds.toFixed(2)} s.${comparison}`);
+  const comparison=ready&&mountedReport===report&&!ringing&&!capture.active&&mountedDigest!==phrase.anatomySha256?` Try your phrase on this ${mountedTopology}, too.`:'';
+  phraseText('phrase-summary',`${phrase.events.length} ${phrase.events.length===1?'touch':'touches'} from the ${phraseTopology}: ${sequence}. First to last touch: ${phrase.spanSeconds.toFixed(2)} s. Original target: ${phraseAnatomy.target.normalFrequenciesHz.map(f=>f.toFixed(2)).join(' / ')} Hz; decay ${phraseAnatomy.target.decaySeconds.toFixed(2)} s.${comparison}`);
  }else phraseText('phrase-summary','');
 }
 $('remember-phrase').onclick=()=>{
@@ -224,6 +226,11 @@ $('replay-phrase').onclick=()=>{
  if(!phrase||phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running'||mountedReport!==report)return;
  try{transport.playGesture(inversePhraseTransportEvents(phrase));phraseText('phrase-status',`Your phrase started on the ${mountedTopology}. Its touches and timing are unchanged. You can answer with your own touch.`);}
  catch(error){phraseText('phrase-status',error.message);}controls();
+};
+
+$('forget-phrase').onclick=()=>{
+ if(busy||phraseCapture.snapshot.active||!phraseCapture.snapshot.phrase)return;
+ clearPhrase();phraseText('phrase-status','Phrase forgotten. Any sound already playing can finish, or choose Quiet.');controls();
 };
 
 $('keep-phrase').onclick=async()=>{
