@@ -1,3 +1,4 @@
+import {compositionPageURL} from '../stage/composition-link.js';
 import {touchConnectionHref,readTouchConnection} from './connection-link.js';
 import {createTouchTransport} from './transport.js';
 import {holdVelocity} from './session.js';
@@ -29,6 +30,7 @@ const transport=createTouchTransport({onChange:controls});
 const refreshControls=()=>controls({state:transport.state,recording:transport.recording()});
 function configure(){
  const journey=selectedConnection();settings=journey.settings;
+ $('inside-loom').href=compositionPageURL(location.href,'loom.html',{version:1,loom:{enabled:true,settings}});
  const listening=new URL('listen.html',location.href);if(!journey.custom)listening.searchParams.set('study',journey.id);
  const origin=new URLSearchParams(location.search),at=Number(origin.get('listenAt'));
  if(!journey.custom&&origin.get('fromStudy')===journey.id&&Number.isFinite(at)&&at>0)listening.searchParams.set('at',String(at));

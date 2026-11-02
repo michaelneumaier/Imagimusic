@@ -399,3 +399,5 @@ History browser boundary harness: tests/touch-history-browser.html/js. Real modu
 Custom Touch connection continuity: src/touch/connection-link.js, tests/touch-connection-link.test.js and owned live/return UI. Exact four-setting local URL route for valid non-preset instruments; explicit silent entry, no gestures in URL, known preset links preserved.
 
 Touch connection discovery study: tools/study-touch-connections.mjs and collab/notes/astra-touch-connection-study.md. Fixed tuning/loss and identical admitted gestures across six declared connections, real PCM metrics and optional local listening artifacts. No model edits or automatic product preset expansion.
+
+Loom-to-Touch design handoff: loom.html/src/loom/main.js and owned Touch main/footer. Reuse existing settings URL contracts for a quiet bidirectional instrument handoff; no study score or old live gestures carried.
