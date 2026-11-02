@@ -393,3 +393,5 @@ Touch history comparison: src/touch/history-comparison.js, history-comparison-wo
 Optional circular history diagnostic: src/touch/history-layout.js, tests/touch-history-layout.test.js and owned diagnostic. Same samples/shared axes/strike breaks; named static time-circle alternative, strips default, no product promotion or audio changes.
 
 Live Touch still-picture choice: touch.html/css and src/touch/main.js. Match replay's explicit listening preference, initially respecting reduced motion; retain sound, gestures and keyboard/pad feedback while hiding body/striker animation.
+
+History browser boundary harness: tests/touch-history-browser.html/js. Real module workers, exact builder parity, cancellation after dispatch and superseded replacement retention; silent, no timing-based simulated workload.
