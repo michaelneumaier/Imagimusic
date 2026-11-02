@@ -389,3 +389,5 @@ Touch history foundation: src/touch/history.js, history-worker.js, tests/touch-h
 Touch history diagnostic: tests/touch-history-diagnostic.html/js and history-worker.js text input adapter. Silent real-worker view with explicit fixed scale, exact gesture list and bounded file intake; no production link yet.
 
 Touch history comparison: src/touch/history-comparison.js, history-comparison-worker.js, tests/touch-history-comparison.test.js, and owned diagnostic UI. Shared duration/ceiling, explicit settings/pickup scaling, original retained; no audio or production integration.
+
+Optional circular history diagnostic: src/touch/history-layout.js, tests/touch-history-layout.test.js and owned diagnostic. Same samples/shared axes/strike breaks; named static time-circle alternative, strips default, no product promotion or audio changes.

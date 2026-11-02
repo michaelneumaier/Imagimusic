@@ -1,3 +1,4 @@
+import {historyPoint,historyPath} from '../src/touch/history-layout.js';
 import {createTouchReturnSession} from '../src/touch/return-session.js';
 import {createInverseJobs} from '../src/inverse/jobs.js';
 import {createTouchSession} from '../src/touch/session.js';
@@ -13,19 +14,33 @@ for(const journey of LOOM_JOURNEYS){const option=document.createElement('option'
 function node(tag,attrs={},text){const el=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attrs))el.setAttribute(key,value);if(text!==undefined)el.textContent=text;return el;}
 function draw(){
  if(!shown)return;const svg=$('plot');for(const group of [...svg.querySelectorAll('g')])group.remove();
- const group=node('g');svg.append(group);const max=Number($('ceiling').value),duration=pair?.duration??shown.duration,x=t=>85+1060*t/duration;let clipped=0;
+ const group=node('g');svg.append(group);const ceiling=Number($('ceiling').value),duration=pair?.duration??shown.duration,layout=$('layout').value,circular=layout==='circles',options={ceiling,duration,layout};let clipped=0;
+ svg.setAttribute('viewBox',circular?'0 0 1200 740':'0 0 1200 620');
+ $('layout-note').textContent=circular?'Static time circles: begin at the top and read clockwise once. Inner = left body; outer = right. Outward distance is the sampled envelope on the chosen scale. The seam is start/end, not a repeating loop. This is a presentation of time, not physical motion or energy flow.':'Time runs left to right; height is the sampled visual envelope.';
+ $('plot-description').textContent=(circular?'Two static circles: time starts at the top and runs clockwise. Inner left body, outer right body.':'Separate traces for left and right bodies on a shared seconds axis.')+' Solid is original; dashed is comparison. Exact gesture ticks and split strike boundaries are retained.';
  for(const body of [0,1]){
-  const top=45+300*body,base=top+175,y=value=>base-175*Math.min(max,value)/max,color=body?'#d3dca6':'#83cabb';
-  group.append(node('text',{x:85,y:top-16,fill:color,'font-size':19},body?'RIGHT BODY':'LEFT BODY'));
-  for(let step=0;step<=4;step++){const value=max*step/4,yy=y(value);group.append(node('path',{d:`M85 ${yy}H1145`,stroke:'#ffffff20',fill:'none'}),node('text',{x:74,y:yy+5,fill:'#b7bdc6','font-size':14,'text-anchor':'end'},String(value)));}
+  const color=body?'#d3dca6':'#83cabb',base=220+300*body;
+  if(circular){
+   for(const value of [0,ceiling]){const radius=100+150*body+70*value/ceiling;group.append(node('circle',{cx:600,cy:355,r:radius,fill:'none',stroke:'#ffffff25'}),node('text',{x:600+radius+6,y:350,fill:color,'font-size':13},String(value)));}
+   group.append(node('text',{x:600,y:body?370:345,fill:color,'font-size':17,'text-anchor':'middle'},body?'OUTER · RIGHT':'INNER · LEFT'));
+  }else{
+   group.append(node('text',{x:85,y:base-191,fill:color,'font-size':19},body?'RIGHT BODY':'LEFT BODY'));
+   for(let step=0;step<=4;step++){const value=ceiling*step/4,yy=historyPoint(body,0,value,options)[1];group.append(node('path',{d:`M85 ${yy}H1145`,stroke:'#ffffff20',fill:'none'}),node('text',{x:74,y:yy+5,fill:'#b7bdc6','font-size':14,'text-anchor':'end'},String(value)));}
+  }
   for(const [history,dashed] of [[shown,false],...(pair?[[pair.comparison,true]]:[])]){
-  let path='',previous=null;
-  for(const point of history.points){const command=previous?.side==='before'&&point.side==='at'&&previous.time===point.time?'M':previous?'L':'M';path+=`${command}${x(point.time).toFixed(3)} ${y(point.envelope[body]).toFixed(3)} `;
-   if(point.envelope[body]>max){clipped++;group.append(node('circle',{cx:x(point.time),cy:top,r:2,fill:'#f1a6a6'}));}previous=point;}
-  group.append(node('path',{d:path,fill:'none',stroke:color,'stroke-width':2,...(dashed?{'stroke-dasharray':'8 5'}:{})}));}
-  for(const event of shown.gestures.filter(e=>e.body===body&&e.withinOutput))group.append(node('path',{d:`M${x(event.time)} ${base+7}v${8+16*event.velocity}`,stroke:color,'stroke-width':2}));
-  for(let step=0;step<=4;step++){const time=duration*step/4;group.append(node('text',{x:x(time),y:base+49,fill:'#b7bdc6','font-size':14,'text-anchor':'middle'},`${time.toFixed(2)} s`));}
+   const result=historyPath(history,body,options);clipped+=result.clipped.length;
+   group.append(node('path',{d:result.path,fill:'none',stroke:color,'stroke-width':2,...(dashed?{'stroke-dasharray':'8 5'}:{})}));
+   for(const [cx,cy] of result.clipped)group.append(node('circle',{cx,cy,r:2,fill:'#f1a6a6'}));
+  }
+  for(const event of shown.gestures.filter(e=>e.body===body&&e.withinOutput)){
+   const [x,y]=historyPoint(body,event.time,0,options);let d;
+   if(circular){const angle=-Math.PI/2+2*Math.PI*event.time/duration,length=8+16*event.velocity;d=`M${x-5*Math.cos(angle)} ${y-5*Math.sin(angle)}l${-length*Math.cos(angle)} ${-length*Math.sin(angle)}`;}
+   else d=`M${x} ${base+7}v${8+16*event.velocity}`;
+   group.append(node('path',{d,stroke:color,'stroke-width':2}));
+  }
+  if(!circular)for(let step=0;step<=4;step++){const time=duration*step/4;group.append(node('text',{x:historyPoint(body,time,0,options)[0],y:base+49,fill:'#b7bdc6','font-size':14,'text-anchor':'middle'},`${time.toFixed(2)} s`));}
  }
+ if(circular)for(let step=0;step<4;step++){const angle=-Math.PI/2+step*Math.PI/2,dx=Math.cos(angle),dy=Math.sin(angle);group.append(node('path',{d:`M${600+90*dx} ${355+90*dy}L${600+330*dx} ${355+330*dy}`,stroke:'#ffffff25','stroke-dasharray':'3 6'}),node('text',{x:600+(step%2?390:350)*dx,y:355+350*dy+(step===0?14:5),fill:'#b7bdc6','font-size':16,'text-anchor':'middle'},step===0?`0 / ${duration.toFixed(2)} s · seam`:`${(duration*step/4).toFixed(2)} s`));}
  $('clipping').textContent=`${clipped} body samples above the chosen ceiling. Gesture marks may overlap; the list below preserves every event.`;
 }
 async function open(file){const own=++generation;cancelComparison();$('status').textContent='Preparing the sampled history…';try{const result=await session.open(file);if(own!==generation)return;shown=result;pair=null;$('comparison-facts').textContent='';$('comparison-status').textContent='The original remains available. Preparation stays silent.';
@@ -39,7 +54,7 @@ async function open(file){const own=++generation;cancelComparison();$('status').
 $('example').onclick=()=>{const s=createTouchSession(getLoomJourney('distant-cousins').settings,8000);s.strike({frame:0,body:0,velocity:.6});s.strike({frame:5704,body:1,velocity:.5});s.finish(32000);open(new File([JSON.stringify(s.snapshot())],'delayed-neighbour.json',{type:'application/json'}));};
 $('file').onchange=()=>{const file=$('file').files?.[0];$('file').value='';if(file)open(file);};
 $('cancel').onclick=()=>{if(session.state!=='preparing')return;generation++;session.cancel();$('status').textContent='Preparation cancelled.'+(shown?' Previous drawing retained.':'');};
-$('ceiling').onchange=draw;
+$('ceiling').onchange=$('layout').onchange=draw;
 $('compare').onclick=async()=>{if(!shown||comparisonBusy||session.state==='preparing')return;cancelComparison();const own=comparisonGeneration;comparisonBusy=true;controls();$('comparison-status').textContent='Preparing both histories…';
  try{const result=await comparisonJobs.run({record:shown.record,targetId:$('target').value});if(own!==comparisonGeneration)return;pair=result;draw();$('comparison-status').textContent=`Solid: original. Dashed: ${pair.targetTitle}.`;
  $('comparison-facts').textContent=pair.targetTitle+': '+pair.changes.map(c=>`${c.parameter}: ${c.from} → ${c.to}`).join(' · ')+`. Pickup scales: ${pair.original.pickupScale.toPrecision(6)} → ${pair.comparison.pickupScale.toPrecision(6)}. Durations: ${pair.original.duration.toFixed(3)} / ${pair.comparison.duration.toFixed(3)} s. Envelope modes: ${pair.original.averaged?'averaged':'interfering'} / ${pair.comparison.averaged?'averaged':'interfering'}.`;
