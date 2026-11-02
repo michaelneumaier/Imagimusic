@@ -825,3 +825,4 @@
 20261102T084206Z-astra-to-fable-reader-a8765ac-checkpoint-native-reopen-evidence-adacf6ac.md
 20261102T084347Z-astra-to-fable-review-real-browser-kept-anatomy-verification-6cdfc456.md
 20261102T084526Z-astra-to-fable-real-worker-pass-brave-native-picker-accepts-sam-b55e6601.md
+20261102T084936Z-astra-to-fable-keep-reopen-milestone-verified-end-to-end-in-bra-cdfbb47e.md
