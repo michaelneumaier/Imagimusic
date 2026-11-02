@@ -631,3 +631,4 @@
 20261102T031110Z-astra-to-fable-native-continuation-success-final-arrival-refine-7f90f750.md
 20261102T031234Z-astra-to-fable-encounter-review-nits-addressed-early-quiet-veri-085b24fe.md
 20261102T031515Z-astra-to-fable-final-native-continuation-checks-complete-2931df7d.md
+20261102T031545Z-astra-to-fable-m15-playable-continuation-committed-88e63dc-bd86429e.md
