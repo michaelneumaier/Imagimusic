@@ -12,7 +12,7 @@ let shown=null,played=null,visual=null,world=null,generation=0,closed=false;
 let comparison=null,comparisonBusy=false,comparisonGeneration=0;
 const comparisonJobs=createInverseJobs({makeWorker:()=>new Worker(new URL('./comparison-worker.js',import.meta.url),{type:'module'})});
 $('still-picture').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function describeView(){$('world').setAttribute('aria-label',$('still-picture').checked?'A still view of two connected bodies.':'Two connected bodies following the saved passage’s modeled vibration envelopes.');if($('world').hidden)return;$('view-note').textContent=$('still-picture').checked?'A still view of the two connected bodies. Sound and playback timing are unchanged; vibration and striker animation are hidden.':'Width and glow reveal amplified vibration envelopes. The bridge indicates connection; it does not show energy moving between bodies.';}
+function describeView(){$('world').setAttribute('aria-label',$('still-picture').checked?'A still view of two bodies.':'Two bodies following the saved passage’s modeled vibration envelopes.');if($('world').hidden)return;$('view-note').textContent=$('still-picture').checked?'A still view of the two bodies. Sound and playback timing are unchanged; vibration and striker animation are hidden.':shown?.record.settings.coupling===0?'Coupling is zero: each body responds independently. Width and glow reveal modeled envelopes.':visual?.visual(0).averaged?'Fast beating: width and glow show averaged modeled envelopes, not each beat. The bridge indicates connection, not energy flow.':'Width and glow reveal amplified vibration envelopes. The bridge indicates connection; it does not show energy moving between bodies.';}
 $('still-picture').onchange=describeView;describeView();
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const session=createTouchReturnSession({onChange:sync});
@@ -41,7 +41,7 @@ function show(result){
   world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;
   world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();
  }catch{$('world').hidden=true;$('view-note').textContent='The 3D view is unavailable here. The original sound can still be played.';}
- sync();
+ describeView();sync();
 }
 $('file').onchange=async()=>{
  const file=$('file').files?.[0];$('file').value='';if(!file)return;
@@ -83,7 +83,7 @@ window.addEventListener('pageshow',event=>{if(event.persisted){sync();status(sho
 function draw(){
  if(closed)return;
  if(shown){const time=played===shown&&!['preparing','error'].includes(replay.state)?replay.time():0;
-  if(world){const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const still=$('still-picture').checked;const frame=still?{time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]}:visual.visual(time);applyLoomScene(loomSceneFrame(frame,shown.record.settings,{active:!still}),world.loom);world.render();}
+  if(world){world.loom.bridge.visible=shown.record.settings.coupling>0;const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const still=$('still-picture').checked;const frame=still?{time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]}:visual.visual(time);applyLoomScene(loomSceneFrame(frame,shown.record.settings,{active:!still}),world.loom);world.render();}
   $('phase').textContent=`${replay.state==='playing'?'LISTENING':replay.state==='ended'?'SETTLED':replay.state==='suspended'?'INTERRUPTED':'READY'} · ${time.toFixed(1)} / ${shown.duration.toFixed(1)} s`;
  }
  requestAnimationFrame(draw);
