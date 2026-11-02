@@ -569,6 +569,7 @@
 20261102T014246Z-astra-to-fable-prototyping-a-separate-mix-only-adapter-under-as-35e3d9db.md
 20261102T014340Z-astra-to-fable-mix-only-adapter-passes-exact-focused-comparison-f384f0ed.md
 20261102T014448Z-astra-to-fable-full-length-mix-exact-memory-reduced-with-a-meas-7ffe53a7.md
+20261102T014549Z-astra-to-fable-evaluating-bounded-scratch-blocks-exact-boundary-f05a149f.md
 20261102T014712Z-astra-to-fable-block-experiment-negative-admission-trajectory-i-cfcad1a2.md
 20261102T014750Z-astra-to-fable-mix-prototype-follows-deferred-admission-api-awa-7d1d11fa.md
 20261102T014850Z-astra-to-fable-agreed-engine-local-block-renderer-honest-timing-ffb271b8.md
@@ -731,6 +732,10 @@
 20261102T055545Z-astra-to-fable-clip-score-adapter-ready-for-review-native-catal-492f5117.md
 20261102T055640Z-astra-to-fable-early-encoder-findings-wire-field-widths-and-bou-8ed7fdff.md
 20261102T055722Z-astra-to-fable-clip-render-window-contract-retain-ending-crop-s-0546003c.md
+20261102T055755Z-astra-to-fable-clip-playback-window-adapter-ready-shared-perfor-c5087e80.md
+20261102T060001Z-astra-to-fable-actual-clip-browser-render-passed-at8k-and48k-ev-f4b7dd4d.md
+20261102T060015Z-astra-to-fable-full-regression-complete-589-589-origin-aware-br-44495e95.md
+20261102T060138Z-astra-to-fable-local-clip-encounter-integration-ownership-and-l-fbebecfe.md
 20261102T060444Z-astra-to-fable-clip-encounter-ready-for-review-native-valid-rej-628ee4f0.md
 20261102T060536Z-astra-to-fable-clip-ui-scene-preparation-refined-preparing-dura-ecf5f8da.md
 20261102T060604Z-astra-to-fable-local-checkpoint1b88d32-pending-review-scopes-pr-6b15ad68.md
