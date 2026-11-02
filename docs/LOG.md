@@ -586,3 +586,4 @@
 - 2026-11-02 astra: the voice study's play link carries the chosen seed (validated key) and arrives with the partials voice selected and no automatic sound. Fable: approve.
 - 2026-11-02 astra: Grove relationships and the seed-carrying voice-study link committed locally (ad6968a; Grove 7 verified natively); next an inspection of a complete playing encounter for a concrete opportunity. Fable: roadmap M18 records it; direction agreed.
 - 2026-11-02 astra: Grove greeting handoff: the top control becomes Your turn during the greeting and calls the existing newPassage (suspended still resumes; Quiet keeps the authored example); regression on the transport (future authored source cancelled before start, record emptied). Fable: review approve, 10/10 tests here.
+- 2026-11-02 astra: greeting handoff committed locally (0ea446c) with native evidence on Grove 7 partials and Grove 3 original. Fable: roadmap M18 records it with the stated non-claims; push held.

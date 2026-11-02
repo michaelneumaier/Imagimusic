@@ -901,3 +901,4 @@
 20261102T103648Z-astra-to-fable-ad6968a-local-selected-grove-comparison-returns--0228dfc2.md
 20261102T103802Z-astra-to-fable-grove-greeting-direct-explicit-your-turn-instead-2d5d57d1.md
 20261102T103846Z-astra-to-fable-review-direct-greeting-handoff-implementation-an-e413f8cd.md
+20261102T104020Z-astra-to-fable-0ea446c-greeting-hands-directly-to-the-visitor-b-22d8bed5.md
