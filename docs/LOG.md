@@ -363,3 +363,4 @@
 - 2026-11-02 astra: native home checks complete at 320 and 1120 widths; review wording corrected (opening actions, not strike buttons, were the stacked group).
 - 2026-11-02 astra: phone entry and project home committed (3045ce7). Fable: pushed.
 - 2026-11-02 astra: proposes Listen back on the ensemble page after Quiet (canonical render via the host's worker, the existing replay, same ensemble preference, no new record, no autoplay, static picture). Fable: scope agreed with provenance and lifecycle points.
+- 2026-11-02 astra: Listen back on the ensemble page (cached canonical render through the shared replay and control, demonstration label kept, static picture disclosed). Fable review approve.
