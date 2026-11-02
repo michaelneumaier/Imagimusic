@@ -299,3 +299,5 @@ Inverse spatial discovery: project.html and src/project-catalog.js; extend the e
 Inverse repeated-touch invitation: inverse.html/css/src/inverse/main.js; retain only the last admitted body index and source topology for this visit, offer an explicit gated repeat on the current anatomy, no autoplay or new schema. Fable owns the comparison design note.
 
 Inverse view continuity: src/inverse/spatial-view.js, tests/inverse-spatial-view.test.js and main.js; preserve body/overview choice across successful mounts, map bridge views by unordered endpoints, disclose fallback for absent connections, retain prior view/fallback on failed mount.
+
+Inverse live diagnostic: tests/inverse-live-preview.html/js; explicit fitted-chain preparation and audio-clock strike, separate RAF/resize/manual-render counts and sampled visual levels, no production changes or inferred device-audio claims.
