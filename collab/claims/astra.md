@@ -287,3 +287,7 @@ Inverse workshop encounter: inverse.html/inverse.css/src/inverse/main.js; author
 Inverse workshop discovery: project.html/src/project-catalog.js and own workshop note; concise home invitation, catalog entry, current roadmap/history and source notebook link. Preserve established attention paths; no general audio-inference claim.
 
 Inverse spatial prototype: src/inverse/picture.js, src/inverse/scene.js, tests/inverse-picture.test.js and tests/inverse-anatomy-preview.html/js; reuse Grove artistic forms in a silent diagnostic with actual fitted candidates, fixed envelope display gain and static full-response bounds. No production page integration or shared scene edits yet.
+
+Inverse close framing: src/inverse/scene.js, tests/inverse-scene-bounds.test.js and existing silent preview; fixed body/bridge/halo/touch-mark bounds separate from ornamental support, compare overview and closer framing without changing geometry or sound.
+
+Inverse spatial picking: src/inverse/picking.js and tests/inverse-picking.test.js; stable raycast identities for actual shell/core meshes and bridge tubes, no support/halo/cue targets, no audio side effects. Fable requested to own focus-bounds.js and its tests separately.

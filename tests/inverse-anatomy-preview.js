@@ -2,8 +2,11 @@ import {composeGrove,groveSystem} from '../src/score/grove.js';
 import {createInverseJobs} from '../src/inverse/jobs.js';
 import {createInverseInstrument} from '../src/inverse/instrument.js';
 import {createInverseScene} from '../src/inverse/scene.js';
+import {createInversePicker} from '../src/inverse/picking.js';
+import {bindBodyTap} from '../src/grove/body-tap.js';
 import {createGroveWorld} from '../src/grove/world.js';
 const button=document.querySelector('#prepare'),status=document.querySelector('#status'),selector=document.querySelector('#state'),views=[];
+const framing=document.querySelector('#framing');
 const jobs=createInverseJobs(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const resize=new ResizeObserver(()=>render());
 button.onclick=async()=>{
@@ -18,7 +21,17 @@ button.onclick=async()=>{
    title.textContent=candidate.topology;canvas.setAttribute('aria-label',candidate.topology+' artistic three-mass anatomy');caption.className='small';caption.textContent=`Maximum resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents. The camera holds its full-response bounds.`;
    article.append(title,canvas,caption);document.querySelector('#views').append(article);
    const world=createGroveWorld(canvas),scene=createInverseScene(candidate.grove),instrument=createInverseInstrument(candidate.grove,{sampleRate:8000});
-   world.controls.enabled=false;world.scene.add(scene.root);world.setFocus(scene.bounds);views.push({world,scene,instrument,caption,canvas,baseCaption:caption.textContent});resize.observe(canvas);
+   world.controls.enabled=false;world.scene.add(scene.root);world.setFocus(chosenBounds(scene));const pick=createInversePicker({canvas,camera:world.camera,getScene:()=>scene});
+   const tap=bindBodyTap(canvas,{pick,enabled:()=>!document.hidden,onTap:target=>{
+    if(target.kind==='bridge'){
+     scene.setBridgeHighlight(scene.bridges[target.index].spec);
+     status.textContent=`${candidate.topology}: connection ${target.a+1}–${target.b+1}, coupling ${target.coupling}. Inspected only; no strike or audio.`;
+    }else{
+     scene.setBridgeHighlight(null);status.textContent=`${candidate.topology}: body ${target.body+1} selected by a deliberate tap. Silent diagnostic; no strike or audio.`;
+    }
+    render();
+   }});
+   views.push({world,scene,instrument,caption,canvas,tap,baseCaption:caption.textContent});resize.observe(canvas);
   }
   update();status.textContent=`${views.length} candidates ready. Silent fixed-time inspection.`;
  }catch(error){status.textContent=error.message;button.disabled=false;}
@@ -31,7 +44,14 @@ function update(){
  }
  render();
 }
+function chosenBounds(scene){
+ const [kind,a,b]=framing.value.split(':');
+ if(kind==='body')return scene.focusBounds.bodies[Number(a)];
+ if(kind==='bridge')return scene.focusBounds.bridges.find(edge=>edge.a===Number(a)&&edge.b===Number(b)).bounds;
+ return kind==='playing'?scene.playingBounds:scene.bounds;
+}
+framing.onchange=()=>{views.forEach(({world,scene})=>world.setFocus(chosenBounds(scene)));render();};
 selector.onchange=update;reduced.addEventListener('change',update);
 function render(){try{views.forEach(v=>{v.world.render();v.caption.textContent=v.baseCaption+` Current render: ${v.canvas.width}×${v.canvas.height}, ${v.world.renderer.info.render.calls} draw calls.`;});}catch(error){status.textContent='Picture error: '+error.message;}}
 addEventListener('pageshow',render);
-addEventListener('pagehide',()=>jobs.cancel());
+addEventListener('pagehide',()=>{jobs.cancel();views.forEach(v=>v.tap.cancel());});
