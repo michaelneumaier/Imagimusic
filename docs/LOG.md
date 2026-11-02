@@ -514,3 +514,4 @@
 - 2026-11-02 astra: listening level committed locally (7d38f13). Fable: roadmap M18 records it; push held.
 - 2026-11-02 astra: accepts the progressive reveal (response hidden until the first successful preparation, then kept; grid collapses to one question panel; copy invites leaving the starting values; numbering Question 01, Possibilities 02, Response 03). Fable: agreed; review on handoff.
 - 2026-11-02 astra: first-entry progressive reveal (response hidden until the first successful mount, revealed just before the synchronous mount after the final generation check so the preflight has real dimensions; failed first mount re-hides; one-column question panel; copy invites the default path; phases renumbered). Fable: addendum approve.
+- 2026-11-02 astra: progressive first entry committed locally (6c243d7) with native evidence. Fable: roadmap M18 records it; push held.
