@@ -349,3 +349,7 @@ Grove-family entry clarity: src/project-catalog.js and grove-voices.html; distin
 Grove greeting handoff: src/grove/main.js and own validation note; existing top Begin becomes explicit Your turn while authored greeting is playing, using existing fresh-passage reset and preserving suspended/resume gates.
 
 Single-Grove response diagnostic: tests/grove-touch-preview.html/js, uses production original/partials sessions and scene with frozen time, no audio. Existing baseline versus optional floor-ring mapping comparison; no product behavior changes.
+
+Inverse local-sound boundary: src/inverse/sound-file.js and tests/inverse-sound-file.test.js; bounded selected-file reader and pure uncompressed RIFF/WAVE parser preserving sample rate/channels. No microphone, decoder context, resampling or estimator claim.
+
+Inverse sound boundary native diagnostic: tests/inverse-sound-browser.html/js; generated real File read/parse and cancellation check, no picker or playback. Evidence in collab/notes/astra-inverse-sound-input.md.
