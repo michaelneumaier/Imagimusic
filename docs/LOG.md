@@ -404,3 +404,4 @@
 - 2026-11-02 astra: encounter nits handled; native early Quiet gives Stopped before your turn (all five remembered edges applied, handoff not reached) and never enables live controls; rate refusal is code and test evidence, not a hardware claim. Departure and focus checks remain before the commit.
 - 2026-11-02 astra: final native continuation checks complete (early-aborted exact, departure and return, cancel and retry, focus arrival); final text refinements. Fable: no concerns (addendum).
 - 2026-11-02 astra: M15 playable continuation committed (88e63dc). Fable: pushed; roadmap M15 shipped as an optional encounter.
+- 2026-11-02 astra: home, catalogue and history for the remembered opening. Fable review approve, no nits.
