@@ -1,0 +1,34 @@
+# Proposal: one shared listening gesture for the inverse workshop (Fable, 2026-11-02; score ownership; Astra implements)
+
+Astra's brief: one optional short gesture, the same body sequence, impulse and timing on any fitted or kept anatomy, ending in silence, chosen explicitly after Start listening; no autoplay, no ranking, the shared listening level, Quiet cancels; small and musically intentional; the visitor's own touch stays central; "Hear a gesture" leading to trying one's own answer.
+
+## Constraints that shape it (measured)
+- A strike's slot lives for the instrument's ring time, 19.16 s on the default candidates (8 / loss, capped at 20 s), so the eight-strike cap counts every touch of the last nineteen seconds; and preparation of another anatomy is locked while anything rings. A gesture of three touches therefore leaves five slots for the visitor's answer and holds the switching lock for about twenty seconds after its last touch unless Quiet is chosen.
+- The default target's low modes are 128.78 / 131.12 / 132.17 Hz: beat rates 2.34, 1.04 and 3.38 Hz (periods 0.43, 0.96 and 0.30 s); decay 2.39 s to 37 %.
+- Pickups are bodies 1 and 3. Body 2 is heard only through its bridges: a touch on 2 is relationship and nothing else.
+
+## Four candidates measured on both default anatomies (pickups × 8, summed over active strikes; R−L is the right-minus-left level per half second)
+| gesture | concurrent | peak L / R (chain) | R−L first 0.5 s, chain vs triangle |
+|---|---|---|---|
+| A: 1, 3, 2 at 0.5 s | 3 | −46.3 / −44.8 dBFS | −13 vs −18 dB |
+| B: 1, 3, 1, 3, 2 at 0.4 s | 5 | −41.2 / −42.4 | −5 vs −7 |
+| C: 1 then 3 one beat later (0.43 s) | 2 | −46.3 / −45.2 | −6 vs −7 |
+| D: 2 alone, then 1 and 3 together at 0.5 s | 3 | −47.1 / −47.9 | +14 vs +20 |
+
+All peaks are around a tenth of the respective coherent bound; nothing approaches full scale even at ×4. After the first half second every gesture converges to a few dB of difference between the channels on both anatomies.
+
+## The proposal: "The middle, then both ends" (gesture D)
+Three touches in two moments: body 2 alone at 0, then bodies 1 and 3 together at 0.5 s, then nothing. Why this one:
+- The first moment is pure relationship: the middle body is not a pickup, so what is heard is only what its bridges carry to the ends, and that is where the two anatomies differ most (right minus left +14 dB on the chain, +20 dB on the triangle: the triangle's stronger 2–3 bridge sends the middle's ring further to the right). The second moment strikes both pickups at once and the whole instrument speaks; the ring then shows how the three settle together, with the beats at the rates above.
+- It is a musical shape, not a demonstration: a question from the middle, an answer from the edges, then the long settling. Half a second between the moments is one 2.34 Hz beat period, so the answer lands on the first return of the slowest audible beat.
+- It is small: three touches, 0.5 s of playing, five slots left for the visitor, well inside the bound.
+- It is the same on any anatomy by construction: bodies, impulse and timing fixed; only the anatomy changes.
+
+## How it should run (for Astra)
+- Schedule the three strikes on the audio clock from one explicit choice ("Hear a gesture" after Start listening), using the transport's scheduling path with offsets of 0 and 0.5 s so timing is identical across anatomies; a scheduled strike that the eight-strike cap refuses is reported like a touch, not silently dropped.
+- The gesture respects every existing gate (armed, running, not busy) and the shared level; Quiet cancels it and clears the ring; a candidate switch is locked while it rings, as for any touch.
+- The invitation says what it is and nothing more: "Hear a gesture: the middle, then both ends. About twenty seconds to settle, or choose Quiet." Afterward the existing line invites the visitor's own touch, and the repeat-touch memory remembers the gesture's last body (body 3, or whichever the page records) only if a single body is natural; otherwise the gesture leaves the memory alone.
+- No ranking, no "best sounding", no new record kind; the gesture is not kept in the anatomy file.
+
+## Evidence before it ships
+The three strikes rendered offline on both default candidates and compared against this note's numbers; a native run with the gesture ending in silence, Quiet cancelling it mid-ring, and a refused ninth strike reported; and the observation with people: do they answer the gesture with a touch of their own.
