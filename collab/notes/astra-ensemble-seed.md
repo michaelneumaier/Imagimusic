@@ -122,3 +122,39 @@ across async hashing. An aborted handoff should be described as “Stopped befor
 your turn” rather than always “opening cut short”: all remembered gestures can
 already have applied while the clock observation is still in transit. Ledger
 content determines whether the remembered material was actually incomplete.
+
+## Source retention and preparation — 2026-11-02
+
+The new continuation-source session keeps a validated original independently of
+the live host. prepare(record,{origin,sampleRate}) invokes an injected job on a
+clone, then replaces the retained source only on a current successful result.
+An unsuccessful candidate, cancellation or late result preserves the previous
+original. Source records, prepared metadata and all outward snapshots are copied.
+Explicit clear removes it; dispose aborts and suppresses delayed callbacks.
+Five focused tests pass, including mutation isolation and competing candidates.
+
+Worker-side prepareEnsembleContinuation uses the existing bounded ordinary
+reader policy (8–48kHz,256KiB), the20-second/32-edge continuation plan, canonical
+original text and a SHA-256 identity over canonical text without its download
+newline. It prepares no PCM and starts no audio. Two tests pass, including an
+independent node:crypto hash comparison while the caller mutates its original,
+and refusal of incompatible rate, derived wrappers, oversized or overlong data.
+Worker/session review was requested from Fable; no page imports them yet.
+
+## Seeded verification gate
+
+Fable handed off215cd5e. Astra reproduced four false-positive verification
+cases: an extra same-frame strike on another body, an extra contact before the
+boundary, a completed boundary earlier than the source ending, and a changed
+instrument. Each reported verified:true. Fixtures and reports are retained in
+renders/ensemble-seeded-review/. Formal request-changes:
+collab/reviews/20261102T0243Z-astra-reviews-seeded-wrapper.md.
+
+Require full reconstructed remembered-history comparison (including contact
+intervals, multiplicity, partial closure and instrument identities), correct
+boundary verification and contradictory-ledger refusal before keeping/reader/UI
+integration. The source session and worker preparation do not depend on the
+seeded wrapper and remain independently reviewable. When adding seeded reader
+support, explicitly refuse both seeded and derived wrappers as new continuation
+or derived-return sources before unwrapping; generic reader support must not
+silently widen the source policy.
