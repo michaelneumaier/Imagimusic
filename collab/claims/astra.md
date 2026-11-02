@@ -315,3 +315,5 @@ Inverse saved instrument intake: src/inverse/read-file.js, tests/inverse-read-fi
 Inverse keep/reopen integration: inverse.html/css, src/inverse/main.js and prepare-worker.js; explicit local keeping, validated single-candidate reopening without replacing the prepared instrument, separate preparation/listening and cancelled intake preservation. Fable owns src/score/grove-inverse-kept.js and schema tests.
 
 Inverse browser return verification: tests/inverse-kept-browser.html/js and tests/fixtures/inverse-kept-chain.json; real local File read, disposable worker reopen/preparation, byte/PCM conservation and refusal/cancel/retry evidence, distinct from native file-picker/production UI checks.
+
+Inverse catalog continuity: project.html and src/project-catalog.js; describe kept-anatomy return and add history milestone after native verification, preserving model and evidence limits.
