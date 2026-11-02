@@ -273,3 +273,11 @@ Inverse-network feasibility probe: tools/probe-inverse-network.mjs and collab/no
 Network ambiguity audition: tools/render-inverse-network-study.mjs, generated renders/inverse-network-study; render the probe's admitted networks under identical target and withheld impulses, shared scale/fade, hashed source report and PCM artifacts. Explicit listening only, no catalog integration or Grove-voice substitution.
 
 Native media diagnostic: tests/inverse-network-media.html; explicit local WAV playback with observable metadata/events to distinguish Safari native-control display from a real load failure. No production player change until observed evidence.
+
+Inverse workshop instrument adapter: src/inverse/instrument.js and tests/inverse-instrument.test.js; immutable validated canonical Grove → exact three-mass coupledNetwork strike response, one fixed displacement gain across candidates, bounded finite stereo render and matching visible envelopes. No Grove voice partials, no solver edits.
+
+Inverse preparation lifecycle: src/inverse/prepare-worker.js, src/inverse/jobs.js and tests/inverse-jobs.test.js; terminate replaced/cancelled search or render workers, ignore stale results, transfer only completed candidate PCM. No autoplay or UI integration yet.
+
+Inverse playing transport: src/inverse/transport.js and tests/inverse-transport.test.js; explicit strikes at the AudioContext clock, maximum eight overlapping responses, Quiet, no candidate replacement during a ring, observable per-strike picture times. No automatic resume or playback.
+
+Inverse native preparation diagnostic: tests/inverse-worker-browser.html; explicit silent real module-worker search, cancellation and candidate PCM transfer verification. Browser result is separate from audio-device evidence.

@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inverse worker diagnostic</title><style>body{font:18px system-ui;background:#101a24;color:#e8ecdf;max-width:850px;margin:3rem auto;padding:1rem}button{font:inherit;padding:1rem}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style><h1>Inverse worker diagnostic</h1><p>Silent diagnostic: real module-worker cancellation, bounded search, and three transferred stereo strikes. No audio context or playback.</p><button id="run">Run silent worker checks</button><pre id="result" role="status">Not run.</pre><script type="module">
+import {createInverseJobs} from '../src/inverse/jobs.js';
+import {composeGrove,groveSystem} from '../src/score/grove.js';
+import {createInverseInstrument} from '../src/inverse/instrument.js';
+const button=document.querySelector('#run'),out=document.querySelector('#result');
+const jobs=createInverseJobs();
+button.onclick=async()=>{
+ button.disabled=true;out.textContent='Running silent worker checks…';
+ try{
+  const grove=composeGrove({seed:3});grove.bodies.forEach(body=>body.mass=.02);
+  const system=groveSystem(grove),target={version:1,kind:'three-resonance',normalFrequenciesHz:system.normalFreqsHz,decaySeconds:system.decayS,provenance:'Diagnostic equal-mass seed 3'};
+  const abandoned=jobs.run({kind:'search',target,options:{budget:{maxEvaluations:2000000}}}).then(()=>{throw new Error('Cancelled job completed');},error=>{if(error.name!=='AbortError')throw error;return error.name;});
+  jobs.cancel();const cancellation=await abandoned;
+  const report=await jobs.run({kind:'search',target,options:{baseMidi:48,seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
+  const prepared=await jobs.run({kind:'candidate',grove,sampleRate:8000});
+  const reference=createInverseInstrument(grove,{sampleRate:8000});
+  for(let body=0;body<3;body++){
+   const expected=reference.renderStrike(body),actual=prepared.strikes[body];
+   for(let c=0;c<2;c++){
+    if(!(actual.channels[c] instanceof Float32Array)||actual.channels[c].length!==expected.frames)throw new Error('Transferred channel shape mismatch');
+    for(let i=0;i<expected.frames;i++)if(actual.channels[c][i]!==expected.channels[c][i])throw new Error('Transferred PCM differs');
+   }
+  }
+  out.textContent=JSON.stringify({status:'PASS',cancellation,evaluations:report.work.evaluations,verdict:report.verdict,kind:prepared.kind,frames:prepared.frames,channelsVerified:6,comparison:'Every transferred sample equals the independent main-thread render; no playback.'},null,2);
+ }catch(error){out.textContent='FAIL: '+error.message;}finally{button.disabled=false;}
+};
+addEventListener('pagehide',()=>jobs.cancel());
+</script></html>
