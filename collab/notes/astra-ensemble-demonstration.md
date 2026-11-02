@@ -57,3 +57,20 @@ review wording correction requested: scheduler times are nondecreasing, with
 Quiet strictly after the last musical event; simultaneous gestures are allowed.
 
 Final focused run:14 tests passed across host, actual processor and phrase.
+
+## Phone entry and homepage follow-through
+
+Native Safari responsive preview at320×656 showed the three opening actions
+stacking into three rows. The mobile action group now uses Begin/Quiet in one
+row and the optional example below, at least44px tall. The full scene fits in
+the initial view; the action group remains sticky on scroll. Strike and soften
+controls remain in their existing three columns. This is desktop Safari layout
+preview, not hardware iPhone performance or touch validation.
+
+The homepage now leads with the experimental playable Three Groves encounter,
+retains its listening-comparison link, updates the current milestone/history,
+and states the outstanding device-output/performance evaluation. Native320px
+and1120px preview checked wrapping/layout. The play link opens an idle ensemble
+page. Catalog text verified after reloading cached resources from origin.
+Fable code/content review approved:
+collab/reviews/20261102T0129Z-fable-reviews-phone-entry-and-home.md.

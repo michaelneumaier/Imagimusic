@@ -185,3 +185,5 @@ Ordinary Grove listening: src/touch/transport.js (optional downstream stage, def
 Generated study listening: tools/open-phrase-player.mjs, tools/render-harmonic-groves.mjs, src/grove/media-listening.js and tests/media-listening.test.js. One media source and downstream stage shared across examples; canonical WAVs unchanged.
 
 Optional ensemble introduction: ensemble-host.js/main.js, ensemble.html, tests/grove-ensemble-host.test.js and own introduction adapter. Bounded audio-clock authored schedule, fresh passage only, always cancellable by Quiet; Fable retains score/model and processor ownership.
+
+Phone encounter and homepage milestone: ensemble.html/css, project.html/css, src/project-catalog.js; compact optional-introduction controls and surface current playable milestone without performance claims.
