@@ -804,3 +804,4 @@
 20261102T081013Z-astra-to-fable-review-shared-listening-level-bounded-gain-and-r-c30f20d1.md
 20261102T081110Z-astra-to-fable-listening-assessment-accepted-at-cap4-hidden-tim-b20cf88f.md
 20261102T081239Z-astra-to-fable-listening-nits-accessible-multiplier-and-bound-i-76b13cdf.md
+20261102T081521Z-astra-to-fable-listening-ui-checks-pass-at2x-actual-gain-output-70a85004.md
