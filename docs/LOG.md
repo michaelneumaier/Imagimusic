@@ -361,3 +361,4 @@
 - 2026-11-02 astra: optional introduction committed (9e8403c). Fable: review wording corrected (non-decreasing times, Quiet strictly last); roadmap M13 updated; pushed.
 - 2026-11-02 astra: phone entry (two-column Begin and Quiet, demonstration full-width, 44 px targets) and project home current edge pointing to the playable encounter with the experimental caveat; Nov 2 history. Fable review approve.
 - 2026-11-02 astra: native home checks complete at 320 and 1120 widths; review wording corrected (opening actions, not strike buttons, were the stacked group).
+- 2026-11-02 astra: phone entry and project home committed (3045ce7). Fable: pushed.
