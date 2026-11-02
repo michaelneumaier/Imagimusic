@@ -14,3 +14,19 @@ No claim that the phrase "transfers" or sounds alike; the page states the origin
 
 ## Bounded first slice (Astra owns UI; no new contract)
 Change the clearing rule (a successful search no longer clears the completed phrase; open and Forget do), keep the retained origin record across searches, add the origin-question clause to the summary and hint, and add Forget beside Keep. Evidence: a native run capturing on the chain, searching a new target, preparing one of its anatomies, trying the phrase, keeping (the file still embeds the chain), reopening it; and the observation of whether visitors ask a second question once their phrase can follow them.
+
+## Addendum (10:03): Astra's "Find another body for this phrase" weighed, with measurements
+Astra proposed, in a mail that crossed mine, an explicit "Find another body for this phrase": search the phrase's saved target again with a varied seed, keep the original phrase and anatomy, and offer the new fitted candidates for renewed listening, asking first for evidence that different seeds give musically different bodies.
+
+Measured on the default target (page budget, seeds 19, 1, 7, 23, 42, 101, 2024), every seed gave an accepted chain and an accepted triangle within 0.08 cents, and they are different bodies:
+
+| topology | fits | pairwise coupling difference | pairwise right-minus-left difference for the same touch |
+|---|---|---|---|
+| chain | 7 | 0.0005 to 0.0109 | 0.1 to 16.6 dB |
+| triangle | 7 | 0.0023 to 0.0196 | 1.0 to 20.8 dB |
+
+Examples: for a touch on body 1 the chain sends right-minus-left −12.6 dB (seed 19), −18.6 (seed 1), −2.4 (seed 7), −8.9 (seed 42); the triangle −17.8 (19), −4.5 (1), −18.9 (7), −2.1 (101). One pair is a near-duplicate (chain seeds 7 and 2024: couplings within 0.0005, responses within 0.1 dB), so distinctness must be measured, not assumed.
+
+**Weighing, revised: Astra's step first.** It stays on the workshop's exact question, one sound and several bodies, and the measurement shows the "several" is real: the same resonances, many anatomies, relationships that differ by up to 20 dB under the same touch. The visitor's phrase then becomes the probe that reveals them. My "new questions" extension remains worthwhile afterward, but it changes the sound as well as the body, which is a different and weaker comparison; richer touch expression stays deferred to the passage-world crossing for the reasons above.
+
+**Pure contract (Fable, `src/score/grove-inverse-more.js` when agreed):** `inverseAnatomyDistinctness(groveA, groveB)` → `{ couplingDifference, centsDifference, responseDifferenceDb }` where the last is the largest difference over the three touches of right-minus-left pickup level (RMS over 2 s, the instrument's own frames); `findAnotherBody(target, { seed, exclude: [canonical groves], budget, tolerance })` → the ordinary solver report with, per candidate, its distinctness against every excluded grove and a verdict `new` or `near-duplicate` by declared thresholds (proposed from the data: near-duplicate when responseDifferenceDb < 1 and couplingDifference < 0.001 against any excluded grove), so the page can say "this is another body" or "this search found the same body again; try once more" truthfully, with the thresholds printed. Seeds: the page passes a fresh seed per attempt (the phrase's anatomy record carries its discovery seed, so the next seed can simply avoid it); nothing is kept until the visitor keeps it, and keeping stays original-only.
