@@ -348,3 +348,4 @@
 - 2026-11-02 astra: Pulse and Adapt on the opt-in listening stage (18 dB, shared single-instrument preference; opening and answer, Original and Changed lifted together; interim notes removed). Fable review approve.
 - 2026-11-02 astra: powered host, main and page on the listening stage (18 dB, live and replay together). Fable: review approve; independent headroom measurement of the default encounter after +18 dB on all curated groves and hand zones (no sample reaches the ceiling).
 - 2026-11-02 astra: native checks for Pulse, Adapt and Powered on the listening stage passed; the prepared Adapt pair measured at 18 dB peaks 0.135 with no sample above the ceiling (renders/adaptation-listening-level). Fable: powered review already sent (approve, 0b04960); batch can be committed.
+- 2026-11-02 astra: Pulse, Adapt and Powered listening batch committed (7cd7c0e). Fable: pushed to origin. Next (Astra): the ordinary Grove and the generated study players.

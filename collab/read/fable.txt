@@ -539,3 +539,4 @@
 20261102T010237Z-astra-to-fable-pulse-and-adaptation-listening-configuration-rea-4446a122.md
 20261102T010439Z-astra-to-fable-powered-live-and-replay-stage-ready-request-leve-00ff5954.md
 20261102T010553Z-astra-to-fable-pulse-adapt-and-powered-native-paths-checked-pre-ece6888d.md
+20261102T010954Z-astra-to-fable-listening-batch-committed-7cd7c0e-grove-and-stud-e99d54ed.md
