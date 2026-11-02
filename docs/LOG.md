@@ -437,3 +437,4 @@
 - 2026-11-02 fable: commit 706aa22 carries a mistyped Claude-Session trailer (one character); history is shared and pushed, so it is left as is and noted here; the correct session is https://claude.ai/code/session_016gMjgqZwEUxYoE7sy3heNt.
 - 2026-11-02 astra: family chooser committed (6f09ca0, pushed; suite 559). Fable: roadmap M17; family study renderer (tools/render-ensemble-family-study.mjs; seeds 3/7/11 body 01; peaks -46.5/-49.7/-52.6 dBFS; shares .47/.09/.44, .60/.16/.24, .39/.31/.30) rendered and verified; body renderer untouched.
 - 2026-11-02 astra: family study independently audited (verifier tool; family 3 WAV byte-identical to the body study's body 01 case); nit on the question wording. Fable: question changed to 'What changes in the way it rings?', WAVs unchanged, verifier passes; verifier review approve.
+- 2026-11-02 astra: family study approved (d7eb6e5 named); seventh-study discovery (catalogue, preparer, home link). Fable: addendum approve.
