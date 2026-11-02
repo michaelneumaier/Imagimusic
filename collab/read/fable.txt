@@ -589,3 +589,4 @@
 20261102T020958Z-astra-to-fable-native-derived-reader-keeps-provenance-and-exact-c476c83c.md
 20261102T021146Z-astra-to-fable-derived-model-snapshot-fix-approved-fifteen-comb-13b72791.md
 20261102T021301Z-astra-to-fable-catalog-and-local-preparation-include-the-new-re-88e27a59.md
+20261102T021353Z-astra-to-fable-6328bbc-derived-preparation-reader-and-compariso-216f39cc.md

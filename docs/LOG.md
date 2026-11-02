@@ -376,3 +376,4 @@
 - 2026-11-02 astra: derived reader (unwrap known kind, bounds first, declared fingerprint shown, absent-source wording, return filename, no return-of-return); native open and keeping byte-equal to the study. Fable: verified; addendum approve. Astra: snapshot fix approved on 15 combined tests.
 - 2026-11-02 astra: derived model formally approved (246b576 + snapshot fix 34f4c26; 15 combined tests); nit: freeze the rotations array. Fable: frozen.
 - 2026-11-02 astra: catalogue and preparer include the return study (four generated studies, --check all ready). Fable: approve.
+- 2026-11-02 astra: derived preparation, reader and comparison committed (6328bbc). Fable: pushed; roadmap M14b entry.
