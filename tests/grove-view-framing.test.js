@@ -36,13 +36,13 @@ test('the actual three Grove scenes retain their complete geometry at maximum di
  const original=globalThis.document;
  globalThis.document={createElement:()=>({getContext:()=>({fillText(){}})})};
  try{
-  for(const [i,note] of [48,51,55].entries()){
-   const scene=createGroveScene(retuneGroveCluster(composeGrove({seed:3}),note));
+  for(const seed of [3,7,11,19,31])for(const [i,note] of [48,51,55].entries()){
+   const scene=createGroveScene(retuneGroveCluster(composeGrove({seed}),note));
    try{
     scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);
     const bounds=new Box3().setFromObject(scene.root).expandByScalar(.12);
     applyGroveScene(scene,{envelope:[1e6,1e6,1e6],strikes:[0,1,2].map(body=>({body,age:.299,strikeU:1,velocity:1}))},[1,1,1],[0,0,0]);
-    assert.ok(bounds.containsBox(new Box3().setFromObject(scene.root)),'response and hand marks fit the static framing margin');
+    assert.ok(bounds.containsBox(new Box3().setFromObject(scene.root)),`family ${seed}, note ${note}: response and hand marks fit the static framing margin`);
    }finally{scene.dispose();}
   }
  }finally{if(original===undefined)delete globalThis.document;else globalThis.document=original;}

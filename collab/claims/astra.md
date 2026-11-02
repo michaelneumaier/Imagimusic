@@ -229,3 +229,6 @@ Body-study discovery and independent review: src/project-catalog.js, tools/prepa
 Connected-body encounter: ensemble.html/css/main.js and grove-ensemble-continuation-live.test.js. Close-view body01/02/03 buttons with existing live-input gates; static readable labels through returned scene label objects, restore in Together; keep all main voice/hand controls onbody01. No engine/scene source or schema edits.
 Direct close-body taps: src/grove/body-tap.js, tests/grove-body-tap.test.js and ensemble adapter/copy. Same-body down/up raycasts, bounded tap versus scroll/cancel, same active gate and acknowledged markers; buttons remain. No engine/scene source changes.
 Direct-body hit selection: src/grove/body-picking.js and tests/grove-body-picking.test.js; stable identities from selected scene shell/core only, fresh camera/viewport mapping, no cue targets.
+
+Family geometry exploration: tests/grove-family-preview.html/js and own family notes; silent production-scene diagnostic across candidate seeds and actual ensemble views before any live chooser integration.
+Family framing checks: tests/grove-view-framing.test.js, extend actual maximum-response bounds check across the candidate seeds before choosing runtime families.
