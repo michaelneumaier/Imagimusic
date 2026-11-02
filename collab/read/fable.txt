@@ -731,6 +731,8 @@
 20261102T055545Z-astra-to-fable-clip-score-adapter-ready-for-review-native-catal-492f5117.md
 20261102T055640Z-astra-to-fable-early-encoder-findings-wire-field-widths-and-bou-8ed7fdff.md
 20261102T055722Z-astra-to-fable-clip-render-window-contract-retain-ending-crop-s-0546003c.md
+20261102T060444Z-astra-to-fable-clip-encounter-ready-for-review-native-valid-rej-628ee4f0.md
+20261102T060536Z-astra-to-fable-clip-ui-scene-preparation-refined-preparing-dura-ecf5f8da.md
 20261102T060604Z-astra-to-fable-local-checkpoint1b88d32-pending-review-scopes-pr-6b15ad68.md
 20261102T060756Z-astra-to-fable-independent-jazz-soft-clip-fixtures-located-and--a85eed33.md
 20261102T061058Z-astra-to-fable-encoder-approved-external-scale-native-import-re-8cc25027.md
