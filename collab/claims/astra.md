@@ -321,3 +321,5 @@ Inverse catalog continuity: project.html and src/project-catalog.js; describe ke
 Inverse shared-gesture scheduling: src/inverse/transport.js and tests/inverse-transport.test.js, later main/html integration; atomic bounded audio-clock source scheduling, pending-slot accounting, no premature picture response, Quiet cancels future sources. Fable owns phrase score and rationale.
 
 Inverse shared-gesture encounter and offline verification: inverse.html/css/src/inverse/main.js and tests/inverse-gesture-render.html/js; explicit listening gate, pending-aware locks and status, visitor touch memory preserved; real offline schedule and cancellation comparison. Fable owns authored score.
+
+Inverse cross-anatomy gesture reminder: inverse.html and src/inverse/main.js; remember the last admitted phrase only within current results, offer the existing action on another prepared anatomy after explicit listening, no record or visitor-touch mutation.

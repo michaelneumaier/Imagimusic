@@ -11,6 +11,7 @@ const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
+let lastGestureTopology=null;
 let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1,fileRead=null;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -28,6 +29,10 @@ function controls(snapshot=state()){
  candidateButtons.forEach(button=>button.disabled=busy||ringing);
  bodyButtons.forEach(button=>button.disabled=busy||!instrument||!armed||context?.state!=='running');
  $('hear-gesture').disabled=busy||ringing||!instrument||!armed||context?.state!=='running';
+ const compareGesture=lastGestureTopology&&mountedReport===report&&mountedTopology!==lastGestureTopology&&!$('hear-gesture').disabled;
+ $('gesture-comparison').hidden=!compareGesture;
+ const comparison=compareGesture?`Try the same gesture on this ${mountedTopology}, too.`:'';
+ if($('gesture-comparison').textContent!==comparison)$('gesture-comparison').textContent=comparison;
  $('repeat-touch').disabled=busy||!lastTouch||!instrument||!armed||context?.state!=='running';
  $('ring-count').textContent=ringing?`${snapshot.active} ringing${snapshot.pending?` · ${snapshot.pending} upcoming`:''} / 8 touches`:'Silent';
 }
@@ -52,7 +57,7 @@ $('search-form').onsubmit=async event=>{
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent='Searching two possible layouts. You can cancel while it works…';
  try{
   const next=await jobs.run({kind:'search',target,options:{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
-  if(token!==generation)return;report=next;lastTouch=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`${next.candidates.filter(c=>c.status==='accepted').length} layouts within tolerance. ${next.work.evaluations.toLocaleString()} evaluations in ${((performance.now()-started)/1000).toFixed(1)} s. ${next.bound.impossibleWithinTolerance?'This target exceeds the equal-mass family’s frequency-ratio bound, even with tolerance.':next.work.exhausted?next.verdict:'This bounded search does not establish uniqueness or a global optimum.'}`;
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
@@ -67,7 +72,7 @@ async function openInstrument(file){
   const opened=await jobs.run({kind:'reopen',text:input.text});if(token!==generation)return;
   const candidate={...opened.candidate,status:opened.candidate.status==='within-tolerance'?'accepted':'saved-outside-tolerance'};
   report={target:opened.record.target,tolerance:opened.record.tolerance,candidates:[candidate],savedRecord:opened.record};
-  lastTouch=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`Opened ${input.name}. Fit recalculated from the saved instrument and target. Prepare it when you are ready to play. Any previously prepared instrument is retained.`;
  }catch(error){if(token===generation)$('status').textContent=`Could not open the anatomy: ${error.message} Previous results and instrument retained.`;}
  finally{if(token===generation){fileRead=null;busy=false;controls();}}
@@ -140,7 +145,7 @@ function repeatInvitation(){
 }
 $('hear-gesture').onclick=()=>{
  if(busy||!instrument||!armed||context?.state!=='running')return;
- try{transport.playGesture(sharedGesture);$('gesture').textContent='Body 2, then bodies 1 and 3 together. You can answer with a touch of your own, or choose Quiet.';}
+ try{transport.playGesture(sharedGesture);if(mountedReport===report)lastGestureTopology=mountedTopology;$('gesture').textContent='Body 2, then bodies 1 and 3 together. You can answer with a touch of your own, or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 };
 $('repeat-touch').onclick=()=>{if(lastTouch)strike(lastTouch.body);};
