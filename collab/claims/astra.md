@@ -339,3 +339,5 @@ Inverse phrase continuity across questions: main.js/inverse.html plus home/catal
 Inverse repeat-search encounter: inverse.html/src/inverse/main.js, later evidence note; one explicit bounded search of displayed target/tolerance/base family with incremented solver seed, retained original phrase, exact prior/original anatomy identity labels. No distance thresholds or solver wrappers.
 
 Inverse original-anatomy return: inverse.html/src/inverse/main.js and own evidence note; explicit silent preparation from retained original record while preserving displayed discoveries, original-target fit labeling and existing capture/replay gates.
+
+Inverse encounter hierarchy: inverse.html/inverse.css and own evidence note; candidate-first results, secondary repeat-search action, grouped phrase-making versus saving/forgetting and optional record detail. No runtime state changes or new presentation mode.

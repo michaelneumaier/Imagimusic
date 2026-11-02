@@ -21,3 +21,13 @@
 .shared-gesture{margin:14px 0 20px}.shared-gesture p{margin-bottom:10px}
 
 .phrase-panel{margin:20px 0}.phrase-panel .actions{gap:10px}.phrase-panel p{margin-bottom:12px}#replay-phrase{background:transparent;color:var(--mint)}
+
+/* Keep the first encounter on playing; file and repeat-search actions are secondary. */
+#keep-phrase,#prepare-original,#search-again{background:transparent;color:var(--mint)}
+.phrase-keeping{margin-top:20px;padding-top:14px;border-top:1px solid var(--line)}
+.phrase-panel #forget-phrase{padding:10px 4px;margin-left:4px}
+#phrase-return{margin:20px 0}#phrase-return p{margin-top:10px}
+.phrase-record-details{margin-top:18px;padding-top:12px;font-size:12px}
+.phrase-record-details summary{margin-bottom:10px;color:var(--muted)}
+.search-more{max-width:740px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.search-more p{margin:12px 0 0}
