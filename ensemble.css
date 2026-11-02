@@ -14,3 +14,5 @@ main{max-width:900px}header{align-items:center;margin-bottom:25px}header span{fo
 @media(max-width:600px){#world[data-close=true]{height:240px}}
 
 @media(max-width:600px){#view-caption,#world{scroll-margin-top:130px}}
+
+.marker-choice{display:flex;align-items:center;gap:10px;min-height:44px}.marker-choice input{width:20px;height:20px;flex:none;margin:0}

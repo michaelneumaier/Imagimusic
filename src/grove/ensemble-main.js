@@ -196,6 +196,8 @@ function park(){operation++;cancelContinuation();sourceSoundController?.abort();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});
 window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAnimationFrame(animation);holdControls.forEach(control=>control.dispose());host.dispose();replay.dispose();returnSession.dispose();continuationSource.dispose();continuationKeep.dispose();scenes.forEach(scene=>scene.dispose());world?.dispose();}});
 try{world=createGroveWorld($('world'));world.controls.enabled=false;scenes=groves.map((grove,i)=>{const scene=createGroveScene(grove);scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);world.scene.add(scene.root);return scene;});world.camera.position.set(0,3.7,10.8);world.camera.lookAt(0,1.4,0);}catch{$('world').hidden=true;$('picture-note').textContent='The 3D view is unavailable. Labelled controls and sound are still available.';}
+const markerOptions={distinguishRemembered:false};
+$('distinguish-remembered').onchange=()=>{markerOptions.distinguishRemembered=$('distinguish-remembered').checked;$('marker-caption').hidden=!markerOptions.distinguishRemembered;};
 const widePictureNote=$('picture-note').textContent;
 const viewNames=['C','E-flat','G'];
 function chooseView(part){
@@ -219,5 +221,5 @@ function chooseView(part){
  }catch(error){$('picture-note').textContent='The close view could not open: '+error.message;}
 }
 if(world&&scenes.length===3&&!$('world').hidden){$('view-choices').hidden=false;$('view-together').onclick=()=>chooseView(null);viewNames.forEach((_,i)=>$('view-'+i).onclick=()=>chooseView(i));}
-function draw(){if(world&&!document.hidden){const frames=host.visual();scenes.forEach((scene,i)=>{const frame=frames[i],recipe=host.recipes?.[i],contacts=frame.contacts??[];applyGroveScene(scene,{...frame,...(reduced.matches?{envelope:[]}: {})},groves[i].bodies.map((_,b)=>contacts[b]?contacts[b].strength===1?1:.4:0),groves[i].bodies.map((_,b)=>contacts[b]?recipe?.zones[contacts[b].zone]:undefined));});world.render();}animation=requestAnimationFrame(draw);}
+function draw(){if(world&&!document.hidden){const frames=host.visual();scenes.forEach((scene,i)=>{const frame=frames[i],recipe=host.recipes?.[i],contacts=frame.contacts??[];applyGroveScene(scene,{...frame,...(reduced.matches?{envelope:[]}: {})},groves[i].bodies.map((_,b)=>contacts[b]?contacts[b].strength===1?1:.4:0),groves[i].bodies.map((_,b)=>contacts[b]?recipe?.zones[contacts[b].zone]:undefined),markerOptions);});world.render();}animation=requestAnimationFrame(draw);}
 sync();draw();
