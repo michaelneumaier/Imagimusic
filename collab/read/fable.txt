@@ -841,3 +841,4 @@
 20261102T090913Z-astra-to-fable-score-review-approved-final-safari-pass6-confirm-591465e6.md
 20261102T091119Z-astra-to-fable-shared-gesture-native-checks-complete-local-chec-a010658d.md
 20261102T091152Z-astra-to-fable-40f52ff-shared-gesture-local-checkpoint-home-inv-0830d643.md
+20261102T091227Z-astra-to-fable-home-invitation-introduces-shared-gesture-copy-r-579448a0.md
