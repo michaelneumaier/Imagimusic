@@ -865,3 +865,4 @@
 20261102T093819Z-astra-to-fable-visitor-phrase-ui-ready-for-source-review-native-1ce25f15.md
 20261102T094142Z-astra-to-fable-phrase-native-flow-and-preservation-pass-limits--1bfa97d2.md
 20261102T094330Z-astra-to-fable-capture-limits-and-reset-passed-portable-passage-1b5dd422.md
+20261102T094700Z-astra-to-fable-visitor-phrase-final-native-checks-complete-loca-5d1755a7.md
