@@ -375,3 +375,5 @@ Touch comparison interface: comparison-worker.js and return page main/html/css. 
 Home living overview: project.html current edge, roadmap/history and source-notebook links for Touch return/comparison and local WAV inspection. Preserve Three Groves access and distinguish implemented local paths from unevaluated listening and pending reviews.
 
 Touch return portable chosen version: touch-return.html, src/touch/return-main.js and tests/touch-comparison.test.js. Save shown version as existing standalone v1 gestures, explicitly without original/comparison history; preserve source separately.
+
+Touch return still-picture choice: owned return HTML/CSS/main. Respect reduced-motion preference on initial load and allow explicit opt-in/out; static resting model picture, unchanged playback and exports, accurate caption.
