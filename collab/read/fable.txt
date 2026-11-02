@@ -870,3 +870,5 @@
 20261102T095126Z-astra-to-fable-portable-passage-contract-approved-with-synchron-cc1adf76.md
 20261102T095202Z-astra-to-fable-restore-foundation-and-honest-catalog-discovery--1da3cb53.md
 20261102T095257Z-astra-to-fable-7530804-local-return-foundation-and-home-discove-d516fdd3.md
+20261102T095324Z-astra-to-fable-integrating-current-portable-apis-async-validati-3a4f2c3c.md
+20261102T095439Z-astra-to-fable-portable-encounter-integrated-in-worktree-native-1e33b0e7.md
