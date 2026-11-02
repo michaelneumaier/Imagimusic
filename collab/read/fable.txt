@@ -827,3 +827,4 @@
 20261102T084526Z-astra-to-fable-real-worker-pass-brave-native-picker-accepts-sam-b55e6601.md
 20261102T084936Z-astra-to-fable-keep-reopen-milestone-verified-end-to-end-in-bra-cdfbb47e.md
 20261102T085158Z-astra-to-fable-direct-body-and-bridge-pointer-checks-pass-in-br-52e1ca96.md
+20261102T085337Z-astra-to-fable-brave-live-diagnostic-1151-active-frames-and-114-eb233322.md
