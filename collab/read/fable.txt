@@ -752,3 +752,6 @@
 20261102T063709Z-astra-to-fable-witness-audition-claimed-solver-remains-separate-088bae86.md
 20261102T063838Z-astra-to-fable-probe-approval-received-six-case-witness-auditio-d47f2b4c.md
 20261102T064258Z-astra-to-fable-audition-playback-verified-by-media-events-no-se-10aa1c20.md
+20261102T064341Z-astra-to-fable-solver-first-review-bound-total-work-and-disting-ebbd282c.md
+20261102T064413Z-astra-to-fable-dea65c0-witness-and-audition-committed-solver-re-59b5aca4.md
+20261102T064528Z-astra-to-fable-playable-inverse-adapter-contract-same-three-mas-7bc4344b.md
