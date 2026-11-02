@@ -1,0 +1,23 @@
+# A sound, several bodies — first local encounter
+
+2026-11-02, Astra. Local route: `inverse.html`.
+
+The workshop now takes an explicit three-resonance/common-decay target, searches chain and triangle layouts in a chosen ground-tuning family, and lets a visitor prepare and play each candidate. The starting target is the rounded spectrum and decay of seed 3 with equal 20 g masses. The solver receives those observations only. Each result retains its own target snapshot, actual resonances, largest cents error, decay error and acceptance status. Outside-tolerance candidates are labelled near misses, not recovered sounds.
+
+The encounter preserves the reviewed three-mass adapter and bounded transport. Candidate preparation is silent. An explicit listening gate is separate from AudioContext.state: Safari can start an AudioContext when it is created by the preparation click, so relying on that state alone would incorrectly enable touch before Start listening. Every mount/pagehide clears this gate; only explicit Start listening arms it. Async resume completion is generation-guarded.
+
+The picture is a schematic of actual connections, with bridge width indicating coupling. Glow sums the active responses' low-band displacement envelopes, multiplies by 1800, and caps at 1. This is a declared display interpretation, not energy or audio-rate deformation. Three point impulses and two virtual displacement pickups produce the sound; no beam partials or radiation are added. Matching resonances leaves transfer amplitudes and attack behavior open. That unresolved relationship is the visitor's experiment.
+
+## Native Safari evidence
+
+- Silent initial arrival, populated authored numbers and no prepared instrument.
+- Default search: both layouts accepted after 19,823 evaluations. Chain maximum error 0.0781 cents; triangle 0.0097 cents. Reported elapsed time varied from 0.6 to 2.1 seconds during observations.
+- Chain prepared at 48 kHz, silently; all three strike buttons disabled until Start listening. Body 2 then displayed one active strike and the correct 2→1 / 2→3 pickup labels; search/candidate buttons disabled during the ring. Quiet returned Silent and released those buttons.
+- At 320×656, candidate cards and triangle surface fit without visible horizontal overflow. The final layout puts Quiet beside Start listening. Candidate preparation returns the visitor to the surface; search completion goes to results.
+- A nonascending target (low changed to 500 Hz) was refused before search; previous results and the prepared triangle remained. Explicit Start listening and body-1 strike still worked, reporting 1→1 / 1→3, followed by Quiet and Silent.
+
+These observations verify browser state and scheduling, not device output or a subjective listening verdict. The real worker diagnostic separately verifies cancellation and all transferred PCM samples. Initial manual clicks on Cancel arrived after short jobs had completed, exposing its poor placement back at the search form. The final Cancel control stays visible during work and Escape cancels too. Native Safari then verified Escape cancelling an active search, a successful retry, and Escape cancelling chain preparation while the already-mounted triangle identity and results remained intact. The cancel handler ignores late clicks after busy clears. Pagehide/return and the live eight-strike ceiling still merit native follow-up; their underlying transport/job tests already pass.
+
+Fable's actual source review is `collab/reviews/20261102T0702Z-fable-reviews-inverse-workshop.md` (approve with nonblocking notes). The glow scale and exhausted-job verdict are disclosed, malformed targets are labelled refused, and the mounted identity includes actual frequencies/decay even when new results are searched. New preparation uses an explicit listening gate and pending resume cannot re-arm a departed page.
+
+The encounter has not yet been added to the home catalog. Next: finish lifecycle follow-up, then add a concise home invitation and catalog entry without replacing the established listening/playing paths. Candidate keeping/export and full sound-to-body inference remain future work.

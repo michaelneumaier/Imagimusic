@@ -281,3 +281,5 @@ Inverse preparation lifecycle: src/inverse/prepare-worker.js, src/inverse/jobs.j
 Inverse playing transport: src/inverse/transport.js and tests/inverse-transport.test.js; explicit strikes at the AudioContext clock, maximum eight overlapping responses, Quiet, no candidate replacement during a ring, observable per-strike picture times. No automatic resume or playback.
 
 Inverse native preparation diagnostic: tests/inverse-worker-browser.html; explicit silent real module-worker search, cancellation and candidate PCM transfer verification. Browser result is separate from audio-device evidence.
+
+Inverse workshop encounter: inverse.html/inverse.css/src/inverse/main.js; authored editable resonance target, bounded cancellable search, explicit candidate preparation and listening, touchable three-mass schematic, visible fit and realism limits. No solver/model edits or publishing.
