@@ -5,6 +5,8 @@ import {createCandidateDiagram} from './candidate-diagram.js';
 import {readInverseFile} from './read-file.js';
 import {keepInverseCandidate,canonicalInverseCandidate} from '../score/grove-inverse-kept.js';
 import {createInverseTransport} from './transport.js';
+import {createInversePhraseCapture} from './phrase-capture.js';
+import {inversePhraseTransportEvents} from '../score/grove-inverse-phrase.js';
 import {INVERSE_SHARED_GESTURE_EVENTS as sharedGesture} from '../score/grove-inverse-gesture.js';
 const $=id=>document.getElementById(id),jobs=createInverseJobs();
 const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
@@ -12,6 +14,8 @@ const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.ma
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
 let lastGestureTopology=null;
+const phraseCapture=createInversePhraseCapture();
+let phraseTopology=null,draftTopology=null;
 let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1,fileRead=null;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -20,20 +24,22 @@ restore();
 function state(){return transport?transport.snapshot():{active:0,pending:0,strikes:[]};}
 function occupied(snapshot=state()){return snapshot.active+snapshot.pending>0;}
 function controls(snapshot=state()){
- const ringing=occupied(snapshot);
- $('open-instrument').disabled=busy||ringing;
- $('search').disabled=busy||ringing;$('example').disabled=busy;
+ expirePhrase(snapshot.time??0);
+ const ringing=occupied(snapshot),remembering=phraseCapture.snapshot.active;
+ $('open-instrument').disabled=busy||ringing||remembering;
+ $('search').disabled=busy||ringing||remembering;$('example').disabled=busy;
  $('cancel').hidden=!busy;
  $('listen').disabled=busy||!instrument||(armed&&context?.state==='running');
  $('listen').textContent=armed&&context?.state==='running'?'Listening enabled':'Start listening';
- candidateButtons.forEach(button=>button.disabled=busy||ringing);
+ candidateButtons.forEach(button=>button.disabled=busy||ringing||remembering);
  bodyButtons.forEach(button=>button.disabled=busy||!instrument||!armed||context?.state!=='running');
- $('hear-gesture').disabled=busy||ringing||!instrument||!armed||context?.state!=='running';
+ $('hear-gesture').disabled=busy||ringing||remembering||!instrument||!armed||context?.state!=='running';
  const compareGesture=lastGestureTopology&&mountedReport===report&&mountedTopology!==lastGestureTopology&&!$('hear-gesture').disabled;
  $('gesture-comparison').hidden=!compareGesture;
  const comparison=compareGesture?`Try the same gesture on this ${mountedTopology}, too.`:'';
  if($('gesture-comparison').textContent!==comparison)$('gesture-comparison').textContent=comparison;
  $('repeat-touch').disabled=busy||!lastTouch||!instrument||!armed||context?.state!=='running';
+ phraseControls(ringing);
  $('ring-count').textContent=ringing?`${snapshot.active} ringing${snapshot.pending?` · ${snapshot.pending} upcoming`:''} / 8 touches`:'Silent';
 }
 function cancel(message='Preparation cancelled. Previous results and instrument retained.'){
@@ -46,10 +52,10 @@ $('listening-level').oninput=()=>{
  try{transport?.setListeningLevel(next);listeningLevel=next;$('level-label').textContent=next===0?'Muted':next+'×';$('listening-level').setAttribute('aria-valuetext',next===0?'Muted, zero times':next+' times');}
  catch(error){$('listening-level').value=listeningLevel;$('gesture').textContent=error.message;}
 };
-$('quiet').onclick=()=>{transport?.quiet();$('gesture').textContent='Quiet. You can choose another anatomy.';controls();};
+$('quiet').onclick=()=>{cancelPhrase('New attempt cancelled. Previous completed phrase retained.');transport?.quiet();$('gesture').textContent='Quiet. You can choose another anatomy.';controls();};
 $('example').onclick=restore;
 $('search-form').onsubmit=async event=>{
- event.preventDefault();if(busy||occupied())return;
+ event.preventDefault();if(busy||occupied()||phraseCapture.snapshot.active)return;
  const values=[0,1,2].map(i=>Number($('f'+i).value)),decay=Number($('decay').value);
  const original=values.every((f,i)=>f===example[i])&&decay===example[3];
  const target={version:1,kind:'three-resonance',normalFrequenciesHz:values,decaySeconds:decay,provenance:original?'Known seed 3, equal 0.02 kg masses, rounded declared target':'Visitor-declared frequencies and common decay'};
@@ -57,7 +63,7 @@ $('search-form').onsubmit=async event=>{
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent='Searching two possible layouts. You can cancel while it works…';
  try{
   const next=await jobs.run({kind:'search',target,options:{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
-  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;clearPhrase();repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`${next.candidates.filter(c=>c.status==='accepted').length} layouts within tolerance. ${next.work.evaluations.toLocaleString()} evaluations in ${((performance.now()-started)/1000).toFixed(1)} s. ${next.bound.impossibleWithinTolerance?'This target exceeds the equal-mass family’s frequency-ratio bound, even with tolerance.':next.work.exhausted?next.verdict:'This bounded search does not establish uniqueness or a global optimum.'}`;
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
@@ -65,14 +71,14 @@ $('search-form').onsubmit=async event=>{
 
 $('open-instrument').onchange=()=>{const file=$('open-instrument').files[0];$('open-instrument').value='';if(file)openInstrument(file);};
 async function openInstrument(file){
- if(busy||occupied())return;
+ if(busy||occupied()||phraseCapture.snapshot.active)return;
  const token=++generation,reader=new AbortController();fileRead=reader;busy=true;controls();$('status').textContent='Checking the kept anatomy…';
  try{
   const input=await readInverseFile(file,{signal:reader.signal});if(token!==generation)return;
   const opened=await jobs.run({kind:'reopen',text:input.text});if(token!==generation)return;
   const candidate={...opened.candidate,status:opened.candidate.status==='within-tolerance'?'accepted':'saved-outside-tolerance'};
   report={target:opened.record.target,tolerance:opened.record.tolerance,candidates:[candidate],savedRecord:opened.record};
-  lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  lastTouch=null;lastGestureTopology=null;clearPhrase();repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`Opened ${input.name}. Fit recalculated from the saved instrument and target. Prepare it when you are ready to play. Any previously prepared instrument is retained.`;
  }catch(error){if(token===generation)$('status').textContent=`Could not open the anatomy: ${error.message} Previous results and instrument retained.`;}
  finally{if(token===generation){fileRead=null;busy=false;controls();}}
@@ -106,7 +112,7 @@ function renderResults(){
  }
 }
 async function prepare(candidate,card){
- if(busy||occupied())return;
+ if(busy||occupied()||phraseCapture.snapshot.active)return;
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent=`Preparing the ${candidate.topology} at your audio context’s sample rate…`;
  try{
   if(!context){context=new AudioContext();transport=createInverseTransport(context);transport.setListeningLevel(listeningLevel);context.onstatechange=()=>controls();}
@@ -144,16 +150,72 @@ function repeatInvitation(){
  $('repeat-touch').textContent=`Touch body ${lastTouch.body+1} again`;
 }
 $('hear-gesture').onclick=()=>{
- if(busy||!instrument||!armed||context?.state!=='running')return;
+ if(phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running')return;
  try{transport.playGesture(sharedGesture);if(mountedReport===report)lastGestureTopology=mountedTopology;$('gesture').textContent='Body 2, then bodies 1 and 3 together. You can answer with a touch of your own, or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 };
 $('repeat-touch').onclick=()=>{if(lastTouch)strike(lastTouch.body);};
 function strike(body){
  if(!armed||busy)return;
- try{const admitted=transport.strike(body);if(admitted&&mountedReport===report){lastTouch={body,topology:mountedTopology};repeatInvitation();}$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight touches are ringing or upcoming. This touch was ignored; wait or choose Quiet.';}
- catch(error){$('gesture').textContent=error.message;}controls();
+ const expired=expirePhrase(context.currentTime);
+ try{
+  const receipt=transport.strikeWithReceipt(body);
+  if(receipt&&mountedReport===report){lastTouch={body,topology:mountedTopology};repeatInvitation();}
+  let remembered=null;
+  if(receipt&&phraseCapture.snapshot.active){remembered=phraseCapture.admit(receipt);if(remembered.finished)completePhrase(remembered.reason==='touch-limit'?'Eight touches reached.':'Eight-second window finished.');}
+  $('gesture').textContent=receipt?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight touches are ringing or upcoming. This touch was ignored; wait or choose Quiet.';
+  if(receipt&&(expired||remembered?.captured===false))$('gesture').textContent+=' This touch played after the phrase window and was not remembered.';
+ }catch(error){$('gesture').textContent=error.message;}controls();
 }
+function phraseText(id,text){if($(id).textContent!==text)$(id).textContent=text;}
+function completePhrase(reason){
+ phraseTopology=draftTopology;draftTopology=null;
+ const count=phraseCapture.snapshot.phrase.events.length;
+ phraseText('phrase-status',`${reason} Remembered ${count} ${count===1?'touch':'touches'}. Let the sound finish or choose Quiet before replaying.`);
+}
+function expirePhrase(time){
+ if(phraseCapture.expire(time)){completePhrase('Eight-second window finished.');return true;}
+ return false;
+}
+function cancelPhrase(message){
+ if(!phraseCapture.snapshot.active)return;
+ phraseCapture.cancel();draftTopology=null;
+ phraseText('phrase-status',phraseCapture.snapshot.phrase?message:'New attempt cancelled. No phrase remembered yet.');
+}
+function clearPhrase(){phraseCapture.clear();phraseTopology=null;draftTopology=null;phraseText('phrase-status','Prepare an anatomy and start listening to begin.');}
+function phraseControls(ringing){
+ const capture=phraseCapture.snapshot,ready=!busy&&!!instrument&&armed&&context?.state==='running';
+ $('remember-phrase').disabled=!ready||ringing||capture.active||mountedReport!==report;
+ $('remember-phrase').textContent=capture.phrase?'Remember a new phrase':'Remember a phrase';
+ $('finish-phrase').hidden=!capture.active;
+ $('replay-phrase').disabled=!ready||ringing||capture.active||!capture.phrase;
+ if(capture.active)phraseText('phrase-status',capture.count?`Remembering ${capture.count} / 8 touches. Choose Done, or keep playing within the eight-second window.`:'Ready to remember. Touch a body to begin the eight-second window.');
+ $('phrase-summary').hidden=!capture.phrase;
+ if(capture.phrase){
+  const phrase=capture.phrase,sequence=phrase.events.map(event=>event.body+1).join(' → ');
+  const comparison=ready&&!ringing&&!capture.active&&mountedTopology!==phraseTopology?` Try your phrase on this ${mountedTopology}, too.`:'';
+  phraseText('phrase-summary',`${phrase.events.length} ${phrase.events.length===1?'touch':'touches'} from the ${phraseTopology}: ${sequence}. First to last touch: ${phrase.spanSeconds.toFixed(2)} s.${comparison}`);
+ }else phraseText('phrase-summary','');
+}
+$('remember-phrase').onclick=()=>{
+ if(busy||occupied()||phraseCapture.snapshot.active||!instrument||!armed||context?.state!=='running'||mountedReport!==report)return;
+ try{phraseCapture.begin({sampleRate:context.sampleRate,capturedAt:new Date().toISOString()});draftTopology=mountedTopology;controls();}
+ catch(error){phraseText('phrase-status',error.message);}
+};
+$('finish-phrase').onclick=()=>{
+ if(!phraseCapture.snapshot.active)return;
+ const result=phraseCapture.finish();
+ if(result.changed)completePhrase('Phrase finished.');
+ else{draftTopology=null;phraseText('phrase-status',result.phrase?'No new touches. Previous phrase retained.':'No touches to remember yet.');}
+ controls();
+};
+$('replay-phrase').onclick=()=>{
+ const phrase=phraseCapture.snapshot.phrase;
+ if(!phrase||phraseCapture.snapshot.active||busy||!instrument||!armed||context?.state!=='running')return;
+ try{transport.playGesture(inversePhraseTransportEvents(phrase));phraseText('phrase-status',`Your phrase started on the ${mountedTopology}. Its touches and timing are unchanged. You can answer with your own touch.`);}
+ catch(error){phraseText('phrase-status',error.message);}controls();
+};
+
 async function ensureSpatial(){
  if(spatial||pictureFailed)return;
  try{
@@ -218,6 +280,7 @@ function tick(){
  raf=requestAnimationFrame(tick);
 }
 addEventListener('pagehide',()=>{
+ cancelPhrase('New attempt cancelled while leaving. Previous completed phrase retained.');
  tap?.cancel();
  const wasBusy=busy;cancel(wasBusy?'Preparation cancelled while leaving the page.':'Listening paused while away. Prepared instrument and results retained.');
  transport?.quiet();armed=false;context?.suspend();

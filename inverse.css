@@ -19,3 +19,5 @@
 .kept-entry{margin-top:18px}.kept-entry input{font-size:13px}.keep-anatomy{background:transparent;color:var(--mint)}
 
 .shared-gesture{margin:14px 0 20px}.shared-gesture p{margin-bottom:10px}
+
+.phrase-panel{margin:20px 0}.phrase-panel .actions{gap:10px}.phrase-panel p{margin-bottom:12px}#replay-phrase{background:transparent;color:var(--mint)}

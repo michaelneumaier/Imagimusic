@@ -329,3 +329,5 @@ Inverse manual-touch receipts: src/inverse/transport.js and tests/inverse-transp
 Inverse visitor phrase capture: src/inverse/phrase-capture.js and tests/inverse-phrase-capture.test.js, later inverse.html/css/main.js integration; explicit transactional visit-local draft, admitted audio-clock receipts only, eight-touch/eight-second limits, natural-tail replay and previous phrase preservation on cancel. Fable owns src/score/grove-inverse-phrase.js and its tests/contract.
 
 Inverse phrase render verification: tests/inverse-phrase-render.html/js; actual offline audio-clock manual receipt capture, same-anatomy replay and cross-anatomy PCM reference checks. Explicit silent diagnostic, no device-audio or visitor-preference claim.
+
+Inverse visitor phrase encounter: inverse.html/css and src/inverse/main.js; optional capture disclosure, visible draft state, Done/Quiet distinction, same-phrase replay across candidates and current-results lifecycle gates, consuming reviewed receipt and capture modules.

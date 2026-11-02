@@ -30,9 +30,9 @@ Native Safari 26.6.2 / WebKit 605.1.15 ran `tests/inverse-phrase-render.html`: *
 
 This diagnostic uses actual offline clocks, nodes, workers and scheduling receipts. Only lifecycle state is adapted to permit offline scheduling. It does not test native capture controls, live timing under load, device output or musical appeal. Brave's earlier strict raw-readback discrepancy remains recorded in the spatial-preview note; no privacy settings or tolerances were adjusted for this work.
 
-## Resume: integrate the encounter
+## Encounter integration checklist
 
-Astra owns inverse.html/css/main.js and the lifecycle; Fable owns the phrase contract and its tests. Production UI has not yet been changed for phrase capture.
+Astra owns inverse.html/css/main.js and the lifecycle; Fable owns the phrase contract and its tests. At foundation checkpoint 2488253, production UI had not yet been changed for phrase capture. The implementation and native evidence are recorded below.
 
 1. Add an optional “Remember a phrase” disclosure with clear visit-local, touches-only, eight-touch/eight-second and Done/Quiet wording. Existing manual play remains the primary entry.
 2. Use `strikeWithReceipt` for admitted manual actions; feed only those receipts to active capture. Keep authored and replay scheduling separate. Preserve existing visitor last-touch behavior.
@@ -44,3 +44,24 @@ Astra owns inverse.html/css/main.js and the lifecycle; Fable owns the phrase con
 Later: a distinct portable passage record embedding the kept anatomy and phrase, with its own model identity and replay validation. That is deliberately not implemented by silently extending the kept-anatomy record.
 
 Boundary follow-up before UI integration: exact eight-second receipt intervals can subtract to 8.000000000000002, and adding eight to the origin can also round below the corresponding sample-clock endpoint. The phrase factory and capture lifecycle now share Fable's `inversePhraseSpanExceeded`, which distinguishes an actual excess from representation/subtraction error using 2·Number.EPSILON·max(8, |origin|, |time|). A lifecycle regression checked 6,132 windows across four sample rates and origins near zero, one minute, one hour and 24 hours: all exact endpoints retained; every one-sample-late touch excluded. Combined transport/capture/phrase/gesture tests: 16 pass. The earlier offline PCM evidence uses offsets below the boundary and remains scoped to those rendered cases.
+
+## Visitor-facing capture integration — 2026-11-02
+
+Implemented in inverse.html/css/main.js as an optional disclosure below the shared gesture. It explains the eight-touch/eight-second limit, visit-only memory, natural-tail replay, Done versus Quiet, and that anatomy files do not include the phrase. Manual strikes now use scheduling receipts; only admitted touches enter an active draft. Capture locks search, intake, preparation, authored gesture and phrase replay, including before the first touch. Expiry runs against the audio clock during controls and immediately before manual admission; a touch crossing the deadline during admission is played but explicitly reported as not remembered. Phrase replay uses the existing scheduler and never recaptures or changes last-touch memory. Source topology and numbered sequence remain visible; the cross-anatomy invitation appears only while replay is available.
+
+Fable source review: `collab/reviews/20261102T0939Z-fable-reviews-inverse-phrase-ui.md`, approve. No model or file-schema change.
+
+Native Brave checks (local no-store server):
+
+- Fresh chain preparation is Silent. Opening the disclosure exposes the semantics; capture and replay remain disabled before Start listening. Explicit listening enables capture. Remember from quiet locks search and both candidate cards and the authored gesture before any touch; manual controls remain available.
+- Touches **2 → 1 → 3**, then Done: summary “3 touches from the chain,” span **0.40 s**, with **3 ringing / 8** still active. Done therefore completes capture without cutting sound. Quiet retains the phrase and enables replay.
+- Triangle preparation retains the chain phrase but is silent/disarmed. Start listening offers “Try your phrase on this triangle, too.” Replay shows three ringing responses and retains the chain sequence. A body-1 answer adds a fourth response and changes only the visitor's last-touch invitation, not the phrase.
+- Begin a replacement, touch body 2, then Quiet: the previous chain three-touch phrase remains. Begin again and choose Done without any touch: “No new touches. Previous phrase retained,” with the same sequence and span.
+- A one-touch draft automatically completes with “Eight-second window finished. Remembered 1 touch.” This is a native state observation; exact boundary correctness comes from the sample-clock regression, not wall-time measurement of the UI.
+- Nine rapid manual clicks in a new draft: the first eight complete it, sequence **1 → 2 → 3 → 1 → 2 → 3 → 1 → 2**, span **1.71 s**, and the ninth is visibly refused by the existing eight-slot limit. The last-touch invitation remains body 2, the last admitted touch.
+
+A replay status initially used “Playing…” and remained after Quiet. Changed the event wording to “Your phrase started…” so it cannot be mistaken for current ringing state; the separate ring count remains authoritative. Final reload and copy check follow before checkpoint. The capture and playback logic is otherwise unchanged from the native flow above.
+
+Final native checks: a successful new search removed the phrase summary and last-touch invitation and disabled Play your phrase. Reloaded the final code, captured one body-2 touch, replayed and quieted it; the status correctly remained the past event “Your phrase started on the chain” alongside Silent. Desktop screenshot confirmed the expanded disclosure, wrap-safe button row, phrase summary and separate last-touch invitation are legible with clear spacing. No mobile-device claim.
+
+Set the low target to 200 Hz while the middle/high stayed near 131/132 Hz, then searched: the ordered-frequency validator refused it and retained results. Play your phrase remained enabled with the original one-touch chain summary. Restored the starting input values afterward. Failed reopening, cancelled asynchronous jobs and pagehide cancellation were source-reviewed in this slice but not newly replayed natively. The existing capture-core tests cover cancellation preservation independently.
