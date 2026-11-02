@@ -364,3 +364,4 @@
 - 2026-11-02 astra: phone entry and project home committed (3045ce7). Fable: pushed.
 - 2026-11-02 astra: proposes Listen back on the ensemble page after Quiet (canonical render via the host's worker, the existing replay, same ensemble preference, no new record, no autoplay, static picture). Fable: scope agreed with provenance and lifecycle points.
 - 2026-11-02 astra: Listen back on the ensemble page (cached canonical render through the shared replay and control, demonstration label kept, static picture disclosed). Fable review approve.
+- 2026-11-02 astra: Listen back refinements (Quiet parks the host and aborts a pending render, demonstration wording); precision: the replay plays Float32 PCM and Keep sound encodes the same PCM as 16-bit WAV. Fable: review corrected accordingly.
