@@ -29,3 +29,20 @@ test('mix-only path retains full canonical identity and admission validation',()
  const record=fixture(1);record.mixGain=.5;assert.throws(()=>renderEnsembleMix(record),/mix gain/);
  record.mixGain=1/3;record.parts[2].silent=false;assert.throws(()=>renderEnsembleMix(record),/silent/);
 });
+
+test('late strikes and adjacent contact intervals preserve exact samples over a longer passage',()=>{
+ const record=fixture(1);
+ record.ended={frame:2049,fadeFrames:7};
+ for(const part of record.parts)part.record.ended={...record.ended};
+ const first=record.parts[0].record;
+ first.events.push(...[1023,1024,1025].map((frame,i)=>({frame,order:100+i,body:0,position:1,velocity:.01})));
+ first.contacts.push({body:0,zone:0,strength:0,start:1023,end:1024,order:103},{body:0,zone:2,strength:1,start:1024,end:1025,order:104});
+ assert.deepEqual(renderEnsembleMix(record).channels,renderEnsembleRecord(record).channels);
+});
+
+test('single-pass admission refuses an over-loud record instead of returning a partial mix',()=>{
+ const record=fixture(1),loud=record.parts[0].record;
+ loud.events=Array.from({length:40},(_,order)=>({frame:0,order,body:order%3,position:2,velocity:1}));loud.contacts=[];
+ assert.throws(()=>renderEnsembleRecord(record),/would have been rejected/);
+ assert.throws(()=>renderEnsembleMix(record),/Part 1.*would have been rejected/);
+});

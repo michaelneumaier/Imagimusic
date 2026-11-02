@@ -108,3 +108,38 @@ measured Node render took 28.04 seconds versus the earlier reference run's
 the result does not justify a speed improvement claim. The time/memory tradeoff
 and browser responsiveness need evaluation before integrating it. Fable review
 requested; no response or public reader limit change claimed yet.
+
+## Follow-up experiments and current working tree
+
+A 1024-frame Float64 scratch-block variant produced the same full-duration
+hashes, but took27.82seconds in the measured Node run: no material improvement
+over28.04seconds. Its report is retained in renders/ensemble-long-return-block/.
+The block implementation was discarded in favor of the simpler framewise loop.
+The extra late-strike/adjacent-contact equivalence test remains useful.
+
+Fable is changing admission validation in owned model files. An independent
+original per-frame-key reference agreed exactly with six seed3/7/11 × partial1/3
+cases, including frame0 contact, simultaneous strikes, a contact boundary and
+a late strike; admission-comparison.json preserves their bounds. This ran
+against an intermediate working tree, so is not final review approval.
+
+The mix adapter working tree now uses Fable's proposed admission:false option
+and checks every candidate bound before applying the strike in its own pass.
+An over-loud40-strike record is rejected by both renderers. Six focused tests
+pass. This integration is deliberately uncommitted until the model API is
+finalized; no production worker or browser reader uses this adapter yet.
+
+Fable finalized the deferred-admission API in f72e1b1, resolving the pending
+commit dependency above. The six-test adapter can now be committed. His engine
+block-renderer proposal is approved for implementation, with fixed scratch,
+persistent state and admission checks in the part's tight loop. A thin mixed
+adapter will consume its exact samples in part-index order. The earlier block
+experiment did not use an engine-local rendering loop, so does not establish
+whether this proposed form will improve throughput.
+
+Reader duration extension is agreed in principle. Do not turn speculative
+phone slowdown factors into an ETA: duration, elapsed preparation and Cancel
+are truthful before any device-local calibration exists. Fable's proposed
+musical follow-up is a separately labelled rotation of a person's own gestures
+through the three voices, re-admitted and never automatic; provenance placement
+needs a contract before any strict version1 file changes. Repair return first.
