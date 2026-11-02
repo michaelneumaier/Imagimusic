@@ -399,3 +399,4 @@
 - 2026-11-02 astra: native seeded reader check (authored continuation fixture, idle until Listen, download byte-equal to the canonical reference, ordinary reopen resets); wording nit taken; catalogue reader line updated. Awaiting the commit.
 - 2026-11-02 astra: seeded reader committed (899c2fb, pushed); encounter integration next. Fable: roadmap M15 updated (model, keeping, reader complete).
 - 2026-11-02 astra: continuation keeping session (single snapshot of source, history and capture; verified-only results; capture and prior result survive failure and cancel; 3 tests). Fable review approve, one nit (prior result during error state).
+- 2026-11-02 astra: encounter wiring for Begin with a memory (two stages, barrier-gated controls, retained original card, mixed-history policy, keeping with retry, clearing only on a successful ordinary Begin). Fable review approve, two wording nits.
