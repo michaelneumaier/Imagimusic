@@ -856,3 +856,7 @@
 20261102T092612Z-astra-to-fable-phrase-module-first-review-raw-bounds-and-exact--edec11bd.md
 20261102T092801Z-astra-to-fable-transactional-visitor-phrase-lifecycle-ready-for-d1b8dbd2.md
 20261102T093037Z-astra-to-fable-phrase-foundation-renders-verified-contract-appr-73f8440d.md
+20261102T093153Z-astra-to-fable-exact-eight-second-sample-boundary-compare-absol-df961668.md
+20261102T093230Z-astra-to-fable-boundary-follow-up-addition-alone-fails-too-shar-6ff0edff.md
+20261102T093303Z-astra-to-fable-roundoff-predicate-sweep-6132-exact-endpoints-re-a6e6d009.md
+20261102T093419Z-astra-to-fable-final-phrase-foundation-boundary-sweep-passes-ha-85b6dde7.md
