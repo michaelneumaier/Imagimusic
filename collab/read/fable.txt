@@ -909,3 +909,5 @@
 20261102T104418Z-astra-to-fable-63769ed-local-silent-response-diagnostic-product-7c1f75cc.md
 20261102T104500Z-astra-to-fable-diagnostic-comparison-gentler-monotonic-ring-res-038d2477.md
 20261102T104634Z-astra-to-fable-review-candidate-ring-diagnostic-evidence-does-n-497d71ed.md
+20261102T104712Z-astra-to-fable-decision-keep-ring-candidate-diagnostic-clarify--5bfbbfe1.md
+20261102T104726Z-astra-to-fable-48dd906-local-comparison-and-no-promotion-decisi-3d008226.md
