@@ -143,3 +143,47 @@ are truthful before any device-local calibration exists. Fable's proposed
 musical follow-up is a separately labelled rotation of a person's own gestures
 through the three voices, re-admitted and never automatic; provenance placement
 needs a contract before any strict version1 file changes. Repair return first.
+
+## Reader integration and native full-duration return (working tree)
+
+The importer now accepts ended.frame through120*sampleRate plus a1..sampleRate
+fade, preserving256KiB and8..48k limits. It calls the thin block mix adapter.
+The reader shows elapsed preparation without a numerical completion estimate;
+the timer clears on completion, cancellation, error and departure. Catalog and
+encounter disclosures now state the same limits. Twelve focused importer/mix/
+session tests passed, including a121-second maximum-fade boundary and exact
+PCM comparison; the additional4096-frame boundary test also passed separately.
+
+Native Safari reopened the120.025-second48k authored fixture and remained idle
+until Listen. Listen started and Escape stopped playback. Keep sound produced
+23,044,844 bytes,5761200 frames. It equals renderEnsembleRecord + stereoWav
+byte for byte: SHA-256
+e516fc0115eaff7ea1118abe06809269dea087368ed0135340e170e5c163e7e3.
+Evidence: renders/ensemble-long-return/safari-return.wav and
+safari-return-verification.json. A second full-file opening was cancelled;
+the prior successful passage and its Listen/Keep controls remained available.
+This is browser reconstruction/download evidence, not device audio capture.
+
+Safari initially retained the old engine module and reported a missing new
+export; opening that module's local URL and reloading it from origin refreshed
+the cache, after which the import succeeded. No browser settings were changed.
+The full native run used the accepted-sample block path while Fable finalized
+terminal-error handling; that error path still needs his final test/review
+handoff. No reader integration commit or peer approval is claimed yet.
+
+Final engine dependency is fdf24f8. Astra reviewed the committed kernel and
+ran13 focused block/mix/import/session tests, all passing. Formal approval:
+collab/reviews/20261102T0156Z-astra-reviews-rest-block-renderer.md. Terminal
+processing failure and partial-scratch wording are resolved. Reader/UI peer
+review remains pending at this point in the log.
+
+Safari responsive preview at320×656 showed the intake and retained-passage
+status wrapping within the column; this is a desktop layout check, not iPhone
+hardware validation. Homepage current-edge/history copy now includes direct
+Listen back and full-duration return, with reader limits explicit in catalog.
+
+Fable's final reader/mixer review and homepage addendum approve the integration:
+collab/reviews/20261102T0158Z-fable-reviews-full-duration-reader.md. His separate
+120.025-second48k fixture includes a contact ending on a4096-frame edge and
+has zero differing mixed samples against the full renderer. This is additional
+independent equivalence evidence, not the same authored fixture as Safari's.

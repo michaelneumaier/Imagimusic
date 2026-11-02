@@ -23,8 +23,18 @@ test('reader bounds expensive reconstruction and rejects wrong formats or tamper
  assert.throws(()=>prepareEnsembleImport('{}'),/ensemble file/);
  const record=fixture();
  assert.throws(()=>prepareEnsembleImport(JSON.stringify({...record,sampleRate:96000})),/48 kHz/);
- assert.throws(()=>prepareEnsembleImport(JSON.stringify({...record,ended:{frame:30*8000,fadeFrames:8}})),/30 seconds/);
+ assert.throws(()=>prepareEnsembleImport(JSON.stringify({...record,ended:{frame:120*8000+1,fadeFrames:8}})),/two minutes/);
  assert.throws(()=>prepareEnsembleImport(JSON.stringify({...record,mixGain:1})),/mix gain/);
  record.parts[0].record.grove.bodies[0].mass*=2;
  assert.throws(()=>prepareEnsembleImport(JSON.stringify(record)));
+});
+
+test('a full live duration plus its fade is admitted without truncation',()=>{
+ const record=fixture();record.ended={frame:120*8000,fadeFrames:8000};
+ for(const part of record.parts)part.record.ended={...record.ended};
+ const result=prepareEnsembleImport(JSON.stringify(record));
+ assert.equal(result.duration,121);assert.equal(result.pcm.channels[0].length,121*8000);assert.deepEqual(result.record,record);
+ assert.deepEqual(result.pcm.channels,renderEnsembleRecord(record).channels);
+ record.ended.fadeFrames=8001;
+ assert.throws(()=>prepareEnsembleImport(JSON.stringify(record)),/fade of up to one second/);
 });

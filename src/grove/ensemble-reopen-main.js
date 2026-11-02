@@ -5,11 +5,15 @@ import {restWorkerJob} from './contact-job.js';
 import {createGroveReplay} from './replay.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id);
-let operation=0;
+let operation=0,preparationStarted=0,preparationTimer=null;
+function showPreparationTime(){const elapsed=Math.floor((performance.now()-preparationStarted)/1000);$('preparation-time').textContent=`Rebuilding · ${elapsed} s elapsed. Long passages can take time; Cancel opening stops the work.`;}
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const session=createRestImportSession({prepare:(data,options)=>restWorkerJob(new URL('./ensemble-import-worker.js',import.meta.url),data,options),onChange:sync});
 const replay=createGroveReplay({listeningDb:20,onChange:({state})=>{sync();if(state==='ended')status('The ensemble has settled. You can listen again.');if(state==='suspended')status('Audio was interrupted. Listen restarts the ensemble.');}});
-function sync(){const busy=session.state==='preparing',ready=!!session.result;$('cancel').hidden=!busy;$('listen').disabled=!ready||busy||replay.state==='preparing';$('save').disabled=!ready||busy;$('quiet').disabled=!['playing','preparing','suspended'].includes(replay.state);}
+function sync(){const busy=session.state==='preparing',ready=!!session.result;
+ if(busy&&preparationTimer===null){preparationStarted=performance.now();showPreparationTime();preparationTimer=setInterval(showPreparationTime,1000);}
+ if(!busy&&preparationTimer!==null){clearInterval(preparationTimer);preparationTimer=null;}
+ $('preparation-time').hidden=!busy;$('cancel').hidden=!busy;$('listen').disabled=!ready||busy||replay.state==='preparing';$('save').disabled=!ready||busy;$('quiet').disabled=!['playing','preparing','suspended'].includes(replay.state);}
 function show(result){
  $('passage').hidden=false;$('name').textContent=result.name;
  $('facts').textContent=`${result.duration.toFixed(2)} seconds · ${result.record.sampleRate/1000} kHz · Three independent Groves`;
@@ -23,7 +27,7 @@ $('quiet').onclick=()=>{replay.stop();status('Quiet. Your ensemble is still here
 $('save').onclick=()=>{if(!session.result||session.state==='preparing')return;const url=URL.createObjectURL(new Blob([stereoWav(session.result.pcm)],{type:'audio/wav'})),a=document.createElement('a');a.href=url;a.download='imagimusic-ensemble.wav';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 window.addEventListener('keydown',event=>{if(event.key!=='Escape')return;event.preventDefault();if(session.state==='preparing')$('cancel').click();replay.stop();status('Quiet. Nothing is playing.');});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){operation++;session.cancel();replay.park();status('Quiet. Listen when you return.');}});
-window.addEventListener('pagehide',event=>{operation++;if(event.persisted){session.cancel();replay.park();}else{session.dispose();replay.dispose();}});
+window.addEventListener('pagehide',event=>{operation++;if(event.persisted){session.cancel();replay.park();}else{clearInterval(preparationTimer);preparationTimer=null;session.dispose();replay.dispose();}});
 window.addEventListener('pageshow',event=>{if(event.persisted){sync();status(session.result?'Your ensemble is here. Listen when you are ready.':'Choose a saved ensemble.');}});
 sync();
 
