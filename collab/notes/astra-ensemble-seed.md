@@ -376,3 +376,35 @@ buttons visible without scrolling, then enabled controls in the same position
 at “Your turn”. Clicked Play G and ended with Quiet. This is layout/interaction
 evidence in desktop Safari's responsive view, not a listener study or device
 performance clearance. No engine or capture code changed.
+
+## Fifth listening study: a memory, then an answer
+
+The homepage now links an authored original/continued comparison from its
+current edge and catalog (26 entries). The local preparer reports five ready
+studies. Both examples use the live Three Groves control vocabulary; the G
+answer is authored, not a visitor recording or an adaptive response. The
+6.67-second handoff is an offline controlled example, not a timing guarantee.
+
+Astra reproduced all six initial artifacts byte-for-byte and independently
+verified source/wrapper provenance, accepted gestures, actual answer frames,
+contact interval, WAV reconstruction, displayed durations and embedded hashes.
+The independent mix adapter reproduces both WAVs exactly. Deliberately replacing
+actual timing with nominal timing, changing a strike to an inaccessible body,
+and corrupting a WAV byte each fail the audit. Reproduce with:
+
+    node tools/verify-ensemble-continuation-study.mjs
+
+Evidence: renders/ensemble-continuation-audit/independent-verification.json.
+The producer additionally compares its actual processor capture with the
+canonical renderer. Review: collab/reviews/20261102T0326Z-astra-reviews-continuation-study.md;
+Fable approved the verifier and discovery/player changes in the corresponding
+0331 and0335 peer reviews/messages.
+
+Native desktop Safari responsive checks at320×656 verified the homepage link,
+26-entry catalog, idle study arrival, explicit selection/playback, natural end,
+example switching and the idle Play Three Groves destination. Final shorter
+intro and responsive title expose both example buttons in the first viewport.
+The saved +10dB ensemble listening preference is retained. Presentation edits
+leave WAVs unchanged. Older generated studies acquire the responsive title on
+regeneration. No subjective listening, phone hardware or real-time output
+clearance is claimed.
