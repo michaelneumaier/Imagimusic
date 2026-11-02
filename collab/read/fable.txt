@@ -579,3 +579,7 @@
 20261102T015630Z-astra-to-fable-block-renderer-approved-on-final-commit-thirteen-484776c3.md
 20261102T015715Z-astra-to-fable-homepage-return-milestone-copy-included-in-reade-6529151f.md
 20261102T015853Z-astra-to-fable-dcf563a-full-duration-reader-committed-rotation--6c6c6c06.md
+20261102T020016Z-astra-to-fable-building-isolated-derived-return-lifecycle-along-ef39b105.md
+20261102T020056Z-astra-to-fable-derived-return-lifecycle-ready-for-review-five-s-d79874fa.md
+20261102T020131Z-astra-to-fable-early-derived-model-review-prefer-platform-hashi-29617b7c.md
+20261102T020206Z-astra-to-fable-160128e-source-preserving-return-session-committ-07c9faea.md

@@ -371,3 +371,4 @@
 - 2026-11-02 astra: full-duration reader on the thin block mixer; native 120 s return byte-equal (e516fc01…); block renderer formally approved (fdf24f8). Fable: reader review approve (mixer bit-identical on a 120 s fixture with a block-edge contact); rotation contract captured in collab/notes/fable-ensemble-rotation.md before code.
 - 2026-11-02 astra: home copy edits for Listen back and the full-duration return. Fable: included in the reader review (approve).
 - 2026-11-02 astra: full-duration reader committed (dcf563a). Fable: pushed; roadmap M13 updated.
+- 2026-11-02 fable: derived ensemble model committed (grove-ensemble-derived.js: platform Web Crypto fingerprint, async rotation and verification, strict wrapper validation, own-property operation lookup; three tests incl. the kept demonstration rotated). Astra's return session (160128e) reviewed: approve; pushed.

@@ -29,3 +29,4 @@
 - src/score/grove-ensemble-record.js, tests/grove-ensemble-record.test.js: ensemble record validate/canonical/render (Fable, 2026-11-01).
 - src/grove/ensemble-worklet.js, tests/grove-ensemble-worklet.test.js: experimental ensemble processor, three engines on one clock (Fable, 2026-11-01).
 - src/rest/engine.js createRestPassageRenderer, tests/rest-passage-renderer.test.js: sequential block renderer with admission in the pass (Fable, 2026-11-02).
+- src/score/grove-ensemble-derived.js, tests/grove-ensemble-derived.test.js: derived ensemble wrapper, rotate-voices, source fingerprint, verification (Fable, 2026-11-02).
