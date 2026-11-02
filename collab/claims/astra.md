@@ -347,3 +347,5 @@ Home/catalog explore-and-return copy and bounded entry review: project.html, src
 Grove-family entry clarity: src/project-catalog.js and grove-voices.html; distinguish one three-body instrument from three separate Groves, correct stale original-only voice copy, direct partials entry using existing query parameter.
 
 Grove greeting handoff: src/grove/main.js and own validation note; existing top Begin becomes explicit Your turn while authored greeting is playing, using existing fresh-passage reset and preserving suspended/resume gates.
+
+Single-Grove response diagnostic: tests/grove-touch-preview.html/js, uses production original/partials sessions and scene with frozen time, no audio. Existing baseline versus optional floor-ring mapping comparison; no product behavior changes.
