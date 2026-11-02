@@ -226,3 +226,50 @@ only after the acknowledged clock barrier; preserve Quiet throughout. Keep the
 finished mixed history as a verified continued passage, never silently as an
 ordinary personal recording. Preserve capture/sound and original on provenance
 failure, with retry. Keep demonstration origin explicit.
+
+## Encounter wiring contract
+
+The reader checkpoint is committed as899c2fb. The encounter will use two
+explicit actions within an optional disclosure: prepare the remembered opening
+(no audio), then “Play this passage, then continue”. This avoids implying that
+preparation itself is silent while starting playback. The retained-original
+card must live outside the current host's keeping section because a successful
+new mount intentionally clears that host's old capture.
+
+Preparation snapshots the completed ordinary host record and its origin. It
+uses the current recipe sample rate and the existing bounded source worker.
+Starting the remembered opening preserves that snapshot, stops replay, clears
+hold ownership and mounts a fresh instance of the same three instruments.
+Before scheduling, check the new recipe rate against the prepared plan; a
+mismatch must refuse playback, preserve the original and explain the refusal.
+No import source is exposed in this first encounter slice, so instrument setup
+continues to come from this encounter's own fixed recipe configuration.
+
+During the opening, disable ordinary strike/hold input and show “The remembered
+passage is playing. Your turn follows.” Quiet stays available. The host's
+continuation barrier is the authority for “Your turn”; visual events and a
+JavaScript timer are not. Completed handoff enables the existing controls;
+aborted handoff never does. Early Quiet says “Stopped before your turn”, even
+when the last remembered gesture was accepted before the clock barrier.
+
+At completion, snapshot host.recording() and host.continuation together with
+the retained original into the keeping session. Prepare verified wrapper text
+off-thread; show a retry action on failure. Sound and replay continue to use the
+finished host capture. Ordinary gesture export and rotate-return preparation
+must be disabled for this mixed history. Use a continued-passage filename and
+keep authored-demonstration source origin visible. A new ordinary Begin clears
+continuation/keeping state only after the new host mount succeeds. Failed or
+cancelled starts retain the prior source and downloadable result. Page hiding
+cancels jobs and parks audio without discarding completed captures/results.
+
+A small keeping-session helper is under Fable review before wiring: immutable
+source/capture/history snapshot, defensive getters, worker cancellation,
+stale-result rejection, explicit origin and retry after verification failure.
+It refuses results without verification.verified===true and never invents an
+ordinary-export fallback. Six lifecycle/adapter tests currently pass.
+
+Fable approved the keeping session in
+collab/reviews/20261102T0305Z-fable-reviews-continuation-keep-session.md.
+His UI nit is accepted: result availability, not state==='ready', governs the
+verified download button. A failed retry may leave state error and a previous
+verified result; keep that download available beside the retry error sentence.
