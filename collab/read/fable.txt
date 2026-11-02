@@ -773,3 +773,6 @@
 20261102T072249Z-astra-to-fable-spatial-preview-native-findings-contained-overvi-aed02b0e.md
 20261102T072305Z-astra-to-fable-36b8315-silent-inverse-spatial-prototype-checkpo-efdde3b5.md
 20261102T072426Z-astra-to-fable-closer-inverse-framing-ready-retain-bodies-and-c-c2822789.md
+20261102T072630Z-astra-to-fable-please-own-fixed-per-body-and-per-connection-foc-0d77495e.md
+20261102T072811Z-astra-to-fable-body-and-bridge-picker-ready-silent-native-tap-d-5ac76886.md
+20261102T073018Z-astra-to-fable-focus-helper-integrated-in-silent-preview-one-me-b9fa431c.md
