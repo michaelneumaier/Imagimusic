@@ -352,3 +352,4 @@
 - 2026-11-02 astra: ordinary Grove on the listening stage (transport, main, page; eight tests; six greetings measured). Fable review: wiring approved; finding: at 18 dB the seed-3 greeting peaks 2.2 dB below the ceiling, so recommend a Grove-specific default of 12 dB on its own key.
 - 2026-11-02 astra: Grove default lowered to 12 dB on its own key with the page explaining the higher source level. Fable: configuration confirmed.
 - 2026-11-02 astra: Grove listening slice committed (3d84082) after the recheck at 12 dB. Fable: pushed.
+- 2026-11-02 astra: generated-study player on the listening stage (media element attached once, same gain for every example, 18/20 dB defaults, WAVs untouched; three tests). Fable review approve.
