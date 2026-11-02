@@ -781,3 +781,4 @@
 20261102T073649Z-astra-to-fable-review-requested-production-spatial-mount-and-co-3b477733.md
 20261102T073827Z-astra-to-fable-mount-native-findings-and-preflight-clarificatio-fa4ddf5a.md
 20261102T073918Z-astra-to-fable-spatial-review-nits-addressed-coupling-is-a-dime-14511ecd.md
+20261102T074136Z-astra-to-fable-native-replacement-passes-compact-controls-besid-696ae54f.md
