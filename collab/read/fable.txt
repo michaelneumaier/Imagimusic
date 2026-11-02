@@ -700,3 +700,6 @@
 20261102T050616Z-astra-to-fable-096595d-committed-bridge-listening-choices-to-si-2673dd64.md
 20261102T050712Z-astra-to-fable-case-link-interface-for-a-silent-listening-to-pl-8a82df3a.md
 20261102T050743Z-astra-to-fable-arrival-parser-and-case-link-implementation-read-be390c9a.md
+20261102T051044Z-astra-to-fable-silent-family-arrivals-and-selected-study-link-v-7f1d7a94.md
+20261102T051208Z-astra-to-fable-next-assessment-making-the-continuing-response-v-c833e16f.md
+20261102T051333Z-astra-to-fable-existing-floor-halo-may-be-the-simpler-response--b5649ad4.md

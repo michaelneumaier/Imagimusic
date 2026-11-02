@@ -1,0 +1,28 @@
+# Assessment: "Follow the ring", making the existing per-body envelope easier to watch (Fable, 2026-11-02; assessment only, no scene change)
+
+Astra's question: would an optional, clearly labelled halo mapping driven only by the existing per-body low-band envelope, with one fixed mapping across families and bodies, help communicate the shared model, or merely add clutter? Default off, exact baseline restored when off, a reduced-motion alternative, no per-body normalisation, no inferred flow, no persistence or prediction, and not Afterglow.
+
+## What the picture has to show (measured)
+Per-body low-band envelope from `visualFromState` (the picture's own quantity) after the page strike (position 1, velocity 0.5), sampled every 10 ms for 4 s, for families 3, 7 and 11 at C and G and each struck body:
+- peaks range from 0.0107 (a neighbour of the struck body, seed 3 body 1) to 0.0614 (seed 3 body 0 struck): a 5.7× span, 15 dB;
+- every body stays above 10 % of its own peak for about 2.8 to 4.0 s and above 1 % for the whole 4 s: the ring is long, so a halo would hold for seconds, which is exactly the "what continues" the page asks about;
+- neighbours peak later than the struck body (0.1 to 0.75 s after it, seed 7's far body latest), so a visible halo would show the order in which bodies take up the ring, with no inference added.
+
+## What the current mapping does with those numbers
+Width 1 + min(0.2, level × 0.6); shell emissive 0.025 + min(0.7, level × 2); core 0.1 + min(1.2, level × 3); floor halo opacity 0.15 + min(0.65, level × 2). At the largest envelope ever reached by the page gesture (0.061) the width changes 3.7 %, the halo opacity rises from 0.15 to 0.27 and the shell emissive by 0.12; at the quietest peaks (0.011) the halo rises by 0.02. None of the caps is ever approached: the halo's cap would need an envelope of 0.325, five times the maximum. The mappings are proportional and honest, but their gains were not set for this gesture's scale, which is why Astra's screenshots show subtle pulses.
+
+## Recommendation: re-gain the existing halo, brightness only, as an opt-in
+- **Mapping**: halo opacity 0.15 + min(0.65, level × 10), one constant for every family and body, caps at an envelope of 0.065 (just above the largest measured peak, so the strongest ring sits at the cap and nothing is normalised per body). The quietest peak (0.011) reads at 0.26, the struck body at 0.80: a visible 3× brightness span standing for a 5.7× envelope span, proportional throughout. Nothing else changes: shells, strike rings, rim dots, hands and labels stay as they are; the halo keeps its radius (no geometry motion) and its body colour.
+- **Why the halo and not a new glyph**: it already exists under every body, already follows the envelope, is distinct from the transient strike ring and the hand mark, and keeps the visual vocabulary small; a thin new under-body ring would be a second thing saying the same quantity.
+- **Default off, exact baseline**: a sixth scene option `{ followRing: false }` (same pattern as `distinguishRemembered`); when false the gain is 2 and the cap 0.65 as today, byte-for-byte the current mapping; when true only the gain constant changes. A test asserts the off pose equals the pre-change pose for every route and that the on mapping is a fixed function of the envelope with the stated gain and cap.
+- **Reduced motion**: the page already passes an empty envelope under prefers-reduced-motion, so halos stay at baseline there; the alternative is a static legend line ("Brighter floor ring: more low-band motion in that body") rather than any animation; brightness is not motion, but the whole envelope display is already off under that preference and this follows it.
+- **Caption (Astra's)**: "Floor rings follow each body's low-band ring, five times brighter than the default picture. Same model, same numbers; only the display gain changes." It is an honest-interpretation gain, not a perceptual presentation, because it maps the same quantity with a different constant; it still gets a name, a switch and a caption, and is never recorded in exports because exports carry the envelope, not the display.
+
+## Competing simpler mapping, considered and not preferred
+A compressive mapping (opacity 0.15 + 0.65 × sqrt(level / 0.065)) would make the quiet neighbours more visible (0.011 → 0.42) at the cost of proportionality; it would make a neighbour look half as bright as the struck body when its envelope is a sixth. Since the point is to watch a shared model, not to flatter the quiet bodies, the linear re-gain is the honest one; if native inspection shows the quiet neighbours still vanish at 320 px, a compressive mapping is the fallback and must be named as such in the caption.
+
+## Evidence plan (Astra's diagnostic)
+Frozen fixture at envelopes 0.011, 0.03 and 0.061 with the option off and on, at 320 and 1000, C and G; a live run of the demonstration with the option on, asking only whether the order in which bodies brighten can be seen; the response-audit tool extended to report halo opacity under both mappings for the demonstration's snapshots. Evidence of visibility only; no claim of perceived causality or appeal.
+
+## Clutter judgment
+Low: no new element, no motion, no colour change; the risk is the opposite, that the halo is still too dim at 320 px, which the fixture will show before anything ships.
