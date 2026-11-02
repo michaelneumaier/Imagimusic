@@ -62,3 +62,6 @@ $('compare').onclick=async()=>{if(!shown||comparisonBusy||session.state==='prepa
 $('cancel-comparison').onclick=()=>{if(!comparisonBusy)return;cancelComparison();$('comparison-status').textContent='Comparison cancelled. Previous drawing retained.';};
 $('target').onchange=()=>{$('comparison-status').textContent='Choose Prepare to compare this target. Any previous dashed comparison remains named below.';};
 window.addEventListener('pagehide',event=>{generation++;cancelComparison();if(event.persisted)session.cancel();else session.dispose();});
+
+const viewport=document.querySelector('.plot-viewport');
+viewport.addEventListener('keydown',event=>{if(event.target!==viewport||event.altKey||event.ctrlKey||event.metaKey)return;if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();if(event.key==='Home')viewport.scrollLeft=0;else if(event.key==='End')viewport.scrollLeft=viewport.scrollWidth;else viewport.scrollLeft+=(event.key==='ArrowRight'?1:-1)*Math.max(80,viewport.clientWidth*.8);});
