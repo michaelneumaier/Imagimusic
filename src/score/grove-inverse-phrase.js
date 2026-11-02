@@ -16,6 +16,17 @@ const validRate = r => Number.isInteger(r) && r >= INVERSE_PHRASE_SAMPLE_RATES[0
 const isoTime = v => typeof v === 'string' && !Number.isNaN(Date.parse(v)) && new Date(v).toISOString() === v;
 const deepFreeze = v => { if (v && typeof v === 'object') { for (const k of Object.keys(v)) deepFreeze(v[k]); Object.freeze(v); } return v; };
 
+/** The one numeric boundary for "a touch came after the eight-second deadline", shared by the factory and the capture lifecycle so two clocks
+ * cannot disagree. Exactly eight sample-clock seconds must pass although floating subtraction overshoots (48 kHz: origin 384896/48000 subtracts
+ * to 8.000000000000002; origin 15872/48000 even defeats `time > origin + 8`), so the excess over eight must exceed a bound on representation and
+ * subtraction round-off, 2·ε·max(8, |origin|, |time|); that bound is about 1e-15 s, not a half-sample allowance, so a touch one sample late
+ * (20.8 µs at 48 kHz) is still refused (Astra's boundary finding and sweep). */
+export function inversePhraseSpanExceeded(origin, time) {
+  if (typeof origin !== 'number' || typeof time !== 'number' || !Number.isFinite(origin) || !Number.isFinite(time)) fail('span check needs finite origin and time.');
+  const elapsed = time - origin, excess = elapsed - INVERSE_PHRASE_MAX_SPAN_SECONDS;
+  return elapsed > INVERSE_PHRASE_MAX_SPAN_SECONDS && excess > 2 * Number.EPSILON * Math.max(INVERSE_PHRASE_MAX_SPAN_SECONDS, Math.abs(origin), Math.abs(time));
+}
+
 /** From the transport's receipts ({ body, time } in audio-clock seconds, in admission order) to a frozen phrase; `at` is the ISO capture time. Times become offsets from the
  * first receipt, rounded to the sample period of the capture context so replay at that rate lands on the same frames. Refuses more than eight
  * touches, a span over eight seconds, times that go backwards, or anything that is not a receipt. */
@@ -33,7 +44,7 @@ export function createInversePhrase(receipts, { at, sampleRate } = {}) {
     if (i && r.time < receipts[i - 1].time) fail(`receipt ${i} is earlier than the one before it.`);
   }
   const origin = receipts[0].time;
-  if (receipts[receipts.length - 1].time - origin > INVERSE_PHRASE_MAX_SPAN_SECONDS) fail(`a phrase spans at most ${INVERSE_PHRASE_MAX_SPAN_SECONDS} s between its first and last touch (checked before rounding).`);
+  if (inversePhraseSpanExceeded(origin, receipts[receipts.length - 1].time)) fail(`a phrase spans at most ${INVERSE_PHRASE_MAX_SPAN_SECONDS} s between its first and last touch (checked before rounding).`);
   const events = receipts.map(r => ({ body: r.body, at: Math.round((r.time - origin) * sampleRate) / sampleRate }));
   const phrase = { kind: INVERSE_PHRASE_KIND, version: INVERSE_PHRASE_VERSION, source: 'visitor', events, spanSeconds: events[events.length - 1].at, impulseNs: INVERSE_IMPULSE_NS, sampleRate, capturedAt };
   return deepFreeze(validateInversePhrase(phrase));

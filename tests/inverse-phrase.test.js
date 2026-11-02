@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createInversePhrase, phraseFromReceipts, validateInversePhrase, inversePhraseTransportEvents, INVERSE_PHRASE_KIND } from '../src/score/grove-inverse-phrase.js';
+import { createInversePhrase, phraseFromReceipts, validateInversePhrase, inversePhraseTransportEvents, inversePhraseSpanExceeded, INVERSE_PHRASE_KIND } from '../src/score/grove-inverse-phrase.js';
 import { INVERSE_IMPULSE_NS } from '../src/inverse/instrument.js';
 import { validateInverseGesture, INVERSE_SHARED_GESTURE } from '../src/score/grove-inverse-gesture.js';
 
@@ -36,6 +36,21 @@ test('refusals: nine touches, a span over eight seconds, times going backwards, 
   assert.throws(() => createInversePhrase([{ body: 0, time: -0.001 }], ok), /non-negative/);
   assert.throws(() => createInversePhrase([{ body: 0, time: 10 }, { body: 1, time: 18.000001 }], ok), /checked before rounding/);
   assert.equal(createInversePhrase([{ body: 0, time: 10 }, { body: 1, time: 18 }], ok).spanSeconds, 8);
+  // Astra's boundary case: exactly eight sample-clock seconds whose floating difference is 8.000000000000002
+  const origin48 = 384896 / 48000, end48 = (384896 + 8 * 48000) / 48000; assert.ok(end48 - origin48 > 8, 'the subtraction overshoots');
+  const exact = createInversePhrase([{ body: 1, time: origin48 }, { body: 2, time: end48 }], { sampleRate: 48000, at: at });
+  assert.equal(exact.spanSeconds, 8); assert.equal(exact.events[1].at, 8);
+  assert.throws(() => createInversePhrase([{ body: 1, time: origin48 }, { body: 2, time: end48 + 1e-6 }], { sampleRate: 48000, at: at }), /checked before rounding/);
+  // Astra's sweep: origin 15872/48000 defeats a plain deadline addition; the shared helper accepts exact eight and refuses one sample late
+  for (const frame of [384896, 15872, 0, 1, 47999, 1234567]) {
+    const o = frame / 48000, e = (frame + 8 * 48000) / 48000, late = (frame + 8 * 48000 + 1) / 48000;
+    assert.equal(inversePhraseSpanExceeded(o, e), false, `frame ${frame}: exactly eight seconds is not late`);
+    assert.equal(inversePhraseSpanExceeded(o, late), true, `frame ${frame}: one sample late is late`);
+    assert.equal(createInversePhrase([{ body: 0, time: o }, { body: 1, time: e }], { sampleRate: 48000, at: at }).spanSeconds, 8);
+    assert.throws(() => createInversePhrase([{ body: 0, time: o }, { body: 1, time: late }], { sampleRate: 48000, at: at }), /checked before rounding/);
+  }
+  assert.equal(inversePhraseSpanExceeded(5, 12.999), false); assert.equal(inversePhraseSpanExceeded(5, 13.000001), true);
+  assert.throws(() => inversePhraseSpanExceeded(NaN, 1), /finite/);
   const offGrid = clone(createInversePhrase([{ body: 1, time: 0 }, { body: 2, time: 0.25 }], ok)); offGrid.events[1].at = 0.2500001; offGrid.spanSeconds = 0.2500001;
   assert.throws(() => validateInversePhrase(offGrid), /sample grid/);
   assert.throws(() => createInversePhrase([{ body: 0, time: 0 }], { sampleRate: 48000, at: 'Nov 2 2026' }), /YYYY-MM-DD/);
