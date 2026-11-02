@@ -47,3 +47,9 @@ Native Safari verified Tight weave at 12.3 s with Listen awaiting action → Pla
 Project home now mentions the still-picture choice in the Touch invitation and preserved listening position in the play/return roadmap. A separate Visual history · workshop study card describes the inspectable strip/circle work and its pending review/visitor-reading gates, linking to the milestone notebook rather than presenting the diagnostic as a finished encounter. A history entry records these changes, and the archive opens the sampling/evidence note.
 
 Native Safari loaded the roadmap and opened both new notebook destinations. The milestone rendered its reading exercise and outstanding gates; the sampling note rendered the real-worker cancellation section and PASS 5/5 evidence. Diff check passed. This is local catalog upkeep, not publication, peer approval or a claim that visual histories improve listening.
+
+## Discovering the design-to-performance path
+
+The home invitation now links directly to tuning a connection in Loom and explains the separate ways of keeping a design (address) and a performance (gesture file). Catalog descriptions for Loom, Touch and Touch return reflect custom-settings playing and still-picture choice; Touch is no longer described merely as an earlier study. Native Safari rendered the new home link and all three revised descriptions. Research history/circle studies remain outside the playable catalog.
+
+Loom's URL write was moved from each input event to the completed change event, while the model/readouts still update during the adjustment. A native drag changed frequency 311 → 410 Hz; after release the URL contained 410 and a reload restored it in READY state. This reduces repeated history writes during a drag without changing the settings handoff. Script syntax and diff checks passed. No publication or new listener-evaluation claim.

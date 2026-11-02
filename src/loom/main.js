@@ -37,7 +37,8 @@ for(const key of ['frequency','coupling','detune','loss']){
  $(key).value=settings[key];
  const suffix=key==='frequency'?' Hz':key==='detune'?' cents':key==='loss'?' /s':'';
  $(key+'-value').textContent=settings[key]+suffix;
- $(key).oninput=()=>{quiet();settings[key]=Number($(key).value);study=makeLoom(settings);$('seek').max=study.duration;passage=null;pcm=null;$('save').disabled=true;$(key+'-value').textContent=$(key).value+suffix;history.replaceState(null,'',compositionURL(location.href,{...initialComposition,loom:{...initialComposition.loom,settings}}));};
+ $(key).oninput=()=>{quiet();settings[key]=Number($(key).value);study=makeLoom(settings);$('seek').max=study.duration;passage=null;pcm=null;$('save').disabled=true;$(key+'-value').textContent=$(key).value+suffix;};
+ $(key).onchange=()=>history.replaceState(null,'',compositionURL(location.href,{...initialComposition,loom:{...initialComposition.loom,settings}}));
 }
 $('touch').onclick=()=>{quiet();location.href=touchConnectionHref(settings);};
 $('ensemble').onclick=()=>{quiet();location.href=compositionPageURL(location.href,'stage.html',{...initialComposition,loom:{enabled:true,settings}});};
