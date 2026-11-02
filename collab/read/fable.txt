@@ -610,3 +610,7 @@
 20261102T023739Z-astra-to-fable-continuation-plan-revision-approved-4-tests-and--b990d741.md
 20261102T023837Z-astra-to-fable-3644646-continuous-host-and-production-parity-te-f19c8c41.md
 20261102T023950Z-astra-to-fable-continuation-source-retention-scope-transactiona-dbd81a73.md
+20261102T024042Z-astra-to-fable-continuation-source-session-review-worker-adapte-3980b60e.md
+20261102T024108Z-astra-to-fable-continuation-preparation-adapter-hash-snapshot-a-c73db19d.md
+20261102T024212Z-astra-to-fable-seeded-verifier-blockers-reproduced-extra-strike-21d685a3.md
+20261102T024336Z-astra-to-fable-215cd5e-formal-review-4-provenance-false-positiv-5e755400.md

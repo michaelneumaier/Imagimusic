@@ -103,3 +103,27 @@ test('strict validation: extra keys, a boundary on an aborted opening, an incons
   assert.equal((await verifySeededEnsemble(other, source)).planMatches, false);
   await assert.rejects(seedEnsembleRecord({ source, continuation: { ...structuredClone(wrapper), state: 'waiting' }, ensemble: wrapper.ensemble }), /ended with its handoff/);
 });
+
+test('provenance cannot be padded: an extra same-frame strike, an extra contact before the boundary, a moved boundary, and ledger joins are all caught', async () => {
+  const source = await keepSource(), plan = continuationPlan(source, { sampleRate: 8000 });
+  const { host, until, verify, block } = fixture(); await host.enable([grove, grove, grove]);
+  host.scheduleContinuation(planSteps(plan), { handoffFrame: plan.handoffFrame }); until(() => host.continuation.state === 'completed');
+  host.send(2, { kind: 'strike', body: 2, position: 0, velocity: 0.3 }); block(4); host.quiet(); until(() => host.state === 'ended');
+  const c = structuredClone(host.continuation), ensemble = verify(c.originFrame); host.dispose();
+  const wrapper = await seedEnsembleRecord({ source, continuation: c, ensemble }); assert.equal((await verifySeededEnsemble(wrapper, source)).verified, true);
+  const padded = f => { const w = structuredClone(wrapper); f(w); return w; }, strike0 = wrapper.ensemble.parts[0].record.events[0];
+  const extraStrike = padded(w => { w.ensemble.parts[0].record.events.push({ ...strike0, order: 99, body: 2 }); w.ensemble.parts[0].record.events.sort((a, b) => a.frame - b.frame || a.order - b.order); });
+  assert.match((await verifySeededEnsemble(extraStrike, source)).mismatches.join(' '), /remembered strikes differ/);
+  const extraContact = padded(w => { w.ensemble.parts[1].record.contacts.push({ body: 1, zone: 2, strength: 1, start: 10, end: 20, order: 98 }); });
+  assert.match((await verifySeededEnsemble(extraContact, source)).mismatches.join(' '), /remembered contacts differ/);
+  const maxApplied = Math.max(...wrapper.opening.ledger.map(e => e.appliedFrame));
+  const moved = padded(w => { w.opening.boundaryFrame = maxApplied; }); validateSeededEnsemble(moved);                  // a valid-looking boundary short of the handoff
+  assert.equal((await verifySeededEnsemble(moved, source)).boundaryMatches, false);
+  await assert.rejects(seedEnsembleRecord({ source, continuation: { ...c, ledger: [...c.ledger, c.ledger[0]] }, ensemble }), /decides .* twice/);
+  await assert.rejects(seedEnsembleRecord({ source, continuation: { ...c, ledger: c.ledger.map((e, i) => i ? e : { ...e, part: 2 }) }, ensemble }), /on part 2, not 0/);
+  await assert.rejects(seedEnsembleRecord({ source, continuation: { ...c, ledger: [...c.ledger, { ...c.ledger[0], id: 'gesture-7' }] }, ensemble }), /not in the plan/);
+  await assert.rejects(seedEnsembleRecord({ source, continuation: { ...c, boundaryFrame: c.boundaryFrame + 1 }, ensemble }), /max\(handoff/);
+  const otherGrove = composeGrove({ seed: 4 }), swapped = padded(w => { w.ensemble.parts[0].record.grove = otherGrove; });
+  validateSeededEnsemble(swapped); assert.equal((await verifySeededEnsemble(swapped, source)).instrumentsMatch, false, 'another instrument on part 0 is not the source\'s');
+  await assert.rejects(seedEnsembleRecord({ source, continuation: c, ensemble: swapped.ensemble }), /instrument differs/);
+});
