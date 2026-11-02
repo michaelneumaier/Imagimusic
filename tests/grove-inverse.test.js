@@ -52,13 +52,16 @@ test('bounded intake: topologies unique and at most two, strict nested options, 
   const ok = { version: 1, kind: 'three-resonance', normalFrequenciesHz: [128, 131, 132], decaySeconds: 2.4, provenance: 'authored' };
   assert.throws(() => searchThreeResonanceGroves(ok, { topologies: ['chain', 'chain'] }), /distinct/);
   assert.throws(() => searchThreeResonanceGroves(ok, { topologies: ['chain', 'triangle', 'chain'] }), /at most two/);
+  const sparse = ['chain', , ]; sparse.length = 2; assert.throws(() => searchThreeResonanceGroves(ok, { topologies: sparse }), /distinct names/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { tolerance: { constructor: 2 } }), /unknown field/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { budget: { toString: 2 } }), /unknown field/);
   assert.throws(() => searchThreeResonanceGroves(ok, { tolerance: { cent: 2 } }), /unknown field/);
   assert.throws(() => searchThreeResonanceGroves(ok, { tolerance: [2] }), /must be an object/);
   assert.throws(() => searchThreeResonanceGroves(ok, { budget: null }), /must be an object/);
   assert.throws(() => searchThreeResonanceGroves(ok, { budget: { restarts: '2' } }), /out of range/);
   assert.throws(() => searchThreeResonanceGroves(ok, { mass: '0.02' }), /mass must be a number/);
   assert.throws(() => searchThreeResonanceGroves(ok, []), /options must be an object/);
-  const sparse = { ...ok, normalFrequenciesHz: [128, , 132] }; assert.throws(() => validateInverseTarget(sparse), /finite positive/);
+  const sparseTarget = { ...ok, normalFrequenciesHz: [128, , 132] }; assert.throws(() => validateInverseTarget(sparseTarget), /finite positive/);
   const capped = searchThreeResonanceGroves(ok, { budget: { restarts: 4, iterations: 300, maxEvaluations: 500 }, seed: 2 });
   assert.ok(capped.work.evaluations <= 500 && capped.work.exhausted === true, 'the whole job stops at the cap');
   assert.ok(capped.verdict.includes('exhausted') || capped.verdict.startsWith('accepted'), 'a budget verdict names the exhaustion');
@@ -66,9 +69,10 @@ test('bounded intake: topologies unique and at most two, strict nested options, 
   assert.ok(INVERSE_LIMITS.maxEvaluations >= INVERSE_LIMITS.restarts * INVERSE_LIMITS.iterations, 'the cap is meaningful against one search');
 });
 
-test('impossibility is judged within tolerance, not against the exact ratio: a target just above the exact bound can still be accepted', () => {
+test('impossibility is judged within tolerance, not against the exact ratio: no false impossibility for a target just above the exact bound', () => {
   const source = equalMassGrove(3), s = groveSystem(source), f = s.normalFreqsHz, bound = familyRatioBound();
-  // Stretch the third frequency so the exact ratio exceeds the exact bound by 4 cents while a 10-cent tolerance still leaves it reachable.
+  // Stretch the third frequency so the exact ratio exceeds the exact bound by 4 cents; under a 10-cent tolerance the widened bound is not exceeded, so no
+  // impossibility may be claimed. The bound is conservative, so this does not establish that the target is reachable; acceptance is checked only if it occurs.
   const stretched = [f[0], f[1], f[0] * bound * 2 ** (4 / 1200)];
   const target = { version: 1, kind: 'three-resonance', normalFrequenciesHz: stretched, decaySeconds: s.decayS, provenance: 'seed 3 spectrum with the top mode stretched beyond the exact bound (synthetic)' };
   const report = searchThreeResonanceGroves(target, { topologies: ['triangle'], tolerance: { cents: 10, decayRelative: 0.05 }, budget: { restarts: 3, iterations: 200 }, seed: 11 });

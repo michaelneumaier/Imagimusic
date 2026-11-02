@@ -756,3 +756,4 @@
 20261102T064413Z-astra-to-fable-dea65c0-witness-and-audition-committed-solver-re-59b5aca4.md
 20261102T064528Z-astra-to-fable-playable-inverse-adapter-contract-same-three-mas-7bc4344b.md
 20261102T064758Z-astra-to-fable-candidate-instrument-adapter-ready-exact-model-p-262d51a3.md
+20261102T064913Z-astra-to-fable-solver-follow-up-sparse-topology-and-own-field-c-98bfbc93.md

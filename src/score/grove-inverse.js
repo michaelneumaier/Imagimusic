@@ -86,14 +86,15 @@ export function searchThreeResonanceGroves(targetInput, options = {}) {
   const strict = (value, defaults, name, isValid) => {                                      // a plain object with known numeric fields only; no coercion
     if (value === undefined) return { ...defaults };
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${name} must be an object.`);
-    for (const k of Object.keys(value)) { if (!(k in defaults)) throw new Error(`${name}: unknown field "${k}".`); if (typeof value[k] !== 'number' || !isValid(k, value[k])) throw new Error(`${name}.${k} is out of range.`); }
+    for (const k of Object.keys(value)) { if (!Object.hasOwn(defaults, k)) throw new Error(`${name}: unknown field "${k}".`); if (typeof value[k] !== 'number' || !isValid(k, value[k])) throw new Error(`${name}.${k} is out of range.`); }   // own fields only: inherited names such as constructor are unknown
     return { ...defaults, ...value };
   };
   const tolerance = strict(options.tolerance, INVERSE_DEFAULTS.tolerance, 'tolerance', (k, v) => Number.isFinite(v) && v > 0);
   const budget = strict(options.budget, INVERSE_DEFAULTS.budget, 'budget', (k, v) => Number.isInteger(v) && v >= 1 && v <= INVERSE_LIMITS[k]);
   const seed = options.seed ?? INVERSE_DEFAULTS.seed, mass = options.mass ?? INVERSE_DEFAULTS.mass;
   const topologies = options.topologies === undefined ? [...GROVE_TOPOLOGIES] : options.topologies;
-  if (!Array.isArray(topologies) || !topologies.length || topologies.length > INVERSE_LIMITS.topologies || new Set(topologies).size !== topologies.length || topologies.some(t => !GROVE_TOPOLOGIES.includes(t))) throw new Error('topologies must be a list of at most two distinct names from chain and triangle.');
+  if (!Array.isArray(topologies) || !topologies.length || topologies.length > INVERSE_LIMITS.topologies) throw new Error('topologies must be a list of at most two distinct names from chain and triangle.');
+  for (let i = 0; i < topologies.length; i++) if (!GROVE_TOPOLOGIES.includes(topologies[i]) || topologies.indexOf(topologies[i]) !== i) throw new Error('topologies must be a list of at most two distinct names from chain and triangle.');   // by index: a sparse array cannot pass
   if (typeof mass !== 'number') throw new Error('mass must be a number.');
   if (!Number.isInteger(seed) || seed < 0 || seed > 4294967295) throw new Error('seed must be an integer in 0..4294967295.');
   if (!(mass >= GROVE_BOUNDS.mass[0] && mass <= GROVE_BOUNDS.mass[1])) throw new Error('mass must lie within the Grove bounds.');
