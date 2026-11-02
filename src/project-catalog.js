@@ -12,7 +12,7 @@ const entries=[
  ['Tension Loom','loom.html','Instruments','Playable','Explore coupled resonators and the physical parameters behind their response.'],
  ['FM tensioner','tensioner.html','Instruments','Playable','A visible tension mechanism interprets frequency modulation.'],
  ['Touch. Listen. Answer.','touch.html','Encounters','Playable','An earlier touch-led study of musical gestures and response.'],
- ['Expressive voices','expressive.html','Instruments','Playable','Follow independent changing voices through a visual instrument study.'],
+ ['Expressive voices','expressive.html','Instruments','Playable','Follow a changing chord. “Look closer” holds one selected voice while all remain audible; inspect its iris, bellows and pitch lever. These bodies interpret a synthesizer. Optionally bring a local MIDI 2.0 Clip within the importer’s stated limits; general DAW compatibility is unverified.'],
  ['Grove voices','grove-voices.html','Instruments','Study','Inspect the voice configurations behind the Grove.'],
  ['The Conservatory','stage.html','Composition & keeping','Playable','A shared score, mechanical performers, causal inspection, and local performance rendering.'],
  ['Bring a score','midi.html','Composition & keeping','In progress','Map a local MIDI file to available instruments and inspect the mapping.'],

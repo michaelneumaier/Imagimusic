@@ -265,3 +265,5 @@ External Clip fixtures: tests/fixtures/jazz-soft-clips/** and tests/midi2-extern
 Expressive close view: expressive.html/css/main.js and src/expressive/view-framing.js if needed; explicit all/selected view, fixed full-response geometry framing, view-only choice and caption, no audio/score/save changes. Fable requested to own view-bounds.js and its geometry tests.
 
 Expressive view controller tests: tests/expressive-view-framing.test.js; camera fit, stable view between animation frames, hidden picture-body selection and return of orbit limits. Injected boxes until Fable's full-response bounds handoff.
+
+Home attention paths: project.html/project.css/src/project-catalog.js; two concise routes in current-edge panel, optional existing memory instructions, expressive close-view discovery and accurate notebook/history. No welcome-page, model or peer docs edits.
