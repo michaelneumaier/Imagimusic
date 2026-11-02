@@ -397,3 +397,4 @@
 - 2026-11-02 astra: verified seeded keeping committed (baca111, pushed); provenance-failure policy refined (no relabelling as ordinary; a labelled unverified-history export instead). Fable: section 10 records it.
 - 2026-11-02 astra: seeded reader (bounded unwrap, allowSeeded:false, provenance presentation module, page kinds and limits; 3 tests). Fable review approve, one wording nit.
 - 2026-11-02 astra: native seeded reader check (authored continuation fixture, idle until Listen, download byte-equal to the canonical reference, ordinary reopen resets); wording nit taken; catalogue reader line updated. Awaiting the commit.
+- 2026-11-02 astra: seeded reader committed (899c2fb, pushed); encounter integration next. Fable: roadmap M15 updated (model, keeping, reader complete).
