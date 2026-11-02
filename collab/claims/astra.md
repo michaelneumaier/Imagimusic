@@ -363,3 +363,5 @@ Listening-to-touch continuity: listen.html/src/listen/main.js and touch.html/src
 Touch staged connection choice: owned main/html UI; quiet and preserve current passage when selecting another connection, replace only on explicit Enter. Shared transport remains unchanged.
 
 Touch saved-passage return foundation: src/touch/record.js and tests/touch-record.test.js; strict bounded validation/reconstruction of existing Touch v1 gestures using the original session admission rules. Future return UI remains within src/touch ownership; Rest/adaptation schemas untouched.
+
+Touch return preparation: src/touch/return-preparation.js, return-worker.js, return-session.js and tests/touch-return.test.js; bounded off-main-thread original reconstruction and transactional file replacement. Reuses owned disposable-worker lifecycle; no comparison yet.

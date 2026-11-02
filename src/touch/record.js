@@ -20,7 +20,7 @@ export function rebuildTouchRecord(input){
  if(input.outputGain!==TOUCH_GAIN)fail('the saved output gain is unsupported.');
  integer(input.sampleRate,8000,192000,'sample rate');
  keys(input.settings,['frequency','coupling','detune','loss'],'settings');
- if(!Array.isArray(input.events)||input.events.length<1||input.events.length>TOUCH_MAX_STRIKES)fail(`keep between 1 and ${TOUCH_MAX_STRIKES,TOUCH_MAX_SECONDS} gestures.`);
+ if(!Array.isArray(input.events)||input.events.length<1||input.events.length>TOUCH_MAX_STRIKES)fail(`keep between 1 and ${TOUCH_MAX_STRIKES} gestures.`);
  const session=createTouchSession(input.settings,input.sampleRate);
  for(const event of input.events){
   keys(event,['frame','body','velocity'],'gesture');
