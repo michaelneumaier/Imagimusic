@@ -71,3 +71,54 @@ source-start offset; unprocessed edges distinct from refused; deterministic
 release/explicit-event ordering; late applied edges remain saveable with honest
 verification; boundary includes refused as well as accepted applied frames.
 A partial opening with no effective gesture yields no invented ordinary record.
+
+## Host continuation implementation — 2026-11-02
+
+The working host now exposes scheduleContinuation(steps,{handoffFrame}) with
+integer source-relative offsets. It validates the whole ≤32-edge/20-second
+plan before posting, requires at least one strike, forbids Quiet in the plan,
+and schedules all parts from one35ms audio-clock base. It does not call or
+change the demonstration scheduler. A cloned continuation getter exposes the
+absolute plan, base, common captured origin and barrier snapshot for later
+keeping adapters; no saved wrapper is produced here.
+
+Processed decisions feed the barrier, state snapshots supply its observed
+clock, and completion emits onChange even without a playing-state transition.
+Ordinary input is refused during waiting/aborted openings; after handoff its
+requested frame is clamped strictly beyond the boundary. Quiet aborts before
+posting and delayed already-processed decisions remain accounted. Finished
+metadata survives park and failed mounting, including restoring its common
+origin when a node creation fails. A successful fresh mount or dispose clears
+it. No live page invokes the new scheduler yet.
+
+Twenty focused host/barrier tests pass. Two additional tests use the actual
+production processor plus host with mocked Web Audio plumbing: a remembered
+strike/contact/release and later personal answer stay in one capture, whose
+Float32 reconstruction equals every captured processor sample; early Quiet
+preserves the accepted partial opening, closes its contact at the actual ending,
+records a later release refusal and likewise reconstructs exactly. These are
+processor computation/capture tests at8kHz, not browser or output-loopback tests.
+
+Fable's generator is being revised to continuationPlan(source,{sampleRate})
+returning a frozen {steps,handoffFrame,sampleRate}. An independent check against
+the authored demonstration confirms the five planned gesture edges match the
+score minus Quiet and preserve the source, with handoff at the source ending.
+The first self-contained generator test revision had one invalid event-order
+fixture; Fable was notified and final review awaits its corrected run.
+
+The corrected generator is committed as b9a354e. Four self-contained tests pass
+in Astra's rerun; formal approval:
+collab/reviews/20261102T0238Z-astra-reviews-continuation-generator.md.
+Fable approved the host integration and both production-processor tests in
+collab/reviews/20261102T0236Z-fable-reviews-continuation-host.md and reports the
+full suite at518/518. Astra's direct scope is22 host/barrier/processor tests plus
+four generator tests and the independent authored-command comparison.
+
+Section8 wrapper semantics are approved for Fable to implement: signed
+source-start/ledger/boundary offsets, every expected edge including explicit
+unprocessed null triples, effective defined by an accepted strike or non-null
+contact set, and honest partial/timing-change reports with input snapshots
+across async hashing. An aborted handoff should be described as “Stopped before
+your turn” rather than always “opening cut short”: all remembered gestures can
+already have applied while the clock observation is still in transit. Ledger
+content determines whether the remembered material was actually incomplete.

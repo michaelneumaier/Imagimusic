@@ -72,3 +72,57 @@ test('opening validates the entire score before posting and cannot enter a perso
  for(const steps of [[],opening.slice(0,-1),[...opening,{part:2,time:4,command:{kind:'strike',body:0,position:0,velocity:.5}}],opening.map((s,i)=>i===1?{...s,part:9}:s),opening.map((s,i)=>i===1?{...s,time:NaN}:s),opening.map((s,i)=>i===2?{...s,time:21}:s)])assert.equal(host.scheduleOpening(steps).reason,'invalid-opening');
  assert.equal(nodes[0].sent.length,0);host.send(2,{kind:'strike',body:0,position:0,velocity:.5});assert.equal(host.state,'ready');assert.equal(host.scheduleOpening(opening).reason,'not-fresh');assert.equal(nodes[0].sent.length,1);host.dispose();
 });
+
+const continuationSteps=[
+ {part:2,frame:0,command:{kind:'strike',body:0,position:0,velocity:.25}},
+ {part:1,frame:50,command:{kind:'strike',body:0,position:0,velocity:.25}},
+ {part:0,frame:100,command:{kind:'strike',body:0,position:0,velocity:.25}}
+];
+function continuationDriver(node){
+ const generation=node.options.processorOptions.generation,orders=[0,0,0];
+ const emit=data=>node.port.onmessage({data:{generation,...data}});
+ const processed=(part,events)=>emit({type:'processed',part,events:events.map(event=>({id:event.id,event,order:orders[part]++,requestedFrame:event.frame,appliedFrame:event.frame,lateByFrames:0,accepted:true}))});
+ return {processed,clock:frame=>emit({type:'state',frame,parts:[0,1,2].map(part=>({part}))}),finish:(end,origin)=>{
+  const ended={frame:end,fadeFrames:8};
+  for(let part=0;part<3;part++)processed(part,[{id:'end-'+part,kind:'quiet',frame:end,fadeFrames:8}]);
+  emit({type:'finished',frame:end+8,ended,origin,parts:orders.map((accepted,part)=>({part,accepted,refused:0,ended}))});
+ }};
+}
+test('continuation hands off only after all voice decisions and processor time, then clamps new input after the boundary',async()=>{
+ const {host,nodes}=fixture();await host.enable(groves);
+ const result=host.scheduleContinuation(continuationSteps,{handoffFrame:800});assert.equal(result.handoffFrame,9080);
+ const driver=continuationDriver(nodes[0]);
+ driver.clock(9200);driver.processed(0,nodes[0].sent[0].events);
+ assert.equal(host.send(0,continuationSteps[0].command).reason,'continuation');
+ driver.processed(1,nodes[0].sent[1].events);driver.processed(2,nodes[0].sent[2].events);
+ assert.equal(host.continuation.state,'completed');assert.equal(host.continuation.boundaryFrame,9080);assert.equal(host.continuation.originFrame,8280);
+ assert.equal(host.send(0,continuationSteps[0].command).queued,true);
+ assert.equal(nodes[0].sent.at(-1).events[0].frame,9081,'fake context clock behind barrier cannot schedule personal input inside the opening');
+ const snapshot=host.continuation;snapshot.steps[0].command.velocity=1;snapshot.ledger[0].appliedFrame=0;
+ assert.equal(host.continuation.steps[0].command.velocity,.25);assert.notEqual(host.continuation.ledger[0].appliedFrame,0);host.dispose();assert.equal(host.continuation,null);
+});
+test('continuation Quiet aborts handoff while retaining delayed accepted decisions and no ordinary input slips in',async()=>{
+ const {host,nodes}=fixture();await host.enable(groves);host.scheduleContinuation(continuationSteps,{handoffFrame:800});
+ const scheduled=nodes[0].sent.slice(),driver=continuationDriver(nodes[0]);assert.equal(host.quiet().queued,true);
+ scheduled.forEach(m=>driver.processed(m.part,m.events));driver.clock(9200);
+ assert.equal(host.continuation.state,'aborted');assert.equal(host.continuation.acknowledged,3);assert.equal('boundaryFrame' in host.continuation,false);
+ assert.equal(host.send(0,continuationSteps[0].command).reason,'continuation');host.park();assert.equal(host.continuation,null);host.dispose();
+});
+test('continuation validates the complete plan before posting and cannot mix with demonstration scheduling',async()=>{
+ const {host,nodes}=fixture();await host.enable(groves);
+ for(const steps of [[],[...continuationSteps,{part:0,frame:200,command:{kind:'quiet',fadeFrames:8}}],[...continuationSteps].reverse(),continuationSteps.map((s,i)=>i? s:{...s,frame:.5}),continuationSteps.map(s=>({...s,part:99}))])assert.equal(host.scheduleContinuation(steps,{handoffFrame:800}).reason,'invalid-continuation');
+ assert.equal(host.scheduleContinuation(continuationSteps,{handoffFrame:160001}).reason,'invalid-continuation');assert.equal(nodes[0].sent.length,0);
+ host.scheduleContinuation(continuationSteps,{handoffFrame:800});assert.equal(host.scheduleOpening(opening).reason,'not-fresh');assert.equal(host.scheduleContinuation(continuationSteps,{handoffFrame:800}).reason,'not-fresh');host.dispose();
+});
+test('completed continuation metadata survives parking and failed mounting, then clears on successful fresh mount',async()=>{
+ let count=0;const nodes=[],contexts=[];
+ const {host}=fixture({createNode:(context,options)=>{
+  contexts.push(context);if(count++===1)throw new Error('mount failed');
+  const node={options,sent:[],port:{postMessage:m=>node.sent.push(m),close(){}},connect(){},disconnect(){}};nodes.push(node);return node;
+ }});
+ await host.enable(groves);host.scheduleContinuation(continuationSteps,{handoffFrame:800});const driver=continuationDriver(nodes[0]);
+ nodes[0].sent.forEach(m=>driver.processed(m.part,m.events));driver.clock(9200);driver.finish(9300,8280);
+ const before=host.continuation,record=host.recording();host.park();assert.deepEqual(host.continuation,before);
+ await assert.rejects(host.enable(groves),/mount failed/);assert.deepEqual(host.recording(),record);assert.deepEqual(host.continuation,before);
+ await host.enable(groves);assert.equal(host.continuation,null);assert.equal(host.hasRecording,false);host.dispose();
+});
