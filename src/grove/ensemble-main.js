@@ -1,3 +1,4 @@
+import {Box3} from '../../vendor/three/build/three.module.js';
 import {createEnsembleContinuationSource} from './ensemble-continuation-source.js';
 import {createEnsembleContinuationKeepSession} from './ensemble-continuation-keep-session.js';
 import {createEnsembleReturnSession} from './ensemble-return-session.js';
@@ -195,5 +196,28 @@ function park(){operation++;cancelContinuation();sourceSoundController?.abort();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});
 window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAnimationFrame(animation);holdControls.forEach(control=>control.dispose());host.dispose();replay.dispose();returnSession.dispose();continuationSource.dispose();continuationKeep.dispose();scenes.forEach(scene=>scene.dispose());world?.dispose();}});
 try{world=createGroveWorld($('world'));world.controls.enabled=false;scenes=groves.map((grove,i)=>{const scene=createGroveScene(grove);scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);world.scene.add(scene.root);return scene;});world.camera.position.set(0,3.7,10.8);world.camera.lookAt(0,1.4,0);}catch{$('world').hidden=true;$('picture-note').textContent='The 3D view is unavailable. Labelled controls and sound are still available.';}
+const widePictureNote=$('picture-note').textContent;
+const viewNames=['C','E-flat','G'];
+function chooseView(part){
+ if(!world)return;
+ try{
+ if(part===null){world.setFocus(null);scenes.forEach(scene=>scene.root.visible=true);$('picture-note').textContent=widePictureNote;}
+ else{
+  const bounds=new Box3().setFromObject(scenes[part].root);
+  // Keep space for the existing amplified shell response and gesture marks.
+  bounds.expandByScalar(.12);world.setFocus(bounds);
+  scenes.forEach((scene,i)=>scene.root.visible=i===part);
+  $('picture-note').textContent=`${viewNames[part]}, close. ${viewNames.filter((_,i)=>i!==part).join(' and ')} are hidden from this view; all three remain audible. Internal connections belong to this Grove only.`;
+ }
+ $('view-caption').hidden=part===null;
+ $('view-caption').textContent=part===null?'':`Looking at ${viewNames[part]}. All three voices remain audible.`;
+ $('world').dataset.close=String(part!==null);
+ $('world').setAttribute('aria-label',part===null?'Three separate Groves: C, E-flat and G':`Close view of ${viewNames[part]}; all three Groves remain audible`);
+ $('view-together').setAttribute('aria-pressed',String(part===null));
+ viewNames.forEach((_,i)=>$('view-'+i).setAttribute('aria-pressed',String(part===i)));
+ const arrival=part===null?$('world'):$('view-caption');arrival.focus({preventScroll:true});arrival.scrollIntoView({block:'start',behavior:'instant'});
+ }catch(error){$('picture-note').textContent='The close view could not open: '+error.message;}
+}
+if(world&&scenes.length===3&&!$('world').hidden){$('view-choices').hidden=false;$('view-together').onclick=()=>chooseView(null);viewNames.forEach((_,i)=>$('view-'+i).onclick=()=>chooseView(i));}
 function draw(){if(world&&!document.hidden){const frames=host.visual();scenes.forEach((scene,i)=>{const frame=frames[i],recipe=host.recipes?.[i],contacts=frame.contacts??[];applyGroveScene(scene,{...frame,...(reduced.matches?{envelope:[]}: {})},groves[i].bodies.map((_,b)=>contacts[b]?contacts[b].strength===1?1:.4:0),groves[i].bodies.map((_,b)=>contacts[b]?recipe?.zones[contacts[b].zone]:undefined));});world.render();}animation=requestAnimationFrame(draw);}
 sync();draw();

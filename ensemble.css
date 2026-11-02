@@ -8,3 +8,9 @@ main{max-width:900px}header{align-items:center;margin-bottom:25px}header span{fo
 @media(max-width:600px){#encounter-actions{display:grid;grid-template-columns:1fr 1fr}#encounter-actions #demonstration{grid-column:1 / -1}#encounter-actions button{min-width:0;min-height:44px}}
 
 @media(max-width:600px){#status{scroll-margin-top:150px}}
+
+.view-choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.view-choices button{min-height:44px;padding:10px 14px}.view-choices button[aria-pressed=true]{background:#455b52;border-color:#d1e5cf}
+
+@media(max-width:600px){#world[data-close=true]{height:240px}}
+
+@media(max-width:600px){#view-caption,#world{scroll-margin-top:130px}}
