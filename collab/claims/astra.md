@@ -341,3 +341,5 @@ Inverse repeat-search encounter: inverse.html/src/inverse/main.js, later evidenc
 Inverse original-anatomy return: inverse.html/src/inverse/main.js and own evidence note; explicit silent preparation from retained original record while preserving displayed discoveries, original-target fit labeling and existing capture/replay gates.
 
 Inverse encounter hierarchy: inverse.html/inverse.css and own evidence note; candidate-first results, secondary repeat-search action, grouped phrase-making versus saving/forgetting and optional record detail. No runtime state changes or new presentation mode.
+
+Home/catalog explore-and-return copy and bounded entry review: project.html, src/project-catalog.js; welcome.html/listen.html/expressive.html stage-link labels aligned with The Conservatory, preserving Three Groves as the separate playable ensemble.
