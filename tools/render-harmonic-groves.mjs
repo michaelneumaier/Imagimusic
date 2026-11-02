@@ -40,7 +40,7 @@ for(const [name,notes] of [['shared-center',[48,48,48]],['three-centers',[48,51,
 }
 await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 await fs.writeFile(path.join(out,'index.html'),openPhrasePlayer({
- title:'Three Groves',playLinkLabel:'Play a single Grove ↗',
+ title:'Three Groves',listeningDb:20,listeningKey:'imagimusic-ensemble-listening-db',playLinkLabel:'Play a single Grove ↗',
  intro:'The same gestures, on three separate instruments. Hear them share a pitch center, then hear their centers spread into C, E-flat and G.',
  question:'Does a harmonic outline give the bodies a stronger identity? What do you miss from the shared center?',
  disclosure:'Authored ensemble study. Each Grove keeps its close internal tuning; the three Groves are independent. Their outputs share a fixed one-third mix gain. No playback-rate shift or loudness normalization. C, E-flat and G name the nominal tuning centers. No listening verdict.',

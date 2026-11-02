@@ -181,3 +181,5 @@ Pulse/adaptation listening configuration: pulse.html/adapt.html and their main m
 Powered listening integration: powered-host.js, powered-main.js, powered.html and powered-host tests. Same optional stage lifecycle and18dB shared live/replay control.
 
 Ordinary Grove listening: src/touch/transport.js (optional downstream stage, default bypass), tests/touch-transport.test.js, src/grove/main.js and grove.html. Paired live/replay control; saved sound/film unchanged.
+
+Generated study listening: tools/open-phrase-player.mjs, tools/render-harmonic-groves.mjs, src/grove/media-listening.js and tests/media-listening.test.js. One media source and downstream stage shared across examples; canonical WAVs unchanged.

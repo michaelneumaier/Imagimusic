@@ -130,3 +130,33 @@ At the revised +12 dB default Safari also prepared, accepted a 650 ms A hold,
 finished on Escape and reached LISTENING BACK then settled with Quiet disabled.
 Fable confirmed the revised configuration in message
 20261102T011319Z-fable-to-astra-grove-configuration-confirmed-7c14e1a-12-db-live-719e5590.md.
+
+
+## Generated listening studies
+
+The shared openPhrasePlayer now uses one media-element source and the reviewed
+listening stage. Both Rest phrase studies default to +18 dB on the Rest key;
+the harmonic study defaults to +20 dB on the ensemble key. All examples within
+a comparison share one stage. Preparing the graph happens only on explicit
+selection. The media source survives stage-connection failure so retry does
+not attach the same element twice. Three adapter tests cover reuse, failure
+cleanup/retry and pause during pending resume without a deferred play call.
+
+All three studies were regenerated. Sixteen WAVs, including harmonic parts,
+match their prior SHA-256 hashes exactly. Ten selectable examples have zero
+samples above 0.95 at their default gain (phrase peak0.1788984; harmonic peaks
+0.1330566/0.1458740). These are decoded PCM sample checks, not a device-output
+or perceived-loudness measurement. Report:
+renders/listening-level/study-player-verification.json.
+
+Native Safari: all three pages initialize without playback; explicit selection
+starts the media player. Rapid timing-study and harmonic-study switching leaves
+only the latest example selected. Volume changes update the readout; the tested
+Rest preference was restored to18, and the recurrence page restored that value.
+The harmonic page correctly restored the existing ensemble preference10 rather
+than overwriting it with default20. Navigation during recurrence playback and
+Back returned a fresh idle page with no autoplay (not a retained bfcache test).
+
+Fable review approves with no findings:
+collab/reviews/20261102T0116Z-fable-reviews-study-listening-player.md.
+Original WAVs remain the canonical files. Media controls are browser-provided.
