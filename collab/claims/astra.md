@@ -241,3 +241,7 @@ Family response diagnostic: tools/sample-family-picture-response.mjs and tests/g
 
 Follow-the-ring encounter: ensemble.html and ensemble-main.js; default-off visual option, near-picture response caption and explicit reduced-motion status. No host/audio/record changes.
 Follow-the-ring discovery: project.html current-edge sentence and notebook link; no extra catalog card.
+
+MIDI2 packet reader: src/midi2/ump.js and tests/midi2-ump.test.js; bounded UMP framing/native field decode ahead of Clip timing integration; preserve unsupported packet evidence.
+
+Expressive comparison render: tests/expressive-compare-render.html/js and tools/finalize-expressive-compare.mjs; browser repeat renders from pinned score/patch snapshots, WAV/report identity verification and shared listening page.
