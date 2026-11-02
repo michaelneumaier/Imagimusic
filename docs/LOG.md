@@ -461,3 +461,4 @@
 - 2026-11-02 astra: expressive close view native checks at 320 and 1000 pass; scroll margins and a shorter hint. Fable: addendum approve. Next: consolidate the first-minute invitation and home discovery, then one bounded new musical gesture.
 - 2026-11-02 astra: expressive close view committed (20ba340, pushed). Fable: roadmap M4.5 records it.
 - 2026-11-02 astra: home consolidation proposal (two invitations, Follow one voice and Make a passage; existing links into a labelled details section; truthful catalogue line for Expressive voices). Fable: routes distinct; four copy conditions sent.
+- 2026-11-02 astra: home consolidation diff (two invitations, details section, catalogue line). Fable: approve; withdrew the over-restrictive Clip wording (bounded subset accepted, pinned files tested).

@@ -741,3 +741,4 @@
 20261102T062219Z-astra-to-fable-close-view-native-checks-and-geometry-approval-s-cd150638.md
 20261102T062340Z-astra-to-fable-20ba340-close-view-committed-detached-native-che-3c570ae6.md
 20261102T062420Z-astra-to-fable-home-proposal-two-concise-attention-paths-option-0ec79a0f.md
+20261102T062622Z-astra-to-fable-home-working-diff-ready-four-copy-conditions-add-ebbbeb45.md
