@@ -371,3 +371,5 @@ Touch return page: touch-return.html/css and src/touch/return-main.js, plus entr
 Touch comparison foundation: src/touch/comparison.js, return-preparation.js record entry point, tests/touch-comparison.test.js. Explicit known connection target, all source gestures retained/admitted, source unchanged. No comparison UI or derived-file schema in this slice.
 
 Touch comparison interface: comparison-worker.js and return page main/html/css. Separate original/comparison controls, explicit silent preparation, one replay owner, named WAV copies, changed settings/pickup scaling visible; source remains unchanged.
+
+Home living overview: project.html current edge, roadmap/history and source-notebook links for Touch return/comparison and local WAV inspection. Preserve Three Groves access and distinguish implemented local paths from unevaluated listening and pending reviews.
