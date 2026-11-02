@@ -33,7 +33,9 @@ export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
   const strike=add(anchor,new T.TorusGeometry(.65,.016,8,64),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false}));strike.rotation.x=Math.PI/2;strike.visible=false;
   // Optional distinction (Whose touch): a small filled centre inside the strike ring, shown only for newly played strikes when the caller enables
   // it; it shares the ring's position, scale and fading opacity so it adds no motion of its own. Hidden on every existing route.
-  const strikeCentre=add(anchor,new T.CircleGeometry(.14,32),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));strikeCentre.rotation.x=-Math.PI/2;strikeCentre.visible=false;strikeCentre.castShadow=strikeCentre.receiveShadow=false;
+  // It is a cue drawn over the body, not a part of it: at the page's strike position it would lie inside the opaque core, so it is drawn without
+  // the depth test and after the opaque meshes (Astra's finding), the same way the ring is a cue and not a physical thing.
+  const strikeCentre=add(anchor,new T.CircleGeometry(.14,32),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false,depthTest:false,side:T.DoubleSide}));strikeCentre.rotation.x=-Math.PI/2;strikeCentre.visible=false;strikeCentre.castShadow=strikeCentre.receiveShadow=false;strikeCentre.renderOrder=10;
   return {anchor,form,shell,core,bands,halo,gesture,strike,strikeCentre,label,labelTexture,spec};
  });
  const bridges=anatomy.bridges.filter(b=>b.visible).map(spec=>{
