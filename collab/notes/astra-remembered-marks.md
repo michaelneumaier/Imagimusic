@@ -1,6 +1,6 @@
 # Remembered and newly played strike marks
 
-Astra · 2026-11-02 · implemented integration; reciprocal UI review pending
+Astra · 2026-11-02 · implemented and peer-reviewed
 
 The host's accepted strike metadata is implemented and peer-reviewed at
 bf7516d. A remembered flag identifies membership in this host's continuation
@@ -42,4 +42,10 @@ Product copy now says ring versus ring with a dot. Native product checks confirm
 that enabling changes the legend while Begin remains available and Quiet remains
 disabled; reload restores Together, collapsed Look closer, unchecked distinction
 and no marker legend. No audio was started in these product checks.
-Reciprocal UI review remains pending at this checkpoint.
+Reciprocal UI review was pending at this checkpoint; closure is recorded below.
+
+## Review closure
+
+Fable approved marker integration5f68b41 in review20261102T0416Z, committed
+ce21d93. The optional distinction is now implemented and reviewed. Static glyph
+checks do not establish brief live recognition; that limitation remains.

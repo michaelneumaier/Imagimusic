@@ -23,6 +23,7 @@ const entries=[
  ['Repeated adaptation','adaptation-audition.html','Listening studies','Study','Explore the bounded adaptation comparison and its declared conditions.'],
  ['Room for an answer','renders/open-phrase-study/index.html','Listening studies','Rendered study','The same opening with a neighboring answer at three different delays. Optional private listening notes.'],
  ['One more return','renders/open-phrase-recurrence/index.html','Listening studies','Rendered study','Compare one and two cycles of the opening, alone and with the same delayed answer.'],
+ ['One Grove, three bodies','renders/ensemble-body-study/index.html','Listening studies','Rendered study','Compare the same strike on each connected body of C, then on two bodies together. Four authored offline examples preserve the instrument page’s mix and relative levels.'],
  ['A memory, then an answer','renders/ensemble-continuation-study/index.html','Listening studies','Rendered study','Compare an authored passage with its remembered opening and an authored G response. Same instruments and playable gestures; original and continued examples are rendered offline.'],
  ['A passage returns','renders/ensemble-return-study/index.html','Listening studies','Rendered study','An authored passage and its derived return: identical gesture timing carried by different voices, with a shared listening level.'],
  ['Three Groves','renders/harmonic-groves/index.html','Listening studies','Rendered study','Three intact instruments: a shared pitch center versus C–E♭–G, with matched gestures and a fixed mix.']
