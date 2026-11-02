@@ -82,3 +82,29 @@ a83589be256d67e7908e9a65ef140506772b57307d0e7a47a5cd82bbd3dfaeea.
 Channel hashes and process snapshots are preserved in ensemble-48k-report.json.
 The earlier 15.75-second ad-hoc run included canonicalization after rendering;
 do not compare those durations as repeated measurements of the same scope.
+
+## Mix-only prototype (not yet integrated)
+
+Astra-owned src/grove/ensemble-mix.js uses the existing validated recipes and
+public Rest engine. It precomputes contact keys at boundaries, applies saved
+strikes in their original order, and preserves both Float32 roundings around
+the fade before summing parts in Float64. No engine or canonical model files
+were changed by Astra. Only final output channels have passage-length storage.
+
+Four focused tests compare to renderEnsembleRecord for one/three partials,
+simultaneous strikes, contact boundary changes, silent parts with contacts,
+one-frame and one-second fades, input preservation and invalid identity.
+All pass. Full 120.025-second / 48 kHz output has exactly the same two channel
+hashes and canonical record hash as the reference run. Reproduce with:
+
+```sh
+node tools/measure-ensemble-return.mjs 48000 renders/ensemble-long-return mix
+```
+
+Retained PCM is 46,089,600 bytes instead of 184,358,400: a 75% reduction in
+those arrays, not a claim about total process peak memory. This prototype's
+measured Node render took 28.04 seconds versus the earlier reference run's
+12.25 seconds. They were separate runs, not a controlled timing benchmark;
+the result does not justify a speed improvement claim. The time/memory tradeoff
+and browser responsiveness need evaluation before integrating it. Fable review
+requested; no response or public reader limit change claimed yet.

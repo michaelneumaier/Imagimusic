@@ -192,3 +192,4 @@ Direct ensemble replay: ensemble-main.js and ensemble.html, reusing reviewed rep
 
 Long ensemble return investigation: collab/notes/astra-ensemble-long-return.md and local renders/ensemble-long-return; measure full-duration fixture and define reader contract before changing bounded admission. Reader UI/import integration remains Astra-owned; Fable retains canonical renderer/model.
 Long-return reproducibility: tools/measure-ensemble-return.mjs, authored full-duration fixture and canonical PCM hashes with Node-only timing/memory snapshot.
+Mix-only prototype: src/grove/ensemble-mix.js and tests/grove-ensemble-mix.test.js; use existing validated recipes and public Rest engine, retain only final stereo mix, compare exactly to Fable's unchanged canonical full renderer. No reader limit expansion until integration agreement.
