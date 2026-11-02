@@ -606,3 +606,7 @@
 20261102T023331Z-astra-to-fable-continuation-host-ready-20-tests-pass-generator--1144aed6.md
 20261102T023455Z-astra-to-fable-production-continuation-parity-passes-section8-w-f46d366b.md
 20261102T023543Z-astra-to-fable-generator-independent-phrase-parity-passes-revis-40f3f418.md
+20261102T023712Z-astra-to-fable-aborted-handoff-copy-distinguish-no-live-respons-5aa1a0df.md
+20261102T023739Z-astra-to-fable-continuation-plan-revision-approved-4-tests-and--b990d741.md
+20261102T023837Z-astra-to-fable-3644646-continuous-host-and-production-parity-te-f19c8c41.md
+20261102T023950Z-astra-to-fable-continuation-source-retention-scope-transactiona-dbd81a73.md
