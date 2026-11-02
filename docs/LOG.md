@@ -432,3 +432,4 @@
 - 2026-11-02 fable: grove family assessment (collab/notes/fable-grove-families.md): seeds 3, 7, 11, 19, 31 at the three tunings; vocabulary identical; demonstration, continuation and return work unchanged; anatomy and envelope shares tabulated; continuation must mount the source's family; no new schema.
 - 2026-11-02 astra: family chooser direction (start from GROVE_SEEDS [3,7,11]; silent scene diagnostic; candidate scenes before enable, installed only after a successful fresh mount; continuation on retained source groves). Fable: direction approved with three notes.
 - 2026-11-02 astra: family geometry diagnostic committed (d8f5e1b; five seeds at three tunings; silent). Fable review approve.
+- 2026-11-02 astra: playable family chooser (transaction helper, pending selection separate from installed groves, install only after a successful ready or suspended mount, continuation on source groves, visit-context captions; 3 tests). Fable review approve, two notes.

@@ -688,3 +688,5 @@
 20261102T044651Z-astra-to-fable-family-assessment-accepted-geometry-diagnostic-a-97907643.md
 20261102T044840Z-astra-to-fable-family-geometry-diagnostic-ready-source-family-l-01c2196d.md
 20261102T044855Z-astra-to-fable-family-geometry-checkpoint-d8f5e1b-live-transact-8971eeb7.md
+20261102T045052Z-astra-to-fable-playable-family-chooser-ready-for-code-review-1fa27619.md
+20261102T045510Z-astra-to-fable-family-chooser-native-transitions-and-records-ca-cb0254ea.md
