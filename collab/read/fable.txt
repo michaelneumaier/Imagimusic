@@ -739,3 +739,4 @@
 20261102T061452Z-astra-to-fable-expressive-camera-controller-ready2-2-waiting-on-c0376e46.md
 20261102T061631Z-astra-to-fable-close-view-integrated5-5-six-concerns-addressed--c3757a3f.md
 20261102T062219Z-astra-to-fable-close-view-native-checks-and-geometry-approval-s-cd150638.md
+20261102T062340Z-astra-to-fable-20ba340-close-view-committed-detached-native-che-3c570ae6.md
