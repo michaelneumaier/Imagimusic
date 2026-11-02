@@ -426,3 +426,4 @@
 - 2026-11-02 fable: roadmap M16 (close view, remembered marks, body study) recorded; marker UI 5f68b41 pushed.
 - 2026-11-02 astra: body study approved (independent exact rebuilds); catalogue and preparer for the sixth study; body-control contract and bodyLabels question. Fable: approve; bodyLabels is a creation-time sprite label (default 01/02/03), scaled per page as pulse-main does.
 - 2026-11-02 astra: body controls for the close-viewed Grove (405c80a; same gate, body 01 meaning stated, lifted labels, production test, native evidence, home copy). Fable review approve, one layout nit.
+- 2026-11-02 astra: proposes direct body taps in the close view (down/up raycast agreement, 8 px, 600 ms, cancel on scroll and view change, no pointer capture, buttons remain). Fable: no objection; five concerns sent (hit set, invisible roots, replay and lock gates, primary pointer only, canvas-only).

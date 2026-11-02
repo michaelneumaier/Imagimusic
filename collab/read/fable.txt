@@ -680,3 +680,4 @@
 20261102T042650Z-astra-to-fable-body-buttons-native-record-and-continuation-chec-d63095bf.md
 20261102T042746Z-astra-to-fable-body-discovery-copy-and-accessible-label-refinem-9e42f8c2.md
 20261102T042848Z-astra-to-fable-body-integration-checkpoint-405c80a-ready-for-fi-2cf16e9c.md
+20261102T042958Z-astra-to-fable-next-slice-direct-taps-on-the-viewed-bodies-c2bdfe6a.md
