@@ -32,7 +32,7 @@ export function prepareTouchHistory(input,{hz=60}={}){
   if(strikes.has(time))points.push({time,side:'before',envelope:session.visual(time-TOUCH_HISTORY_BEFORE_SECONDS).envelope});
   points.push({time,side:'at',envelope:session.visual(time).envelope});
  }
- return {record,duration,frames,hz,beforeProbeSeconds:TOUCH_HISTORY_BEFORE_SECONDS,
+ return {record,duration,frames,hz,pickupScale:session.units[0].pickupScale,beforeProbeSeconds:TOUCH_HISTORY_BEFORE_SECONDS,
   averaged:session.visual(0).averaged,points,
   gestures:record.events.map((event,index)=>({...event,index,time:event.frame/rate,withinOutput:event.frame<frames}))};
 }

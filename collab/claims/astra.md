@@ -387,3 +387,5 @@ Passage-history sampling study: tools/audit-touch-history-sampling.mjs and colla
 Touch history foundation: src/touch/history.js, history-worker.js, tests/touch-history.test.js. Bounded deterministic full-passage visual-envelope history, exact gesture metadata and split strike boundaries; independent worker, no production page integration yet.
 
 Touch history diagnostic: tests/touch-history-diagnostic.html/js and history-worker.js text input adapter. Silent real-worker view with explicit fixed scale, exact gesture list and bounded file intake; no production link yet.
+
+Touch history comparison: src/touch/history-comparison.js, history-comparison-worker.js, tests/touch-history-comparison.test.js, and owned diagnostic UI. Shared duration/ceiling, explicit settings/pickup scaling, original retained; no audio or production integration.
