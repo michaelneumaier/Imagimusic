@@ -5,6 +5,7 @@ import {createCandidateDiagram} from './candidate-diagram.js';
 import {readInverseFile} from './read-file.js';
 import {keepInverseCandidate,canonicalInverseCandidate} from '../score/grove-inverse-kept.js';
 import {createInverseTransport} from './transport.js';
+import {INVERSE_SHARED_GESTURE_EVENTS as sharedGesture} from '../score/grove-inverse-gesture.js';
 const $=id=>document.getElementById(id),jobs=createInverseJobs();
 const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
@@ -15,9 +16,10 @@ let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function restore(){example.slice(0,3).forEach((f,i)=>$('f'+i).value=f);$('decay').value=example[3];$('base').value='48';}
 restore();
-function state(){return transport?transport.snapshot():{active:0,strikes:[]};}
+function state(){return transport?transport.snapshot():{active:0,pending:0,strikes:[]};}
+function occupied(snapshot=state()){return snapshot.active+snapshot.pending>0;}
 function controls(snapshot=state()){
- const ringing=snapshot.active>0;
+ const ringing=occupied(snapshot);
  $('open-instrument').disabled=busy||ringing;
  $('search').disabled=busy||ringing;$('example').disabled=busy;
  $('cancel').hidden=!busy;
@@ -25,8 +27,9 @@ function controls(snapshot=state()){
  $('listen').textContent=armed&&context?.state==='running'?'Listening enabled':'Start listening';
  candidateButtons.forEach(button=>button.disabled=busy||ringing);
  bodyButtons.forEach(button=>button.disabled=busy||!instrument||!armed||context?.state!=='running');
+ $('hear-gesture').disabled=busy||ringing||!instrument||!armed||context?.state!=='running';
  $('repeat-touch').disabled=busy||!lastTouch||!instrument||!armed||context?.state!=='running';
- $('ring-count').textContent=ringing?`${snapshot.active} / 8 strikes ringing`:'Silent';
+ $('ring-count').textContent=ringing?`${snapshot.active} ringing${snapshot.pending?` · ${snapshot.pending} upcoming`:''} / 8 touches`:'Silent';
 }
 function cancel(message='Preparation cancelled. Previous results and instrument retained.'){
  generation++;fileRead?.abort();fileRead=null;jobs.cancel();busy=false;$('status').textContent=message;controls();
@@ -41,7 +44,7 @@ $('listening-level').oninput=()=>{
 $('quiet').onclick=()=>{transport?.quiet();$('gesture').textContent='Quiet. You can choose another anatomy.';controls();};
 $('example').onclick=restore;
 $('search-form').onsubmit=async event=>{
- event.preventDefault();if(busy||state().active)return;
+ event.preventDefault();if(busy||occupied())return;
  const values=[0,1,2].map(i=>Number($('f'+i).value)),decay=Number($('decay').value);
  const original=values.every((f,i)=>f===example[i])&&decay===example[3];
  const target={version:1,kind:'three-resonance',normalFrequenciesHz:values,decaySeconds:decay,provenance:original?'Known seed 3, equal 0.02 kg masses, rounded declared target':'Visitor-declared frequencies and common decay'};
@@ -57,7 +60,7 @@ $('search-form').onsubmit=async event=>{
 
 $('open-instrument').onchange=()=>{const file=$('open-instrument').files[0];$('open-instrument').value='';if(file)openInstrument(file);};
 async function openInstrument(file){
- if(busy||state().active)return;
+ if(busy||occupied())return;
  const token=++generation,reader=new AbortController();fileRead=reader;busy=true;controls();$('status').textContent='Checking the kept anatomy…';
  try{
   const input=await readInverseFile(file,{signal:reader.signal});if(token!==generation)return;
@@ -98,7 +101,7 @@ function renderResults(){
  }
 }
 async function prepare(candidate,card){
- if(busy||state().active)return;
+ if(busy||occupied())return;
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent=`Preparing the ${candidate.topology} at your audio context’s sample rate…`;
  try{
   if(!context){context=new AudioContext();transport=createInverseTransport(context);transport.setListeningLevel(listeningLevel);context.onstatechange=()=>controls();}
@@ -113,7 +116,8 @@ async function prepare(candidate,card){
   document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
   $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
   $('status').textContent=`${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.`;
-  $('gesture').textContent='Choose Start listening, then touch a body.';
+  $('gesture').textContent='Choose Start listening, then touch a body or hear the shared gesture.';
+  $('shared-gesture-help').textContent=`The middle, then both ends. The same three touches on every anatomy. About ${Math.ceil(instrument.duration+.5)} seconds to settle, or choose Quiet.`;
   $('playing-title').focus({preventScroll:true});document.querySelector('.playing').scrollIntoView({block:'start'});
  }catch(error){
   if(!instrument){document.querySelector('.playing').hidden=true;document.querySelector('.workshop').classList.remove('has-instrument');}
@@ -134,10 +138,15 @@ function repeatInvitation(){
  $('same-touch-caption').textContent=`Your last touch was body ${lastTouch.body+1} on the ${lastTouch.topology}. Try that numbered body on the prepared anatomy. Each touch uses the same impulse; listen for what changes.`;
  $('repeat-touch').textContent=`Touch body ${lastTouch.body+1} again`;
 }
+$('hear-gesture').onclick=()=>{
+ if(busy||!instrument||!armed||context?.state!=='running')return;
+ try{transport.playGesture(sharedGesture);$('gesture').textContent='The middle, then both ends. You can answer with a touch of your own, or choose Quiet.';}
+ catch(error){$('gesture').textContent=error.message;}controls();
+};
 $('repeat-touch').onclick=()=>{if(lastTouch)strike(lastTouch.body);};
 function strike(body){
  if(!armed||busy)return;
- try{const admitted=transport.strike(body);if(admitted&&mountedReport===report){lastTouch={body,topology:mountedTopology};repeatInvitation();}$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight strikes are still ringing. This touch was ignored; wait or choose Quiet.';}
+ try{const admitted=transport.strike(body);if(admitted&&mountedReport===report){lastTouch={body,topology:mountedTopology};repeatInvitation();}$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight touches are ringing or upcoming. This touch was ignored; wait or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 }
 async function ensureSpatial(){

@@ -317,3 +317,7 @@ Inverse keep/reopen integration: inverse.html/css, src/inverse/main.js and prepa
 Inverse browser return verification: tests/inverse-kept-browser.html/js and tests/fixtures/inverse-kept-chain.json; real local File read, disposable worker reopen/preparation, byte/PCM conservation and refusal/cancel/retry evidence, distinct from native file-picker/production UI checks.
 
 Inverse catalog continuity: project.html and src/project-catalog.js; describe kept-anatomy return and add history milestone after native verification, preserving model and evidence limits.
+
+Inverse shared-gesture scheduling: src/inverse/transport.js and tests/inverse-transport.test.js, later main/html integration; atomic bounded audio-clock source scheduling, pending-slot accounting, no premature picture response, Quiet cancels future sources. Fable owns phrase score and rationale.
+
+Inverse shared-gesture encounter and offline verification: inverse.html/css/src/inverse/main.js and tests/inverse-gesture-render.html/js; explicit listening gate, pending-aware locks and status, visitor touch memory preserved; real offline schedule and cancellation comparison. Fable owns authored score.

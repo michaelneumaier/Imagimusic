@@ -50,3 +50,28 @@ test('rapid live level changes continue from the interpolated gain; quiet and su
  context.state='suspended';const before=automation.length;transport.setListeningLevel(0);
  assert.equal(automation.length,before+2);assert.deepEqual(automation.at(-1),['set',0,.03]);
 });
+
+test('shared gestures reserve future slots, use one audio origin, and show only started responses',()=>{
+ const {transport,context,nodes,automation}=setup();transport.mount(prepared);context.currentTime=10;
+ const origin=transport.playGesture([{body:0,at:0},{body:2,at:1.5},{body:1,at:3}]);
+ assert.equal(origin,10.03);assert.deepEqual(nodes.map(n=>n.started),[10.03,11.53,13.03]);
+ assert.deepEqual(transport.snapshot(),{time:10,active:0,pending:3,strikes:[]});
+ assert.throws(()=>transport.mount(prepared),/Quiet/);assert.throws(()=>transport.playGesture([{body:0,at:0}]),/quiet/);
+ transport.setListeningLevel(2);assert.deepEqual(automation.slice(-2),[['cancel',10],['set',2,10]]);
+ context.currentTime=origin+.5;const state=transport.snapshot();assert.equal(state.active,1);assert.equal(state.pending,2);assert.equal(state.strikes[0].age,.5);
+ assert.deepEqual(state.strikes[0].displacement,instrument.frame(0,.5).displacement);
+ for(let i=0;i<5;i++)assert.equal(transport.strike(i%3),true);
+ assert.equal(transport.strike(0),false);assert.equal(nodes.length,8);
+ transport.quiet();assert.ok(nodes.every(n=>n.stopped&&n.disconnected));assert.deepEqual(transport.snapshot(),{time:origin+.5,active:0,pending:0,strikes:[]});
+ context.currentTime=origin+4;assert.equal(transport.snapshot().active,0);
+});
+test('gesture validation and suspended state create no sources, and a failed start rolls back every phrase source',()=>{
+ const {transport,context,nodes}=setup();transport.mount(prepared);
+ for(const events of [[],new Array(2),Array.from({length:9},()=>({body:0,at:0})),[{body:0,at:9}],[{body:3,at:0}],[{body:0,at:NaN}],[{body:0,at:1},{body:1,at:0}]])assert.throws(()=>transport.playGesture(events),RangeError);
+ assert.equal(nodes.length,0);context.state='suspended';assert.throws(()=>transport.playGesture([{body:0,at:0}]),/Start listening/);assert.equal(nodes.length,0);context.state='running';
+ const create=context.createBufferSource;
+ context.createBufferSource=()=>{const node=create();if(nodes.length===2)node.start=()=>{throw new Error('start failed');};return node;};
+ assert.throws(()=>transport.playGesture([{body:0,at:0},{body:1,at:1},{body:2,at:2}]),/start failed/);
+ assert.equal(nodes.length,3);assert.ok(nodes.every(n=>n.stopped&&n.disconnected));assert.equal(transport.snapshot().pending,0);assert.equal(transport.snapshot().active,0);
+ context.createBufferSource=create;assert.equal(transport.strike(1),true);transport.quiet();
+});
