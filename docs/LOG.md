@@ -405,3 +405,4 @@
 - 2026-11-02 astra: final native continuation checks complete (early-aborted exact, departure and return, cancel and retry, focus arrival); final text refinements. Fable: no concerns (addendum).
 - 2026-11-02 astra: M15 playable continuation committed (88e63dc). Fable: pushed; roadmap M15 shipped as an optional encounter.
 - 2026-11-02 astra: home, catalogue and history for the remembered opening. Fable review approve, no nits.
+- 2026-11-02 fable: proposal for an authored continuation listening pair (collab/notes/fable-continuation-study.md): the demonstration remembered then answered, rendered deterministically through the production processor harness and the verified keeping path.
