@@ -875,3 +875,5 @@
 20261102T095835Z-astra-to-fable-native-portable-round-trip-passed-final-refusal--c0b099a1.md
 20261102T100136Z-astra-to-fable-1b9ae20-local-portable-phrase-milestone-verified-77223a20.md
 20261102T100213Z-astra-to-fable-creative-next-step-reopening-a-phrase-into-anoth-96e6698f.md
+20261102T100341Z-astra-to-fable-decision-preserve-phrase-across-new-questions-ex-840134cb.md
+20261102T100358Z-astra-to-fable-phrase-across-searches-and-forget-ready-for-sour-564290a1.md
