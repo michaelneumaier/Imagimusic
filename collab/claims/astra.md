@@ -285,3 +285,5 @@ Inverse native preparation diagnostic: tests/inverse-worker-browser.html; explic
 Inverse workshop encounter: inverse.html/inverse.css/src/inverse/main.js; authored editable resonance target, bounded cancellable search, explicit candidate preparation and listening, touchable three-mass schematic, visible fit and realism limits. No solver/model edits or publishing.
 
 Inverse workshop discovery: project.html/src/project-catalog.js and own workshop note; concise home invitation, catalog entry, current roadmap/history and source notebook link. Preserve established attention paths; no general audio-inference claim.
+
+Inverse spatial prototype: src/inverse/picture.js, src/inverse/scene.js, tests/inverse-picture.test.js and tests/inverse-anatomy-preview.html/js; reuse Grove artistic forms in a silent diagnostic with actual fitted candidates, fixed envelope display gain and static full-response bounds. No production page integration or shared scene edits yet.
