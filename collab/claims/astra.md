@@ -249,3 +249,13 @@ Expressive comparison render: tests/expressive-compare-render.html/js and tools/
 Expressive comparison artifact tests: tests/expressive-compare-artifacts.test.js; explicitly synthetic fixtures verify corruption and rehashed semantic mismatches are refused, not browser audio evidence.
 
 Clip structure and time: src/midi2/clip.js and tests/midi2-clip.test.js; preserve configuration/sequence origin and raw packets, explicit receiver tempo policy, no rendering or evaluator configuration changes.
+
+Expression listening discovery: src/project-catalog.js, tools/prepare-project-home.mjs and project.html; catalog verified browser-rendered comparison, explicitly report manual browser preparation for fresh checkouts.
+
+Clip score adapter: src/midi2/clip-score.js and tests/midi2-clip-score.test.js; bounded binary-to-symbolic import preserving setup timing and source end, refusing note-specific setup, reporting unsupported payloads without fabricated events. No playback until origin-aware render integration.
+
+Clip playback window: src/expressive/clip-performance.js, tests/expressive-clip-performance.test.js and optional endSeconds in performance.js; preserve End-of-Clip silence plus release, render full setup then crop at first sample at/after origin, same source time for picture. No production import UI yet.
+
+Clip browser verification: tests/expressive-clip-render.html/js; silent real OfflineAudioContext comparison of origin-aware crop against separately rendered full source, repeatability, sample bounds and release silence. Literal independent fixture, no encoder dependency or device-audio claim.
+
+Expressive Clip encounter: expressive.html/css and src/expressive/main.js; optional local file preparation, bounded read, retained prior study on rejection, explicit Listen, source-origin picture timing, reported unsupported content and cancellation on source/page changes. Existing symbolic studies preserved.

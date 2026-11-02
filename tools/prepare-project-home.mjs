@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
+import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
  ['Room for an answer','renders/open-phrase-study','tools/render-open-phrase-study.mjs'],
@@ -32,7 +33,20 @@ for(const [title,directory,script] of studies){
  console.log('Preparing: '+title+' (physical rendering may take a few minutes)');
  await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script],{cwd:root,stdio:['ignore','ignore','inherit']});child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(title+' preparation failed: '+(signal??code))));});
  if(!await available(directory))throw new Error(title+' renderer did not produce a complete listening page');
+ missing--;
  console.log('Ready: '+title);
 }
-if(args.includes('--check')&&missing){process.exitCode=1;console.log('Run node tools/prepare-project-home.mjs to prepare the missing studies.');}
+// Offline Web Audio needs an explicit browser render; never pretend Node can
+// regenerate it or overwrite the pinned inputs behind an existing WAV pair.
+try{
+ await verifyExpressiveComparison(path.join(root,'renders/expressive-compare'));
+ await fs.access(path.join(root,'renders/expressive-compare/index.html'));
+ console.log('Ready: What does expression add? (verified saved browser artifacts)');
+}catch(error){
+ missing++;
+ console.log('Missing or invalid: What does expression add? '+error.message);
+ console.log('Prepare inputs with node tools/compare-expressive-study.mjs; open /tests/expressive-compare-render.html in the local browser, prepare and keep both WAVs plus browser-verification.json into renders/expressive-compare; then run node tools/finalize-expressive-compare.mjs.');
+}
+if(missing&&args.includes('--check')){process.exitCode=1;console.log('Run node tools/prepare-project-home.mjs for Node-rendered studies; follow the browser instructions above for the expression comparison.');}
+else if(missing&& !args.includes('--check')) console.log('Node-rendered studies prepared. Any missing expression comparison needs the explicit browser steps above.');
 else console.log('Project home studies available. Start the local server with npm start and open /project.html.');

@@ -4,17 +4,21 @@ import {adsrLevel,aperture01} from '../dynamics.js';
 
 const compiledScores=new WeakMap();
 export const EXPRESSION_LIMITS=Object.freeze({voices:8,events:512,lastEventSeconds:30,durationSeconds:40});
-export function createExpressionPerformance(score,patch=DEFAULT_PATCH,sampleRate=48000){
+export function createExpressionPerformance(score,patch=DEFAULT_PATCH,sampleRate=48000,options={}){
  if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>192000)throw new Error('Unsupported sample rate');
  const saved=JSON.parse(canonicalExpressionScore(score)),instrument=validatePatch(patch);
  if(saved.events.length>EXPRESSION_LIMITS.events)throw new Error('This expressive study supports at most 512 events.');
  const lastTime=saved.events.at(-1)?.time??0;
+ if(!options||typeof options!=='object'||Array.isArray(options))throw new TypeError('Performance options must be an object.');
+ for(const key of Object.keys(options))if(key!=='endSeconds')throw new Error(`Unknown performance option: ${key}`);
+ const endSeconds=options.endSeconds??lastTime;
+ if(!Number.isFinite(endSeconds)||endSeconds<lastTime||endSeconds>EXPRESSION_LIMITS.lastEventSeconds)throw new Error('Performance end must include every event and fit within30 seconds.');
  if(lastTime>EXPRESSION_LIMITS.lastEventSeconds)throw new Error('This expressive study supports events within 30 seconds.');
  const compiled=compileExpression(saved),final=compiled.at(lastTime);
  if(!final.voices.length||final.voices.length>EXPRESSION_LIMITS.voices)throw new Error('This expressive study needs 1–8 voices.');
  if(final.voices.some(v=>v.effectiveNoteOff===null))throw new Error('Release every note and the sustain pedal before rendering this finite study.');
  const voices=final.voices.map(v=>({voiceId:v.voiceId,address:{...v.address},noteOn:v.noteOn,noteOff:v.effectiveNoteOff,end:v.effectiveNoteOff+instrument.bellows.adsr.r}));
- const duration=Math.max(lastTime,...voices.map(v=>v.end))+.25;
+ const duration=Math.max(endSeconds,...voices.map(v=>v.end))+.25;
  if(Math.ceil(duration*1000)*voices.length>500000)throw new Error('Expression control schedule exceeds the study budget.');
  if(duration>EXPRESSION_LIMITS.durationSeconds)throw new Error('This expressive study exceeds 40 seconds including release.');
  const performance=Object.freeze({version:1,score:compiled.score,patch:instrument,sampleRate,voices,duration,reported:final.reported,
