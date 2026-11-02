@@ -19,6 +19,7 @@ const entries=[
  ['The Conservatory','stage.html','Composition & keeping','Playable','A shared score, mechanical performers, causal inspection, and local performance rendering.'],
  ['Bring a score','midi.html','Composition & keeping','In progress','Map a local MIDI file to available instruments and inspect the mapping.'],
  ['Reopen a passage','reopen.html','Composition & keeping','Tool','Return to supported saved Grove and Rest records. Ensemble records are not supported here yet.'],
+ ['Return to a touch','touch-return.html','Composition & keeping','Tool','Reopen saved Touch gestures in their original two-body connection. Prepare silently, listen with the modeled response, or keep a WAV copy. Local Touch v1 files; bounded reconstruction, no conversion from Rest or Grove recordings.'],
  ['Return to three voices','ensemble-reopen.html','Composition & keeping','Tool','Rebuild a saved three-Grove ensemble, labelled derived return or continued passage. Local files up to two minutes plus their fade, at 8–48 kHz and up to 256 KiB; explicit playback and sound download.'],
  ['Listening room','audition.html','Listening studies','Study','Compare prepared examples from the earlier instrument work.'],
  ['A changed structure','variant-audition.html','Listening studies','Study','Compare the same gesture on a fixed one-connection variant at equal output gain.'],

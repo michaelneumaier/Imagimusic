@@ -365,3 +365,5 @@ Touch staged connection choice: owned main/html UI; quiet and preserve current p
 Touch saved-passage return foundation: src/touch/record.js and tests/touch-record.test.js; strict bounded validation/reconstruction of existing Touch v1 gestures using the original session admission rules. Future return UI remains within src/touch ownership; Rest/adaptation schemas untouched.
 
 Touch return preparation: src/touch/return-preparation.js, return-worker.js, return-session.js and tests/touch-return.test.js; bounded off-main-thread original reconstruction and transactional file replacement. Reuses owned disposable-worker lifecycle; no comparison yet.
+
+Touch return page: touch-return.html/css and src/touch/return-main.js, plus entry links in owned Touch/catalog files after native validation. Original sound and analytic two-body replay, explicit start/Quiet, local saves; no derived comparison.
