@@ -343,3 +343,5 @@ Inverse original-anatomy return: inverse.html/src/inverse/main.js and own eviden
 Inverse encounter hierarchy: inverse.html/inverse.css and own evidence note; candidate-first results, secondary repeat-search action, grouped phrase-making versus saving/forgetting and optional record detail. No runtime state changes or new presentation mode.
 
 Home/catalog explore-and-return copy and bounded entry review: project.html, src/project-catalog.js; welcome.html/listen.html/expressive.html stage-link labels aligned with The Conservatory, preserving Three Groves as the separate playable ensemble.
+
+Grove-family entry clarity: src/project-catalog.js and grove-voices.html; distinguish one three-body instrument from three separate Groves, correct stale original-only voice copy, direct partials entry using existing query parameter.

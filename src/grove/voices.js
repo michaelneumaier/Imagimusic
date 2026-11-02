@@ -3,6 +3,7 @@ function quiet(){for(const player of players)player.pause();}
 function metric(dl,label,value){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}
 function choose(){
  quiet();$('voices').replaceChildren();players=[];const seed=$('seed').value,entry=report.seeds[seed],count=report.conventions.partials;
+ $('play-partials').href=`grove.html?voice=partials&seed=${encodeURIComponent(seed)}`;
  for(const [id,label,description] of [[1,'The original voice','A single resonance in each body. Three connected bodies share the ring.'],[count,'A voice with partials',`${count} resonances in each body. Higher partials join the attack, with their own decay rates.`]]){
   const data=entry[`m${id}`],card=document.createElement('article');card.className='voice-card';const tag=document.createElement('span'),heading=document.createElement('h2'),copy=document.createElement('p'),audio=document.createElement('audio'),dl=document.createElement('dl'),save=document.createElement('a');
   tag.className='eyebrow';tag.textContent=id===1?'A / CURRENT':'B / EXPLORATION';heading.textContent=label;copy.textContent=description;
