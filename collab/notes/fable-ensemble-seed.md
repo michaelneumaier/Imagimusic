@@ -1,27 +1,35 @@
-# A saved passage as a seed for a new live response (Fable, 2026-11-02; proposal only, no model change)
+# Continue from this passage: a saved passage as a seed (Fable; revised 2026-11-02 after Astra's six corrections; proposal only, no model change)
 
-Astra's direction: let a finished or reopened passage seed a new live passage, with an explicit boundary between remembered gestures and new personal touches. The contract has to keep authorship honest in the kept file and make the experience clear in the first minute.
+Working words (Astra): "Continue from this passage" / "Its gestures play first. Then the voices are yours. The original stays here." No feeling promised.
 
-## The experience
-After Quiet, or after reopening a saved ensemble, one collapsed invitation: "Play with what remains." Prepare seed builds nothing new; it schedules the remembered passage as an authored opening on a fresh live passage, through the host's existing `scheduleOpening` (fresh-only, bounded, prevalidated, one shared clock, Quiet always allowed). While the remembered opening is still being applied the ordinary controls are refused, as for the demonstration; at the acknowledgement of its last command the bodies become the person's, and they play into whatever still rings, as in the open phrase. Quiet ends everything together; keeping names say "seeded passage". Nothing plays automatically; the seed is never a second live performance of the person's past, only its gestures re-applied through the same admission.
+## 1. What is admitted as a source (whole, bounded, same rate)
+- An ordinary strict v1 ensemble record only; derived returns and seeded passages are refused as sources in the first prototype.
+- The whole source or nothing: a source whose `ended.frame` exceeds 20 s, or whose gesture edges (strikes plus contact edges across all parts) exceed 32, is refused with a sentence; nothing is truncated silently.
+- The source's sample rate must equal the live context's; otherwise refuse. No claim of exact reapplication is made across rounding or resampling.
 
-## The boundary, in the file
-A wrapper kind, like the derived return, around an unchanged strict v1 ensemble record of the whole seeded passage:
-```
-{ "kind": "imagimusic-grove-ensemble-seeded", "version": 1,
-  "seededFrom": { "kind": "imagimusic-grove-ensemble", "version": 1, "canonicalSha256": "<source fingerprint>", "operation": "replay-as-opening" },
-  "boundaryFrame": <the frame at which the remembered opening's last command was acknowledged>,
-  "ensemble": { ...strict v1 record... } }
-```
-- Every gesture at or before `boundaryFrame` is remembered (re-applied from the seed through admission); every gesture after it is new. Because ordinary commands are refused until the opening's last acknowledgement, the boundary is a single frame per passage and needs no per-event marking, which keeps the v1 schema untouched.
-- The remembered gestures are the seed's gestures only if admission accepted them again; the live state is the same as the original's only if nothing was refused, and the wrapper records refusals (`remembered: { planned: n, accepted: m }`) so a seeded passage never claims to contain its source exactly when it does not.
-- The source fingerprint is a declared identity, as for the return; the reader labels the file "seeded from a remembered passage; new touches after <time>", and verification needs the source in hand.
+## 2. The transformation, stated (an opening made from the passage, not its old sound)
+- Replay the source's gesture edges on a fresh mount: every strike and every contact edge, each on its own part, at its source frame offset from a common base.
+- Omit the source's Quiet and its audio fade: the bodies must remain available afterwards, so the source's ending is not replayed as a command.
+- Hands that were still down at the source's Quiet are released at the source's `ended.frame`; the UI shows those controls released, so no damper is invisibly held.
+- Handoff time is the source's `ended.frame` (the original ending), not its last gesture: the person's voices begin where the original ended, into whatever still rings from the reapplied gestures. The page says "an opening made from the passage"; it does not say the old sound returns.
 
-## Why this and not a mixed record
-Marking remembered and new gestures event by event inside a v1 record would change the strict schema for a convenience; a frame boundary enforced by the host's refusal rule is both simpler and more honest, and it matches how the open phrase already behaves.
+## 3. A distinct continuation scheduler (not `scheduleOpening`)
+`scheduleOpening` requires exactly one final Quiet and leaves the host in the opening state for good, and Quiet destroys the tail and ends the capture, so it cannot be reused. A new `scheduleContinuation(steps, {handoffFrame})` on the host:
+- fresh-only, same bounds (≤32 edges, ≤20 s), prevalidated, no Quiet among the steps, releases appended at `handoffFrame` for any contact still down;
+- sets `continuing = true`; while continuing, ordinary commands are refused (reason `continuation`) except Quiet, which is always allowed;
+- the **handoff barrier**: continuing ends only when (a) every scheduled id across all three parts has an acknowledgement, and (b) the processor's clock has passed `handoffFrame`, observed as the latest frame reported by the processor rather than inferred from message order (acknowledgements arrive grouped by part per block, so message order is not frame order). The boundary frame recorded is `max(handoffFrame, max appliedFrame over all scheduled ids)`.
+- new input is scheduled strictly after the boundary: the first personal command's frame is `max(its own base frame, boundaryFrame + 1)` even when the UI callback fires inside the render block that crossed the barrier.
 
-## Open questions before any code
-1. Should the remembered opening be the whole source passage or its first N seconds, bounded by `scheduleOpening`'s 32 commands and 20 s? A passage longer than that cannot be a seed as-is; the honest options are to refuse, or to seed with the opening's first 20 s and say so.
-2. Should a derived return be allowed as a seed (playing with the return of one's own passage)? The reader's `allowDerived: false` rule for returns suggests not in the first version.
-3. The first-minute wording: "what remains" is literally true only while the remembered passage still rings; the invitation should say the remembered passage plays first.
-Astra owns the experience and provenance decisions; nothing here extends the model until agreed.
+## 4. The kept file, and the retained original
+- A wrapper kind `imagimusic-grove-ensemble-seeded` v1 around an unchanged strict v1 record of the whole seeded passage, with `seededFrom { kind, version, canonicalSha256 }` (a declared identity, as for returns), `operation: "continue-from-passage"`, `boundaryFrame`, and `opening: { scheduled, acknowledged, handoff: "completed" | "aborted" }`.
+- Everything at or before `boundaryFrame` was scheduled from the source; everything after it is new; the refusal rule makes this a single frame per passage.
+- The original is retained apart from the host: a continuation session holds the immutable source snapshot (as the return session does) so the original's gestures and sound stay downloadable after the fresh seeded mount, which clears the host's record. "Your turn" keeps its meaning (an empty passage) and is not repurposed; the seeded start is its own control.
+
+## 5. Early Quiet before the barrier: aborted opening
+If Quiet arrives before the barrier, the kept wrapper says `handoff: "aborted"` with `scheduled` and `acknowledged` counts and no `boundaryFrame` (the key is absent, not invented); the passage contains the acknowledged reapplied gestures only, and the page says the opening was cut short. The reader labels it "seeded, opening cut short". Counts never claim identity.
+
+## 6. Reapplication verification (defined before the wrapper is final)
+With the source in hand, verification checks that, for each part, the seeded record's events at or before `boundaryFrame` equal the source's gesture edges shifted by the common base (strikes: frame, body, position, velocity; contacts: frame, body, zone, strength), minus the source's ending and plus the appended releases at the handoff; a completed handoff additionally requires every scheduled id acknowledged. Admission on reapplication may still refuse an edge the source once accepted (the fresh mount's state differs only by what was already reapplied, so this is expected to be rare but is not excluded); a refused edge makes verification report `reapplied: partial` with the refused edges listed, never silently.
+
+## Open for Astra's host design
+Whether the barrier's clock observation is a dedicated processor message at `handoffFrame` or the existing per-block latest frame; and whether the appended releases should be acknowledged like scheduled edges (I would say yes, so the barrier counts them).

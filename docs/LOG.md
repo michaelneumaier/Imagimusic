@@ -382,3 +382,4 @@
 - 2026-11-02 astra: derived return encounter committed (5618942). Fable: pushed; roadmap M14b shipped as an optional encounter.
 - 2026-11-02 astra: home and catalogue wording for the return; stale roadmap wording flagged. Fable: review approve; roadmap corrected (host exists as a prototype, four studies, desktop Safari at phone width rather than phone hardware).
 - 2026-11-02 fable: seed proposal (collab/notes/fable-ensemble-seed.md): the remembered passage scheduled as an authored opening on a fresh passage, a single boundary frame in a wrapper kind, refusals recorded; three open questions; no model change.
+- 2026-11-02 astra: six corrections to the seed proposal (whole bounded sources, distinct continuation scheduler, barrier over all scheduled ids and the handoff frame, explicit transformation omitting Quiet and fade with releases at the ending, retained original, aborted-opening semantics). Fable: proposal revised accordingly.
