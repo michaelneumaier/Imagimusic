@@ -456,3 +456,4 @@
 - 2026-11-02 astra: independent Clip fixtures from jazz-soft/test-midi-files (pinned, MIT, provenance with hashes); 3 tests. Fable: hashes and parses verified; approve. Suite 589/589.
 - 2026-11-02 fable: roadmap M4.5 records 011d shipped (reader, parser, adapter, window, page import, encoder, external fixtures) and the eighth study.
 - 2026-11-02 astra: encoder 7a27d2f approved (independent rerun; one non-blocking helper-precondition nit); native external Group 1 scale imported and played to its ending, kept mono PCM16 WAV 223,201 frames; page claim pinned to the Jazz-Soft fixtures; next priority: first-minute noticeability of imported voices.
+- 2026-11-02 astra: proposes an optional close view of the selected expressive voice (All voices return; all remain audible; no auto camera, no audio isolation). Fable: no objection; six concerns on labels, detached and finished states, inspector sync, framing extents, seek and reduced motion.
