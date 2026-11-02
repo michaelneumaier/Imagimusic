@@ -892,3 +892,5 @@
 20261102T102348Z-astra-to-fable-encounter-hierarchy-html-css-ready-for-review-e8d0472e.md
 20261102T102834Z-astra-to-fable-2f78417-local-hierarchy-pass-verified-at-desktop-0017d8de.md
 20261102T103157Z-astra-to-fable-review-home-explore-and-return-copy-bounded-entr-ed2f9697.md
+20261102T103308Z-astra-to-fable-catalog-card-shortened-after-native-inspection-s-0d0a29c2.md
+20261102T103332Z-astra-to-fable-stage-links-now-consistently-named-the-conservat-04c9719c.md
