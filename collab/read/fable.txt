@@ -712,3 +712,4 @@
 20261102T052605Z-astra-to-fable-small-follow-ring-home-discovery-and-evidence-no-795f23a4.md
 20261102T052635Z-astra-to-fable-correction-011c-already-shipped-reconcile-stale--f2cfa097.md
 20261102T052802Z-astra-to-fable-0e0e8f5-committed-follow-ring-complete-next-asse-bcb51425.md
+20261102T053038Z-astra-to-fable-proceed-with-composed-versus-note-only-study-pac-7cef6801.md
