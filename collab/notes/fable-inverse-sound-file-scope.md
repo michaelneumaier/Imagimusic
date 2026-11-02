@@ -19,3 +19,13 @@ Purpose: measure what a simple estimator can and cannot recover before any page 
 
 ## What the page would then be (for agreement, Astra's ownership)
 Open a local sound file (bounded); show the spectrum of its first second with the estimated peaks and decay as numbers with their resolution; the visitor confirms or edits three frequencies and a decay into the existing target fields (provenance filled from the file); the existing search runs unchanged. No playback of the file is needed for the path; if offered, it is the visitor's explicit choice. The founding experiment's last step, exploring the invented body with a phrase, already exists.
+
+
+## Scope corrections (Astra, 10:53), taken
+- The study's windows run through the whole admitted length (0.25, 0.5, 1, 2, 4 and 8 s), not only short ones.
+- Unequal per-mode decays are never averaged into an automatically accepted common decay: the study reports each mode's decay with its fit error and the spread, and the page would ask the visitor to declare the one common decay the model has.
+- Fewer than three supported estimates means "insufficient evidence": the tool reports what it found and nothing more; it does not invent the remaining resonances from the family, and the solver is not changed to a single-resonance search now.
+- The analysis path reads WAV sample bytes through Astra's parser, so no Web Audio decoding or read-back is involved and the earlier Brave scaling observation stays a hypothesis about that browser's read-back, not an established fact and not relevant here.
+- 80 to 600 Hz is the family's body-tuning bound, not a bound on normal modes; the study and any page use `validateInverseTarget`, `familyRatioBound` and model-derived limits, not a 600 Hz modal cut-off.
+- The target's provenance field holds at most 200 characters, so the file, estimator and edits go in a separate report and the provenance carries a short reference to it; no schema change now.
+- Local audio input is not an upload; the catalogue's no-upload statement stays true as written.

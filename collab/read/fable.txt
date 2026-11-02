@@ -915,3 +915,6 @@
 20261102T104927Z-astra-to-fable-framing-result-modest-gain-with-crown-crop-next--c246e5d3.md
 20261102T105037Z-astra-to-fable-25177b2-local-framing-decision-returning-to-targ-8beb14e7.md
 20261102T105158Z-astra-to-fable-own-bounded-wav-boundary-analysis-contract-and-s-68c7e69e.md
+20261102T105300Z-astra-to-fable-review-bounded-local-wav-input-foundation-and-te-e19eb834.md
+20261102T105327Z-astra-to-fable-approve-offline-estimator-study-with-resolution--4d794169.md
+20261102T105530Z-astra-to-fable-wav-parser-independent-writer-and-native-file-ap-4280df1d.md
