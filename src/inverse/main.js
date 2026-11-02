@@ -2,13 +2,15 @@ import {validateInverseTarget} from '../score/grove-inverse.js';
 import {composeGrove,groveSystem} from '../score/grove.js';
 import {createInverseJobs} from './jobs.js';
 import {createCandidateDiagram} from './candidate-diagram.js';
+import {readInverseFile} from './read-file.js';
+import {keepInverseCandidate,canonicalInverseCandidate} from '../score/grove-inverse-kept.js';
 import {createInverseTransport} from './transport.js';
 const $=id=>document.getElementById(id),jobs=createInverseJobs();
 const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
-let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1;
+let lastTouch=null,mountedTopology=null,mountedReport=null,listeningLevel=1,fileRead=null;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function restore(){example.slice(0,3).forEach((f,i)=>$('f'+i).value=f);$('decay').value=example[3];$('base').value='48';}
@@ -16,6 +18,7 @@ restore();
 function state(){return transport?transport.snapshot():{active:0,strikes:[]};}
 function controls(snapshot=state()){
  const ringing=snapshot.active>0;
+ $('open-instrument').disabled=busy||ringing;
  $('search').disabled=busy||ringing;$('example').disabled=busy;
  $('cancel').hidden=!busy;
  $('listen').disabled=busy||!instrument||(armed&&context?.state==='running');
@@ -26,7 +29,7 @@ function controls(snapshot=state()){
  $('ring-count').textContent=ringing?`${snapshot.active} / 8 strikes ringing`:'Silent';
 }
 function cancel(message='Preparation cancelled. Previous results and instrument retained.'){
- generation++;jobs.cancel();busy=false;$('status').textContent=message;controls();
+ generation++;fileRead?.abort();fileRead=null;jobs.cancel();busy=false;$('status').textContent=message;controls();
 }
 $('cancel').onclick=()=>{if(busy)cancel();};
 addEventListener('keydown',event=>{if(event.key==='Escape'&&busy){event.preventDefault();cancel();}});
@@ -51,18 +54,45 @@ $('search-form').onsubmit=async event=>{
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
 };
+
+$('open-instrument').onchange=()=>{const file=$('open-instrument').files[0];$('open-instrument').value='';if(file)openInstrument(file);};
+async function openInstrument(file){
+ if(busy||state().active)return;
+ const token=++generation,reader=new AbortController();fileRead=reader;busy=true;controls();$('status').textContent='Checking the kept anatomy…';
+ try{
+  const input=await readInverseFile(file,{signal:reader.signal});if(token!==generation)return;
+  const opened=await jobs.run({kind:'reopen',text:input.text});if(token!==generation)return;
+  const candidate={...opened.candidate,status:opened.candidate.status==='within-tolerance'?'accepted':'saved-outside-tolerance'};
+  report={target:opened.record.target,tolerance:opened.record.tolerance,candidates:[candidate],savedRecord:opened.record};
+  lastTouch=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  $('status').textContent=`Opened ${input.name}. Fit recalculated from the saved instrument and target. Prepare it when you are ready to play. Any previously prepared instrument is retained.`;
+ }catch(error){if(token===generation)$('status').textContent=`Could not open the anatomy: ${error.message} Previous results and instrument retained.`;}
+ finally{if(token===generation){fileRead=null;busy=false;controls();}}
+}
+function keepCandidate(index){
+ try{
+  const record=report.savedRecord??keepInverseCandidate(report,index,{at:new Date().toISOString()});
+  const url=URL.createObjectURL(new Blob([canonicalInverseCandidate(record)],{type:'application/json'})),link=document.createElement('a');
+  link.href=url;link.download=`imagimusic-inverse-${record.grove.topology}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  $('status').textContent='The anatomy file is ready to keep. It holds the instrument and target, without your played touches.';
+ }catch(error){$('status').textContent=`Could not keep the anatomy: ${error.message}`;}
+}
+
 function renderResults(){
  $('results-section').hidden=false;$('results').replaceChildren();candidateButtons.length=0;
- $('target-snapshot').textContent=`Results for ${report.target.normalFrequenciesHz.map(f=>f.toFixed(4)).join(' / ')} Hz; decay ${report.target.decaySeconds.toFixed(4)} s. ${report.target.provenance}. Input edits do not change these results until you search again.`;
- for(const candidate of report.candidates){
+ $('target-snapshot').textContent=`${report.savedRecord?'Kept instrument for':'Results for'} ${report.target.normalFrequenciesHz.map(f=>f.toFixed(4)).join(' / ')} Hz; decay ${report.target.decaySeconds.toFixed(4)} s. ${report.target.provenance}. Tolerance: ±${report.tolerance.cents} cents; ${100*report.tolerance.decayRelative}% decay. Input edits do not change these results until you search again.`;
+ for(const [index,candidate] of report.candidates.entries()){
   const card=document.createElement('article');card.className='candidate';
   const title=document.createElement('h3');title.textContent=candidate.topology;card.append(title);
-  const fit=document.createElement('p');fit.textContent=candidate.status==='accepted'?'Within the declared tolerance':candidate.status==='impossible-in-family'?'Outside tolerance · target impossible in this family':candidate.status==='best-outside-tolerance'?'Best found · outside tolerance':'No admitted candidate found';card.append(fit);
+  const fit=document.createElement('p');fit.textContent=candidate.status==='accepted'?'Within the declared tolerance':candidate.status==='impossible-in-family'?'Outside tolerance · target impossible in this family':candidate.status==='best-outside-tolerance'?'Best found · outside tolerance':candidate.status==='saved-outside-tolerance'?'Kept instrument · outside tolerance':'No admitted candidate found';card.append(fit);
   if(candidate.grove){
    card.append(createCandidateDiagram(candidate.grove));
+   if(report.savedRecord){const origin=document.createElement('p');const discovery=report.savedRecord.discovery;origin.textContent=`Kept instrument. Declared discovery: seed ${discovery.seed}, ${discovery.evaluations.toLocaleString()} evaluations. Fit above is recalculated.`;card.append(origin);}
    const residual=document.createElement('p');residual.textContent=`Largest resonance error: ${candidate.residual.maxAbsCents.toFixed(4)} cents. Decay error: ${(100*Math.abs(candidate.residual.decayRelative)).toFixed(4)}%.`;card.append(residual);
-   const achieved=document.createElement('p');achieved.textContent=`Found: ${candidate.residual.achieved.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz.`;card.append(achieved);
-   const button=document.createElement('button');button.textContent=candidate.status==='accepted'?'Prepare this anatomy':'Explore this near miss';button.onclick=()=>prepare(candidate,card);card.append(button);candidateButtons.push(button);
+   const achieved=document.createElement('p');achieved.textContent=`Resonances: ${candidate.residual.achieved.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz.`;card.append(achieved);
+   const button=document.createElement('button');button.textContent=report.savedRecord?'Prepare kept anatomy':candidate.status==='accepted'?'Prepare this anatomy':'Explore this near miss';button.onclick=()=>prepare(candidate,card);
+   const keep=document.createElement('button');keep.textContent='Keep this anatomy';keep.className='keep-anatomy';keep.onclick=()=>keepCandidate(index);
+   const actions=document.createElement('div');actions.className='actions';actions.append(button,keep);card.append(actions);candidateButtons.push(button,keep);
   }
   $('results').append(card);
  }

@@ -15,3 +15,5 @@
 .workshop:not(.has-instrument){grid-template-columns:minmax(0,1fr);max-width:650px}
 
 .candidate-map{margin:18px 0 22px;background:#142126;border-radius:10px;padding:10px 12px}.candidate-map svg{display:block;width:100%;max-width:340px;margin:auto}.candidate-map figcaption{font-size:12px;color:var(--muted);text-align:center;margin:4px 0 2px}
+
+.kept-entry{margin-top:18px}.kept-entry input{font-size:13px}.keep-anatomy{background:transparent;color:var(--mint)}

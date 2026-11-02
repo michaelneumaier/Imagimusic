@@ -309,3 +309,9 @@ Inverse gain render diagnostic: tests/inverse-level-render.html/js; actual Offli
 Inverse first entry: inverse.html/css and src/inverse/main.js; reveal response only after first successful mount, retain across later work, collapse empty initial grid and clarify the starting-example action.
 
 Inverse candidate maps: src/inverse/candidate-diagram.js, main.js and inverse.css; static numbered schematic from actual candidate edges to aid choice before preparation, no coupling-strength or response encoding.
+
+Inverse saved instrument intake: src/inverse/read-file.js, tests/inverse-read-file.test.js; bounded selected local UTF-8 bytes with cancellation checks. Later owned UI/worker integration consumes Fable canonical saved-candidate contract; no schema edits here.
+
+Inverse keep/reopen integration: inverse.html/css, src/inverse/main.js and prepare-worker.js; explicit local keeping, validated single-candidate reopening without replacing the prepared instrument, separate preparation/listening and cancelled intake preservation. Fable owns src/score/grove-inverse-kept.js and schema tests.
+
+Inverse browser return verification: tests/inverse-kept-browser.html/js and tests/fixtures/inverse-kept-chain.json; real local File read, disposable worker reopen/preparation, byte/PCM conservation and refusal/cancel/retry evidence, distinct from native file-picker/production UI checks.
