@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { composeGrove, groveSystem, canonicalGrove, validateGrove } from '../src/score/grove.js';
-import { searchThreeResonanceGroves, validateInverseTarget, familyRatioBound } from '../src/score/grove-inverse.js';
+import { searchThreeResonanceGroves, validateInverseTarget, familyRatioBound, baseOrder, INVERSE_LIMITS } from '../src/score/grove-inverse.js';
+import { NOTES } from '../src/model.js';
 
 const equalMassGrove = seed => { const g = JSON.parse(canonicalGrove(composeGrove({ seed }))); g.bodies.forEach(b => { b.mass = 0.02; }); return validateGrove(g); };
 const targetFrom = (g, provenance) => { const s = groveSystem(g); return { version: 1, kind: 'three-resonance', normalFrequenciesHz: s.normalFreqsHz.slice(), decaySeconds: s.decayS, provenance }; };
@@ -45,4 +46,33 @@ test('refusals: malformed targets, out-of-range frequencies, decays outside the 
   assert.throws(() => searchThreeResonanceGroves(ok, { topologies: ['ring'] }), /topologies/);
   assert.throws(() => searchThreeResonanceGroves(ok, { nope: 1 }), /unknown option/);
   assert.throws(() => searchThreeResonanceGroves(ok, { baseMidi: 49 }), /garden note/);
+});
+
+test('bounded intake: topologies unique and at most two, strict nested options, sparse frequencies, and a whole-job evaluation cap', () => {
+  const ok = { version: 1, kind: 'three-resonance', normalFrequenciesHz: [128, 131, 132], decaySeconds: 2.4, provenance: 'authored' };
+  assert.throws(() => searchThreeResonanceGroves(ok, { topologies: ['chain', 'chain'] }), /distinct/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { topologies: ['chain', 'triangle', 'chain'] }), /at most two/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { tolerance: { cent: 2 } }), /unknown field/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { tolerance: [2] }), /must be an object/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { budget: null }), /must be an object/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { budget: { restarts: '2' } }), /out of range/);
+  assert.throws(() => searchThreeResonanceGroves(ok, { mass: '0.02' }), /mass must be a number/);
+  assert.throws(() => searchThreeResonanceGroves(ok, []), /options must be an object/);
+  const sparse = { ...ok, normalFrequenciesHz: [128, , 132] }; assert.throws(() => validateInverseTarget(sparse), /finite positive/);
+  const capped = searchThreeResonanceGroves(ok, { budget: { restarts: 4, iterations: 300, maxEvaluations: 500 }, seed: 2 });
+  assert.ok(capped.work.evaluations <= 500 && capped.work.exhausted === true, 'the whole job stops at the cap');
+  assert.ok(capped.verdict.includes('exhausted') || capped.verdict.startsWith('accepted'), 'a budget verdict names the exhaustion');
+  const original = [...NOTES]; assert.deepEqual(baseOrder(130.8)[0], 48); assert.deepEqual(baseOrder(392)[0], 67); assert.deepEqual(NOTES, original, 'NOTES is never mutated');
+  assert.ok(INVERSE_LIMITS.maxEvaluations >= INVERSE_LIMITS.restarts * INVERSE_LIMITS.iterations, 'the cap is meaningful against one search');
+});
+
+test('impossibility is judged within tolerance, not against the exact ratio: a target just above the exact bound can still be accepted', () => {
+  const source = equalMassGrove(3), s = groveSystem(source), f = s.normalFreqsHz, bound = familyRatioBound();
+  // Stretch the third frequency so the exact ratio exceeds the exact bound by 4 cents while a 10-cent tolerance still leaves it reachable.
+  const stretched = [f[0], f[1], f[0] * bound * 2 ** (4 / 1200)];
+  const target = { version: 1, kind: 'three-resonance', normalFrequenciesHz: stretched, decaySeconds: s.decayS, provenance: 'seed 3 spectrum with the top mode stretched beyond the exact bound (synthetic)' };
+  const report = searchThreeResonanceGroves(target, { topologies: ['triangle'], tolerance: { cents: 10, decayRelative: 0.05 }, budget: { restarts: 3, iterations: 200 }, seed: 11 });
+  assert.equal(report.bound.exactRatioExceedsBound, true); assert.equal(report.bound.impossibleWithinTolerance, false);
+  assert.notEqual(report.candidates[0].status, 'impossible-in-family', 'no impossibility claim when the tolerance-widened bound is not exceeded');
+  if (report.candidates[0].status === 'accepted') assert.ok(report.verdict.includes('within tolerance, not exact'));
 });

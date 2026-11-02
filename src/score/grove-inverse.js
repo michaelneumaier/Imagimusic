@@ -11,8 +11,9 @@ export const INVERSE_VERSION = 1;
 export const INVERSE_MODEL = 'groveSystem → coupledNetwork: three lumped masses with ground springs and bridge springs, one proportional loss; damped normal frequencies √(λ − γ²); beam partials of the voice layer not covered';
 export const INVERSE_FITTED = Object.freeze(['normalFrequenciesHz (three damped normal frequencies)', 'decaySeconds (1/γ, the common proportional loss)']);
 export const INVERSE_EXCLUDED = Object.freeze(['mode amplitudes and residues', 'pickup positions and scale', 'attack and strike position', 'masses (equal-mass prior; invisible to the spectrum under the Grove coupling recipe)', 'beam partials', 'anything heard']);
-export const INVERSE_DEFAULTS = Object.freeze({ tolerance: Object.freeze({ cents: 2, decayRelative: 0.05 }), budget: Object.freeze({ restarts: 6, iterations: 300 }), seed: 1, mass: 0.02 });
-export const INVERSE_LIMITS = Object.freeze({ restarts: 64, iterations: 5000 });
+export const INVERSE_DEFAULTS = Object.freeze({ tolerance: Object.freeze({ cents: 2, decayRelative: 0.05 }), budget: Object.freeze({ restarts: 6, iterations: 300, maxEvaluations: 200000 }), seed: 1, mass: 0.02 });
+// restarts and iterations bound one search (one base, one topology); maxEvaluations bounds the whole job across every base and topology, counted per model evaluation (each Nelder–Mead step costs at most a few).
+export const INVERSE_LIMITS = Object.freeze({ restarts: 64, iterations: 5000, maxEvaluations: 2000000, topologies: 2 });
 const EQUAL_MASS_LAMBDA_FACTOR = 1.16, FULL_MASS_LAMBDA_FACTOR = 1.64;   // Weyl + Gershgorin: λ_max ≤ (1 + 2·2·0.04·(m_max/m_min)) ω_max², λ_min ≥ ω_min² (bridge part positive semidefinite)
 
 /** The largest damped-frequency ratio any admitted Grove can reach (equal masses by default); above it a target is impossible in this family, independently of any search. */
@@ -28,7 +29,7 @@ export function validateInverseTarget(target) {
   for (const k of Object.keys(target)) if (!['version', 'kind', 'normalFrequenciesHz', 'decaySeconds', 'provenance'].includes(k)) throw new Error(`target: unsupported field "${k}".`);
   if (target.version !== INVERSE_VERSION || target.kind !== 'three-resonance') throw new Error('target must be a version-1 three-resonance target.');
   const f = target.normalFrequenciesHz; if (!Array.isArray(f) || f.length !== 3) throw new Error('normalFrequenciesHz must list three frequencies.');
-  f.forEach((x, i) => { finitePositive(x, `normalFrequenciesHz[${i}]`); if (i && !(x > f[i - 1])) throw new Error('normalFrequenciesHz must be strictly ascending.'); });
+  for (let i = 0; i < 3; i++) { finitePositive(f[i], `normalFrequenciesHz[${i}]`); if (i && !(f[i] > f[i - 1])) throw new Error('normalFrequenciesHz must be strictly ascending.'); }   // by index: a sparse array cannot slip through
   if (f[0] < GROVE_BOUNDS.hz[0] * 2 ** (-GROVE_BOUNDS.clusterCents / 1200) || f[2] > GROVE_BOUNDS.hz[1] * 1.2) throw new Error('normalFrequenciesHz lie outside the family\'s frequency range.');
   finitePositive(target.decaySeconds, 'decaySeconds');
   if (typeof target.provenance !== 'string' || !target.provenance.length || target.provenance.length > 200) throw new Error('provenance must say where the target comes from (1..200 characters).');
@@ -39,6 +40,8 @@ export function validateInverseTarget(target) {
 const rng = seed => { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
 const round = (v, d) => Math.round(v * 10 ** d) / 10 ** d, clamp = (v, [lo, hi]) => Math.min(hi, Math.max(lo, v));
 const centsBounds = [-GROVE_BOUNDS.clusterCents, GROVE_BOUNDS.clusterCents];
+/** Garden notes ordered by distance in cents from a frequency (a sorted copy; NOTES is never mutated). */
+export const baseOrder = hz => [...NOTES].sort((a, b) => Math.abs(1200 * Math.log2(frequency(a) / hz)) - Math.abs(1200 * Math.log2(frequency(b) / hz)) || a - b);
 
 /** A canonical Grove from search coordinates (cents of bodies 1 and 2, one coupling per bridge), or null if the model refuses it. */
 function candidateGrove({ baseMidi, topology, mass, loss }, x) {
@@ -56,13 +59,13 @@ function residualOf(grove, target) {
 }
 
 /** Bounded Nelder–Mead over the cents and couplings (loss is set directly from the decay), deterministic for a given seed and budget. */
-function search(spec, target, budget, seed) {
+function search(spec, target, budget, seed, work) {
   const dims = spec.topology === 'chain' ? 4 : 5, lo = [centsBounds[0], centsBounds[0], ...Array(dims - 2).fill(GROVE_BOUNDS.coupling[0])], hi = [centsBounds[1], centsBounds[1], ...Array(dims - 2).fill(GROVE_BOUNDS.coupling[1])];
   const random = rng(seed); let evaluations = 0, best = null;
-  const cost = x => { evaluations++; const g = candidateGrove(spec, x); if (!g) return Infinity; const r = residualOf(g, target); if (!best || r.cost < best.residual.cost) best = { grove: g, residual: r }; return r.cost; };
-  for (let restart = 0; restart < budget.restarts; restart++) {
+  const cost = x => { if (work.used >= work.max) { work.exhausted = true; return Infinity; } work.used++; evaluations++; const g = candidateGrove(spec, x); if (!g) return Infinity; const r = residualOf(g, target); if (!best || r.cost < best.residual.cost) best = { grove: g, residual: r }; return r.cost; };
+  for (let restart = 0; restart < budget.restarts && !work.exhausted; restart++) {
     let simplex = Array.from({ length: dims + 1 }, () => lo.map((l, i) => l + random() * (hi[i] - l))).map(x => ({ x, f: cost(x) }));
-    for (let it = 0; it < budget.iterations; it++) {
+    for (let it = 0; it < budget.iterations && !work.exhausted; it++) {
       simplex.sort((a, b) => a.f - b.f); const worst = simplex[dims], centroid = lo.map((_, i) => simplex.slice(0, dims).reduce((s, p) => s + p.x[i], 0) / dims);
       const at = t => centroid.map((c, i) => clamp(c + t * (c - worst.x[i]), [lo[i], hi[i]]));
       const reflected = at(1), fr = cost(reflected);
@@ -78,29 +81,45 @@ function search(spec, target, budget, seed) {
 /** One candidate per requested topology, each with its residual and a status that never equates a search failure with impossibility. */
 export function searchThreeResonanceGroves(targetInput, options = {}) {
   const target = JSON.parse(JSON.stringify(validateInverseTarget(targetInput)));
+  if (!options || typeof options !== 'object' || Array.isArray(options)) throw new Error('options must be an object.');
   for (const k of Object.keys(options)) if (!['topologies', 'baseMidi', 'tolerance', 'budget', 'seed', 'mass'].includes(k)) throw new Error(`unknown option "${k}".`);
-  const topologies = options.topologies ?? [...GROVE_TOPOLOGIES], tolerance = { ...INVERSE_DEFAULTS.tolerance, ...options.tolerance }, budget = { ...INVERSE_DEFAULTS.budget, ...options.budget }, seed = options.seed ?? INVERSE_DEFAULTS.seed, mass = options.mass ?? INVERSE_DEFAULTS.mass;
-  if (!Array.isArray(topologies) || !topologies.length || topologies.some(t => !GROVE_TOPOLOGIES.includes(t))) throw new Error('topologies must be chain, triangle or both.');
-  if (!Number.isInteger(budget.restarts) || budget.restarts < 1 || budget.restarts > INVERSE_LIMITS.restarts || !Number.isInteger(budget.iterations) || budget.iterations < 1 || budget.iterations > INVERSE_LIMITS.iterations) throw new Error(`budget must be 1..${INVERSE_LIMITS.restarts} restarts and 1..${INVERSE_LIMITS.iterations} iterations.`);
+  const strict = (value, defaults, name, isValid) => {                                      // a plain object with known numeric fields only; no coercion
+    if (value === undefined) return { ...defaults };
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${name} must be an object.`);
+    for (const k of Object.keys(value)) { if (!(k in defaults)) throw new Error(`${name}: unknown field "${k}".`); if (typeof value[k] !== 'number' || !isValid(k, value[k])) throw new Error(`${name}.${k} is out of range.`); }
+    return { ...defaults, ...value };
+  };
+  const tolerance = strict(options.tolerance, INVERSE_DEFAULTS.tolerance, 'tolerance', (k, v) => Number.isFinite(v) && v > 0);
+  const budget = strict(options.budget, INVERSE_DEFAULTS.budget, 'budget', (k, v) => Number.isInteger(v) && v >= 1 && v <= INVERSE_LIMITS[k]);
+  const seed = options.seed ?? INVERSE_DEFAULTS.seed, mass = options.mass ?? INVERSE_DEFAULTS.mass;
+  const topologies = options.topologies === undefined ? [...GROVE_TOPOLOGIES] : options.topologies;
+  if (!Array.isArray(topologies) || !topologies.length || topologies.length > INVERSE_LIMITS.topologies || new Set(topologies).size !== topologies.length || topologies.some(t => !GROVE_TOPOLOGIES.includes(t))) throw new Error('topologies must be a list of at most two distinct names from chain and triangle.');
+  if (typeof mass !== 'number') throw new Error('mass must be a number.');
   if (!Number.isInteger(seed) || seed < 0 || seed > 4294967295) throw new Error('seed must be an integer in 0..4294967295.');
-  if (!(tolerance.cents > 0 && tolerance.decayRelative > 0 && Number.isFinite(tolerance.cents) && Number.isFinite(tolerance.decayRelative))) throw new Error('tolerance must be finite and positive.');
   if (!(mass >= GROVE_BOUNDS.mass[0] && mass <= GROVE_BOUNDS.mass[1])) throw new Error('mass must lie within the Grove bounds.');
-  const bases = options.baseMidi !== undefined ? [options.baseMidi] : NOTES; if (bases.some(b => !NOTES.includes(b))) throw new Error('baseMidi must be a garden note.');
+  if (options.baseMidi !== undefined && !NOTES.includes(options.baseMidi)) throw new Error('baseMidi must be a garden note.');
+  const bases = options.baseMidi !== undefined ? [options.baseMidi] : baseOrder(target.normalFrequenciesHz[0]);
   // Loss from the decay directly (decayS = 1/γ): the only parameter that sets the decay; refused, not clamped, outside the bounds.
   const loss = 1 / target.decaySeconds; if (loss < GROVE_BOUNDS.loss[0] || loss > GROVE_BOUNDS.loss[1]) throw new Error(`decaySeconds ${target.decaySeconds} needs a loss of ${loss.toFixed(4)}, outside the family's ${GROVE_BOUNDS.loss[0]}..${GROVE_BOUNDS.loss[1]}.`);
-  const ratio = target.normalFrequenciesHz[2] / target.normalFrequenciesHz[0], bound = familyRatioBound({ equalMasses: true }), impossible = ratio > bound;
+  // Two bounds, kept apart: the exact target ratio against the family's exact bound, and the same against the bound widened by the cents tolerance
+  // on both ends (2^(2·cents/1200)); only the second proves that no admitted Grove fits within tolerance. A candidate within tolerance is accepted
+  // even when the exact ratio exceeds the exact bound, and the report says so.
+  const ratio = target.normalFrequenciesHz[2] / target.normalFrequenciesHz[0], bound = familyRatioBound({ equalMasses: true }), toleranceWidenedBound = bound * 2 ** (2 * tolerance.cents / 1200);
+  const exactRatioExceedsBound = ratio > bound, impossibleWithinTolerance = ratio > toleranceWidenedBound;
+  const work = { used: 0, max: budget.maxEvaluations, exhausted: false };
   const candidates = topologies.map((topology, ti) => {
-    // The base note nearest the target's lowest frequency is searched first; every garden note is tried and the best kept.
+    // Bases in order of distance from the target's lowest frequency (a sorted copy; NOTES is never mutated); every base is tried unless the work budget runs out, and the best is kept.
     let bestOverall = null, evaluations = 0;
-    for (const baseMidi of bases) { const { best, evaluations: n } = search({ baseMidi, topology, mass, loss }, target, budget, (seed + 1000 * ti + baseMidi) >>> 0); evaluations += n; if (best && (!bestOverall || best.residual.cost < bestOverall.residual.cost)) bestOverall = { ...best, baseMidi }; }
+    for (const baseMidi of bases) { if (work.exhausted) break; const { best, evaluations: n } = search({ baseMidi, topology, mass, loss }, target, budget, (seed + 1000 * ti + baseMidi) >>> 0, work); evaluations += n; if (best && (!bestOverall || best.residual.cost < bestOverall.residual.cost)) bestOverall = { ...best, baseMidi }; }
     if (!bestOverall) return { topology, status: 'no-admitted-candidate', evaluations };
     const within = bestOverall.residual.maxAbsCents <= tolerance.cents && Math.abs(bestOverall.residual.decayRelative) <= tolerance.decayRelative;
-    const status = impossible ? 'impossible-in-family' : within ? 'accepted' : 'best-outside-tolerance';
+    const status = within ? 'accepted' : impossibleWithinTolerance ? 'impossible-in-family' : 'best-outside-tolerance';
     const { cost, ...residual } = bestOverall.residual;
     return { topology, baseMidi: bestOverall.baseMidi, status, grove: JSON.parse(canonicalGrove(bestOverall.grove)), residual, evaluations };
   });
   return { version: INVERSE_VERSION, model: INVERSE_MODEL, fitted: [...INVERSE_FITTED], excluded: [...INVERSE_EXCLUDED], target, tolerance, budget, seed, mass, massPrior: 'equal masses; unidentifiable from the spectrum under the Grove coupling recipe (all-mass scaling leaves the normal frequencies unchanged)',
-    bound: { familyRatioBound: bound, targetRatio: ratio, equalMasses: true, derivation: 'Weyl + Gershgorin on A = D + L with bridge weights ≤ 0.04 ω_max² and degree ≤ 2; λ_max ≤ 1.16 ω_max², λ_min ≥ ω_min²; ±40 cents, 0.01 Hz tolerance, γ ≤ 2 at 80 Hz' },
-    verdict: impossible ? 'impossible-in-family: the target\'s frequency ratio exceeds what any admitted equal-mass Grove can reach (an independent bound, not a search failure); best residuals reported anyway' : candidates.some(c => c.status === 'accepted') ? 'accepted: at least one admitted candidate within tolerance (no uniqueness, no global optimum, nothing about the sound)' : 'no feasible fit found within the search budget (not a proof of impossibility)',
+    work: { evaluations: work.used, maxEvaluations: work.max, exhausted: work.exhausted, note: 'restarts and iterations bound one search per base and topology; maxEvaluations bounds the whole job; when exhausted, remaining bases and topologies were not searched and the verdict is a budget verdict' },
+    bound: { familyRatioBound: bound, toleranceWidenedBound, targetRatio: ratio, exactRatioExceedsBound, impossibleWithinTolerance, equalMasses: true, derivation: 'Weyl + Gershgorin on A = D + L with bridge weights ≤ 0.04 ω_max² and degree ≤ 2; λ_max ≤ 1.16 ω_max², λ_min ≥ ω_min²; ±40 cents, 0.01 Hz tolerance, γ ≤ 2 at 80 Hz' },
+    verdict: candidates.some(c => c.status === 'accepted') ? 'accepted: at least one admitted candidate within tolerance (no uniqueness, no global optimum, nothing about the sound)' + (exactRatioExceedsBound ? '; the exact target ratio exceeds the exact family bound, so the fit is within tolerance, not exact' : '') : impossibleWithinTolerance ? 'impossible-in-family: the target\'s frequency ratio exceeds what any admitted equal-mass Grove can reach even with the cents tolerance (an independent bound, not a search failure); best residuals reported anyway' : work.exhausted ? 'no feasible fit found within the evaluation budget, which was exhausted before every base and topology was searched (not a proof of impossibility)' : 'no feasible fit found within the search budget (not a proof of impossibility)',
     candidates };
 }
