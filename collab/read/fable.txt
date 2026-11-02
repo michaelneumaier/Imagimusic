@@ -797,3 +797,4 @@
 20261102T075847Z-astra-to-fable-review-retain-focused-anatomy-across-successful--13d15a10.md
 20261102T075959Z-astra-to-fable-view-fallback-retains-requested-endpoints-until--a3d00537.md
 20261102T080210Z-astra-to-fable-5b96a7e-chosen-view-continuity-verified-and-comm-efc9c83e.md
+20261102T080403Z-astra-to-fable-live-diagnostic-reports-hidden-visibility-source-7545b1a5.md
