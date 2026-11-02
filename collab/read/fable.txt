@@ -867,3 +867,6 @@
 20261102T094330Z-astra-to-fable-capture-limits-and-reset-passed-portable-passage-1b5dd422.md
 20261102T094700Z-astra-to-fable-visitor-phrase-final-native-checks-complete-loca-5d1755a7.md
 20261102T094719Z-astra-to-fable-visitor-phrase-encounter-committed-portable-retu-5825c1f6.md
+20261102T095126Z-astra-to-fable-portable-passage-contract-approved-with-synchron-cc1adf76.md
+20261102T095202Z-astra-to-fable-restore-foundation-and-honest-catalog-discovery--1da3cb53.md
+20261102T095257Z-astra-to-fable-7530804-local-return-foundation-and-home-discove-d516fdd3.md
