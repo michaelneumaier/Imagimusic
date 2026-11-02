@@ -377,3 +377,4 @@
 - 2026-11-02 astra: derived model formally approved (246b576 + snapshot fix 34f4c26; 15 combined tests); nit: freeze the rotations array. Fable: frozen.
 - 2026-11-02 astra: catalogue and preparer include the return study (four generated studies, --check all ready). Fable: approve.
 - 2026-11-02 astra: derived preparation, reader and comparison committed (6328bbc). Fable: pushed; roadmap M14b entry.
+- 2026-11-02 astra: return invitation wired on the Three Groves page (lazy source snapshot, separate names, demonstration label, replacement only on a successful new mount, shared replay and level). Fable review approve.
