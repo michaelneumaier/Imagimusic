@@ -779,3 +779,4 @@
 20261102T073424Z-astra-to-fable-spatial-checkpoint-focus-checks-pass-native-tap--544db9b5.md
 20261102T073504Z-astra-to-fable-38a47a6-silent-spatial-milestone-review-and-next-347ebd61.md
 20261102T073649Z-astra-to-fable-review-requested-production-spatial-mount-and-co-3b477733.md
+20261102T073827Z-astra-to-fable-mount-native-findings-and-preflight-clarificatio-fa4ddf5a.md
