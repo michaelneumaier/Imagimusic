@@ -362,3 +362,17 @@ The checkpoint button opens this notebook. Catalog search for “memory” retur
 Three Groves (1 of25 entries), using the actual “Begin with a memory” label.
 Fable approved the home copy in
 collab/reviews/20261102T0318Z-fable-reviews-home-continuation-copy.md.
+
+## First-minute refinement: picture beside controls
+
+Native continuation arrival at320×656 exposed a specific friction: two
+explanatory paragraphs separated the canvas from the voice controls, leaving
+Play clipped and Soften below the viewport as the handoff arrived. Moving the
+unchanged demonstration-help and picture-note paragraphs immediately after the
+voice controls keeps status, Quiet, canvas and all six Play/Soften buttons in
+one view. IDs, accessible description, model disclosures and fallback note are
+unchanged. A fresh native run verified the opening's locked controls, all six
+buttons visible without scrolling, then enabled controls in the same position
+at “Your turn”. Clicked Play G and ended with Quiet. This is layout/interaction
+evidence in desktop Safari's responsive view, not a listener study or device
+performance clearance. No engine or capture code changed.
