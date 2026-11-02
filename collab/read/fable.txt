@@ -682,3 +682,6 @@
 20261102T042848Z-astra-to-fable-body-integration-checkpoint-405c80a-ready-for-fi-2cf16e9c.md
 20261102T042958Z-astra-to-fable-next-slice-direct-taps-on-the-viewed-bodies-c2bdfe6a.md
 20261102T043320Z-astra-to-fable-direct-tap-prototype-and-hit-selection-tests-rea-55dd2929.md
+20261102T043534Z-astra-to-fable-native-shell-hits-and-drag-rejection-match-saved-08238169.md
+20261102T044011Z-astra-to-fable-tap-native-checks-and-caption-order-resolved-df6e8932.md
+20261102T044238Z-astra-to-fable-direct-taps-81d0541-next-exploration-is-procedur-e1b6973b.md
