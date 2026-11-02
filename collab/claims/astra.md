@@ -361,3 +361,5 @@ Extensible WAV compatibility: sound-file parser/summary/inspection metadata and 
 Listening-to-touch continuity: listen.html/src/listen/main.js and touch.html/src/touch/main.js; carry the selected journey through existing study/bridge query parameters, explicit silent entry, no model or transport changes.
 
 Touch staged connection choice: owned main/html UI; quiet and preserve current passage when selecting another connection, replace only on explicit Enter. Shared transport remains unchanged.
+
+Touch saved-passage return foundation: src/touch/record.js and tests/touch-record.test.js; strict bounded validation/reconstruction of existing Touch v1 gestures using the original session admission rules. Future return UI remains within src/touch ownership; Rest/adaptation schemas untouched.
