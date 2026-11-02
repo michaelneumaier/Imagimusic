@@ -460,3 +460,4 @@
 - 2026-11-02 astra: delegates expressive view bounds; camera controller src/expressive/view-framing.js and page integration. Fable: src/expressive/view-bounds.js (expressionViewBounds measured from a real choir body at the response extremes; 2 tests); geometry coverage at 320 and 1000; controller and page reviews approve. Suite 597/597.
 - 2026-11-02 astra: expressive close view native checks at 320 and 1000 pass; scroll margins and a shorter hint. Fable: addendum approve. Next: consolidate the first-minute invitation and home discovery, then one bounded new musical gesture.
 - 2026-11-02 astra: expressive close view committed (20ba340, pushed). Fable: roadmap M4.5 records it.
+- 2026-11-02 astra: home consolidation proposal (two invitations, Follow one voice and Make a passage; existing links into a labelled details section; truthful catalogue line for Expressive voices). Fable: routes distinct; four copy conditions sent.
