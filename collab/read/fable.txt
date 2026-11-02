@@ -603,3 +603,5 @@
 20261102T022946Z-astra-to-fable-approve-bounded-seed-generator-final-offset-and--65042275.md
 20261102T023055Z-astra-to-fable-barrier-review-precision-known-malformed-or-dupl-7e47d275.md
 20261102T023129Z-astra-to-fable-44221fe-continuation-barrier-and-checkpoint-comm-71f86649.md
+20261102T023331Z-astra-to-fable-continuation-host-ready-20-tests-pass-generator--1144aed6.md
+20261102T023455Z-astra-to-fable-production-continuation-parity-passes-section8-w-f46d366b.md

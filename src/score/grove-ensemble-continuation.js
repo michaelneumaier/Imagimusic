@@ -10,8 +10,9 @@ export const CONTINUATION_OPERATION = 'continue-from-passage';
 export const CONTINUATION_EDGES = Object.freeze(['release', 'set', 'strike']);
 export const CONTINUATION_ORDER = 'frame, then part, then synthetic releases before explicit events at that frame, then explicit strikes and contact sets by the record\'s stored order, then body';
 
-/** Generate the bounded continuation steps of a strict, ordinary ensemble record; refuses rather than truncates. Pure: equal inputs give equal outputs; the source is never modified. */
-export function continuationSteps(input, { sampleRate } = {}) {
+/** The bounded continuation plan of a strict, ordinary ensemble record: { steps, handoffFrame, sampleRate }, frozen; refuses rather than truncates.
+ * Pure: equal inputs give equal outputs; the source is never modified. Step frames are offsets from the continuation's scheduling base; the handoff is the source's ending. */
+export function continuationPlan(input, { sampleRate } = {}) {
   if (!input || typeof input !== 'object' || input.kind !== ENSEMBLE_RECORD_KIND) throw new Error('Choose an original saved ensemble as the source of a continuation.');
   const source = structuredClone(input);
   validateEnsembleRecord(source, { admission: false });                                   // strict ordinary schema; admission belongs to the live host on reapplication
@@ -36,11 +37,5 @@ export function continuationSteps(input, { sampleRate } = {}) {
   // Total order: frame, part, synthetic releases before explicit events, explicit events by stored order, then body.
   const rank = s => (s.order === null ? 0 : 1);
   steps.sort((a, b) => a.frame - b.frame || a.part - b.part || rank(a) - rank(b) || (a.order === null ? 0 : a.order - b.order) || a.body - b.body);
-  return Object.freeze(steps.map((s, i) => Object.freeze({ ...s, id: `continuation-${i}`, command: Object.freeze(s.command) })));
-}
-
-/** The handoff frame is the source's ending, in the source's own frame space; the steps' frames are offsets from the continuation's scheduling base. */
-export function continuationHandoffFrame(input) {
-  if (!input || typeof input !== 'object' || !input.ended || !Number.isSafeInteger(input.ended.frame)) throw new Error('not an ensemble record');
-  return input.ended.frame;
+  return Object.freeze({ steps: Object.freeze(steps.map((s, i) => Object.freeze({ ...s, id: `continuation-${i}`, command: Object.freeze(s.command) }))), handoffFrame, sampleRate: source.sampleRate });
 }
