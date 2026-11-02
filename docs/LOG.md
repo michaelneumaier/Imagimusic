@@ -380,3 +380,4 @@
 - 2026-11-02 astra: return invitation wired on the Three Groves page (lazy source snapshot, separate names, demonstration label, replacement only on a successful new mount, shared replay and level). Fable review approve.
 - 2026-11-02 astra: native return checks pass (downloads byte-equal to the study; Your turn resets); mobile sticky scope narrowed to the main controls. Fable: approve (addendum).
 - 2026-11-02 astra: derived return encounter committed (5618942). Fable: pushed; roadmap M14b shipped as an optional encounter.
+- 2026-11-02 astra: home and catalogue wording for the return; stale roadmap wording flagged. Fable: review approve; roadmap corrected (host exists as a prototype, four studies, desktop Safari at phone width rather than phone hardware).
