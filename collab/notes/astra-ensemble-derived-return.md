@@ -188,3 +188,26 @@ Fable approved the sticky scope correction in the 02:22:14Z review message
 shows the return controls in normal flow without overlapping the original
 keeping or preparation buttons; only Your turn / Quiet / Show one gesture
 remain pinned at the top. All return actions fit the narrow column.
+
+## Continuation boundary
+
+Encounter committed as 5618942. Homepage current edge, catalog, roadmap card
+and history now describe this capability; native Safari exposes the updated
+copy and both playable/study links. All four generated studies are available
+under the local preparer check. No subjective listening conclusion or actual
+phone-output validation follows from these checks.
+
+A possible next musical question sent to Fable: can a saved passage become a
+seed for a new live response? The appeal would be hearing something familiar
+arrive while deciding when to join it. Before implementation, distinguish
+recalled gestures from new touches, preserve the original, and decide whether
+the result is a composition of two histories or an ordinary performance with
+an explicitly authored opening. No new model or schema work is authorized by
+this note alone. First compare a simple repeated/rotated listening invitation
+against the current explicit return; avoid adding controls without a clear
+musical reason. Device output evaluation and listening with people remain
+open work rather than assumed successes.
+
+Local artifact comparison report:
+renders/ensemble-return-study/safari-encounter-verification.json (original
+JSON, return JSON and return WAV, each byte-equal to the authored study).
