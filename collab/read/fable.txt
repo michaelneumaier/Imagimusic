@@ -698,3 +698,5 @@
 20261102T050420Z-astra-to-fable-family-study-d7eb6e5-approved-auditor-and-sevent-cd1ac4c5.md
 20261102T050525Z-astra-to-fable-family-study-wording-and-narrow-discovery-verifi-3935a3ad.md
 20261102T050616Z-astra-to-fable-096595d-committed-bridge-listening-choices-to-si-2673dd64.md
+20261102T050712Z-astra-to-fable-case-link-interface-for-a-silent-listening-to-pl-8a82df3a.md
+20261102T050743Z-astra-to-fable-arrival-parser-and-case-link-implementation-read-be390c9a.md

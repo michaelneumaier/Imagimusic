@@ -39,7 +39,8 @@ for (const seed of seeds) {
   const g = groves[0], label = `${names[seed] ?? 'Family'} · ${seed} · body 01 struck`;
   report.cases.push({ name, seed, label, file: name + '.wav', recordFile: name + '.json', recordSha256: sha(text), wavSha256: sha(wav), frames: pcm.channels[0].length, peak, peakDbfs: +(20 * Math.log10(peak)).toFixed(1),
     anatomy: { bodiesHz: g.bodies.map(b => +b.hz.toFixed(1)), masses: g.bodies.map(b => +b.mass.toFixed(4)), bridges: g.bridges.map(e => ({ a: e.a + 1, b: e.b + 1, coupling: +e.coupling.toFixed(4) })), loss: g.loss }, envelopeShare: envelopeShares(recipes[0]) });
-  playerCases.push({ name, label, file: name + '.wav', wavSha256: sha(wav), frames: pcm.channels[0].length, peak });
+  // Listening to playing: a silent arrival at Three Groves with this family pending (no autoplay, no storage; the page parses the parameter strictly).
+  playerCases.push({ name, label, file: name + '.wav', wavSha256: sha(wav), frames: pcm.channels[0].length, peak, playHref: `../../ensemble.html?family=${seed}`, playLabel: `Play ${names[seed] ?? 'this family'} ↗` });
 }
 const peaks = report.cases.map(c => c.peakDbfs); report.relativeLevels = `peaks ${peaks.join(' / ')} dBFS for families ${seeds.join(' / ')}; the loudest and quietest differ by ${(Math.max(...peaks) - Math.min(...peaks)).toFixed(1)} dB; nothing normalised`;
 report.limitation = 'Offline renders of authored records; the anatomy (tuning, mass, bridges, loss) is the generator\'s, the envelope share describes the picture\'s projection over 3 s; nothing is claimed about audibility, distinctness, preference or feeling. Families are not ranked.';
