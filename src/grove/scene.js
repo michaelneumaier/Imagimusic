@@ -31,7 +31,10 @@ export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
   const halo=add(root,new T.TorusGeometry(.6,.009,6,64),new T.MeshBasicMaterial({color:colors[i%colors.length],transparent:true,opacity:.15}),[spec.position[0],.025,spec.position[2]]);halo.rotation.x=Math.PI/2;
   const gesture=add(anchor,new T.TorusGeometry(.65,.012,8,64),new T.MeshBasicMaterial({color:0xf2e3ff,transparent:true,opacity:0,depthWrite:false}));gesture.rotation.x=Math.PI/2;
   const strike=add(anchor,new T.TorusGeometry(.65,.016,8,64),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false}));strike.rotation.x=Math.PI/2;strike.visible=false;
-  return {anchor,form,shell,core,bands,halo,gesture,strike,label,labelTexture,spec};
+  // Optional distinction (Whose touch): a small filled centre inside the strike ring, shown only for newly played strikes when the caller enables
+  // it; it shares the ring's position, scale and fading opacity so it adds no motion of its own. Hidden on every existing route.
+  const strikeCentre=add(anchor,new T.CircleGeometry(.14,32),new T.MeshBasicMaterial({color:0xffdfad,transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));strikeCentre.rotation.x=-Math.PI/2;strikeCentre.visible=false;strikeCentre.castShadow=strikeCentre.receiveShadow=false;
+  return {anchor,form,shell,core,bands,halo,gesture,strike,strikeCentre,label,labelTexture,spec};
  });
  const bridges=anatomy.bridges.filter(b=>b.visible).map(spec=>{
   const a=anatomy.bodies[spec.a].attachment,b=anatomy.bodies[spec.b].attachment,sag=Math.min(a[1],b[1])-.35;
@@ -54,12 +57,13 @@ export function createGroveScene(grove,{vectors=[],bodyLabels=[]}={}){
  return {root,bodies,bridges,anatomy,setBridgeHighlight,dispose(){const geometries=new Set(),materials=new Set();root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});bodies.forEach(b=>b.labelTexture.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
 }
 /** Amplified response envelopes animate shell width and light, never edge flow. */
-export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[]){
+export function applyGroveScene(scene,{envelope=[],strikes=[]}={},holds=[],positions=[],{distinguishRemembered=false}={}){
  const markers=groveStrikeMarkers(strikes,scene.bodies.length);
  for(const [i,body] of scene.bodies.entries()){
   const level=Math.max(0,envelope[i]??0),pulse=Math.min(.2,level*.6);
   const held=holds[i]??0;body.gesture.position.y=positions[i]===undefined?0:(.5-positions[i])*2.6*body.spec.scale[1];body.gesture.visible=held>0;body.gesture.material.opacity=held>0?.35+.5*held:0;body.gesture.scale.setScalar(1+.35*held);
   const marker=markers[i];body.strike.visible=!!marker;body.strike.material.opacity=marker?.opacity??0;body.strike.position.y=marker?(0.5-marker.u)*2.6*body.spec.scale[1]:0;body.strike.scale.setScalar(marker?.scale??1);
+  const centre=distinguishRemembered&&marker&&!marker.remembered;body.strikeCentre.visible=!!centre;body.strikeCentre.material.opacity=centre?marker.opacity:0;body.strikeCentre.position.y=body.strike.position.y;body.strikeCentre.scale.setScalar(marker?.scale??1);
   body.form.scale.set(body.spec.scale[0]*(1+pulse),body.spec.scale[1],body.spec.scale[2]*(1+pulse));
   body.shell.material.emissiveIntensity=.025+Math.min(.7,level*2);body.core.material.emissiveIntensity=.1+Math.min(1.2,level*3);body.halo.material.opacity=.15+Math.min(.65,level*2);
  }
