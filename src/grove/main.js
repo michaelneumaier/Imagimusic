@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {composeGrove,GROVE_SEEDS,describeGrove} from '../score/grove.js';
 import {createImpulseTransport} from '../touch/transport.js';
 import {holdVelocity} from '../touch/session.js';
@@ -14,14 +15,14 @@ import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
 const $=id=>document.getElementById(id),held=new Map(),keys=['a','s','d'];
 let grove,world,sculpture,scenePlaying,pads=[],greeting=null,mode='live',enterToken=0;
-const replay=createGroveReplay({onChange:({state})=>{if(mode==='replay'){$('replay').textContent=state==='playing'?'Listen again ↗':'Listen back ↗';syncQuiet();if(state==='suspended')status('Listening was interrupted. Listen again restarts this passage.');if(state==='ended')status('Your passage has settled. Listen again, keep it, or begin another.');}}});
+const replay=createGroveReplay({listeningDb:12,onChange:({state})=>{if(mode==='replay'){$('replay').textContent=state==='playing'?'Listen again ↗':'Listen back ↗';syncQuiet();if(state==='suspended')status('Listening was interrupted. Listen again restarts this passage.');if(state==='ended')status('Your passage has settled. Listen again, keep it, or begin another.');}}});
 function filmPlaying(){const video=$('movie-preview');return !video.paused&&!video.ended;}
 function syncQuiet(){$('quiet').disabled=!(filmPlaying()||(mode==='replay'?['playing','preparing','suspended'].includes(replay.state):['playing','suspended'].includes(transport.state)));}
 function stopReplay({pauseFilm=true}={}){if(pauseFilm)$('movie-preview').pause();replay.stop();if(mode==='replay')mode='live';syncQuiet();}
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
 const rich=()=>$('voice').value==='partials';
 const movie=bindGroveMovieControls({onPreviewPlay:()=>{stopReplay({pauseFilm:false});status('Playing your saved film.');},getSource:()=>{stopReplay();return {recording:transport.recording(),pcm:transport.saveAudio(),camera:{position:world.camera.position.toArray(),target:world.controls.target.toArray()}};}});
-const transport=createImpulseTransport({createSession:(settings,sr)=>settings.voice?createGroveVoiceSession(settings,sr):createGroveSession(settings.grove,sr),prepare:createGroveStudyJob,onChange:({state,recording})=>{
+const transport=createImpulseTransport({listeningDb:12,createSession:(settings,sr)=>settings.voice?createGroveVoiceSession(settings,sr):createGroveSession(settings.grove,sr),prepare:createGroveStudyJob,onChange:({state,recording})=>{
  const open=['ready','playing'].includes(state),has=!!recording?.events.length;movie.setReady(state==='ended'&&has&&!!world);
  pads.forEach(p=>p.disabled=!open||mode==='greeting');$('begin').disabled=state==='preparing'||open;
  $('begin').textContent=state==='preparing'?'Opening the grove…':state==='suspended'?'Resume the grove ↗':state==='ended'?'Begin another ↗':open?'The grove is open':'Enter the grove ↗';
@@ -75,3 +76,5 @@ function draw(){
  if(mode==='replay')phase=replay.state==='ended'?'YOUR PASSAGE HAS SETTLED':'LISTENING BACK';$('phase').textContent=phase;requestAnimationFrame(draw);
 }
 draw();
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[transport,replay],defaultDb:12,storageKey:'imagimusic-grove-listening-db'});

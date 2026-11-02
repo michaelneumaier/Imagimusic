@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createTouchTransport} from '../src/touch/transport.js';
 function fake(){
- const nodes=[],gains=[],context={sampleRate:8000,currentTime:1,state:'running',destination:{},async resume(){},close(){},createBuffer:(_c,n)=>({copyToChannel(){},length:n}),createGain(){const events=[],node={gain:{value:1,setValueAtTime:(v,t)=>events.push(['set',v,t]),linearRampToValueAtTime:(v,t)=>events.push(['ramp',v,t])},connect(){},disconnect(){},events};gains.push(node);return node;},createBufferSource(){const node={connect(){},disconnect(){},start(...args){node.started=args;},stop(...args){node.stopped=args;}};nodes.push(node);return node;}};
+ const nodes=[],gains=[],context={sampleRate:8000,currentTime:1,state:'running',destination:{},async resume(){},close(){},createBuffer:(_c,n)=>({copyToChannel(){},length:n}),createGain(){const events=[],node={gain:{value:1,setValueAtTime:(v,t)=>events.push(['set',v,t]),linearRampToValueAtTime:(v,t)=>events.push(['ramp',v,t])},connections:[],connect(target){this.connections.push(target);},disconnect(){this.connections=[];},events};gains.push(node);return node;},createBufferSource(){const node={connect(){},disconnect(){},start(...args){node.started=args;},stop(...args){node.stopped=args;}};nodes.push(node);return node;}};
  const bank=[0,1].map(()=>({sampleRate:8000,channels:[new Float32Array(100),new Float32Array(100)]}));
  return {context,nodes,gains,bank};
 }
@@ -51,4 +51,24 @@ test('a malformed authored impulse slot is rejected before replacing the current
  const {context,bank,nodes}=fake();const createSession=()=>{const events=[];return {strike(event){events.push({...event});return {accepted:true,event};},snapshot:()=>({events:structuredClone(events),sampleRate:8000,ended:null}),finish(){}};};
  const transport=createTouchTransport({createContext:()=>context,createSession,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});await transport.enable({});transport.strike(0,.5);const before=transport.recording();
  assert.throws(()=>transport.playSequence([{body:0,frame:0,velocity:.5,bufferIndex:2}]),/buffer index/);assert.deepEqual(transport.recording(),before);assert.equal(nodes.length,1);assert.equal(nodes[0].stopped,undefined);
+});
+
+test('listening gain follows every passage bus without changing captured PCM or Quiet fade',async()=>{
+ const {context,bank,gains}=fake(),stages=[];
+ bank[0].channels=[Float32Array.of(.1,.2),Float32Array.of(.2,.1)];
+ const createListeningStage=(_context,{db})=>{const stage={input:{},output:{connect(destination){assert.equal(destination,context.destination);}},levels:[db],setDb(db){this.levels.push(db);},dispose(){this.disposed=true;}};stages.push(stage);return stage;};
+ const transport=createTouchTransport({createContext:()=>context,prepare:()=>({promise:Promise.resolve(bank),cancel(){}}),createListeningStage,listeningDb:18});
+ await transport.enable({});assert.equal(gains[0].connections[0],stages[0].input);transport.strike(0,.5);const record=transport.recording(),pcm=transport.saveAudio();
+ transport.setListeningDb(6);assert.deepEqual(transport.recording(),record);assert.deepEqual(transport.saveAudio(),pcm);
+ context.currentTime+=.1;transport.quiet();assert.deepEqual(gains[0].events.map(e=>e.slice(0,2)),[['set',1],['ramp',0]]);
+ transport.newPassage();assert.equal(gains[2].connections[0],stages[0].input);transport.strike(1,.5);assert.equal(stages.length,1);assert.deepEqual(stages[0].levels,[18,6]);
+ transport.dispose();assert.equal(stages[0].disposed,true);assert.equal(context.onstatechange,null);
+});
+
+test('a failed listening connection is disposed and can be retried without bypassing the stage',async()=>{
+ const {context,bank}=fake(),stages=[];let fail=true;
+ const createListeningStage=()=>{const stage={input:{},output:{connect(){if(fail)throw Error('connection refused');}},setDb(){},dispose(){this.disposed=true;}};stages.push(stage);return stage;};
+ const transport=createTouchTransport({createContext:()=>context,prepare:()=>({promise:Promise.resolve(bank),cancel(){}}),createListeningStage,listeningDb:18});
+ await assert.rejects(transport.enable({}),/connection refused/);assert.equal(transport.state,'error');assert.equal(stages[0].disposed,true);
+ assert.equal(transport.strike(0,.5).accepted,false);fail=false;await transport.enable({});assert.equal(stages.length,2);assert.equal(transport.strike(0,.5).accepted,true);transport.dispose();
 });

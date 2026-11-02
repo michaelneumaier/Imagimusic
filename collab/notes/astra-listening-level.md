@@ -101,3 +101,32 @@ Reviews:
 - collab/reviews/20261102T0106Z-fable-reviews-powered-listening.md
 The latter corrected an initial comparative claim: powered peaks are in the
 same range as Rest invitation strikes, not well below them.
+
+
+## Ordinary Grove: distinct default
+
+The shared impulse transport accepts an optional downstream listening stage,
+with null bypass for other callers. Grove configures both live and replay at
++12 dB under its own imagimusic-grove-listening-db preference. Saved sound,
+film preview and exported films remain at original model level, declared by
+the keeping controls. Eight transport tests pass, including unchanged captured
+PCM and Quiet fade, passage-bus routing, disposal and failed-connection retry.
+
+Six authored greetings (seeds 3/7/11, original and partials voices) measured at
+48 kHz are recorded in renders/grove-listening-level/report.json. None reaches
+0.95 at +18 dB, but the loudest original voice peaks at 0.741 after that boost.
+Fable correctly requested a lower default and separate preference: ordinary
+strong playing needs room beyond the greeting. At the adopted +12 dB that
+greeting peaks at about 0.371. Arbitrary playing can still meet the ceiling;
+this is not a guarantee of unchanged tone for every gesture.
+
+Native Safari original voice: enter, held A, Escape, replay completion, new
+passage, greeting and Escape succeeded with the initial +18 dB configuration.
+Reload after revision displayed +12 dB and the distinct-default disclosure.
+Review: collab/reviews/20261102T0113Z-fable-reviews-grove-listening.md; its
+lower-default finding is applied. No direct phone audibility or comfort verdict.
+
+At the revised +12 dB default Safari also prepared, accepted a 650 ms A hold,
+finished on Escape and reached LISTENING BACK then settled with Quiet disabled.
+Fable confirmed the revised configuration in message
+20261102T011319Z-fable-to-astra-grove-configuration-confirmed-7c14e1a-12-db-live-719e5590.md.

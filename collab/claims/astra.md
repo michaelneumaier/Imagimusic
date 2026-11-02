@@ -179,3 +179,5 @@ Interim listening-level disclosure: pulse.html, powered.html, grove.html and ada
 Pulse/adaptation listening configuration: pulse.html/adapt.html and their main modules. Existing reviewed18dB stage and shared single-instrument preference, matching both comparison branches.
 
 Powered listening integration: powered-host.js, powered-main.js, powered.html and powered-host tests. Same optional stage lifecycle and18dB shared live/replay control.
+
+Ordinary Grove listening: src/touch/transport.js (optional downstream stage, default bypass), tests/touch-transport.test.js, src/grove/main.js and grove.html. Paired live/replay control; saved sound/film unchanged.

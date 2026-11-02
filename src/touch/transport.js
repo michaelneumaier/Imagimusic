@@ -1,3 +1,4 @@
+import {createListeningLevel,listeningGain} from '../grove/listening-level.js';
 import {createTouchSession,renderTouchRecording,impulseBufferIndex} from './session.js';
 import {createLoomRenderJob} from '../loom/render-job.js';
 function prepareBank(settings,sampleRate){
@@ -11,9 +12,21 @@ export function scheduleTouchImpulse(context,buffer,master,{when,velocity,onende
 export function scheduleTouchFade(context,master,when,fadeFrames){master.gain.setValueAtTime(1,when);master.gain.linearRampToValueAtTime(0,when+fadeFrames/context.sampleRate);}
 
 /** Each scheduled buffer is one impulse; all share a fixed-gain output bus. */
-export function createTouchTransport({createContext=()=>new AudioContext(),prepare=prepareBank,onChange=()=>{},createSession=createTouchSession}={}){
+export function createTouchTransport({createContext=()=>new AudioContext(),prepare=prepareBank,onChange=()=>{},createSession=createTouchSession,createListeningStage=createListeningLevel,listeningDb=null}={}){
  let context,session,bank,buffers,master,origin=null,state='idle',token=0,job,settings,suspendedFrom=null;
+ let listening=null;
+ if(listeningDb!==null)listeningGain(listeningDb);
  const sources=new Map();
+ function ensureListening(){
+  if(!context||listeningDb===null||listening)return;
+  const candidate=createListeningStage(context,{db:listeningDb});
+  try{candidate.output.connect(context.destination);}catch(error){candidate.dispose();throw error;}
+  listening=candidate;
+ }
+ function setListeningDb(db){
+  listeningGain(db);listeningDb=db;const existed=!!listening;ensureListening();listening?.setDb(db);
+  if(!existed&&listening){for(const bus of new Set([master,...sources.values()].filter(Boolean))){bus.disconnect();bus.connect(listening.input);}}
+ }
  const emit=()=>onChange({state,recording:session?.snapshot()??null});
  function contextChanged(){if(context.state!=='running'&&['ready','playing'].includes(state)){suspendedFrom=state;state='suspended';emit();}else if(context.state==='running'&&state==='suspended'){state=suspendedFrom??'ready';suspendedFrom=null;emit();}}
  async function resume(){if(!context||state!=='suspended')return;await context.resume();contextChanged();if(context.state!=='running')throw new Error('Audio is still interrupted. Try Resume again.');}
@@ -30,8 +43,8 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
  }
  function cancel(){token++;job?.cancel();job=null;quiet();}
  function fresh(){
-  quiet();if(master&&![...sources.values()].includes(master))master.disconnect();session=createSession(settings,context.sampleRate);origin=null;
-  master=context.createGain();master.connect(context.destination);state='ready';suspendedFrom=null;contextChanged();emit();
+  ensureListening();quiet();if(master&&![...sources.values()].includes(master))master.disconnect();session=createSession(settings,context.sampleRate);origin=null;
+  master=context.createGain();master.connect(listening?.input??context.destination);state='ready';suspendedFrom=null;contextChanged();emit();
  }
  async function enable(nextSettings){
   cancel();const own=token;settings=structuredClone(nextSettings);state='preparing';emit();
@@ -69,8 +82,8 @@ export function createTouchTransport({createContext=()=>new AudioContext(),prepa
  function newPassage(){if(!bank||state==='preparing')return;fresh();}
  function recording(){return session?.snapshot()??null;}
  function saveAudio(){if(!bank||!session)throw new Error('Prepare the instrument first');return renderTouchRecording(session.snapshot(),bank);}
- function dispose(){cancel();context?.close();}
- return {enable,resume,strike,playSequence,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
+ function dispose(){cancel();listening?.dispose();listening=null;if(context){context.onstatechange=null;context.close();}}
+ return {setListeningDb,enable,resume,strike,playSequence,quiet,newPassage,time,recording,saveAudio,dispose,get state(){return state;},get session(){return session;}};
 }
 
 // The same clock, impulse scheduler and recorded ending serve other fixed linear instruments.
