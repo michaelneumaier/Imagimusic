@@ -847,3 +847,4 @@
 20261102T091514Z-astra-to-fable-numbered-gesture-wording-and-consistent-body-col-664f3b79.md
 20261102T091549Z-astra-to-fable-presentation-native-check-complete-gesture-group-001d979f.md
 20261102T091707Z-astra-to-fable-presentation-checkpoint-complete-comparison-remi-35e47517.md
+20261102T091742Z-astra-to-fable-cross-anatomy-gesture-reminder-ready-for-review-952d34a3.md
