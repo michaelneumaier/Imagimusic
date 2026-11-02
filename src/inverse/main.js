@@ -74,6 +74,8 @@ async function prepare(candidate,card){
   if(token!==generation)return;
   await ensureSpatial();
   if(token!==generation)return;
+  // Give the synchronous picture preflight real dimensions; roll back on a failed first mount.
+  document.querySelector('.playing').hidden=false;document.querySelector('.workshop').classList.add('has-instrument');
   const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;mountedTopology=candidate.topology;mountedReport=report;armed=false;repeatInvitation();
   if(spatial&&!pictureFailed){configureViews();document.querySelector('.playing').classList.add('spatial-ready');}
   document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
@@ -81,7 +83,10 @@ async function prepare(candidate,card){
   $('status').textContent=`${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.`;
   $('gesture').textContent='Choose Start listening, then touch a body.';
   $('playing-title').focus({preventScroll:true});document.querySelector('.playing').scrollIntoView({block:'start'});
- }catch(error){if(token===generation)$('status').textContent=`Preparation failed: ${error.message} Previous instrument retained.`;}
+ }catch(error){
+  if(!instrument){document.querySelector('.playing').hidden=true;document.querySelector('.workshop').classList.remove('has-instrument');}
+  if(token===generation)$('status').textContent=`Preparation failed: ${error.message} Previous instrument retained.`;
+ }
  finally{if(token===generation){busy=false;controls();}}
 }
 $('listen').onclick=async()=>{

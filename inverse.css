@@ -11,3 +11,5 @@
 #same-touch{margin:14px 0 20px;padding:14px;border-left:2px solid var(--mint);background:#142126}#same-touch p{margin-bottom:10px}#repeat-touch{background:transparent;color:var(--mint)}
 
 .listening-level{max-width:320px;margin:14px 0 4px}.listening-level output{float:right;color:var(--mint)}.listening-level input{padding:0;accent-color:var(--mint);height:24px}#level-help{margin-bottom:12px}
+
+.workshop:not(.has-instrument){grid-template-columns:minmax(0,1fr);max-width:650px}

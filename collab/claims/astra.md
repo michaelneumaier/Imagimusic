@@ -305,3 +305,5 @@ Inverse live diagnostic: tests/inverse-live-preview.html/js; explicit fitted-cha
 Inverse listening level: src/inverse/transport.js, tests/inverse-transport.test.js, inverse.html/css/main.js; shared visitor-controlled 0..4 monitoring gain with default1, bounded smooth live changes, unchanged PCM/model/display and candidate-independent level.
 
 Inverse gain render diagnostic: tests/inverse-level-render.html/js; actual OfflineAudioContext output for mute, unity, fourfold scale and interrupted live ramps through production transport, with explicit offline state facade and no device playback.
+
+Inverse first entry: inverse.html/css and src/inverse/main.js; reveal response only after first successful mount, retain across later work, collapse empty initial grid and clarify the starting-example action.
