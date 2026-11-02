@@ -175,4 +175,7 @@ Listening-level prototype: src/grove/listening-level.js, tests/grove-listening-l
 Listening graph browser diagnostic: tests/listening-level.html and tests/listening-level-browser.js; muted offline Web Audio verification of gain/ceiling at 0 and20dB.
 
 Rest/reopen listening integration: contact-host.js, replay.js, listening-control.js, rest-main.js/rest.html, reopen-main.js/reopen.html, ensemble-reopen-main.js/ensemble-reopen.html and focused host/replay/control tests. Explicit opt-in stage leaves other routes unchanged.
-Interim listening-level disclosure: pulse.html, powered.html, grove.html and adapt.html until their paired live/replay integration.\n
+Interim listening-level disclosure: pulse.html, powered.html, grove.html and adapt.html until their paired live/replay integration.
+Pulse/adaptation listening configuration: pulse.html/adapt.html and their main modules. Existing reviewed18dB stage and shared single-instrument preference, matching both comparison branches.
+
+Powered listening integration: powered-host.js, powered-main.js, powered.html and powered-host tests. Same optional stage lifecycle and18dB shared live/replay control.

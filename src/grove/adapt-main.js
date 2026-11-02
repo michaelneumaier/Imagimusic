@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {readRestFile} from './read-rest-file.js';
 import {writeRestPlayHandoff} from './rest-play-handoff.js';
 import {createRestImportSession} from './rest-import-session.js';
@@ -15,7 +16,7 @@ async function readSource(source,{signal}){
  return readRestFile(file,{signal});
 }
 const session=createRestImportSession({read:readSource,prepare:(data,options)=>restWorkerJob(new URL('./rest-adaptation-worker.js',import.meta.url),data,options),onChange:sync});
-const replay=createGroveReplay({onChange:({state})=>{sync();if(state==='ended')status(`${selected} has settled. Your original and comparison are here.`);if(state==='suspended')status('Audio paused. Choose a version to restart it.');}});
+const replay=createGroveReplay({listeningDb:18,onChange:({state})=>{sync();if(state==='ended')status(`${selected} has settled. Your original and comparison are here.`);if(state==='suspended')status('Audio paused. Choose a version to restart it.');}});
 function sync(){const busy=session.state==='preparing',ready=!!session.result;for(const id of ['original','changed','keep','play-changed'])$(id).disabled=busy||!ready;$('cancel').hidden=!busy;$('example').disabled=busy;$('quiet').disabled=!['preparing','playing','suspended'].includes(replay.state);}
 function stop(){playOperation++;replay.stop();}
 function show(result){
@@ -38,3 +39,5 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();sta
 window.addEventListener('pagehide',event=>{operation++;stop();if(event.persisted){session.cancel();replay.park();return;}session.dispose();replay.dispose();});
 window.addEventListener('pageshow',event=>{if(event.persisted){sync();status(session.result?'Your comparison is here. Choose a version when you’re ready.':'Welcome back. Choose saved Rest gestures when you’re ready.');}});
 sync();
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[replay],defaultDb:18,storageKey:'imagimusic-rest-listening-db'});

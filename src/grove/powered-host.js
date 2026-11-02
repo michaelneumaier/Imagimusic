@@ -1,11 +1,16 @@
+import {createListeningLevel,listeningGain} from './listening-level.js';
 import {createPoweredCapture} from './powered-capture.js';
 import {restWorkerJob} from './contact-job.js';
 import {visualFromState} from '../rest/engine.js';
 const prepareDefault=(data,options)=>restWorkerJob(new URL('./powered-prepare-worker.js',import.meta.url),data,options);
 const renderDefault=(data,options)=>restWorkerJob(new URL('./powered-render-worker.js',import.meta.url),data,options);
 /** One bounded powered encounter per explicit Begin. No automatic restarts. */
-export function createPoweredHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-powered-encounter',options),prepare=prepareDefault,render=renderDefault,onChange=()=>{},onDecision=()=>{}}={}){
+export function createPoweredHost({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-powered-encounter',options),prepare=prepareDefault,render=renderDefault,createListeningStage=createListeningLevel,listeningDb=null,onChange=()=>{},onDecision=()=>{}}={}){
  let context=null,node=null,recipe=null,driver=null,capture=null,snapshot=null,pcm=null,rendering=null,prepareAbort=null,renderAbort=null,token=0,serial=0,state='idle',failure=null,quietRequested=false,disposed=false,finishedTime=0,pendingContact=null,timing=null;
+ let listening=null;
+ if(listeningDb!==null)listeningGain(listeningDb);
+ function ensureListening(){if(context&&!listening&&listeningDb!==null){const next=createListeningStage(context,{db:listeningDb});try{next.output.connect(context.destination);}catch(error){next.dispose();throw error;}listening=next;}}
+ function setListeningDb(db){listeningGain(db);listeningDb=db;const had=!!listening;ensureListening();listening?.setDb(db);if(node&&!had&&listening){node.disconnect();node.connect(listening.input);}}
  const emit=()=>{if(!disposed)onChange({state,error:failure});};
  const setState=next=>{state=next;emit();};
  function detach(){if(node){node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();node=null;}}
@@ -22,6 +27,7 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
    const [,,prepared]=await Promise.all([resume,module,preparation]);
    if(disposed||own!==token||abort.signal.aborted)return false;
    if(context.state!=='running')throw new Error('Audio is interrupted. Begin again when audio is available.');
+   ensureListening();
    const mountedFrame=Math.ceil(context.currentTime*context.sampleRate);
    const generation=`powered-${own}`,originFrame=Math.ceil((context.currentTime+.035)*context.sampleRate);
    const nextCapture=createPoweredCapture(prepared.recipe,{generation,driver:prepared.driver,fadeFrames:prepared.fadeFrames});
@@ -38,7 +44,7 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
     }catch(error){fail(error);}
    };
    node.onprocessorerror=()=>fail(new Error('The powered audio processor stopped unexpectedly.'));
-   node.connect(context.destination);setState('playing');return true;
+   node.connect(listening?.input??context.destination);setState('playing');return true;
   }catch(error){if(disposed||own!==token||abort.signal.aborted)return false;fail(error);throw error;}
  }
  // Requested frames are diagnostic; capture records acknowledged applied frames.
@@ -74,11 +80,11 @@ export function createPoweredHost({createContext=()=>new AudioContext(),createNo
  /** Release audio for browser-cache parking while retaining only a finished encounter. */
  function park(){
   if(disposed)return;token++;prepareAbort?.abort();renderAbort?.abort();prepareAbort=renderAbort=null;rendering=null;pendingContact=null;detach();
-  const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
+  listening?.dispose();listening=null;const old=context;context=null;if(old){old.onstatechange=null;Promise.resolve(old.close()).catch(()=>{});}
   failure=null;quietRequested=false;
   if(capture?.state!=='complete'){capture=recipe=driver=snapshot=pcm=timing=null;finishedTime=0;}
   setState(capture?'ended':'idle');
  }
- function dispose(){if(disposed)return;disposed=true;token++;prepareAbort?.abort();renderAbort?.abort();detach();context?.close();state='disposed';pcm=null;}
- return {begin,send,quiet,resume,park,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get timing(){return timing?{...timing}:null;},get stats(){return capture?.stats??null;}};
+ function dispose(){if(disposed)return;disposed=true;token++;prepareAbort?.abort();renderAbort?.abort();detach();listening?.dispose();listening=null;context?.close();state='disposed';pcm=null;}
+ return {begin,send,quiet,setListeningDb,resume,park,recording,saveAudio,visual,dispose,get state(){return state;},get recipe(){return recipe;},get driver(){return driver;},get timing(){return timing?{...timing}:null;},get stats(){return capture?.stats??null;}};
 }

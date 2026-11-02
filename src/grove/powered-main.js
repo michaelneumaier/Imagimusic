@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {composeGrove} from '../score/grove.js';
 import {poweredNextInvitation} from '../score/grove-powered.js';
 import {createResponseCauses,responseCausesForRecord} from './response-causes.js';
@@ -14,9 +15,9 @@ import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),pads=[$('upper'),$('tip')];
 let grove=composeGrove({seed:3}),world,scene,picking,picture=null,pictureAbort=null,replayMode=false,saving=false,revision=0,trace=null,traceMode=null,traceRecipe=null,traceReplayIndex=0,causes=null;
 const status=text=>{$('status').textContent=text;};
-const host=createPoweredHost({onChange:({state,error})=>{if(state==='playing'&&host.recipe!==traceRecipe){trace?.reset();traceRecipe=host.recipe;traceMode='live';causes=createResponseCauses({sampleRate:host.recipe.sampleRate,driver:host.driver});}sync();if(state==='idle')hands.clear();if(state==='ended'){$('trace-controls').hidden=false;hands.clear();const record=host.recording();if(traceMode==='live')causes=responseCausesForRecord(record);$('next-touch').textContent=poweredNextInvitation(record,host.recipe);status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){trace?.reset();traceMode=null;hands.clear();status(error.message);}},onDecision:ack=>{if(traceMode==='live'&&causes)causes.consume(ack);if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
+const host=createPoweredHost({listeningDb:18,onChange:({state,error})=>{if(state==='playing'&&host.recipe!==traceRecipe){trace?.reset();traceRecipe=host.recipe;traceMode='live';causes=createResponseCauses({sampleRate:host.recipe.sampleRate,driver:host.driver});}sync();if(state==='idle')hands.clear();if(state==='ended'){$('trace-controls').hidden=false;hands.clear();const record=host.recording();if(traceMode==='live')causes=responseCausesForRecord(record);$('next-touch').textContent=poweredNextInvitation(record,host.recipe);status('Let that settle. Listen back, or begin again with a different touch.');}if(state==='suspended')status('Audio paused. Resume continues this encounter.');if(state==='error'){trace?.reset();traceMode=null;hands.clear();status(error.message);}},onDecision:ack=>{if(traceMode==='live'&&causes)causes.consume(ack);if(!ack.accepted&&ack.reason==='contact-limit')status('This encounter has enough gestures. Lift, listen, and begin another.');}});
 const hands=createPoweredGesture({send:command=>host.send(command)});
-const replay=createGroveReplay({onChange:({state})=>{sync();if(replayMode&&state==='ended')status('Your encounter has settled.');if(replayMode&&state==='suspended')status('Listening paused. Listen back starts your saved encounter again.');}});
+const replay=createGroveReplay({listeningDb:18,onChange:({state})=>{sync();if(replayMode&&state==='ended')status('Your encounter has settled.');if(replayMode&&state==='suspended')status('Listening paused. Listen back starts your saved encounter again.');}});
 function active(){return ['preparing','playing','suspended'].includes(host.state)&&!replayMode;}
 function sync(){
  const state=host.state,ended=state==='ended',busy=['preparing','playing','suspended','ending'].includes(state);
@@ -65,3 +66,5 @@ function draw(){
  $('phase').textContent=replayMode?replay.state==='ended'?'SETTLED':'LISTENING BACK':host.state==='playing'?(showSource?'ENERGY ENTERING':'LISTEN TO THE RELEASE'):({idle:'BEFORE THE GESTURE',preparing:'PREPARING',suspended:'PAUSED',ending:'SETTLING',ended:'SETTLED',error:'AUDIO STOPPED'}[host.state]??'');requestAnimationFrame(draw);
 }
 sync();draw();
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[host,replay],defaultDb:18,storageKey:'imagimusic-rest-listening-db'});

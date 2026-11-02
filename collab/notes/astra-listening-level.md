@@ -66,3 +66,38 @@ at48k, six strikes and three contacts, SHA-256
 885180a02657ddc0a81ed1401fbea3273752bb88aa15d40812f6f8334423a831.
 The download is original-level model sound, not captured boosted output.
 This does not establish comfort or audibility on a phone.
+
+
+## Pulse, Adapt and Powered
+
+Pulse now uses +18 dB for its single continuous opening/answer host. Adapt uses
++18 dB for its one replay instance, so Original and Changed receive the same
+gain. Powered uses +18 dB for live and replay together. All share the guarded
+single-instrument preference with Rest. Original-level saved-audio notes are
+visible; interim quiet-level notes are removed on these three routes. Grove
+and the generated listening-study players remain the next batch.
+
+Native Safari: Pulse reached THE BODIES ARE YOURS, accepted S and ended on
+Escape with keeping controls. Adapt's prepared pair remained silent until
+choice, both Original and Changed reached Listening, then Escape stopped it.
+Powered Begin completed its encounter; Listen back reached LISTENING BACK and
+then SETTLED with Quiet disabled.
+
+Prepared Adapt pair measured from canonical float PCM: after +18 dB, original
+peak0.1347724914 and changed0.1356141048; zero samples above0.95 in either.
+Report: renders/adaptation-listening-level/report.json. Only this example is
+covered; arbitrary imported files can reach the ceiling. Equal gain is not a
+claim of equal perceived loudness.
+
+Powered host tests:13 pass, including unchanged canonical capture, disposal,
+selected-level restoration and failed-stage retry. Fable independently checked
+the exact default preparation on seeds3/7/11 at48k, free and hand at each zone
+from0.5–2s: all nine cases had zero samples above0.95 after+18dB. Highest boosted
+peak about−9.6dBFS. These fixture checks do not prove an arbitrary performance
+cannot clip or establish phone audibility.
+
+Reviews:
+- collab/reviews/20261102T0104Z-fable-reviews-pulse-adapt-listening.md
+- collab/reviews/20261102T0106Z-fable-reviews-powered-listening.md
+The latter corrected an initial comparative claim: powered peaks are in the
+same range as Rest invitation strikes, not well below them.

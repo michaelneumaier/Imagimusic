@@ -50,3 +50,11 @@ test('parking an unfinished encounter does not fabricate a finished capture',asy
 test('parking during preparation preserves an earlier complete capture and rejects stale preparation',async()=>{
  const wait=deferred();let calls=0;const s=setup({prepare:()=>++calls===1?Promise.resolve(prepared):wait.promise});await s.host.begin({});s.finish();const record=s.host.recording(),begin=s.host.begin({});s.host.park();assert.equal(s.host.state,'ended');assert.deepEqual(s.host.recording(),record);wait.resolve(prepared);assert.equal(await begin,false);assert.equal(s.nodes.length,1);s.host.dispose();
 });
+test('listening stage preserves canonical powered capture and follows context lifecycle',async()=>{
+ const stages=[],s=setup({listeningDb:18,createListeningStage:(_,options)=>{const stage={initial:options.db,input:{},output:{connect(){}},setDb(db){this.db=db;},dispose(){this.disposed=true;}};stages.push(stage);return stage;}});
+ await s.host.begin(composeGrove({seed:7}));s.finish();const record=s.host.recording();s.host.setListeningDb(6);assert.deepEqual(s.host.recording(),record);assert.equal(stages[0].db,6);s.host.park();assert.equal(stages[0].disposed,true);await s.host.begin(composeGrove({seed:7}));assert.equal(stages[1].initial,6);s.host.dispose();assert.equal(stages[1].disposed,true);
+});
+test('failed powered listening stage is disposed and explicitly retried',async()=>{
+ let attempts=0,disposed=0;const s=setup({listeningDb:18,createListeningStage:()=>({input:{},output:{connect(){if(attempts++===0)throw new Error('stage failed');}},setDb(){},dispose(){disposed++;}})});
+ await assert.rejects(s.host.begin(composeGrove({seed:7})),/stage failed/);assert.equal(disposed,1);assert.equal(s.nodes.length,0);await s.host.begin(composeGrove({seed:7}));assert.equal(s.host.state,'playing');assert.equal(attempts,2);s.host.dispose();
+});

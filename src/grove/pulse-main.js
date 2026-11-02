@@ -1,3 +1,4 @@
+import {bindListeningControl} from './listening-control.js';
 import {composeGrove} from '../score/grove.js';
 import {restWorkerJob} from './contact-job.js';
 import {createRestHost} from './contact-host.js';
@@ -16,7 +17,7 @@ function sync(){
  for(let b=0;b<3;b++)$('body-'+b).disabled=!active();
  $('keeping').hidden=!(ended&&has);$('sound').disabled=saving;$('gestures').disabled=saving;
 }
-const host=createRestHost({
+const host=createRestHost({listeningDb:18,
  onChange:({state,error})=>{
   sync();
   if(state==='error'){opening=false;status(error.message,true);$('phase').textContent='UNAVAILABLE';}
@@ -78,3 +79,5 @@ window.addEventListener('pagehide',event=>{
  cancelAnimationFrame(animation);host.dispose();sculpture?.dispose();world?.dispose();
 });
 window.addEventListener('pageshow',event=>{if(event.persisted){sync();$('phase').textContent=host.state==='ended'?'QUIET':'BEFORE THE PHRASE';status(host.state==='ended'?'Your finished passage is still here.':'Ready when you are. Hear the opening to begin.');}});
+
+bindListeningControl({input:$('listening-level'),output:$('listening-value'),targets:[host],defaultDb:18,storageKey:'imagimusic-rest-listening-db'});
