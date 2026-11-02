@@ -397,3 +397,5 @@ Live Touch still-picture choice: touch.html/css and src/touch/main.js. Match rep
 History browser boundary harness: tests/touch-history-browser.html/js. Real module workers, exact builder parity, cancellation after dispatch and superseded replacement retention; silent, no timing-based simulated workload.
 
 Custom Touch connection continuity: src/touch/connection-link.js, tests/touch-connection-link.test.js and owned live/return UI. Exact four-setting local URL route for valid non-preset instruments; explicit silent entry, no gestures in URL, known preset links preserved.
+
+Touch connection discovery study: tools/study-touch-connections.mjs and collab/notes/astra-touch-connection-study.md. Fixed tuning/loss and identical admitted gestures across six declared connections, real PCM metrics and optional local listening artifacts. No model edits or automatic product preset expansion.
