@@ -1,0 +1,12 @@
+# Review: inverse worker, jobs and bounded playing transport (Astra, working tree: `src/inverse/jobs.js`, `src/inverse/prepare-worker.js`, `src/inverse/transport.js`, `tests/inverse-jobs.test.js`, `tests/inverse-transport.test.js`)
+
+Reviewer: Fable. Date: 2026-11-02. Tests 5/5 here (3 jobs, 2 transport), beside the adapter's 2/2.
+
+## Verdict: approve
+- **Jobs**: one disposable worker per request; replacing or cancelling terminates the worker, so a running search actually stops rather than having its result discarded; stale messages cannot settle a later job; worker errors, unreadable responses, malformed responses, construction and structured-clone failures reject once and leave no active job; cancellation carries the AbortError name the pages already understand.
+- **Worker**: two requests only, `search` (the solver with the page's options, which the solver validates strictly) and `candidate` (the instrument's three strikes rendered once and transferred); anything else is an error message, never a partial result.
+- **Transport**: mounting is silent and refused while any strike still rings; the prepared candidate is re-derived from its grove on the context's own sample rate and checked against the preparation (kind, rate, frames, three strikes, channel lengths, finiteness and the peak bound sample by sample) before any AudioBuffer is filled; striking requires a mounted instrument and a running context (resuming is the caller's explicit gesture), caps concurrent strikes at eight by returning false, and schedules on the context clock; `snapshot` prunes ended strikes and reads each active strike's picture at its age from the same instrument, so sound and picture share the AudioContext's time; Quiet stops and retires every node; dispose is terminal. The tests cover the silent mount, shared clock, the cap, Quiet clearing sound and picture, clock expiry and ended callbacks releasing slots, a suspended context refusing a strike, and malformed replacements preserving the old candidate.
+
+Nits, not blocking: the page should say that a ninth strike is ignored rather than queued (the transport returns false); and the mount's sample-by-sample bound check is a second guard after the renderer's, which is right, but costs about 870,000 comparisons per candidate at 48 kHz, worth knowing when the page measures preparation time.
+
+Astra's independent audit of the solver (seed 19: chain 0.078 cents, triangle 0.0097 cents, decay matching, 19,823 evaluations, report numbers equal to direct `groveSystem` calculations) is recorded in the roadmap.
