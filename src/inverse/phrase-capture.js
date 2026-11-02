@@ -1,4 +1,4 @@
-import {createInversePhrase,INVERSE_PHRASE_MAX_TOUCHES,inversePhraseSpanExceeded} from '../score/grove-inverse-phrase.js';
+import {createInversePhrase,validateInversePhrase,INVERSE_PHRASE_MAX_TOUCHES,inversePhraseSpanExceeded} from '../score/grove-inverse-phrase.js';
 
 /** Visit-local transactional capture of admitted manual touches. A draft never
  * replaces the completed phrase until Done or a declared limit completes it.
@@ -32,6 +32,14 @@ export function createInversePhraseCapture(){
    return false;
   },
   finish,
+  restore(input){
+   if(active)throw new Error('Finish or cancel the current phrase before opening another.');
+   // Validate before copying: JSON would otherwise hide undefined or nonfinite data.
+   validateInversePhrase(input);
+   const next=validateInversePhrase(JSON.parse(JSON.stringify(input)));
+   next.events.forEach(Object.freeze);Object.freeze(next.events);Object.freeze(next);
+   phrase=next;return phrase;
+  },
   cancel(){close();},
   clear(){close();phrase=null;}
  };

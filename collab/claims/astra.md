@@ -331,3 +331,5 @@ Inverse visitor phrase capture: src/inverse/phrase-capture.js and tests/inverse-
 Inverse phrase render verification: tests/inverse-phrase-render.html/js; actual offline audio-clock manual receipt capture, same-anatomy replay and cross-anatomy PCM reference checks. Explicit silent diagnostic, no device-audio or visitor-preference claim.
 
 Inverse visitor phrase encounter: inverse.html/css and src/inverse/main.js; optional capture disclosure, visible draft state, Done/Quiet distinction, same-phrase replay across candidates and current-results lifecycle gates, consuming reviewed receipt and capture modules.
+
+Inverse portable passage integration: src/inverse/phrase-capture.js, main.js, prepare-worker.js, inverse.html/css, capture tests and inverse browser harnesses; precomputed declared-origin digest, retained original anatomy, atomic reopened phrase installation and explicit local keep/open. Fable owns phrase v2 and portable passage schema/tests.

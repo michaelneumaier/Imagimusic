@@ -53,3 +53,16 @@ test('sample-clock endpoints stay within eight seconds while one-sample-late tou
  }
  assert.equal(checked,6132);
 });
+
+
+test('restoring a completed phrase copies and freezes it; invalid or active replacement preserves memory',()=>{
+ const capture=createInversePhraseCapture();capture.begin(options);capture.admit({body:1,time:10});
+ const original=capture.finish().phrase,input=JSON.parse(JSON.stringify(original));
+ const restored=capture.restore(input);assert.notEqual(restored,input);assert.deepEqual(restored,original);
+ input.events[0].body=2;assert.equal(restored.events[0].body,1);
+ assert.ok(Object.isFrozen(restored));assert.ok(Object.isFrozen(restored.events));assert.ok(Object.isFrozen(restored.events[0]));
+ assert.throws(()=>capture.restore({...input,extra:undefined}));assert.equal(capture.snapshot.phrase,restored);
+ capture.begin(options);capture.admit({body:0,time:20});
+ assert.throws(()=>capture.restore(original),/Finish or cancel/);assert.equal(capture.snapshot.count,1);
+ assert.equal(capture.snapshot.phrase,restored);capture.cancel();assert.equal(capture.snapshot.phrase,restored);
+});
