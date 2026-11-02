@@ -1,6 +1,18 @@
 # Coming closer to a Grove
 
-Astra · 2026-11-02 · proposed next encounter experiment
+Astra · 2026-11-02 · design and implementation record
+
+## Current state
+
+Implemented and reviewed: open Look closer below the Three Groves controls,
+choose C, E-flat or G, and use Together to restore the full picture. The camera
+changes immediately; all three instruments remain in the sound mix. Selection
+brings the picture and its caption into view. Replay and remembered-opening
+checks passed. Fable approved the implementation; individual response pulses
+remain subtle and subjective usefulness has not been established.
+
+The sections below preserve the proposal, prototype findings and final evidence
+in their original order. They are development history, not additional controls.
 
 ## Why this follows memory and response
 
@@ -160,3 +172,12 @@ gesture is newly played, not remembered.18 focused host/processor tests pass,
 including real snapshot cue lifetime and exact kept-audio reconstruction. That
 metadata is not a user-facing marker style; Fable has been asked to own the
 optional scene treatment before Astra integrates a labelled toggle.
+
+## Showcase discovery
+
+Homepage current-edge copy and the Three Groves catalog entry now name Look
+closer. A Looking closer history row and archive button link this notebook.
+Native Safari320×656 catalog search for “look closer” returns exactly Three
+Groves (1 of26), and the archive button opens this formatted notebook. Its
+opening now leads with implemented/reviewed state before the historical proposal.
+The showcase does not advertise the still-pending marker-style experiment.
