@@ -117,7 +117,7 @@ async function prepare(candidate,card){
   $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
   $('status').textContent=`${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.`;
   $('gesture').textContent='Choose Start listening, then touch a body or hear the shared gesture.';
-  $('shared-gesture-help').textContent=`The middle, then both ends. The same three touches on every anatomy. About ${Math.ceil(instrument.duration+.5)} seconds to settle, or choose Quiet.`;
+  $('shared-gesture-help').textContent=`Body 2, then bodies 1 and 3 together. The same three touches on every anatomy. About ${Math.ceil(instrument.duration+.5)} seconds to settle, or choose Quiet.`;
   $('playing-title').focus({preventScroll:true});document.querySelector('.playing').scrollIntoView({block:'start'});
  }catch(error){
   if(!instrument){document.querySelector('.playing').hidden=true;document.querySelector('.workshop').classList.remove('has-instrument');}
@@ -140,7 +140,7 @@ function repeatInvitation(){
 }
 $('hear-gesture').onclick=()=>{
  if(busy||!instrument||!armed||context?.state!=='running')return;
- try{transport.playGesture(sharedGesture);$('gesture').textContent='The middle, then both ends. You can answer with a touch of your own, or choose Quiet.';}
+ try{transport.playGesture(sharedGesture);$('gesture').textContent='Body 2, then bodies 1 and 3 together. You can answer with a touch of your own, or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 };
 $('repeat-touch').onclick=()=>{if(lastTouch)strike(lastTouch.body);};
