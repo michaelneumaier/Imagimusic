@@ -29,3 +29,11 @@ Only after the strip is readable, try a reversible circular layout as a perceptu
 5. Product choice: promote only the treatment supported by the preceding evidence, or keep it as a workshop study if it distracts.
 
 The resumable milestone is the diagnostic and its repeatable sample report, not an assumed immersive effect. It remains useful if the circular presentation is rejected. This work can proceed independently while Fable's recording-analysis corrections and current implementation reviews are pending; it does not bypass the samples-only boundary on the public WAV study.
+
+## Resumable checkpoint after the first diagnostic
+
+The numerical study, bounded builder, real-worker diagnostic, shared-axis comparison and optional static circular alternative now exist locally. See `collab/notes/astra-touch-history-sampling.md` for the measured errors, explicit limitations, native evidence and commit-era progression. Enter through `tests/touch-history-diagnostic.html`; the generated example needs no saved file. The full regression suite now passes 685 tests. Production Touch return is still unchanged by this history work.
+
+What can be reviewed now: exact gesture/Quiet semantics, event-sided plotting, equal axes across original/comparison, named pickup scaling, clipping disclosure, and the same data mapped to two reversible layouts. Desktop example, two real file-picker fixtures (including 128 gestures) and clipping counts have evidence. No sound or visual history is added to existing v1 exports.
+
+What remains before promotion: Fable's actual review response; native invalid replacement/cancellation checks on this diagnostic; narrow-screen/readability assessment; and a real visitor's reading of time, body identity and gesture boundaries. The current circles are a candidate treatment, not a selected product design. A useful next independent step is failure/lifecycle checks and preparing a short reading exercise, without further expanding the presentation controls. Recording-to-resonance work remains separate and the estimator review remains unresolved.

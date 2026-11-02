@@ -30,7 +30,7 @@ function draw(){
   for(const [history,dashed] of [[shown,false],...(pair?[[pair.comparison,true]]:[])]){
    const result=historyPath(history,body,options);clipped+=result.clipped.length;
    group.append(node('path',{d:result.path,fill:'none',stroke:color,'stroke-width':2,...(dashed?{'stroke-dasharray':'8 5'}:{})}));
-   for(const [cx,cy] of result.clipped)group.append(node('circle',{cx,cy,r:2,fill:'#f1a6a6'}));
+   if(result.clipped.length)group.append(node('path',{d:result.clipped.map(([cx,cy])=>`M${cx.toFixed(3)} ${cy.toFixed(3)}h.01`).join(' '),fill:'none',stroke:'#f1a6a6','stroke-width':4,'stroke-linecap':'round'}));
   }
   for(const event of shown.gestures.filter(e=>e.body===body&&e.withinOutput)){
    const [x,y]=historyPoint(body,event.time,0,options);let d;
