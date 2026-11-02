@@ -41,7 +41,7 @@ test('the actual three Grove scenes retain their complete geometry at maximum di
    try{
     scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);
     const bounds=new Box3().setFromObject(scene.root).expandByScalar(.12);
-    applyGroveScene(scene,{envelope:[1e6,1e6,1e6]},[1,1,1],[0,0,0]);
+    applyGroveScene(scene,{envelope:[1e6,1e6,1e6],strikes:[0,1,2].map(body=>({body,age:.299,strikeU:1,velocity:1}))},[1,1,1],[0,0,0]);
     assert.ok(bounds.containsBox(new Box3().setFromObject(scene.root)),'response and hand marks fit the static framing margin');
    }finally{scene.dispose();}
   }

@@ -204,10 +204,10 @@ function chooseView(part){
  if(part===null){world.setFocus(null);scenes.forEach(scene=>scene.root.visible=true);$('picture-note').textContent=widePictureNote;}
  else{
   const bounds=new Box3().setFromObject(scenes[part].root);
-  // Keep space for the existing amplified shell response and gesture marks.
+  // 0.12 covers the capped20% shell widening and scaled strike/hand rings (scene test).
   bounds.expandByScalar(.12);world.setFocus(bounds);
   scenes.forEach((scene,i)=>scene.root.visible=i===part);
-  $('picture-note').textContent=`${viewNames[part]}, close. ${viewNames.filter((_,i)=>i!==part).join(' and ')} are hidden from this view; all three remain audible. Internal connections belong to this Grove only.`;
+  $('picture-note').textContent=`${viewNames[part]}, close. ${viewNames.filter((_,i)=>i!==part).join(' and ')} are hidden from this view. Internal connections belong to this Grove only.`;
  }
  $('view-caption').hidden=part===null;
  $('view-caption').textContent=part===null?'':`Looking at ${viewNames[part]}. All three voices remain audible.`;

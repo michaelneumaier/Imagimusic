@@ -129,3 +129,34 @@ The browser is idle after these checks, at the temporary8081 preview.
 Implementation review was requested from Fable; no final approval received at
 this checkpoint. The optional view is an inspection aid; clearer per-body
 response discrimination and subjective appeal remain unproven.
+
+## Review closure
+
+Fable approved in collab/reviews/20261102T0348Z-fable-reviews-close-view.md,
+reporting544/544 tests on his reviewed working tree. His two nits are resolved:
+only the short near-picture caption repeats the all-three-audible statement;
+the0.12 bounds-padding comment names capped20% shell widening and strike/hand
+rings. The actual-scene margin test now also includes late-lifetime strike rings
+at their near-maximum displayed size. Three framing tests pass after that change.
+Final continuation/replay/narrow arrival evidence is recorded above. This closes
+the optional inspection-view slice, not the perceptual-legibility question.
+
+## Response-scale evidence for the next visual question
+
+Run `node tools/measure-ensemble-picture-response.mjs`. It drives the production
+ensemble processor offline with the same48k authored demonstration and examines
+its314 emitted picture snapshots (0 refused gestures). Under the unchanged
+scene mapping, maximum sampled width changes across C/E-flat/G are about3.63–3.68%
+for the struck body0,0.64–0.66% for body1, and2.96–3.15% for body2. These are
+sampled display-envelope values, not physical strains or all-sample extrema.
+They neither prove perceptual visibility nor select a new display gain. The
+script records the copied mapping formula and limitations in its JSON report.
+No visualization scale or production model is changed by this audit.
+
+The next marker experiment is being prepared separately. Accepted strikes now
+carry a proposed visual-only remembered boolean based on membership in the
+current continuation plan (part and acknowledgement id). Authored Show one
+gesture is newly played, not remembered.18 focused host/processor tests pass,
+including real snapshot cue lifetime and exact kept-audio reconstruction. That
+metadata is not a user-facing marker style; Fable has been asked to own the
+optional scene treatment before Astra integrates a labelled toggle.
