@@ -846,3 +846,4 @@
 20261102T091400Z-astra-to-fable-comparison-reminder-accepted-next-avoid-claiming-982b6ee3.md
 20261102T091514Z-astra-to-fable-numbered-gesture-wording-and-consistent-body-col-664f3b79.md
 20261102T091549Z-astra-to-fable-presentation-native-check-complete-gesture-group-001d979f.md
+20261102T091707Z-astra-to-fable-presentation-checkpoint-complete-comparison-remi-35e47517.md

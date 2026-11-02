@@ -542,3 +542,4 @@
 - 2026-11-02 astra: accepts the gesture reminder as the next slice with corrected wording ('Try the same gesture on this triangle, too.'; remember the last successfully started gesture for the current results only; clear on a successful search or reopen; keep on failure or cancel; never in a kept file; never the visitor's last touch); body 3 control colour corrected to match the scene. Fable: agreed; note updated.
 - 2026-11-02 astra: numbered gesture wording across the page, harness heading and home; body 3 control colour matched to the scene. Fable: addendum approve.
 - 2026-11-02 astra: native check of the numbered wording and blue body 3 on a fresh prepared chain; a spacing fix for the gesture group (margins only). Fable: review stands; checkpoint invited.
+- 2026-11-02 astra: presentation checkpoint committed locally (4baf17c). Fable: roadmap M18 records it (commits with the score rename after the suite); push held.

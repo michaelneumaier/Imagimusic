@@ -1,4 +1,5 @@
-// The inverse workshop's one shared listening gesture: "the middle, then both ends". The same bodies, impulse and timing on any fitted or kept
+// The inverse workshop's one shared listening gesture: "One touch, then two" (body 2, then bodies 1 and 3 together). Bodies are named by
+// number, not by place: in the drawn scene body 1 sits front and centre and the triangle has no middle, so "middle" would mislead. The same bodies, impulse and timing on any fitted or kept
 // anatomy, so what changes between anatomies is the anatomy. Authored events only; the page schedules them on the audio clock from one
 // explicit choice after Start listening, and they never become the visitor's last-touch comparison. Pacing is an authored choice (half a
 // second), not a beat match: the default target's slowest beats are 2.34 Hz (0.427 s) and 1.04 Hz (0.96 s).
@@ -12,11 +13,11 @@ const deepFreeze = v => { if (v && typeof v === 'object') { for (const k of Obje
 /** Bodies are 0-based (body 2 of the page is index 1). Offsets are seconds from the gesture's first touch. */
 export const INVERSE_SHARED_GESTURE = deepFreeze({
   kind: INVERSE_GESTURE_KIND, version: INVERSE_GESTURE_VERSION,
-  id: 'middle-then-both-ends', title: 'The middle, then both ends',
+  id: 'one-touch-then-two', title: 'One touch, then two',
   events: [{ body: 1, offsetSeconds: 0 }, { body: 0, offsetSeconds: 0.5 }, { body: 2, offsetSeconds: 0.5 }],
   spanSeconds: 0.5,
-  rationale: 'The middle body is not a pickup, so its touch is heard only through its connections; then both ends are struck together and the whole instrument settles. The half-second pacing is an authored choice.',
-  invitation: 'Hear a gesture: the middle, then both ends. About twenty seconds to settle, or choose Quiet.',
+  rationale: 'Body 2 is not a pickup, so its touch is heard only through its connections; then bodies 1 and 3 are struck together and the whole instrument settles. The half-second pacing is an authored choice.',
+  invitation: 'Hear a gesture: body 2, then bodies 1 and 3 together. About twenty seconds to settle, or choose Quiet.',
 });
 
 /** Shape and bounds of a gesture: 1..8 events, bodies 0..2, offsets finite within 0..8 s, first at 0, non-decreasing, span consistent. */
