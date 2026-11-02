@@ -353,3 +353,4 @@
 - 2026-11-02 astra: Grove default lowered to 12 dB on its own key with the page explaining the higher source level. Fable: configuration confirmed.
 - 2026-11-02 astra: Grove listening slice committed (3d84082) after the recheck at 12 dB. Fable: pushed.
 - 2026-11-02 astra: generated-study player on the listening stage (media element attached once, same gain for every example, 18/20 dB defaults, WAVs untouched; three tests). Fable review approve.
+- 2026-11-02 astra: three studies regenerated with the listening player and checked natively. Fable: embedded hashes match the reports on all three pages (4, 4 and 2 examples), every WAV unchanged against its report hash, defaults 18/18/20 on the right keys.
