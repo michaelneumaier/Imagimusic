@@ -1,0 +1,33 @@
+{
+  "repository": "https://github.com/jazz-soft/test-midi-files",
+  "revision": "ee79d9e3b093a048cc09ea017aee8e8834452d2d",
+  "license": "MIT; see LICENSE.md",
+  "retrieved": "2026-11-02",
+  "files": [
+    {
+      "file": "test-c-major-scale-m2-g0.midi2",
+      "bytes": 264,
+      "sha256": "e1e08fee5a8b76871e5ac39b6e7e4aa87ecdc839b86c087127b14200067285c2",
+      "url": "https://raw.githubusercontent.com/jazz-soft/test-midi-files/ee79d9e3b093a048cc09ea017aee8e8834452d2d/midi2/test-c-major-scale-m2-g0.midi2"
+    },
+    {
+      "file": "test-c-major-scale-m2-g1.midi2",
+      "bytes": 264,
+      "sha256": "1f9137ef46b132df463ff843da05265c5445425d9ce05c6443b1683f3b8c42cc",
+      "url": "https://raw.githubusercontent.com/jazz-soft/test-midi-files/ee79d9e3b093a048cc09ea017aee8e8834452d2d/midi2/test-c-major-scale-m2-g1.midi2"
+    },
+    {
+      "file": "test-c-major-scale-m1-g0.midi2",
+      "bytes": 200,
+      "sha256": "e1dbf4b911bbbdf30f43c4417245197440ad8e0081a62d125ff0c672e862fd5b",
+      "url": "https://raw.githubusercontent.com/jazz-soft/test-midi-files/ee79d9e3b093a048cc09ea017aee8e8834452d2d/midi2/test-c-major-scale-m1-g0.midi2"
+    },
+    {
+      "file": "test-minimal.midi2",
+      "bytes": 56,
+      "sha256": "5619b56606859f7e4be9bad881bb74f087eebd66fcb9f0dbf1f4e018aa7a685a",
+      "url": "https://raw.githubusercontent.com/jazz-soft/test-midi-files/ee79d9e3b093a048cc09ea017aee8e8834452d2d/midi2/test-minimal.midi2"
+    }
+  ],
+  "scope": "Unmodified external test files. No upstream scripts or dependencies executed. These establish specific external fixture compatibility, not DAW export, transport or universal conformance."
+}

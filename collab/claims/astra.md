@@ -259,3 +259,5 @@ Clip playback window: src/expressive/clip-performance.js, tests/expressive-clip-
 Clip browser verification: tests/expressive-clip-render.html/js; silent real OfflineAudioContext comparison of origin-aware crop against separately rendered full source, repeatability, sample bounds and release silence. Literal independent fixture, no encoder dependency or device-audio claim.
 
 Expressive Clip encounter: expressive.html/css and src/expressive/main.js; optional local file preparation, bounded read, retained prior study on rejection, explicit Listen, source-origin picture timing, reported unsupported content and cancellation on source/page changes. Existing symbolic studies preserved.
+
+External Clip fixtures: tests/fixtures/jazz-soft-clips/** and tests/midi2-external-clips.test.js; pin unchanged MIT-licensed upstream sample bytes and provenance, validate declared notes/timing/groups and explicit subset refusals without executing upstream code.
