@@ -47,7 +47,7 @@ await fs.writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 2
 await fs.writeFile(path.join(out, 'index.html'), openPhrasePlayer({
   title: 'The same touch, three families',
   intro: 'One strike on body 01 of the C Grove, the strike the Three Groves page makes, for each generated family: Pair and neighbour, Chain, Close triangle. E♭ and G stay silent; the mix and level are the page\'s.',
-  question: 'What continues after the touch, in each? Where does it go?',
+  question: 'What continues after the touch, in each? What changes in the way it rings?',
   disclosure: 'Reduced vibrating-body models with virtual pickups. Authored ensemble records, one per family, rendered offline; the same strike position and velocity as the Three Groves page, the same duration and fade, no normalisation, so the families keep their own relative levels (' + report.relativeLevels + '). Not a personal performance or a device recording. The families differ in generated tuning, mass, connections and loss together; nothing is claimed about how any of them sounds, and none is preferred.',
   cases: playerCases, playLinkLabel: 'Play Three Groves ↗', playLinkHref: '../../ensemble.html', listeningDb: 20, listeningKey: 'imagimusic-ensemble-listening-db',
 }));
