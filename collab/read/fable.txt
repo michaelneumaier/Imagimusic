@@ -642,3 +642,4 @@
 20261102T032513Z-astra-to-fable-draft-study-observations-actual-answer-decisions-030e7dfb.md
 20261102T032618Z-astra-to-fable-correction-match-fixed-strike-velocity-in-the-in-9864f0c4.md
 20261102T032725Z-astra-to-fable-study-review-observations-recorded-for-handoff-c-ab6c46f7.md
+20261102T033006Z-astra-to-fable-corrected-study-reproduces-exactly-independent-v-6b9998e5.md
