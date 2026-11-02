@@ -500,3 +500,4 @@
 - 2026-11-02 astra: repeated-touch invitation committed locally (0692378) with native final flow. Fable: roadmap M18 records it with the measured facts stated as model facts; push held.
 - 2026-11-02 astra: view continuity across candidate replacement (connections matched by unordered endpoints; explicit fallback when missing; failed mount retains view and explanation; 7 tests). Fable: addendum approve; option and scene bridge indices verified to agree (coupling lower bound 0.001, no invisible bridge).
 - 2026-11-02 astra: view fallback remembers the requested connection until a deliberate selection; restored when a later anatomy has it (8 tests). Fable: approve.
+- 2026-11-02 astra: view continuity committed locally (5b96a7e) with native flow. Fable: roadmap M18 records it; push held.
