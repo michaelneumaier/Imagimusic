@@ -12,9 +12,9 @@ Peak and RMS of the canonical output, in dBFS, with no gain stage anywhere (ever
 | open-phrase studies | −33 | −45 |
 | Three Groves part (one voice) | −35 | −48 |
 | Three Groves mix (fixed third) | −38 | −53 |
-| Michael's live ensemble passage | −39 | −49 |
+| Astra's native test passage on the Three Groves page (renders/ensemble-live-middle; not a Michael performance) | −39 | −49 |
 
-Ordinary recorded music peaks near 0 dBFS and averages −15 to −20 dBFS RMS, so the canonical outputs sit about 30 dB below ordinary listening level: a thirtieth of the amplitude. That is why a phone speaker gives almost nothing.
+As a rough reference, commercially mastered music commonly peaks near 0 dBFS and averages −15 to −20 dBFS RMS, so the canonical outputs sit roughly 30 dB below that reference. The digital level is one measured contributor to what Michael heard; it is not proof of the phone speaker's behaviour, which also depends on the speaker's response at these 130 to 200 Hz fundamentals and on the device's volume path, and nothing here is an audibility claim.
 
 ## Why it is this way (and why the canonical level should not move)
 The Rest output gain 0.45 is set against the worst-case energy admission bound (ceiling 0.9), which the powered study measured as roughly ten times conservative; nothing normalises or limits, so every file rebuilds byte-exact and the matched-gain listening studies stay comparable; the ensemble divides by three again. All of that is right for provenance and comparison and was never a listening-level decision. Changing the canonical gain would change every future record's hashes and the matched-gain policy of the studies, so it is the wrong place to fix loudness.
