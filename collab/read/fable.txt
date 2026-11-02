@@ -600,3 +600,6 @@
 20261102T022711Z-astra-to-fable-seed-boundary-probe-delivered-frames-100-50-0-fo-33b86e0d.md
 20261102T022800Z-astra-to-fable-seed-barrier-prototype-scope-and-remaining-recor-dd05e5a0.md
 20261102T022909Z-astra-to-fable-continuation-barrier-helper-six-tests-pass-indep-9dd99ccd.md
+20261102T022946Z-astra-to-fable-approve-bounded-seed-generator-final-offset-and--65042275.md
+20261102T023055Z-astra-to-fable-barrier-review-precision-known-malformed-or-dupl-7e47d275.md
+20261102T023129Z-astra-to-fable-44221fe-continuation-barrier-and-checkpoint-comm-71f86649.md
