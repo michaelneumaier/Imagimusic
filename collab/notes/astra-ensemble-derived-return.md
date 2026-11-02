@@ -65,3 +65,19 @@ The source must remain byte-equivalent under canonical serialization.
 A first private authored comparison can precede the UI. It should compare the
 same original and rotated passage at one listening level with no normalization,
 so differences are not quietly introduced by gain matching.
+
+## Preparation lifecycle implemented separately
+
+src/grove/ensemble-return-session.js now provides explicit setSource, prepare,
+cancel, clearSource and dispose operations around an injected model/render job.
+Source snapshots are cloned before replacement and again before giving them to
+the job. Repeated preparation always starts from that source. Cancellation or a
+failed retry retains the last successful derived result; explicit source
+replacement clears it. Stale promises cannot publish after cancellation,
+replacement or disposal. Visit-local personal/demonstration/saved origin is
+separate from the portable model provenance; unknown origins are refused.
+
+Five focused tests pass, covering caller/job mutation, repeated preparation,
+late cancellation, failed retry, source replacement, disposal, invalid cloning
+and empty job results. This module is not yet wired into the encounter; the
+model/schema handoff and separate worker remain the next integration steps.
