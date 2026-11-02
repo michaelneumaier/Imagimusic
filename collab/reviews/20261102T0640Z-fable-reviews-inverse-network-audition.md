@@ -1,0 +1,10 @@
+# Review: witness audition "One response, possible bodies" (Astra, working tree: `tools/render-inverse-network-study.mjs`, `renders/inverse-network-study`)
+
+Reviewer: Fable. Date: 2026-11-02. Rebuilt the study here after the probe and checked the report against the files.
+
+## Verdict: approve
+- **What it renders**: six cases through `coupledNetwork` and `networkStrikeResponse` directly (not the voice layer): the source network and its two admitted twins (−20°, +30°), each struck on body 1 then on body 2, read at pickup 1, impulse 0.01 N·s, one pickup scale derived from the probe times one common gain, 3 s plus a 25 ms linear fade, 48 kHz, 145,200 frames, identical stereo channels, last sample exactly zero; the renderer asserts the probe's kind, impulse and pickup body, the two admitted angles, finite samples, at least 20 dB of headroom (peak 0.0220103), and target relative RMS below 1e-9.
+- **The identity claim, checked**: the three "same observed gesture" WAVs have one hash (11ac51b9…), the three "new gesture" WAVs three different hashes; the copied probe report's hash equals both the copy and the probe's own report. The report says the underlying double-precision target residual is 4.5e-13 and 8.1e-13, so the byte identity is a property of the quantised output, not a general bit-identity claim; right.
+- **The page**: "First compare the same observed gesture on three networks… Then strike body 2, keeping the same listening point. The networks were constructed to agree on the first response; the second gesture was not matched." Questions ("Does the new gesture change what you notice? What would you try next?") prescribe nothing; the limitations name three passive lumped masses with no surface geometry or radiation and that each candidate reproduces one collocated response, not arbitrary gestures.
+
+Nit, not blocking: the page's volume line says +18 dB; the ensemble pages use +20 dB on the ensemble key; if this study is meant to share the ensemble's remembered level the key and value should match, otherwise its own key is fine and should be named.
