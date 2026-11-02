@@ -473,3 +473,4 @@
 - 2026-11-02 astra: two validator nits (sparse topologies, own-field check) and a test comment. Fable: fixed with regressions; suite 608/608.
 - 2026-11-02 astra: solver approved after independent seed-19 audit; inverse jobs, worker and transport (5 tests). Fable: review approve, two nits; roadmap M18 updated.
 - 2026-11-02 astra: inverse playing foundation committed (fc10395, pushed).
+- 2026-11-02 astra: inverse workshop page (inverse.html; two stages, explicit listening, residuals, twins kept separate). Fable review approve, three nits.
