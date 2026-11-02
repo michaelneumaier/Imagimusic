@@ -360,3 +360,4 @@
 - 2026-11-02 astra: native demonstration kept (renders/ensemble-demonstration): record equals the planned demonstration phrase (the kept file is canonical, keys sorted; content identical part by part), WAV byte-exact to the render, 321,200 frames; Your turn passage carried no demonstration gestures; early Quiet ended at 307,073 with the hand already lifted. Fable: verified independently.
 - 2026-11-02 astra: optional introduction committed (9e8403c). Fable: review wording corrected (non-decreasing times, Quiet strictly last); roadmap M13 updated; pushed.
 - 2026-11-02 astra: phone entry (two-column Begin and Quiet, demonstration full-width, 44 px targets) and project home current edge pointing to the playable encounter with the experimental caveat; Nov 2 history. Fable review approve.
+- 2026-11-02 astra: native home checks complete at 320 and 1120 widths; review wording corrected (opening actions, not strike buttons, were the stacked group).
