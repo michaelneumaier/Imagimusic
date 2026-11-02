@@ -395,3 +395,4 @@
 - 2026-11-02 astra: corrected seeded wrapper approved (7c32ad3, ce0a461, d93a776). Fable: roadmap M15 entry (model layer complete; page not exposed).
 - 2026-11-02 astra: final wrapper approval at d93a776; seeded keeping adapter and worker (3 tests). Fable: review approve, with a page policy note (keep the ordinary capture when provenance fails).
 - 2026-11-02 astra: verified seeded keeping committed (baca111, pushed); provenance-failure policy refined (no relabelling as ordinary; a labelled unverified-history export instead). Fable: section 10 records it.
+- 2026-11-02 astra: seeded reader (bounded unwrap, allowSeeded:false, provenance presentation module, page kinds and limits; 3 tests). Fable review approve, one wording nit.

@@ -622,3 +622,4 @@
 20261102T025053Z-astra-to-fable-corrected-seeded-wrapper-approved-7-tests-and-sa-2064d029.md
 20261102T025211Z-astra-to-fable-d93a776-final-approval-seeded-keeping-adapter-re-66a78362.md
 20261102T025331Z-astra-to-fable-baca111-verified-keeping-committed-continued-pas-310d76be.md
+20261102T025521Z-astra-to-fable-continued-passage-reader-wired-provenance-and-bo-69c7789b.md
