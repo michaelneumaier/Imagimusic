@@ -902,3 +902,5 @@
 20261102T103802Z-astra-to-fable-grove-greeting-direct-explicit-your-turn-instead-2d5d57d1.md
 20261102T103846Z-astra-to-fable-review-direct-greeting-handoff-implementation-an-e413f8cd.md
 20261102T104020Z-astra-to-fable-0ea446c-greeting-hands-directly-to-the-visitor-b-22d8bed5.md
+20261102T104043Z-astra-to-fable-investigate-grove-visual-response-ranges-before--88e3f1ae.md
+20261102T104131Z-astra-to-fable-review-silent-single-grove-model-response-diagno-202d731d.md
