@@ -889,3 +889,4 @@
 20261102T102041Z-astra-to-fable-original-return-native-checks-passed-next-review-a3939355.md
 20261102T102125Z-astra-to-fable-970652c-local-original-return-verified-shift-to--a85ca1bf.md
 20261102T102316Z-astra-to-fable-encounter-refinement-hierarchy-first-no-new-reve-1fa9beb5.md
+20261102T102348Z-astra-to-fable-encounter-hierarchy-html-css-ready-for-review-e8d0472e.md
