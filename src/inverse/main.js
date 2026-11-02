@@ -7,6 +7,7 @@ const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
+let lastTouch=null,mountedTopology=null,mountedReport=null;
 let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function restore(){example.slice(0,3).forEach((f,i)=>$('f'+i).value=f);$('decay').value=example[3];$('base').value='48';}
@@ -20,6 +21,7 @@ function controls(snapshot=state()){
  $('listen').textContent=armed&&context?.state==='running'?'Listening enabled':'Start listening';
  candidateButtons.forEach(button=>button.disabled=busy||ringing);
  bodyButtons.forEach(button=>button.disabled=busy||!instrument||!armed||context?.state!=='running');
+ $('repeat-touch').disabled=busy||!lastTouch||!instrument||!armed||context?.state!=='running';
  $('ring-count').textContent=ringing?`${snapshot.active} / 8 strikes ringing`:'Silent';
 }
 function cancel(message='Preparation cancelled. Previous results and instrument retained.'){
@@ -38,7 +40,7 @@ $('search-form').onsubmit=async event=>{
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent='Searching two possible layouts. You can cancel while it works…';
  try{
   const next=await jobs.run({kind:'search',target,options:{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
-  if(token!==generation)return;report=next;renderResults();$('results-section').scrollIntoView({block:'start'});
+  if(token!==generation)return;report=next;lastTouch=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   $('status').textContent=`${next.candidates.filter(c=>c.status==='accepted').length} layouts within tolerance. ${next.work.evaluations.toLocaleString()} evaluations in ${((performance.now()-started)/1000).toFixed(1)} s. ${next.bound.impossibleWithinTolerance?'This target exceeds the equal-mass family’s frequency-ratio bound, even with tolerance.':next.work.exhausted?next.verdict:'This bounded search does not establish uniqueness or a global optimum.'}`;
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
@@ -67,7 +69,7 @@ async function prepare(candidate,card){
   if(token!==generation)return;
   await ensureSpatial();
   if(token!==generation)return;
-  const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;armed=false;
+  const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;mountedTopology=candidate.topology;mountedReport=report;armed=false;repeatInvitation();
   if(spatial&&!pictureFailed){configureViews();document.querySelector('.playing').classList.add('spatial-ready');}
   document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
   $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
@@ -84,9 +86,16 @@ $('listen').onclick=async()=>{
  catch(error){if(token!==generation)return;$('gesture').textContent='Could not start listening: '+error.message;}
  controls();
 };
+function repeatInvitation(){
+ $('same-touch').hidden=!lastTouch;
+ if(!lastTouch)return;
+ $('same-touch-caption').textContent=`Your last touch was body ${lastTouch.body+1} on the ${lastTouch.topology}. Try that numbered body on the prepared anatomy. Each touch uses the same impulse; listen for what changes.`;
+ $('repeat-touch').textContent=`Touch body ${lastTouch.body+1} again`;
+}
+$('repeat-touch').onclick=()=>{if(lastTouch)strike(lastTouch.body);};
 function strike(body){
  if(!armed||busy)return;
- try{const admitted=transport.strike(body);$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight strikes are still ringing. This touch was ignored; wait or choose Quiet.';}
+ try{const admitted=transport.strike(body);if(admitted&&mountedReport===report){lastTouch={body,topology:mountedTopology};repeatInvitation();}$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight strikes are still ringing. This touch was ignored; wait or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 }
 async function ensureSpatial(){

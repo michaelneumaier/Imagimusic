@@ -295,3 +295,5 @@ Inverse spatial picking: src/inverse/picking.js and tests/inverse-picking.test.j
 Inverse spatial mount: src/inverse/spatial-view.js and tests/inverse-spatial-view.test.js; synchronous preflight picture plus transactional transport mount, retained prior scene/focus on failure, resource cleanup and static view selection. Production integration in inverse.html/css/main.js follows these checks; numbered controls remain available.
 
 Inverse spatial discovery: project.html and src/project-catalog.js; extend the existing workshop entry and history, link the evidence note without a duplicate catalog card.
+
+Inverse repeated-touch invitation: inverse.html/css/src/inverse/main.js; retain only the last admitted body index and source topology for this visit, offer an explicit gated repeat on the current anatomy, no autoplay or new schema. Fable owns the comparison design note.
