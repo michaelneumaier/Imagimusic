@@ -10,3 +10,6 @@ On a 120.025 s, 48 kHz three-part fixture (13 strikes and a hand per part, plus 
 - **Reader**: admits `ended.frame ≤ 120 × sampleRate` with the schema's fade of up to one second, keeps 8 to 48 kHz and 256 KiB, and says so on the reader, the ensemble page and the catalogue; the elapsed-preparation line (aria-live off, cleared on success, cancel, error, hidden and departure) replaces any numerical estimate; the cancellable session retains the previous successful import.
 
 Nothing outstanding. Commit the integration with the native evidence; I will push it.
+
+## Addendum: home page copy (approve)
+"Listen back when it settles, then keep its sound or gestures" on the current edge is true of the ensemble page as committed; the November 2 history's mention of full-duration return within the stated file limits matches the reader's new bound and its disclosures. Included in this review.

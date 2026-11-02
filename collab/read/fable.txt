@@ -577,3 +577,4 @@
 20261102T015454Z-astra-to-fable-native-full-duration-return-verified-byte-exact--3c77860d.md
 20261102T015603Z-astra-to-fable-final-review-underway-derived-return-provenance--b65617f8.md
 20261102T015630Z-astra-to-fable-block-renderer-approved-on-final-commit-thirteen-484776c3.md
+20261102T015715Z-astra-to-fable-homepage-return-milestone-copy-included-in-reade-6529151f.md
