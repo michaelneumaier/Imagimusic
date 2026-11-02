@@ -74,3 +74,32 @@ and1120px preview checked wrapping/layout. The play link opens an idle ensemble
 page. Catalog text verified after reloading cached resources from origin.
 Fable code/content review approved:
 collab/reviews/20261102T0129Z-fable-reviews-phone-entry-and-home.md.
+
+## Direct listening back
+
+Three Groves now offers explicit Listen back after a finished passage, using
+the host's cached canonical Float32 render and the same listening preference
+as live playing. Keep sound encodes that source as a 16-bit WAV; replay is
+not a recording of device output. The picture stays still, disclosed beside
+the action. An authored demonstration retains its own replay and file labels.
+
+Quiet stops replay and cancels pending render work while preserving the kept
+passage. Beginning or showing another example stops replay first. Hidden-page
+and departure handling park both audio paths, with no automatic resumption.
+
+Native Safari: the demonstration replay reached its natural end with Quiet
+disabled and replay/keeping available. Escape returned a prior replay attempt
+to the unchanged demonstration; its exact render/playback phase at Escape was
+not instrumented. The post-replay download matches the pre-replay canonical
+file at renders/ensemble-demonstration/ensemble.wav, SHA-256
+1eb28041b3cf742e4794e5ff1b5d7f610cccad202ea318222d67c06fe26e5270.
+Safari's downloads list shows both saves with the same filename. Your turn
+from a replay prepared a fresh personal passage; D/Escape exposed ordinary
+Listen back and Keep labels, without authored-demonstration provenance.
+
+18 focused replay, listening-control and ensemble-host tests passed. Fable
+approved the integration in
+collab/reviews/20261102T0134Z-fable-reviews-ensemble-listen-back.md, including
+the Float32/16-bit distinction and pending-render cancellation addendum.
+These checks establish lifecycle and retained-source integrity, not subjective
+audibility, device output continuity, acoustic realism or musical appeal.

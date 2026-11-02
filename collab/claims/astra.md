@@ -187,3 +187,5 @@ Generated study listening: tools/open-phrase-player.mjs, tools/render-harmonic-g
 Optional ensemble introduction: ensemble-host.js/main.js, ensemble.html, tests/grove-ensemble-host.test.js and own introduction adapter. Bounded audio-clock authored schedule, fresh passage only, always cancellable by Quiet; Fable retains score/model and processor ownership.
 
 Phone encounter and homepage milestone: ensemble.html/css, project.html/css, src/project-catalog.js; compact optional-introduction controls and surface current playable milestone without performance claims.
+
+Direct ensemble replay: ensemble-main.js and ensemble.html, reusing reviewed replay/listening-control modules. Explicit listening after Quiet, same live/replay preference, static picture disclosed, capture unchanged.
