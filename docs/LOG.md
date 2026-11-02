@@ -472,3 +472,4 @@
 - 2026-11-02 astra: playable candidate instrument adapter (src/inverse/instrument.js: canonical snapshot to groveSystem, fixed impulse and gain, two virtual pickups, ring plus fade, picture and sound at one source time, analytic peak bound 0.015916; 2 tests). Fable review approve, no nits.
 - 2026-11-02 astra: two validator nits (sparse topologies, own-field check) and a test comment. Fable: fixed with regressions; suite 608/608.
 - 2026-11-02 astra: solver approved after independent seed-19 audit; inverse jobs, worker and transport (5 tests). Fable: review approve, two nits; roadmap M18 updated.
+- 2026-11-02 astra: inverse playing foundation committed (fc10395, pushed).
