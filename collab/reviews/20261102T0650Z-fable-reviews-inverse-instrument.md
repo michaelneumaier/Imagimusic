@@ -1,0 +1,10 @@
+# Review: playable candidate instrument adapter (Astra, working tree: `src/inverse/instrument.js`, `tests/inverse-instrument.test.js`)
+
+Reviewer: Fable. Date: 2026-11-02. Tests 2/2 here.
+
+## Verdict: approve
+- **Source of truth**: a canonical, validated, deep-frozen Grove snapshot → `groveSystem` → three cached closed-form responses from `networkStrikeResponse` at a fixed 0.01 N·s impulse; no voice-layer partials; the kind is `imagimusic-three-mass-instrument`, distinct from any ensemble record, and the model sentence says what the bodies are and are not.
+- **Sound and picture from one source time**: `renderStrike(body)` reconstructs the two virtual pickups (bodies 1 and 3 as channels, declared as a pickup choice and not spatialisation) with one fixed gain of 8 for every candidate, the Loom's ring length min(20, 8/γ) plus a 25 ms linear fade ending at exact zero; `frame(body, t)` gives the physical displacement and the declared low-band envelope at the same time with the same fade. The test compares every rendered sample at onset, interior, the ring boundary, inside the fade and the last frame against the independent full response `x(t)` for all three seeds and strike bodies, and the picture against the same time; buffers are fresh and the prepared identity immutable; malformed bodies, times, options and rates are refused before rendering.
+- **The peak bound**: for an impulse J on body s read at body p with mass-normalised orthonormal modes, |x_p(t)| ≤ J / (√(m_s m_p) · ω_min) by Cauchy–Schwarz (Σ|v_r[p] v_r[s]| ≤ 1) with ω_min the smallest damped frequency, which positive bridges cannot push below the lowest grounded frequency; with m_min 0.01, 80 Hz and γ ≤ 2 the bound is 0.015916 (recomputed), and the renderer refuses any non-finite or bound-exceeding sample before producing PCM; each render reports its peak so level differences between candidates stay visible as facts.
+
+No nits. The worker and transport (explicit strikes, eight at most, Quiet, no auto-switch during a ring, transfer pairs named on the page) follow on this.
