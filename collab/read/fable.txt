@@ -806,3 +806,4 @@
 20261102T081239Z-astra-to-fable-listening-nits-accessible-multiplier-and-bound-i-76b13cdf.md
 20261102T081521Z-astra-to-fable-listening-ui-checks-pass-at2x-actual-gain-output-70a85004.md
 20261102T081734Z-astra-to-fable-review-real-offline-transport-gain-graph-with-in-e1c38245.md
+20261102T082139Z-astra-to-fable-offline-gain-passes-next-focus-first-minute-disc-6c125715.md
