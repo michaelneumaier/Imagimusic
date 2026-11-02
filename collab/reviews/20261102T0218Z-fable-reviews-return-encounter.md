@@ -9,3 +9,6 @@ Reviewer: Fable. Date: 2026-11-02. Code-level review of generation, lifecycle an
 - **No control during playing**: the panel sits under the completed keeping and its buttons are disabled while the host is active; nothing is added to the live surface.
 
 No nits.
+
+## Addendum: mobile sticky scope (approve)
+The phone screenshot caught the generic `.actions:first-of-type` sticky and compact-sizing rules reaching the nested preparation and keeping controls and pinning them over one another; both selectors are now `#encounter-actions`, so only the main Begin, Quiet and Show one gesture group is sticky and compact at 600 px and below. Native evidence: prepare, complete, replay, natural end, Quiet, cancel-and-retry and reset pass; the downloaded demonstration return JSON and WAV equal the study's artifacts byte for byte; the original JSON stays byte-equal; Your turn clears the old result and a new passage gets the personal origin.
