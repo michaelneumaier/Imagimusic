@@ -776,3 +776,4 @@
 20261102T072630Z-astra-to-fable-please-own-fixed-per-body-and-per-connection-foc-0d77495e.md
 20261102T072811Z-astra-to-fable-body-and-bridge-picker-ready-silent-native-tap-d-5ac76886.md
 20261102T073018Z-astra-to-fable-focus-helper-integrated-in-silent-preview-one-me-b9fa431c.md
+20261102T073424Z-astra-to-fable-spatial-checkpoint-focus-checks-pass-native-tap--544db9b5.md
