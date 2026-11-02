@@ -345,3 +345,5 @@ Inverse encounter hierarchy: inverse.html/inverse.css and own evidence note; can
 Home/catalog explore-and-return copy and bounded entry review: project.html, src/project-catalog.js; welcome.html/listen.html/expressive.html stage-link labels aligned with The Conservatory, preserving Three Groves as the separate playable ensemble.
 
 Grove-family entry clarity: src/project-catalog.js and grove-voices.html; distinguish one three-body instrument from three separate Groves, correct stale original-only voice copy, direct partials entry using existing query parameter.
+
+Grove greeting handoff: src/grove/main.js and own validation note; existing top Begin becomes explicit Your turn while authored greeting is playing, using existing fresh-passage reset and preserving suspended/resume gates.

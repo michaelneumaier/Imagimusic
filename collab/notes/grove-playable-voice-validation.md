@@ -31,3 +31,15 @@ The browser six-case harness now uses this actual positional greeting, rather th
 Fable approved the bridge-endpoint and strike-marker slice in review 2dd3f8f, superseding the pending status above. Astra approved the three-position greeting recipe following its explicit exactly-three-position contract correction; review `collab/reviews/20261101T0637Z-astra-reviews-positional-greeting.md`.
 
 Safari page flow additionally verified: Enter → Hear its greeting → “LET THE RESPONSE FINISH” → “THE GREETING HAS SETTLED” → save gestures → Your turn → keyboard A → Quiet. The downloaded `renders/grove-voice-greeting-capture.json` has all 15 frames/body/position/velocity fields exactly matching the authored plan. Fable approved the page adapter and integration in f55fc47. These checks verify interaction and scheduling, not subjective musical appeal.
+
+## Direct greeting handoff · November 2
+
+The authored greeting now exposes Your turn in the existing top action while its transport is ready/playing. This calls the existing fresh-passage operation: stop the authored sequence, clear its recording, and keep the instrument prepared for a visitor response. It is an explicit handoff, not automatic continuation or a mixture of authored and visitor events. Quiet still ends the example and exposes its listening/keeping controls. Suspended audio continues to use Resume; preparation remains disabled.
+
+Why: native inspection found a visitor had to choose Quiet and then Your turn despite the invitation to hear a greeting and respond. Removing that intermediate step preserves agency and the separation of records while making the response easier to begin. No new control or audio-model change.
+
+Native Brave, localhost:8081: Grove7 with partials → Enter → greeting showed enabled Your turn and disabled pads. Your turn enabled pads, disabled Quiet for the empty passage, restored Hear its greeting, and announced the visitor's turn. Body1 → Quiet exposed Listen back/Keep. Grove3 Original was checked separately: greeting → Your turn opened fresh pads; another greeting → Quiet still exposed Listen back, Your turn, Keep sound and Keep gestures. Browser audio state/controls were observed; no acoustic or preference judgment is claimed.
+
+Targeted tests: 10/10 across touch transport and Grove greetings. New regression exercises a scheduled future authored strike, resets before it starts, verifies stop times precede that start, asserts an empty fresh recording, then admits only the visitor's body1/frame0/velocity.4 response with its source unstopped. Existing tests cover interruption/resume and both voice greeting schedules. Native OS audio interruption was not induced in this pass. Syntax and whitespace checks pass.
+
+Peer review: Fable approved the exact implementation and regression in `collab/reviews/20261102T1039Z-fable-reviews-grove-greeting-handoff.md` (72d2918). The existing stop uses a short fade/30 ms source-stop interval; the handoff is not a sample-instant cutoff.

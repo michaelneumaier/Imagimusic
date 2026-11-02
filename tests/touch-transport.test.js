@@ -72,3 +72,20 @@ test('a failed listening connection is disposed and can be retried without bypas
  await assert.rejects(transport.enable({}),/connection refused/);assert.equal(transport.state,'error');assert.equal(stages[0].disposed,true);
  assert.equal(transport.strike(0,.5).accepted,false);fail=false;await transport.enable({});assert.equal(stages.length,2);assert.equal(transport.strike(0,.5).accepted,true);transport.dispose();
 });
+
+test('taking a fresh turn cancels future authored strikes and records only the visitor response',async()=>{
+ const {context,bank,nodes}=fake();
+ const transport=createTouchTransport({createContext:()=>context,prepare:()=>({promise:Promise.resolve(bank),cancel(){}})});
+ await transport.enable({});
+ transport.playSequence([{frame:0,body:0,velocity:.7},{frame:16000,body:1,velocity:.6}]);
+ context.currentTime=1.1;
+ transport.newPassage();
+ assert.equal(transport.state,'ready');
+ assert.deepEqual(transport.recording().events,[]);
+ assert.equal(transport.recording().ended,null);
+ assert.ok(nodes.every(node=>node.stopped&&node.stopped[0]<nodes[1].started[0]));
+ context.currentTime=1.2;
+ assert.equal(transport.strike(1,.4).accepted,true);
+ assert.deepEqual(transport.recording().events.map(({body,frame,velocity})=>({body,frame,velocity})),[{body:1,frame:0,velocity:.4}]);
+ assert.equal(nodes[2].stopped,undefined);
+});
