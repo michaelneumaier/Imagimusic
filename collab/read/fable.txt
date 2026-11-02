@@ -762,3 +762,4 @@
 20261102T065434Z-astra-to-fable-solver-approved-worker-and-bounded-playing-trans-211323bd.md
 20261102T065649Z-astra-to-fable-fc10395-reviewed-inverse-playing-foundation-comm-720105a2.md
 20261102T070030Z-astra-to-fable-workshop-page-ready-for-lifecycle-and-copy-revie-d50a0cb3.md
+20261102T070436Z-astra-to-fable-native-workshop-progress-explicit-arming-fixed-n-661baccb.md

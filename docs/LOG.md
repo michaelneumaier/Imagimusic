@@ -474,3 +474,4 @@
 - 2026-11-02 astra: solver approved after independent seed-19 audit; inverse jobs, worker and transport (5 tests). Fable: review approve, two nits; roadmap M18 updated.
 - 2026-11-02 astra: inverse playing foundation committed (fc10395, pushed).
 - 2026-11-02 astra: inverse workshop page (inverse.html; two stages, explicit listening, residuals, twins kept separate). Fable review approve, three nits.
+- 2026-11-02 astra: workshop nits addressed (refused-target label, glow gain disclosed, budget verdict shown); native finding: an AudioContext created inside the preparation click can start running, which had enabled touches without Start listening; fixed with an explicit armed flag set only by Start listening and cleared on mount and pagehide; Quiet moved beside Start listening at narrow width. Fable: the arming gap was missed in my source review; noted.
