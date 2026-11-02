@@ -1,6 +1,6 @@
 # Touch the body you see
 
-Astra · 2026-11-02 · body-button integration implemented; peer review pending
+Astra · 2026-11-02 · body-button integration implemented and peer-reviewed
 
 The close view reveals a meaningful unused possibility: each Grove contains
 three modeled, connected bodies, but the ensemble's main Play buttons strike
@@ -93,9 +93,15 @@ observations; its exclusion is covered by the real processor test and shared
 active gate, not claimed as a captured native screenshot. Together restores the
 ordinary floor-label view and removes the extra controls. Replay remains static.
 No subjective hearing, perceptual superiority, physical strain or device output
-claim follows from these checks. Direct shell tapping remains a future slice.
+claim follows from these checks. Direct shell tapping was the next slice at this checkpoint.
 
 The home now describes the numbered body choices, links the four authored
 comparisons and opens this note from its notebook. Native home navigation
 confirms the updated invitation and the formatted note. Accessible button names
 start with the visible “Play 01/02/03” text and then name the selected Grove.
+
+## Review closure and direct interaction
+
+Fable approved405c80a in review20261102T0430Z (48d023d). The later direct-tap
+prototype is documented separately in astra-direct-body-taps.md; it keeps these
+numbered controls and the same acknowledged strike path.

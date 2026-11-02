@@ -1,3 +1,5 @@
+import {bindBodyTap} from './body-tap.js';
+import {createBodyPicker} from './body-picking.js';
 import {Box3} from '../../vendor/three/build/three.module.js';
 import {createEnsembleContinuationSource} from './ensemble-continuation-source.js';
 import {createEnsembleContinuationKeepSession} from './ensemble-continuation-keep-session.js';
@@ -15,7 +17,7 @@ import {createGroveWorld} from './world.js';
 import {createGroveScene,applyGroveScene} from './scene.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),groves=[48,51,55].map(note=>retuneGroveCluster(composeGrove({seed:3}),note)),keys=['a','s','d'],holdControls=[],held=[false,false,false],reduced=matchMedia('(prefers-reduced-motion: reduce)');
-let selectedPart=null,world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
+let bodyTap=null,selectedPart=null,world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
 const active=()=>!demonstration&&(!continued||host.continuation?.state==='completed')&&!busy&&!quietWanted&&['ready','playing'].includes(host.state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
@@ -193,9 +195,9 @@ function download(bytes,type,name){const url=URL.createObjectURL(new Blob([bytes
 $('gestures').onclick=()=>{if(continued)return;try{download(canonicalEnsembleRecord(host.recording())+'\n','application/json',demonstration?'imagimusic-ensemble-demonstration.json':'imagimusic-ensemble.json');}catch(error){status(error.message,true);}};
 $('sound').onclick=async()=>{saving=true;sync();const own=operation;status('Rebuilding the kept sound…');try{const pcm=await host.saveAudio();if(own===operation){download(stereoWav(pcm),'audio/wav',continued?continuationFilename('wav'):demonstration?'imagimusic-ensemble-demonstration.wav':'imagimusic-ensemble.wav');status('The ensemble sound is ready to keep.');}}catch(error){if(own===operation&&error.name!=='AbortError')status(error.message,true);}finally{if(own===operation){saving=false;sync();}}};
 window.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();$('quiet').click();return;}if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||event.target.matches('input,textarea,select,[contenteditable=true]'))return;const i=keys.indexOf(event.key.toLowerCase());if(i>=0&&active()){event.preventDefault();$('strike-'+i).click();}});
-function park(){operation++;cancelContinuation();sourceSoundController?.abort();sourceSoundController=null;cancelReturn();listeningBack=listeningReturn=false;replay.park();releaseAll();busy=saving=quietWanted=false;clearOwners();held.fill(false);host.park();status(host.hasRecording?(demonstration?'The demonstration is kept here. Listen again when you return.':'Your passage is kept here. Listen back when you return.'):'Quiet. Begin when you return.');sync();}
+function park(){bodyTap?.cancel();operation++;cancelContinuation();sourceSoundController?.abort();sourceSoundController=null;cancelReturn();listeningBack=listeningReturn=false;replay.park();releaseAll();busy=saving=quietWanted=false;clearOwners();held.fill(false);host.park();status(host.hasRecording?(demonstration?'The demonstration is kept here. Listen again when you return.':'Your passage is kept here. Listen back when you return.'):'Quiet. Begin when you return.');sync();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});
-window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAnimationFrame(animation);holdControls.forEach(control=>control.dispose());host.dispose();replay.dispose();returnSession.dispose();continuationSource.dispose();continuationKeep.dispose();scenes.forEach(scene=>scene.dispose());world?.dispose();}});
+window.addEventListener('pagehide',event=>{park();if(!event.persisted){cancelAnimationFrame(animation);bodyTap?.dispose();holdControls.forEach(control=>control.dispose());host.dispose();replay.dispose();returnSession.dispose();continuationSource.dispose();continuationKeep.dispose();scenes.forEach(scene=>scene.dispose());world?.dispose();}});
 try{world=createGroveWorld($('world'));world.controls.enabled=false;scenes=groves.map((grove,i)=>{const scene=createGroveScene(grove);scene.root.scale.setScalar(.47);scene.root.position.set((i-1)*3.2,.1,0);world.scene.add(scene.root);return scene;});world.camera.position.set(0,3.7,10.8);world.camera.lookAt(0,1.4,0);}catch{$('world').hidden=true;$('picture-note').textContent='The 3D view is unavailable. Labelled controls and sound are still available.';}
 // Preserve the scene's ordinary floor labels; close views lift the same numbers
 // above their actual bodies at a readable, screen-relative size. Sound is unchanged.
@@ -209,12 +211,18 @@ function labelBodies(part){
   label.material.needsUpdate=true;
  }));
 }
+const pickBody=world?createBodyPicker({canvas:$('world'),camera:world.camera,scenes,selectedPart:()=>selectedPart}):()=>null;
+bodyTap=bindBodyTap($('world'),{
+ pick:pickBody,enabled:()=>selectedPart!==null&&active()&&!!world,
+ onTap:({part,body})=>{if(part===selectedPart&&active())host.send(part,{kind:'strike',body,position:1,velocity:.5});}
+});
 const markerOptions={distinguishRemembered:false};
 $('distinguish-remembered').onchange=()=>{markerOptions.distinguishRemembered=$('distinguish-remembered').checked;$('marker-caption').hidden=!markerOptions.distinguishRemembered;};
 const widePictureNote=$('picture-note').textContent;
 const viewNames=['C','E-flat','G'];
 function chooseView(part){
  if(!world)return;
+ bodyTap?.cancel();
  try{
  if(part===null){world.setFocus(null);scenes.forEach(scene=>scene.root.visible=true);$('picture-note').textContent=widePictureNote;}
  else{
