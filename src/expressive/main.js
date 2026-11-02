@@ -4,10 +4,12 @@ import {createClipPerformance,renderClipAudio} from './clip-performance.js';
 import {renderExpressionAudio} from './audio.js';
 import {createExpressionScene,expressionSceneFrame,applyExpressionScene} from './scene.js';
 import {createListeningTransport} from '../listen/transport.js';
+import {createExpressionView} from './view-framing.js';
+import {expressionViewBounds} from './view-bounds.js';
 import {createWorld} from '../stage/world.js';
 import {encodeWav} from '../model.js';
 const $=id=>document.getElementById(id),letters='ABCDEFGH';
-let passage,score,world,scene,selectedVoice=0,lastReadout=-Infinity,clipSource=null,clipPrepared=null,loadRevision=0,fileReadPending=false;
+let passage,score,world,scene,selectedVoice=0,lastReadout=-Infinity,clipSource=null,clipPrepared=null,loadRevision=0,fileReadPending=false,view=null,closeView=false;
 const playbackDuration=()=>clipPrepared?.duration??passage.duration;
 const descriptions={study:'A plain voice opens slowly. A second answers in the opposite direction; a lower voice remains as the others settle.',detachReset:'The old E keeps its expression. A new E begins with fresh controls; both still follow the shared pitch bend.',detachOnly:'The old E keeps its expression, and the new E inherits the current per-note controls.',resetOnly:'The held E follows the reset back toward neutral. No fourth voice enters.'};
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
@@ -43,9 +45,17 @@ function choose(){
  buildVoices();
  if(world)rebuildScene();status('Press Listen. This short study reveals one kind of change at a time.');
 }
+function selectVoice(id){
+ selectedVoice=id;lastReadout=-Infinity;$('view-voice').value=String(id);
+ for(const b of $('voices').children)b.setAttribute('aria-pressed',String(Number(b.dataset.voice)===id));
+}
 function buildVoices(){
+ closeView=false;$('view-all').setAttribute('aria-pressed','true');$('view-close').setAttribute('aria-pressed','false');
+ $('view-voice').replaceChildren();
+ for(const v of passage.voices){const option=document.createElement('option');option.value=v.voiceId;option.textContent='Voice '+letters[v.voiceId];$('view-voice').append(option);}
+ $('view-voice').value=String(selectedVoice);
  $('voices').replaceChildren();
- for(const v of passage.voices){const button=document.createElement('button');button.className='voice-card';button.dataset.voice=v.voiceId;button.setAttribute('aria-pressed',String(v.voiceId===selectedVoice));const title=document.createElement('strong');title.textContent=`Voice ${letters[v.voiceId]}`;const detail=document.createElement('span');detail.textContent=`Note ${v.address.noteNumber} · Waiting`;button.append(title,detail);button.onclick=()=>{selectedVoice=v.voiceId;lastReadout=-Infinity;for(const b of $('voices').children)b.setAttribute('aria-pressed',String(Number(b.dataset.voice)===selectedVoice));};$('voices').append(button);}
+ for(const v of passage.voices){const button=document.createElement('button');button.className='voice-card';button.dataset.voice=v.voiceId;button.setAttribute('aria-pressed',String(v.voiceId===selectedVoice));const title=document.createElement('strong');title.textContent=`Voice ${letters[v.voiceId]}`;const detail=document.createElement('span');detail.textContent=`Note ${v.address.noteNumber} · Waiting`;button.append(title,detail);button.onclick=()=>selectVoice(v.voiceId);$('voices').append(button);}
 }
 function rebuildScene(next=createExpressionScene(passage.voices.length)){
  world.scene.add(next.root);
@@ -74,10 +84,13 @@ $('clip-file').onchange=async()=>{
  }catch(error){if(own===loadRevision)$('clip-status').textContent='Could not prepare this file: '+error.message+(installed?' The Clip was admitted, but its display could not be completed. Choose a study to reset.':' Your prior study remains selected.');}
  finally{if(own===loadRevision){fileReadPending=false;$('listen').disabled=false;}}
 };
+$('view-voice').onchange=()=>selectVoice(Number($('view-voice').value));
+function setCloseView(value){closeView=value;$('view-all').setAttribute('aria-pressed',String(!value));$('view-close').setAttribute('aria-pressed',String(value));}
+$('view-all').onclick=()=>setCloseView(false);$('view-close').onclick=()=>setCloseView(true);
 $('study').onchange=choose;
 $('listen').onclick=async()=>{
  if(['playing','preparing'].includes(transport.state)){transport.stop();return;}
- try{await transport.play({score,clipSource});if(transport.state==='playing'&&world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}
+ try{await transport.play({score,clipSource});if(transport.state==='playing'&&world)$('view-all').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}
 };
 $('quiet').onclick=()=>{transport.stop();cancelFileRead();};$('seek').oninput=()=>transport.seek(Number($('seek').value));
 $('save').onclick=()=>{const pcm=transport.pcm;if(!pcm)return;const url=URL.createObjectURL(new Blob([encodeWav(pcm.channels[0],pcm.sampleRate)],{type:'audio/wav'})),link=document.createElement('a');link.href=url;link.download=`imagimusic-expression-${clipSource?'local-clip':$('study').value}.wav`;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
@@ -85,7 +98,7 @@ function cancelFileRead(){loadRevision++;if(fileReadPending){$('clip-file').valu
 document.addEventListener('visibilitychange',()=>{if(document.hidden){transport.stop();cancelFileRead();}});window.addEventListener('pagehide',()=>{transport.stop();cancelFileRead();});
 const initial=new URLSearchParams(location.search).get('scene');if(Object.hasOwn(descriptions,initial))$('study').value=initial;
 choose();
-try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;rebuildScene();}catch(error){$('world').hidden=true;status('The 3D view is unavailable here. Sound and per-voice inspection remain available.',true);}
+try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;view=createExpressionView({camera:world.camera,controls:world.controls,boundsFor:expressionViewBounds});rebuildScene();}catch(error){$('world').hidden=true;$('view-all').disabled=true;$('view-close').disabled=true;status('The 3D view is unavailable here. Sound and per-voice inspection remain available.',true);}
 function updateReadout(frame){
  for(const button of $('voices').children){const v=frame.voices.find(v=>v.voiceId===Number(button.dataset.voice));button.querySelector('span').textContent=v?`${v.frequencyHz.toFixed(1)} Hz · ${v.retired?'Settled':v.detached?'Detached':v.env.stage}`:'Waiting for this voice';}
  const voice=frame.voices.find(v=>v.voiceId===selectedVoice);$('voice-title').textContent=`Voice ${letters[selectedVoice]}`;
@@ -96,7 +109,12 @@ function updateReadout(frame){
 }
 function draw(){
  const t=transport.time(),frame=expressionSceneFrame(passage,t+(clipPrepared?.playbackOriginSeconds??0));
- if(world){const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}applyExpressionScene(frame,scene);world.render();}
+ if(world){view?.update({scene,selected:selectedVoice,close:closeView,width:$('world').clientWidth,height:$('world').clientHeight});applyExpressionScene(frame,scene);world.render();}
+ const inspected=frame.voices.find(v=>v.voiceId===selectedVoice);
+ const caption=closeView?`Voice ${letters[selectedVoice]}, close · ${!inspected?'waiting to enter':inspected.retired?'finished':inspected.detached?'expression detached':'following its expression'}. All voices remain audible. Synthesizer interpretation, not an acoustic chamber.`:'All voices in view. Select a voice and Look closer to inspect its mechanism. Synthesizer interpretation, not an acoustic chamber.';
+ if($('view-caption').textContent!==caption)$('view-caption').textContent=caption;
+ const hint=closeView?`Voice ${letters[selectedVoice]} · iris, bellows, pitch lever`:'Voices A onward, from left to right. Follow the iris and the small pitch lever.';
+ if($('picture-hint').textContent!==hint)$('picture-hint').textContent=hint;
  $('chapter').textContent=$('study').value==='study'?EXPRESSIVE_STUDY_PHASES.filter(phase=>phase.from<=t).at(-1).title.toUpperCase():clipSource?'YOUR MIDI CLIP':'A SHARED CHORD';
  $('seek').value=t;$('time').textContent=`${t.toFixed(2)} / ${playbackDuration().toFixed(2)} s`;$('clock').textContent=`${frame.voices.filter(v=>!v.retired).length} active voices`;
  if(Math.abs(t-lastReadout)>.08||lastReadout===-Infinity){updateReadout(frame);lastReadout=t;}

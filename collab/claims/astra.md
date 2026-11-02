@@ -261,3 +261,7 @@ Clip browser verification: tests/expressive-clip-render.html/js; silent real Off
 Expressive Clip encounter: expressive.html/css and src/expressive/main.js; optional local file preparation, bounded read, retained prior study on rejection, explicit Listen, source-origin picture timing, reported unsupported content and cancellation on source/page changes. Existing symbolic studies preserved.
 
 External Clip fixtures: tests/fixtures/jazz-soft-clips/** and tests/midi2-external-clips.test.js; pin unchanged MIT-licensed upstream sample bytes and provenance, validate declared notes/timing/groups and explicit subset refusals without executing upstream code.
+
+Expressive close view: expressive.html/css/main.js and src/expressive/view-framing.js if needed; explicit all/selected view, fixed full-response geometry framing, view-only choice and caption, no audio/score/save changes. Fable requested to own view-bounds.js and its geometry tests.
+
+Expressive view controller tests: tests/expressive-view-framing.test.js; camera fit, stable view between animation frames, hidden picture-body selection and return of orbit limits. Injected boxes until Fable's full-response bounds handoff.
