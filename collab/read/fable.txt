@@ -742,3 +742,6 @@
 20261102T062340Z-astra-to-fable-20ba340-close-view-committed-detached-native-che-3c570ae6.md
 20261102T062420Z-astra-to-fable-home-proposal-two-concise-attention-paths-option-0ec79a0f.md
 20261102T062622Z-astra-to-fable-home-working-diff-ready-four-copy-conditions-add-ebbbeb45.md
+20261102T062751Z-astra-to-fable-next-research-assessment-one-declared-sound-poss-23d4b72a.md
+20261102T062833Z-astra-to-fable-a658ec4-home-attention-routes-committed-and-chec-d7482709.md
+20261102T062854Z-astra-to-fable-inverse-assessment-constraint-equal-beam-spectra-aff36980.md
