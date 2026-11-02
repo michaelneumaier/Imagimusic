@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createTouchSession,renderTouchBank,renderTouchRecording} from '../src/touch/session.js';
 import {getLoomJourney} from '../src/listen/journeys.js';
+import {prepareTouchReturn} from '../src/touch/return-preparation.js';
 import {prepareTouchComparison} from '../src/touch/comparison.js';
 const source=()=>{const session=createTouchSession(getLoomJourney('distant-cousins').settings,8000);session.strike({frame:0,body:0,velocity:.5});session.strike({frame:3217,body:1,velocity:.3});return session.finish(8000);};
 test('comparison changes only declared settings, preserving source, gestures, ending and fixed output gain',()=>{
@@ -25,4 +26,12 @@ test('identical or unknown targets are refused and natural endings remain natura
  assert.throws(()=>prepareTouchComparison(source(),'imagined-target'),/Unknown listening study/);
  const record=source();record.ended=null;const r=prepareTouchComparison(record,'tight-weave');assert.equal(r.record.ended,null);assert.equal(r.source.ended,null);
  assert.equal(r.duration,(record.events.at(-1).frame+Math.ceil(Math.min(20,8/.7)*8000))/8000);
+});
+
+test('a kept comparison reopens as its own exact standalone passage',()=>{
+ const original=source(),before=structuredClone(original),comparison=prepareTouchComparison(original,'tight-weave');
+ const reopened=prepareTouchReturn(JSON.stringify(comparison.record,null,2)+'\n');
+ assert.deepEqual(reopened.record,comparison.record);assert.deepEqual(reopened.pcm,comparison.pcm);
+ assert.equal(reopened.pickupScale,comparison.pickupScale);assert.equal(reopened.duration,comparison.duration);
+ assert.deepEqual(original,before);assert.equal(Object.hasOwn(reopened.record,'source'),false);
 });
