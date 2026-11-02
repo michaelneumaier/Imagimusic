@@ -395,3 +395,5 @@ Optional circular history diagnostic: src/touch/history-layout.js, tests/touch-h
 Live Touch still-picture choice: touch.html/css and src/touch/main.js. Match replay's explicit listening preference, initially respecting reduced motion; retain sound, gestures and keyboard/pad feedback while hiding body/striker animation.
 
 History browser boundary harness: tests/touch-history-browser.html/js. Real module workers, exact builder parity, cancellation after dispatch and superseded replacement retention; silent, no timing-based simulated workload.
+
+Custom Touch connection continuity: src/touch/connection-link.js, tests/touch-connection-link.test.js and owned live/return UI. Exact four-setting local URL route for valid non-preset instruments; explicit silent entry, no gestures in URL, known preset links preserved.

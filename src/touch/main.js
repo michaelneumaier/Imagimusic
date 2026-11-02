@@ -1,3 +1,4 @@
+import {touchConnectionHref,readTouchConnection} from './connection-link.js';
 import {createTouchTransport} from './transport.js';
 import {holdVelocity} from './session.js';
 import {getLoomJourney} from '../listen/journeys.js';
@@ -6,6 +7,8 @@ import {createWorld} from '../stage/world.js';
 import {loomSceneFrame,applyLoomScene} from '../loom/scene.js';
 import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),pads=[$('left'),$('right')],held=new Map();
+let customConnection=null;
+const selectedConnection=()=>$('bridge').value==='custom'?customConnection:getLoomJourney($('bridge').value);
 let world,settings,stillAt=0,lastPhase='',lastGesture=null,connectionPending=false;
 $('still-picture').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function describeView(){const still=$('still-picture').checked;$('world').setAttribute('aria-label',still?'A still view of two connected bodies.':'Two coupled resonators: the body’s width and glow follow its modeled vibration envelope.');$('view-note').textContent=still?'A still view. Sound, gestures and pad feedback are unchanged.':'Width and glow follow the modeled response.';}
@@ -14,7 +17,7 @@ function status(text,error=false){$('status').textContent=text;$('status').datas
 function controls({state,recording}){
  const playable=!connectionPending&&['ready','playing'].includes(state),has=!!recording?.events.length;
  pads.forEach(pad=>pad.disabled=!playable);$('begin').disabled=state==='preparing'||playable;
- $('begin').textContent=state==='preparing'?'Preparing the connection…':connectionPending?`Enter ${getLoomJourney($('bridge').value).title} ↗`:state==='suspended'?'Resume the instrument ↗':playable?'The instrument is open':'Enter the instrument ↗';
+ $('begin').textContent=state==='preparing'?'Preparing the connection…':connectionPending?`Enter ${selectedConnection().title} ↗`:state==='suspended'?'Resume the instrument ↗':playable?'The instrument is open':'Enter the instrument ↗';
  $('quiet').disabled=!has||state==='ended'||state==='preparing';$('new').disabled=connectionPending||!has||state==='preparing';$('bridge').disabled=state==='preparing';$('save').disabled=!has||state==='preparing';$('score').disabled=!has||state==='preparing';
  $('count').textContent=has?`${recording.events.length} ${recording.events.length===1?'gesture':'gestures'} held here`:'Nothing played yet';
  if(state==='suspended')status('Audio was interrupted. Resume to keep playing this passage.');
@@ -23,22 +26,22 @@ function controls({state,recording}){
 const transport=createTouchTransport({onChange:controls});
 const refreshControls=()=>controls({state:transport.state,recording:transport.recording()});
 function configure(){
- const journey=getLoomJourney($('bridge').value);settings=journey.settings;
- const listening=new URL('listen.html',location.href);listening.searchParams.set('study',journey.id);
+ const journey=selectedConnection();settings=journey.settings;
+ const listening=new URL('listen.html',location.href);if(!journey.custom)listening.searchParams.set('study',journey.id);
  const origin=new URLSearchParams(location.search),at=Number(origin.get('listenAt'));
- if(origin.get('fromStudy')===journey.id&&Number.isFinite(at)&&at>0)listening.searchParams.set('at',String(at));
- for(const link of document.querySelectorAll('[data-listen-connection]')){link.href=listening.href;if(!link.classList.contains('brand'))link.textContent=listening.searchParams.has('at')?'Return to your listening place ↗':'Listen to this connection ↗';}
+ if(!journey.custom&&origin.get('fromStudy')===journey.id&&Number.isFinite(at)&&at>0)listening.searchParams.set('at',String(at));
+ for(const link of document.querySelectorAll('[data-listen-connection]')){link.href=listening.href;if(!link.classList.contains('brand'))link.textContent=journey.custom?'Explore listening studies ↗':listening.searchParams.has('at')?'Return to your listening place ↗':'Listen to this connection ↗';}
  const peaks=[0,1].map(body=>answerPeak(settings,body));
  $('model-detail').textContent=`This connection uses ${settings.frequency} Hz base tuning, ${settings.detune} cents detuning, coupling ${settings.coupling}, and loss ${settings.loss}/s. A unit left touch gives the other body its first drawn envelope maximum at ${peaks[0].swellSeconds?.toFixed(3)??'no distinct'} seconds, about ${(peaks[0].ratio*100).toFixed(0)}% of the struck body’s first peak (2 ms measurement grid). This is a swell, not sound arriving after a delay.`;
- const url=new URL(location.href);url.searchParams.set('bridge',$('bridge').value);history.replaceState(null,'',url);stillAt=0;lastGesture=null;
+ const url=new URL(location.href),route=new URL(touchConnectionHref(settings),location.href);url.searchParams.delete('bridge');url.searchParams.delete('connection');for(const [key,value] of route.searchParams)url.searchParams.set(key,value);history.replaceState(null,'',url);stillAt=0;lastGesture=null;
 }
-async function enter(){clearHolds();if(transport.state==='suspended'&&!connectionPending){try{await transport.resume();status('The connection is open again. Your passage is still here.');}catch(error){status(error.message,true);}return;}status('Preparing the two responses…');try{await transport.enable(getLoomJourney($('bridge').value).settings);configure();connectionPending=false;refreshControls();stillAt=0;lastGesture=null;$('hint').textContent='Both bodies belong to the same ringing system.';status('Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
+async function enter(){clearHolds();if(transport.state==='suspended'&&!connectionPending){try{await transport.resume();status('The connection is open again. Your passage is still here.');}catch(error){status(error.message,true);}return;}status('Preparing the two responses…');try{await transport.enable(selectedConnection().settings);configure();connectionPending=false;refreshControls();stillAt=0;lastGesture=null;$('hint').textContent='Both bodies belong to the same ringing system.';status('Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
 $('begin').onclick=enter;$('bridge').onchange=()=>{
  clearHolds();
  if(!transport.session){configure();status('Connection selected. Enter the instrument when you are ready.');return;}
  connectionPending=true;transport.quiet();refreshControls();
  const kept=transport.recording()?.events.length?'Your current passage is still available to keep.':'The current connection is quiet.';
- status(`Next: ${getLoomJourney($('bridge').value).title}. ${kept} Enter the new connection when you are ready.`);
+ status(`Next: ${selectedConnection().title}. ${kept} Enter the new connection when you are ready.`);
 };
 function clearHolds(){held.clear();pads.forEach(pad=>{pad.setAttribute('aria-pressed','false');pad.style.setProperty('--hold','0%');});}
 function begin(body,key){if(connectionPending||!['ready','playing'].includes(transport.state)||held.has(body))return;held.set(body,{key,start:performance.now()});pads[body].setAttribute('aria-pressed','true');}
@@ -70,7 +73,11 @@ $('quiet').onclick=()=>{clearHolds();transport.quiet();};$('new').onclick=()=>{c
 function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 $('save').onclick=()=>{try{download(stereoWav(transport.saveAudio()),'audio/wav','imagimusic-touch.wav');status('The complete passage was saved as sound.');}catch(error){status(error.message,true);}};
 $('score').onclick=()=>download(JSON.stringify(transport.recording(),null,2),'application/json','imagimusic-touch.json');
-const requested=new URLSearchParams(location.search).get('bridge');if(['close-kin','distant-cousins','tight-weave'].includes(requested))$('bridge').value=requested;configure();
+let routeError=null;
+try{const requested=readTouchConnection(location.search);if(requested.custom){customConnection=requested;const option=document.createElement('option');option.value='custom';option.textContent=requested.title;$('bridge').append(option);}$('bridge').value=requested.id;}catch(error){routeError=error;$('bridge').value='close-kin';}
+configure();
+if(routeError)status(`Could not open the linked connection: ${routeError.message} Close kin is selected instead. Choose a connection and enter when ready.`,true);
+else if(customConnection)status('Your custom connection is selected. Enter to begin a new passage; no saved gestures were carried over.');
 try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();}catch(error){$('world').hidden=true;status('The 3D view is unavailable; the pads can still play the connection.');}
 function draw(){
  const t=transport.time();if(world){const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const still=$('still-picture').checked;const resting={time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]};const frame=still?resting:transport.session?.visual(t)??resting;applyLoomScene(loomSceneFrame(frame,settings,{active:!still}),world.loom);world.render();}

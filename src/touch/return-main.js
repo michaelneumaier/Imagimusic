@@ -1,3 +1,4 @@
+import {touchConnectionHref} from './connection-link.js';
 import {createTouchReturnSession} from './return-session.js';
 import {rebuildTouchRecord} from './record.js';
 import {createGroveReplay} from '../grove/replay.js';
@@ -34,8 +35,7 @@ function show(result){
  const record=result.record,s=record.settings;
  $('facts').textContent=`${record.events.length} ${record.events.length===1?'gesture':'gestures'} · ${result.duration.toFixed(2)} seconds · ${record.sampleRate.toLocaleString()} Hz · ${record.ended?'saved Quiet ending':'natural ending'}`;
  $('settings').textContent=`${s.frequency} Hz base tuning · ${s.detune} cents detuning · coupling ${s.coupling} · loss ${s.loss}/s. Fixed output gain ${record.outputGain}; model pickup scale ${result.pickupScale.toPrecision(6)}.`;
- const match=LOOM_JOURNEYS.find(journey=>Object.keys(s).every(key=>journey.settings[key]===s[key]));
- $('play').hidden=$('play-note').hidden=!match;if(match)$('play').href=`touch.html?bridge=${encodeURIComponent(match.id)}`;
+ $('play').hidden=$('play-note').hidden=false;$('play').href=touchConnectionHref(s);
  if(!world)try{
   world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
   world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;
