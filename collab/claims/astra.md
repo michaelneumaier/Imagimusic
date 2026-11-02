@@ -323,3 +323,9 @@ Inverse shared-gesture scheduling: src/inverse/transport.js and tests/inverse-tr
 Inverse shared-gesture encounter and offline verification: inverse.html/css/src/inverse/main.js and tests/inverse-gesture-render.html/js; explicit listening gate, pending-aware locks and status, visitor touch memory preserved; real offline schedule and cancellation comparison. Fable owns authored score.
 
 Inverse cross-anatomy gesture reminder: inverse.html and src/inverse/main.js; remember the last admitted phrase only within current results, offer the existing action on another prepared anatomy after explicit listening, no record or visitor-touch mutation.
+
+Inverse manual-touch receipts: src/inverse/transport.js and tests/inverse-transport.test.js; expose the actual scheduled AudioContext origin after admission for later visitor-phrase capture, preserve the existing boolean strike API and rollback/gain/overlap behavior. No capture or schema integration yet.
+
+Inverse visitor phrase capture: src/inverse/phrase-capture.js and tests/inverse-phrase-capture.test.js, later inverse.html/css/main.js integration; explicit transactional visit-local draft, admitted audio-clock receipts only, eight-touch/eight-second limits, natural-tail replay and previous phrase preservation on cancel. Fable owns src/score/grove-inverse-phrase.js and its tests/contract.
+
+Inverse phrase render verification: tests/inverse-phrase-render.html/js; actual offline audio-clock manual receipt capture, same-anatomy replay and cross-anatomy PCM reference checks. Explicit silent diagnostic, no device-audio or visitor-preference claim.

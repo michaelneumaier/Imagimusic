@@ -75,3 +75,16 @@ test('gesture validation and suspended state create no sources, and a failed sta
  assert.equal(nodes.length,3);assert.ok(nodes.every(n=>n.stopped&&n.disconnected));assert.equal(transport.snapshot().pending,0);assert.equal(transport.snapshot().active,0);
  context.createBufferSource=create;assert.equal(transport.strike(1),true);transport.quiet();
 });
+
+test('manual touch receipts name the actual scheduled origin, not the caller clock before source creation',()=>{
+ const {transport,context,nodes}=setup();transport.mount(prepared);context.currentTime=4;
+ const create=context.createBufferSource;context.createBufferSource=()=>{context.currentTime+=.016;return create();};
+ const receipt=transport.strikeWithReceipt(2);
+ assert.deepEqual(receipt,{body:2,time:4.016});assert.equal(receipt.time,nodes[0].started);assert.ok(Object.isFrozen(receipt));
+ context.currentTime=5;assert.equal(receipt.time,4.016);
+ for(let i=0;i<7;i++)assert.ok(transport.strikeWithReceipt(i%3));
+ assert.equal(transport.strikeWithReceipt(0),null);assert.equal(nodes.length,8);
+ transport.quiet();context.state='suspended';assert.throws(()=>transport.strikeWithReceipt(0),/Start listening/);
+ assert.throws(()=>transport.strikeWithReceipt(3),/Strike body/);assert.equal(nodes.length,8);
+ context.state='running';assert.equal(transport.strike(0),true);transport.dispose();
+});

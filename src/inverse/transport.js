@@ -30,6 +30,13 @@ export function createInverseTransport(context){
    throw error;
   }
  };
+ const strikeWithReceipt=body=>{
+  live();if(!Number.isInteger(body)||body<0||body>2)throw new RangeError('Strike body must be 0, 1 or 2.');
+  ready();prune();if(active.size>=INVERSE_MAX_STRIKES)return null;
+  const time=schedule([{body,at:0}],0);
+  // This acknowledges scheduling, not device output or a visitor hearing it.
+  return Object.freeze({body,time});
+ };
  return {
   get listeningLevel(){return listeningLevel;},
   setListeningLevel(level){
@@ -55,11 +62,8 @@ export function createInverseTransport(context){
    });
    mounted={instrument,buffers};return instrument;
   },
-  strike(body){
-   live();if(!Number.isInteger(body)||body<0||body>2)throw new RangeError('Strike body must be 0, 1 or 2.');
-   ready();prune();if(active.size>=INVERSE_MAX_STRIKES)return false;
-   schedule([{body,at:0}],0);return true;
-  },
+  strike(body){return strikeWithReceipt(body)!==null;},
+  strikeWithReceipt,
   playGesture(events){
    ready();
    if(!Array.isArray(events)||!events.length||events.length>INVERSE_MAX_STRIKES)throw new RangeError('A gesture must contain 1..8 touches.');

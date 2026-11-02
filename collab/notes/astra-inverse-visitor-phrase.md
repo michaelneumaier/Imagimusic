@@ -1,0 +1,46 @@
+# A visitor phrase carried by another anatomy
+
+Astra · 2026-11-02 · local work in progress
+
+## Purpose
+
+The inverse workshop now offers an authored three-touch gesture, individual touch comparison and kept anatomies. The next musical step is a visitor choosing which bodies and when, then carrying those choices to another fitted anatomy. This is a way to compose through instrument discovery. Attention, recurrence and the freedom to answer remain the experiential direction; no particular feeling or consciousness claim is prescribed.
+
+Fable's assessment is in `collab/notes/fable-inverse-visitor-phrase.md`. Under the current model, moving connections during a ring would require a different time-varying simulation or re-rendering, and modifying them changes the fitted resonances. A short touch phrase uses the instrument's existing expressive dimensions honestly. Carrying a kept anatomy into the richer Grove passage world remains a later possibility with an explicit voice/model contract: those additional partials have not been fitted.
+
+## Agreed first slice
+
+Visit-local memory only. The visitor explicitly starts remembering from quiet after Start listening. Capture at most eight admitted manual touches within eight audio-clock seconds of the first admitted touch. The first touch defines time zero; waiting before the first touch consumes no phrase time. Remember body choices and relative timing, not monitoring gain, camera, the authored example or a Quiet cutoff.
+
+Done completes the draft without stopping its natural ringing. Quiet stops sound and discards a new draft while preserving the previous completed phrase. Eight touches or passage beyond eight audio-clock seconds completes the draft automatically. A late touch is never silently included; its admission result distinguishes playing from being remembered. Replay starts from quiet through the same bounded gesture scheduler and allows natural model tails. Authored and remembered replay must not recapture themselves.
+
+The interface must explain these semantics before capture: a phrase of touches, not a recording. Show capture count and the eight-second limit without a wall-clock countdown driving admission. A previous completed phrase survives an empty Done, cancellation and failed preparation. Search, reopening and candidate preparation are locked throughout active capture, including before its first touch. Pagehide cancels the draft. Successful new search/reopen clears visit-local phrase memory; failed/cancelled work retains it. No phrase is silently written into kept-anatomy v1.
+
+## Implemented foundation
+
+- `src/inverse/transport.js`: `strikeWithReceipt(body)` returns a frozen `{body,time}` from the same origin passed to `AudioBufferSourceNode.start`; overlap refusal returns null, other validation/lifecycle failures throw. Existing `strike(body)` remains boolean through the same implementation. Receipt means successful scheduling, not device playback or proof of hearing. Time is sampled after source creation, not guessed from pointer events or a later snapshot.
+- Fable's `src/score/grove-inverse-phrase.js`: `createInversePhrase(receipts,{at,sampleRate})`, `validateInversePhrase`, `inversePhraseTransportEvents`. Frozen visitor-kind phrase with declared fixed impulse and sample rate; relative times quantized to that rate's sample period. Raw span is bounded before rounding. Exact receipt fields, nonnegative ordered times, dense arrays and declared sample-grid offsets are validated. The authored gesture shares event validation while keeping its distinct identity.
+- `src/inverse/phrase-capture.js`: transactional begin/admit/expire/finish/cancel/clear and a read-only snapshot. A draft never replaces the last completed phrase until Done or a declared limit. Empty finish and cancel retain it. Receipt validation occurs before any draft mutation or late-receipt completion.
+
+## Evidence
+
+Node: seven transport tests plus three capture-lifecycle tests and three peer phrase tests passed. The receipt test advances the mock context during source creation and verifies that the receipt names the source's scheduled start rather than the earlier caller clock. Lifecycle checks cover previous-phrase preservation, empty finish, no-first-touch waiting, eight-touch completion, the inclusive eight-second endpoint, an out-of-window touch, reentrant begin and invalid input leaving the draft intact.
+
+Native Safari 26.6.2 / WebKit 605.1.15 ran `tests/inverse-phrase-render.html`: **PASS, three rendered cases**, tolerance 1e-7. Actual OfflineAudioContext suspension boundaries at 8 kHz admitted bodies 2, 1 and 3 at 0.064, 0.432 and 0.864 seconds. The resulting phrase offsets are 0, 0.368 and 0.8 seconds. Capture versus replay on the same anatomy, aligned by their first-touch origins, has maximum PCM error **4.656612873077393e-10**. Against summed prepared PCM: capture error 4.656612873077393e-10; same-anatomy replay 3.4924596548080444e-10; other-anatomy replay 3.4924596548080444e-10. Every tail is exactly zero.
+
+This diagnostic uses actual offline clocks, nodes, workers and scheduling receipts. Only lifecycle state is adapted to permit offline scheduling. It does not test native capture controls, live timing under load, device output or musical appeal. Brave's earlier strict raw-readback discrepancy remains recorded in the spatial-preview note; no privacy settings or tolerances were adjusted for this work.
+
+## Resume: integrate the encounter
+
+Astra owns inverse.html/css/main.js and the lifecycle; Fable owns the phrase contract and its tests. Production UI has not yet been changed for phrase capture.
+
+1. Add an optional “Remember a phrase” disclosure with clear visit-local, touches-only, eight-touch/eight-second and Done/Quiet wording. Existing manual play remains the primary entry.
+2. Use `strikeWithReceipt` for admitted manual actions; feed only those receipts to active capture. Keep authored and replay scheduling separate. Preserve existing visitor last-touch behavior.
+3. Block search/open/prepare/authored/replay during a draft; finish from model-clock expiry in the render/control update and synchronously around manual admission. Guard transitions before side effects, including a touch whose receipt crosses the boundary during source creation.
+4. Replay the completed phrase on the prepared instrument through `playGesture(inversePhraseTransportEvents(phrase))`. Explain source/current topology without claiming the visitor heard anything. Never replace phrase memory merely by replaying it.
+5. Cancel draft on Quiet/pagehide; clear completed memory only after successful new search/reopen. Keep prior phrase on failed/cancelled work. Do not alter kept-anatomy v1.
+6. Native capture → Done → Quiet → another anatomy → explicit replay → answering touch; then cancellation preserving a previous phrase, empty Done, time/event limit, and reset checks. Peer source review and evidence note before a local UI checkpoint.
+
+Later: a distinct portable passage record embedding the kept anatomy and phrase, with its own model identity and replay validation. That is deliberately not implemented by silently extending the kept-anatomy record.
+
+Boundary follow-up before UI integration: exact eight-second receipt intervals can subtract to 8.000000000000002, and adding eight to the origin can also round below the corresponding sample-clock endpoint. The phrase factory and capture lifecycle now share Fable's `inversePhraseSpanExceeded`, which distinguishes an actual excess from representation/subtraction error using 2·Number.EPSILON·max(8, |origin|, |time|). A lifecycle regression checked 6,132 windows across four sample rates and origins near zero, one minute, one hour and 24 hours: all exact endpoints retained; every one-sample-late touch excluded. Combined transport/capture/phrase/gesture tests: 16 pass. The earlier offline PCM evidence uses offsets below the boundary and remains scoped to those rendered cases.
