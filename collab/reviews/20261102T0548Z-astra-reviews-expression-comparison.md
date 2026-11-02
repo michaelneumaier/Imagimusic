@@ -1,0 +1,15 @@
+# Review: composed versus note-only inputs
+
+Astra, 2026-11-02. Reviewed Fable5277c72 and subsequent working-tree corrections. Verdict: request changes before rendering/discovery.
+
+The derivation preserves notes, native velocity/attributes, mapping and lifecycle controls, removes the named expression types and renumbers order. It does not pretend to compare MIDI1 and MIDI2 capabilities. The analytic report is appropriately separate from hearing evidence. The later source correction now counts attribute0x03 specifically and distinguishes other nonzero attributes; the timeline now includes left limits. Those corrections address the earlier findings, subject to final producer handoff.
+
+**Blocker:** the working producer serializes the patch using `JSON.stringify(patch, Object.keys(patch).sort())`. That array is a recursive property allowlist, so nested fields absent from the root key list are omitted. This cannot preserve the complete instrument snapshot. Use ordinary JSON serialization of the validated patch, or a genuinely recursive canonicalizer, and verify nested geometry, bellows and ADSR survive. The browser harness must render both examples from this saved snapshot, not a future live default.
+
+The agreed requested render contract is `patchSnapshot` plus SHA256 of `JSON.stringify(patchSnapshot)` without a newline. If the producer instead supplies a separately hashed patch file, agree that contract explicitly and verify file/snapshot equality before rendering. The harness currently refuses the older incomplete artifact in native Safari and exposes no downloads. No comparison WAVs or listening outcomes have been claimed.
+
+Astra's artifact verifier independently filters the composed event list and checks source/patch/report bindings, exact WAV hashes and monoPCM16 format, quantized peak/RMS agreement and final silence. Its two synthetic tests check corruption and rehashed semantic changes; they are not browser render evidence. Positive browser renders remain outstanding until the producer correction lands.
+
+## Follow-up after producer60d5e59
+
+Blocker resolved: inspected plain serialization and the explicit snapshot/hash contract, regenerated inputs and successfully rendered both examples twice in native Safari26.6.2. Full Float32 bytes matched within each repeated pair; each is1087200frames at48kHz (22.65seconds), with exactly silent final100ms. Saved both WAVs and browser report through native controls; `tools/finalize-expressive-compare.mjs` independently passed source derivation, snapshot/report binding and WAV format/hash/quantized measurements. Composed WAV SHA256 `8906d4d49f0cfa70b1c015443c513b2bf60994776c42382afc363ec169ddee46`; note-only `b47a5fe21ca162c71f7ba465400c0cb756295d61ac63f065c1f3a97192c452d3`. Focused packet/Clip/comparison/artifact suite18/18. Verdict now **approve** for these saved inputs and bounded evidence. Attribute and left-limit corrections remain in Fable's working tree and need his commit; not staged by Astra. No listening preference, device-output or physical-acoustic claim follows from these checks.

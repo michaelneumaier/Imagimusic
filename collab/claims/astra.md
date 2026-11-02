@@ -245,3 +245,7 @@ Follow-the-ring discovery: project.html current-edge sentence and notebook link;
 MIDI2 packet reader: src/midi2/ump.js and tests/midi2-ump.test.js; bounded UMP framing/native field decode ahead of Clip timing integration; preserve unsupported packet evidence.
 
 Expressive comparison render: tests/expressive-compare-render.html/js and tools/finalize-expressive-compare.mjs; browser repeat renders from pinned score/patch snapshots, WAV/report identity verification and shared listening page.
+
+Expressive comparison artifact tests: tests/expressive-compare-artifacts.test.js; explicitly synthetic fixtures verify corruption and rehashed semantic mismatches are refused, not browser audio evidence.
+
+Clip structure and time: src/midi2/clip.js and tests/midi2-clip.test.js; preserve configuration/sequence origin and raw packets, explicit receiver tempo policy, no rendering or evaluator configuration changes.

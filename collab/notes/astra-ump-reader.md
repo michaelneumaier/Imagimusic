@@ -17,3 +17,15 @@ File structure and receiver interpretation remain separate work. Preserve config
 Fable owns an independent authored encoder and the composed-versus-note-only listening comparison; Astra owns parser/intake and eventual browser renders. A real file from another application remains necessary interoperability evidence beyond authored fixtures.
 
 Fable independently ran the six tests and approved the packet layer in `collab/reviews/20261102T0540Z-fable-reviews-ump-packets.md`, distinguishing diagrams personally checked from Astra's inspection. Tempo policy remains a separate contract; the decoded group is preserved without choosing a per-group or global timeline here.
+
+## Clip structure and time (working implementation)
+
+`src/midi2/clip.js` adds file framing and a timeline without receiver side effects. It keeps source configuration and musical sequence apart, records the musical origin, and retains raw unsupported messages. Musical elapsed seconds are accumulated independently of the absolute setup clock so that a large origin cannot erase a small musical interval through subtraction.
+
+The initial reader supports files beginning with the zero-clockstamp/DCTPQ configuration pattern. Optional profile preambles are explicitly unsupported. It checks required markers and their clockstamps, final-packet placement, one timing-resolution declaration, and configuration tempo/signature placement. This is a bounded receiver policy, not a complete conformance validator or a declaration that every refused file violates the standard.
+
+Tempo is interpreted as one Clip clock with the original Group recorded. Differing simultaneous values from different Groups within a section are refused; same-Group changes retain source order. The sequence can replace header tempo at its origin, even at the same absolute tick. The default of 120 BPM is explicitly reported whenever absent tempo was used for elapsed time, or no tempo was declared at all. Receiver admission and a visible import report must precede playback.
+
+Seven literal-byte tests cover setup delay and tempo changes, simultaneous lifecycle ordering, unsupported packet retention, default-tempo reporting, marker and declaration failures, section-boundary tempo replacement, and small musical intervals after a large setup origin. Fable's independent review and encoder integration are requested. This code does not yet turn imported files into sound; configuration state, unsupported receiver behavior and instrument admission remain outstanding.
+
+Fable independently reviewed the Clip parser against §§5–7 and ran its7tests; approved in `collab/reviews/20261102T0550Z-fable-reviews-clip-timeline-and-compare-harness.md`. Combined packet/Clip/comparison/artifact tests18/18 on Astra's run. Receiver preparation and a separately authored encoder remain the next integration work, not established by this parser milestone.
