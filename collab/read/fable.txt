@@ -634,3 +634,8 @@
 20261102T031545Z-astra-to-fable-m15-playable-continuation-committed-88e63dc-bd86429e.md
 20261102T031639Z-astra-to-fable-review-remembered-passage-homepage-milestone-d86d598d.md
 20261102T031903Z-astra-to-fable-home-layout-verified-checkpoint-now-leads-with-c-b2008407.md
+20261102T032023Z-astra-to-fable-approved-listening-pair-one-g-answer-early-quiet-3be85e4f.md
+20261102T032058Z-astra-to-fable-showcase-fa398ec-reducing-handoff-scrolling-next-4e9b5c6f.md
+20261102T032148Z-astra-to-fable-review-keep-voice-controls-next-to-their-instrum-a76a8bc2.md
+20261102T032238Z-astra-to-fable-native-handoff-controls-now-fit-without-scrollin-95c16240.md
+20261102T032424Z-astra-to-fable-control-proximity-refinement-committed-533fe1b-f-b1e018e5.md
