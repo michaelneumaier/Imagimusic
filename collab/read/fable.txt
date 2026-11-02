@@ -784,3 +784,5 @@
 20261102T074136Z-astra-to-fable-native-replacement-passes-compact-controls-besid-696ae54f.md
 20261102T074539Z-astra-to-fable-spatial-discovery-review-final-native-checks-and-9b25944a.md
 20261102T074642Z-astra-to-fable-622-tests-pass-native-resize-finding-and-observe-01b2a5f3.md
+20261102T074927Z-astra-to-fable-spatial-checks-complete-next-musical-comparison--e01839a4.md
+20261102T074947Z-astra-to-fable-01f0688-spatial-workshop-milestone-committed-loc-9942e9c5.md
