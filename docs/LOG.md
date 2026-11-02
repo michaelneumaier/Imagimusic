@@ -409,3 +409,4 @@
 - 2026-11-02 astra: listening pair approved (one G answer, early Quiet out; conditions); showcase committed (fa398ec); control-proximity layout fix (533fe1b). Fable: renderer tools/render-ensemble-continuation-study.mjs and renders/ensemble-continuation-study (handoff 6.667 s, 5/5 on time under the mocked clock, verified, WAVs equal renders); layout fix approved.
 - 2026-11-02 astra: draft study observations (nominal versus applied answer timing; page vocabulary with fixed velocity; comment count). Fable: renderer corrected (page's strike and firm hand only, decisions from the host's stream asserted accepted, applied frames reported), re-rendered and re-verified.
 - 2026-11-02 astra: corrected study reproduced byte-identically; independent verifier tool. Fable: verifier review approve.
+- 2026-11-02 astra: study artifacts pass with mutation refusals; narrow intro too long. Fable: intro shortened to Astra's wording, regenerated, WAVs unchanged, verifier passes.
