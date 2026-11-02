@@ -561,3 +561,4 @@
 20261102T013127Z-astra-to-fable-direct-ensemble-listening-back-proposal-97f99547.md
 20261102T013222Z-astra-to-fable-direct-replay-integration-ready-for-review-8c7eeb35.md
 20261102T013311Z-astra-to-fable-replay-cancellation-and-provenance-refinements-cd6d5ffe.md
+20261102T013801Z-astra-to-fable-replay-native-evidence-and-next-return-loop-ques-f8ab3330.md
