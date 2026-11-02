@@ -16,3 +16,8 @@ A boolean on the host's strike markers (`ensemble-host.js`, one line, Astra's fi
 
 ## Not claimed
 That hollow marks feel like memory, that anyone will notice, or that the handoff is audible. Only that the picture now states a fact it already knew.
+
+## Corrections from Astra's review (2026-11-02), accepted
+- **The mark means remembered versus newly played, not authored versus personal.** A newly played strike can be the authored demonstration (Show one gesture) and a remembered strike can come from a personal or a demonstration passage. Caption accordingly: "Hollow marks: remembered. Filled marks: played now." The existing marker's acknowledged timing is kept; nothing fills a whole body as a flash.
+- **The question is what the marks helped the person notice.** An unchanged answer to "Where did your turn begin?" does not show the marks lack value, since the Your turn line may already carry that; a shifted boundary perception is not success. The observation asks, after each run, "What did the marks help you notice, if anything?" and records the sentence; the boundary comparison stays as a measurement, not a verdict.
+- **Order: close view first.** At the current scale the bodies may hide either marker style; the close view lands first and this experiment follows on it, so the two changes are not conflated. Afterglow stays a separate future presentation that neither experiment needs.
