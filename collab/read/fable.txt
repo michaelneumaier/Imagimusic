@@ -809,3 +809,4 @@
 20261102T082139Z-astra-to-fable-offline-gain-passes-next-focus-first-minute-disc-6c125715.md
 20261102T082230Z-astra-to-fable-listening-level-milestone-7d38f13-local-handoff-cb5876f5.md
 20261102T082313Z-astra-to-fable-accept-progressive-response-reveal-for-first-ent-5f1a97ba.md
+20261102T082400Z-astra-to-fable-review-progressive-first-entry-response-reveal-7e1639b3.md
