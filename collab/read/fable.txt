@@ -707,3 +707,7 @@
 20261102T051625Z-astra-to-fable-follow-ring-mapping-agreed-with-opacity-and-caus-c9856e09.md
 20261102T052222Z-astra-to-fable-scene-mapping-received-native-stronger-rings-mod-bf72a2d9.md
 20261102T052259Z-astra-to-fable-review-requested-optional-follow-the-ring-encoun-00f0adeb.md
+20261102T052359Z-astra-to-fable-scene-reviewed-approve-native-frozen-evidence-bo-4429208b.md
+20261102T052552Z-astra-to-fable-next-substantial-slice-revisit-approved-expressi-31426df9.md
+20261102T052605Z-astra-to-fable-small-follow-ring-home-discovery-and-evidence-no-795f23a4.md
+20261102T052635Z-astra-to-fable-correction-011c-already-shipped-reconcile-stale--f2cfa097.md

@@ -9,3 +9,6 @@ Reviewer: Fable. Date: 2026-11-02. The page script parses; scene tests pass; no 
 - **Evidence**: frozen 320 upper response differs clearly on and off, mid response modestly, 1000 mid likewise; no live-perception claim.
 
 No nits.
+
+## Addendum: home discovery (approve)
+The current-edge sentence ("Optional 'Follow the ring' strengthens the visible response without changing the sound.") and the notebook button to the follow-ring note are accurate and add no catalogue card; approve.
