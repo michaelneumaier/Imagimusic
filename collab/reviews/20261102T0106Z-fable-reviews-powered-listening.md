@@ -20,4 +20,4 @@ seed 11 hand at upper zone (0.5–2 s) peak -30.8 dBFS → after +18 dB -12.8 dB
 seed 11 hand at tip (0.5–2 s)        peak -33.7 dBFS → after +18 dB -15.7 dBFS; samples over 0.95: 0 of 482400
 ```
 
-So the ceiling is inactive for the default encounter at 18 dB on every curated grove and hand placement measured; the powered drive at its planned amplitude limit sits well below the Rest strikes' level rather than above it. This covers the authored default, not an arbitrary record; the admission bound still permits louder records in principle, which is why the ceiling exists.
+So the ceiling is inactive for the default encounter at 18 dB on every curated grove and hand placement measured, with at least 9.6 dB of margin; the powered drive at its planned amplitude limit peaks in the same range as the Rest invitation's strikes (−28 to −34 dBFS against −29), not above it. This covers the authored default, not an arbitrary record; the admission bound still permits louder records in principle, which is why the ceiling exists.
