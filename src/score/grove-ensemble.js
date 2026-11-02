@@ -12,23 +12,30 @@ export const ENSEMBLE_BOUNDS = Object.freeze({ parts: 3, minSeconds: 6, maxSecon
  *  two ring (beats 3.5 to 6), then all three are struck together (beat 8), and every part goes Quiet at beat 12 so the arrangement ends together.
  *  Requires three recipes with the same voice and sample rate; their Groves may differ (that is the point). Per-part commands are identical
  *  across arrangements because they depend only on the beat grid, the position vocabulary and the firm strength. */
-export function composeEnsemblePhrase(recipes, { tempo = 72 } = {}) {
+export function composeEnsemblePhrase(recipes, { tempo = 72, together = true, velocity = 0.6 } = {}) {
+  if (typeof together !== 'boolean') throw new Error('together must be a boolean.');
+  if (!Number.isFinite(velocity) || velocity <= 0 || velocity > 1) throw new Error('velocity must be in (0, 1].');
   if (!Array.isArray(recipes) || recipes.length !== ENSEMBLE_BOUNDS.parts) throw new Error(`the ensemble phrase is written for ${ENSEMBLE_BOUNDS.parts} parts.`);
   if (!Number.isInteger(tempo) || tempo < 40 || tempo > 160) throw new Error('tempo must be an integer in 40..160.');
   const sr = recipes[0].sampleRate, voice = canonicalVoiceConfig(recipes[0].voice);
   recipes.forEach((r, i) => { if (r.sampleRate !== sr) throw new Error(`part ${i}: sample rate differs.`); if (canonicalVoiceConfig(r.voice) !== voice) throw new Error(`part ${i}: voice differs.`); if (r.strengths.findIndex(s => s.name === 'firm') < 0 || !r.zones?.length || !r.positions?.length) throw new Error(`part ${i}: needs the firm strength, a zone and a position.`); });
   const beat = b => Math.round(b * 60 / tempo * sr), firm = recipes[0].strengths.findIndex(s => s.name === 'firm'), tip = recipes[0].zones.length - 1, position = Math.floor((recipes[0].positions.length - 1) / 2);
-  const strike = (id, b, velocity) => ({ id, kind: 'strike', frame: beat(b), body: 0, position, velocity });
-  const quiet = { id: 'ensemble-quiet', kind: 'quiet', frame: beat(12), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
+  const strike = (id, b, v) => ({ id, kind: 'strike', frame: beat(b), body: 0, position, velocity: v });
+  // The study phrase (together: true, the default): arrivals at 0.6, the hand, all three together at 8, Quiet at 12. The demonstration
+  // (together: false): the same arrivals and hand at the page's own press velocity, no chord, Quiet at 8; 6.7 s at tempo 72.
+  const endBeat = together ? 12 : 8, quiet = { id: 'ensemble-quiet', kind: 'quiet', frame: beat(endBeat), fadeFrames: Math.round(REST_QUIET_FADE_SECONDS * sr) };
+  const chord = n => (together ? [strike(`ensemble-together-${n}`, 8, 0.5)] : []);
   const parts = [
-    { index: 0, role: 'root', commands: [strike('ensemble-arrive-1', 0, 0.6), { id: 'ensemble-hand', kind: 'contact', frame: beat(3.5), body: 0, zone: tip, strength: firm }, { id: 'ensemble-lift', kind: 'contact', frame: beat(6), body: 0, zone: null }, strike('ensemble-together-1', 8, 0.5), { ...quiet }] },
-    { index: 1, role: 'third', commands: [strike('ensemble-arrive-2', 1, 0.6), strike('ensemble-together-2', 8, 0.5), { ...quiet }] },
-    { index: 2, role: 'fifth', commands: [strike('ensemble-arrive-3', 2, 0.6), strike('ensemble-together-3', 8, 0.5), { ...quiet }] },
+    { index: 0, role: 'root', commands: [strike('ensemble-arrive-1', 0, velocity), { id: 'ensemble-hand', kind: 'contact', frame: beat(3.5), body: 0, zone: tip, strength: firm }, { id: 'ensemble-lift', kind: 'contact', frame: beat(6), body: 0, zone: null }, ...chord(1), { ...quiet }] },
+    { index: 1, role: 'third', commands: [strike('ensemble-arrive-2', 1, velocity), ...chord(2), { ...quiet }] },
+    { index: 2, role: 'fifth', commands: [strike('ensemble-arrive-3', 2, velocity), ...chord(3), { ...quiet }] },
   ];
-  const seconds = +(beat(12) / sr + REST_QUIET_FADE_SECONDS).toFixed(3);
+  const seconds = +(beat(endBeat) / sr + REST_QUIET_FADE_SECONDS).toFixed(3);
   if (seconds < ENSEMBLE_BOUNDS.minSeconds || seconds > ENSEMBLE_BOUNDS.maxSeconds) throw new Error(`phrase lasts ${seconds} s; bound is ${ENSEMBLE_BOUNDS.minSeconds}..${ENSEMBLE_BOUNDS.maxSeconds} s.`);
-  const sections = [{ id: 'arrive', beats: [0, 3.5] }, { id: 'hand', beats: [3.5, 6] }, { id: 'ring', beats: [6, 8] }, { id: 'together', beats: [8, 12] }, { id: 'quiet', beats: [12, 12] }];
-  return { version: ENSEMBLE_PHRASE_VERSION, tempo, sampleRate: sr, voice, seconds, endFrame: beat(12), position, zone: tip, parts, sections, bases: recipes.map(r => r.grove.cluster.baseMidi), groves: recipes.map(r => canonicalGrove(r.grove)) };
+  const sections = together
+    ? [{ id: 'arrive', beats: [0, 3.5] }, { id: 'hand', beats: [3.5, 6] }, { id: 'ring', beats: [6, 8] }, { id: 'together', beats: [8, 12] }, { id: 'quiet', beats: [12, 12] }]
+    : [{ id: 'arrive', beats: [0, 3.5] }, { id: 'hand', beats: [3.5, 6] }, { id: 'ring', beats: [6, 8] }, { id: 'quiet', beats: [8, 8] }];
+  return { version: ENSEMBLE_PHRASE_VERSION, tempo, together, velocity, sampleRate: sr, voice, seconds, endFrame: beat(endBeat), position, zone: tip, parts, sections, bases: recipes.map(r => r.grove.cluster.baseMidi), groves: recipes.map(r => canonicalGrove(r.grove)) };
 }
 
 /** One admitted Rest record per part, on its own recipe; the same commands composed on different recipes yield records that differ only in
