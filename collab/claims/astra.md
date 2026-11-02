@@ -381,3 +381,5 @@ Touch return still-picture choice: owned return HTML/CSS/main. Respect reduced-m
 Independent duration audit: tools/audit-sound-study-duration.mjs and collab/notes/astra-sound-duration-audit.md. Read-only import of Fable's estimator; paired actual truncated samples versus full recording at identical spectral windows, with explicit available durations and source hash. No estimator or production edits.
 
 Listening-position continuity: src/listen/main.js, src/touch/main.js, tests/listen-transport.test.js. URL-only quiet return marker, tied to originating study; no gestures/audio storage and no autoplay.
+
+Passage-history sampling study: tools/audit-touch-history-sampling.mjs and collab/notes/astra-touch-history-sampling.md. Analytic model samples only, no production rendering or sound changes; evaluate interpolation and exact-event/ending boundaries against dense sampled references.
