@@ -1,6 +1,7 @@
 import {validateInverseTarget} from '../score/grove-inverse.js';
 import {composeGrove,groveSystem} from '../score/grove.js';
 import {createInverseJobs} from './jobs.js';
+import {createCandidateDiagram} from './candidate-diagram.js';
 import {createInverseTransport} from './transport.js';
 const $=id=>document.getElementById(id),jobs=createInverseJobs();
 const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
@@ -58,6 +59,7 @@ function renderResults(){
   const title=document.createElement('h3');title.textContent=candidate.topology;card.append(title);
   const fit=document.createElement('p');fit.textContent=candidate.status==='accepted'?'Within the declared tolerance':candidate.status==='impossible-in-family'?'Outside tolerance · target impossible in this family':candidate.status==='best-outside-tolerance'?'Best found · outside tolerance':'No admitted candidate found';card.append(fit);
   if(candidate.grove){
+   card.append(createCandidateDiagram(candidate.grove));
    const residual=document.createElement('p');residual.textContent=`Largest resonance error: ${candidate.residual.maxAbsCents.toFixed(4)} cents. Decay error: ${(100*Math.abs(candidate.residual.decayRelative)).toFixed(4)}%.`;card.append(residual);
    const achieved=document.createElement('p');achieved.textContent=`Found: ${candidate.residual.achieved.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz.`;card.append(achieved);
    const button=document.createElement('button');button.textContent=candidate.status==='accepted'?'Prepare this anatomy':'Explore this near miss';button.onclick=()=>prepare(candidate,card);card.append(button);candidateButtons.push(button);

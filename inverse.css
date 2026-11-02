@@ -13,3 +13,5 @@
 .listening-level{max-width:320px;margin:14px 0 4px}.listening-level output{float:right;color:var(--mint)}.listening-level input{padding:0;accent-color:var(--mint);height:24px}#level-help{margin-bottom:12px}
 
 .workshop:not(.has-instrument){grid-template-columns:minmax(0,1fr);max-width:650px}
+
+.candidate-map{margin:18px 0 22px;background:#142126;border-radius:10px;padding:10px 12px}.candidate-map svg{display:block;width:100%;max-width:340px;margin:auto}.candidate-map figcaption{font-size:12px;color:var(--muted);text-align:center;margin:4px 0 2px}

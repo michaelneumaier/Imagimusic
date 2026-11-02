@@ -307,3 +307,5 @@ Inverse listening level: src/inverse/transport.js, tests/inverse-transport.test.
 Inverse gain render diagnostic: tests/inverse-level-render.html/js; actual OfflineAudioContext output for mute, unity, fourfold scale and interrupted live ramps through production transport, with explicit offline state facade and no device playback.
 
 Inverse first entry: inverse.html/css and src/inverse/main.js; reveal response only after first successful mount, retain across later work, collapse empty initial grid and clarify the starting-example action.
+
+Inverse candidate maps: src/inverse/candidate-diagram.js, main.js and inverse.css; static numbered schematic from actual candidate edges to aid choice before preparation, no coupling-strength or response encoding.
