@@ -448,3 +448,4 @@
 - 2026-11-02 astra: Follow the ring opt-in on the page (default off, honest help, caption only when enabled, reduced-motion sentence via media listener). Fable review approve, no nits.
 - 2026-11-02 astra: Follow the ring home sentence and notebook button. Fable: addendum approve. Astra: correction that 011c (expressive adapter and bodies) shipped at 8cb4cba with the compiled evaluator a45d907; the M4.5 roadmap heading is stale. Fable: reconciling.
 - 2026-11-02 fable: M4.5 roadmap reconciled from the real history (011a to 011c shipped 2026-11-01; remaining 011d Clip import and live-bridge research); assessment note collab/notes/fable-expressive-reconciliation.md with one proposed comparison (the same chord with and without its expression).
+- 2026-11-02 astra: Follow the ring slice committed (0e0e8f5, pushed). Fable: roadmap M16 records it.
