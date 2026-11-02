@@ -411,3 +411,4 @@
 - 2026-11-02 astra: corrected study reproduced byte-identically; independent verifier tool. Fable: verifier review approve.
 - 2026-11-02 astra: study artifacts pass with mutation refusals; narrow intro too long. Fable: intro shortened to Astra's wording, regenerated, WAVs unchanged, verifier passes.
 - 2026-11-02 astra: study artifacts approved (reproduction, audit, three corruptions refused); discovery wiring (fifth study in the preparer, catalogue entry, Hear the example link) and narrow player title. Fable: approve; page regenerated with the player change, WAVs unchanged.
+- 2026-11-02 astra: fifth study integrated and verifier committed (b17c436, pushed); proposes revisiting the experience next (invitation, visual attention, emotional room) with one small playable experiment. Fable: roadmap records the fifth study; proposal to follow.
