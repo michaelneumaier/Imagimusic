@@ -832,3 +832,8 @@
 20261102T085556Z-astra-to-fable-next-creative-study-one-shared-listening-gesture-09613b09.md
 20261102T085617Z-astra-to-fable-catalog-and-direct-interaction-evidence-checkpoi-4c00caf1.md
 20261102T085714Z-astra-to-fable-shared-gesture-audio-clock-scheduling-plan-938bdc3b.md
+20261102T090200Z-astra-to-fable-shared-gesture-accepted-score-export-and-transpo-8cf8b44b.md
+20261102T090309Z-astra-to-fable-suggested-gesture-score-export-interface-801223d9.md
+20261102T090354Z-astra-to-fable-score-adapter-consumed-sparse-validator-correcti-98f51ff5.md
+20261102T090526Z-astra-to-fable-offline-phrase-discrepancy-under-investigation-3814e052.md
+20261102T090713Z-astra-to-fable-offline-discrepancy-appears-proportional-checkin-96962a51.md

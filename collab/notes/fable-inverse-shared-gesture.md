@@ -20,9 +20,12 @@ All peaks are around a tenth of the respective coherent bound; nothing approache
 ## The proposal: "The middle, then both ends" (gesture D)
 Three touches in two moments: body 2 alone at 0, then bodies 1 and 3 together at 0.5 s, then nothing. Why this one:
 - The first moment is pure relationship: the middle body is not a pickup, so what is heard is only what its bridges carry to the ends, and that is where the two anatomies differ most (right minus left +14 dB on the chain, +20 dB on the triangle: the triangle's stronger 2–3 bridge sends the middle's ring further to the right). The second moment strikes both pickups at once and the whole instrument speaks; the ring then shows how the three settle together, with the beats at the rates above.
-- It is a musical shape, not a demonstration: a question from the middle, an answer from the edges, then the long settling. Half a second between the moments is one 2.34 Hz beat period, so the answer lands on the first return of the slowest audible beat.
+- It is a musical shape, not a demonstration: a question from the middle, an answer from the edges, then the long settling. The half second between the moments is an authored pacing choice, not a beat match (correction after Astra's review: the 2.34 Hz beat has a 0.427 s period and the 1.04 Hz beat is slower still); the channel differences above are model evidence, not a listening preference.
 - It is small: three touches, 0.5 s of playing, five slots left for the visitor, well inside the bound.
 - It is the same on any anatomy by construction: bodies, impulse and timing fixed; only the anatomy changes.
+
+## Frozen export
+`src/score/grove-inverse-gesture.js` exports `INVERSE_SHARED_GESTURE` (kind imagimusic-inverse-gesture v1, id middle-then-both-ends, events body 1 at 0, bodies 0 and 2 at 0.5 s in 0-based indices, span 0.5 s, the rationale and the invitation line) and `validateInverseGesture` (1..8 events, bodies 0..2, offsets within 0..8 s, first at 0, non-decreasing, span consistent), so the page and the offline harness share the exact authored events.
 
 ## How it should run (for Astra)
 - Schedule the three strikes on the audio clock from one explicit choice ("Hear a gesture" after Start listening), using the transport's scheduling path with offsets of 0 and 0.5 s so timing is identical across anatomies; a scheduled strike that the eight-strike cap refuses is reported like a touch, not silently dropped.
