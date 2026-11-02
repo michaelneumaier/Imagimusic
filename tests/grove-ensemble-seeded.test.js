@@ -144,3 +144,18 @@ test('capture edges: a contact set applied on the Quiet frame of an aborted open
     inverted.opening.ledger[b].requestedFrame = Math.min(inverted.opening.ledger[b].requestedFrame, inverted.opening.ledger[b].appliedFrame);
     assert.throws(() => validateSeededEnsemble(inverted), /ordered queue/); }
 });
+
+test('same-frame order is part of identity: two remembered strikes on one part and frame, kept in reversed order, do not verify', async () => {
+  const { host: first, block: b1, until: u1 } = fixture(); await first.enable([grove, grove, grove]);
+  assert.ok(first.send(0, { kind: 'strike', body: 0, position: 0, velocity: 0.25 }).queued); assert.ok(first.send(0, { kind: 'strike', body: 1, position: 0, velocity: 0.2 }).queued); b1(4);   // one frame, body 0 then body 1
+  first.quiet(); u1(() => first.state === 'ended'); const source = first.recording(); first.dispose();
+  const plan = continuationPlan(source, { sampleRate: 8000 }); assert.equal(plan.steps.map(s => `${s.frame}:${s.body}`).join(' '), '0:0 0:1');
+  const { host, until, verify, block } = fixture(); await host.enable([grove, grove, grove]);
+  host.scheduleContinuation(planSteps(plan), { handoffFrame: plan.handoffFrame }); until(() => host.continuation.state === 'completed'); block(2); host.quiet(); until(() => host.state === 'ended');
+  const wrapper = await seedEnsembleRecord({ source, continuation: host.continuation, ensemble: verify(host.continuation.originFrame) }); host.dispose();
+  assert.equal((await verifySeededEnsemble(wrapper, source)).verified, true);
+  const reversed = structuredClone(wrapper), events = reversed.ensemble.parts[0].record.events;
+  assert.deepEqual(events.map(e => e.body), [0, 1]); [events[0].body, events[1].body] = [1, 0]; [events[0].velocity, events[1].velocity] = [events[1].velocity, events[0].velocity];   // stored orders 0/1 now carry the reversed sequence
+  validateSeededEnsemble(reversed); const report = await verifySeededEnsemble(reversed, source);
+  assert.equal(report.verified, false); assert.match(report.mismatches.join(' '), /content or order/);
+});

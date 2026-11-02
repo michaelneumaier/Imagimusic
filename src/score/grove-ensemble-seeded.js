@@ -108,16 +108,19 @@ function expectedRememberedContent(wrapper, plan) {
   for (const { e, i } of accepted) {
     const part = parts[e.part], cmd = plan.steps[i].command, f = e.appliedFrame;
     if (e.edge === 'strike') part.events.push({ frame: f, body: cmd.body, position: cmd.position, velocity: cmd.velocity });
-    else if (e.edge === 'set') { close(part, cmd.body, f); part.open.set(cmd.body, { body: cmd.body, zone: cmd.zone, strength: cmd.strength, start: f }); }
+    else if (e.edge === 'set') { close(part, cmd.body, f); part.open.set(cmd.body, { body: cmd.body, zone: cmd.zone, strength: cmd.strength, start: f, at: i }); }
     else close(part, cmd.body, f);
   }
+  for (const part of parts) part.contacts.sort((a, b) => a.start - b.start || a.at - b.at);                  // as the capture stores them: by start, then by the set's order
   const ended = wrapper.ensemble.ended.frame;
   // When the handoff was aborted, Quiet closed the open contacts at the ending; the capture keeps only intervals of positive length (frame > start).
   if (wrapper.opening.handoff === 'aborted') return parts.map(part => ({ events: part.events, contacts: part.contacts, open: [...part.open.values()].filter(o => ended > o.start).map(o => ({ ...o, end: ended })) }));
   return parts.map(part => ({ events: part.events, contacts: part.contacts, open: [...part.open.values()] }));
 }
-const eventKey = x => `${x.frame}:${x.body}:${x.position}:${x.velocity}`, contactKey = x => `${x.start}:${x.end}:${x.body}:${x.zone}:${x.strength}`;
-const sortedKeys = (list, key) => list.map(key).sort();
+// Ordered projections, never sorted bags: a kept record stores events by frame then actual order and contacts by start then the set's order, so the
+// stored sequence is the sequence the processor applied; same-frame order must agree with the plan and ledger even when raw counters differ.
+const eventKey = x => `${x.frame}:${x.body}:${x.position}:${x.velocity}`, contactKey = x => `${x.start}:${x.end}:${x.body}:${x.zone}:${x.strength}`, openKey = c => `${c.start}:${c.body}:${c.zone}:${c.strength}`;
+const projection = (list, key) => list.map(key).join('|');
 
 /** With the source in hand: does the ledger describe this source's plan, is the boundary where the ledger says, and is the kept passage's remembered
  * content exactly the content the accepted edges produce (multiplicity included)? A completed handoff compares everything at or before the boundary and
@@ -145,10 +148,11 @@ export async function verifySeededEnsemble(wrapperInput, sourceInput) {
   wrapper.ensemble.parts.forEach((p, part) => {
     const r = p.record, x = expected[part], completed = wrapper.opening.handoff === 'completed';
     const events = completed ? r.events.filter(e => e.frame <= boundary) : r.events, closed = completed ? r.contacts.filter(c => c.start <= boundary && c.end <= boundary) : r.contacts;
-    if (sortedKeys(events, eventKey).join('|') !== sortedKeys(x.events, eventKey).join('|')) report.mismatches.push(`part ${part}: the remembered strikes differ from the accepted ledger (${events.length} kept, ${x.events.length} expected)`);
+    if (projection(events, eventKey) !== projection(x.events, eventKey)) report.mismatches.push(`part ${part}: the remembered strikes differ from the accepted ledger in content or order (${events.length} kept, ${x.events.length} expected)`);
+    const expectedClosed = completed ? x.contacts : x.contacts.concat(x.open).sort((a, b) => a.start - b.start || a.at - b.at);
+    if (projection(closed, contactKey) !== projection(expectedClosed, contactKey)) report.mismatches.push(`part ${part}: the remembered contacts differ from the accepted ledger in content or order (${closed.length} kept, ${expectedClosed.length} expected)`);
     const openKept = completed ? r.contacts.filter(c => c.start <= boundary && c.end > boundary) : [];
-    if (sortedKeys(closed, contactKey).join('|') !== sortedKeys(x.contacts.concat(completed ? [] : x.open), contactKey).join('|')) report.mismatches.push(`part ${part}: the remembered contacts differ from the accepted ledger (${closed.length} kept, ${x.contacts.length + (completed ? 0 : x.open.length)} expected)`);
-    if (completed && sortedKeys(openKept, c => `${c.start}:${c.body}:${c.zone}:${c.strength}`).join('|') !== sortedKeys(x.open, c => `${c.start}:${c.body}:${c.zone}:${c.strength}`).join('|')) report.mismatches.push(`part ${part}: the contacts still held at the boundary differ from the accepted ledger`);
+    if (completed && projection(openKept, openKey) !== projection(x.open, openKey)) report.mismatches.push(`part ${part}: the contacts still held at the boundary differ from the accepted ledger`);
   });
   report.contentMatches = report.mismatches.length === 0;
   report.verified = report.hashMatches && report.instrumentsMatch && report.planMatches && report.boundaryMatches !== false && report.contentMatches;

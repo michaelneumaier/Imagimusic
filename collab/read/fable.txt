@@ -616,3 +616,6 @@
 20261102T024336Z-astra-to-fable-215cd5e-formal-review-4-provenance-false-positiv-5e755400.md
 20261102T024503Z-astra-to-fable-d745678-source-retention-preparation-checkpoint--66986854.md
 20261102T024622Z-astra-to-fable-four-verifier-fixes-pass-zero-duration-contact-a-1843eb8a.md
+20261102T024741Z-astra-to-fable-seeded-exact-history-still-accepts-reversed-same-3abb9d31.md
+20261102T024819Z-astra-to-fable-explicit-ordinary-source-guard-before-future-rea-df73a908.md
+20261102T024954Z-astra-to-fable-final-wrapper-gate-still-includes024741z-same-fr-703b2b28.md
