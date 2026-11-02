@@ -46,7 +46,7 @@ $('file').onchange=async()=>{
  $('target').value=Array.from($('target').options).find(option=>!option.disabled).value;show(result);status('Your original passage is ready. Choose Listen when you are ready.');}
  catch(error){if(own===generation&&error.name!=='AbortError')status(error.message+(shown?' Your previous passage remains available.':''),true);}
 };
-$('cancel').onclick=()=>{generation++;session.cancel();status('Opening cancelled.'+(shown?' Your previous passage remains available.':''));};
+$('cancel').onclick=()=>{if(session.state!=='preparing')return;generation++;session.cancel();status('Opening cancelled.'+(shown?' Your previous passage remains available.':''));};
 async function listenTo(result){
  if(!result||session.state==='preparing'||comparisonBusy)return;const own=generation;replay.stop();show(result);played=result;
  try{await replay.play(result.pcm);if(own===generation&&replay.state==='playing')status(result.targetId?`Listening to the ${result.targetTitle} comparison.`:'Listening to your original passage.');}catch(error){if(own===generation)status(error.message,true);}
@@ -56,7 +56,7 @@ $('listen-comparison').onclick=()=>listenTo(comparison);
 function cancelComparison(){comparisonGeneration++;comparisonJobs.cancel();comparisonBusy=false;sync();}
 for(const journey of LOOM_JOURNEYS){const option=document.createElement('option');option.value=journey.id;option.textContent=journey.title;$('target').append(option);}
 $('target').onchange=()=>{cancelComparison();$('comparison-status').textContent='Choose Prepare to try this connection. Any previous comparison remains available under its own name.';};
-$('cancel-comparison').onclick=()=>{cancelComparison();$('comparison-status').textContent='Comparison cancelled. Your prepared versions are unchanged.';};
+$('cancel-comparison').onclick=()=>{if(!comparisonBusy)return;cancelComparison();$('comparison-status').textContent='Comparison cancelled. Your prepared versions are unchanged.';};
 $('prepare-comparison').onclick=async()=>{
  const original=session.result;if(!original||session.state==='preparing'||comparisonBusy)return;
  cancelComparison();const own=comparisonGeneration;comparisonBusy=true;replay.stop();sync();$('comparison-status').textContent='Preparing the same gestures in another connection…';
