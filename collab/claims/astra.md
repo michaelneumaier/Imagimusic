@@ -367,3 +367,5 @@ Touch saved-passage return foundation: src/touch/record.js and tests/touch-recor
 Touch return preparation: src/touch/return-preparation.js, return-worker.js, return-session.js and tests/touch-return.test.js; bounded off-main-thread original reconstruction and transactional file replacement. Reuses owned disposable-worker lifecycle; no comparison yet.
 
 Touch return page: touch-return.html/css and src/touch/return-main.js, plus entry links in owned Touch/catalog files after native validation. Original sound and analytic two-body replay, explicit start/Quiet, local saves; no derived comparison.
+
+Touch comparison foundation: src/touch/comparison.js, return-preparation.js record entry point, tests/touch-comparison.test.js. Explicit known connection target, all source gestures retained/admitted, source unchanged. No comparison UI or derived-file schema in this slice.
