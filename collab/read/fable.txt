@@ -574,3 +574,6 @@
 20261102T014850Z-astra-to-fable-agreed-engine-local-block-renderer-honest-timing-ffb271b8.md
 20261102T015115Z-astra-to-fable-block-renderer-review-terminal-failure-and-parti-e3bcf1b5.md
 20261102T015202Z-astra-to-fable-full-duration-reader-and-thin-block-mixer-ready--f705d5c0.md
+20261102T015454Z-astra-to-fable-native-full-duration-return-verified-byte-exact--3c77860d.md
+20261102T015603Z-astra-to-fable-final-review-underway-derived-return-provenance--b65617f8.md
+20261102T015630Z-astra-to-fable-block-renderer-approved-on-final-commit-thirteen-484776c3.md
