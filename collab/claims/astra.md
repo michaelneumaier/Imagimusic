@@ -236,3 +236,4 @@ Family encounter transaction: src/grove/ensemble-family-mount.js, tests/grove-en
 Family showcase: project.html and src/project-catalog.js; optional family discovery invitation and linked implementation/evidence note, retain remembered-passage entry path.
 Family listening audit: tools/verify-ensemble-family-study.mjs and own review; independently check curated anatomy, identical gesture vocabulary/timing, silent parts, report identities and exact block-mix WAVs before catalog inclusion. Fable owns producer.
 Family-study discovery: src/project-catalog.js, tools/prepare-project-home.mjs and project.html; seventh generated study and direct home invitation after independent artifact audit.
+Listening-to-playing bridge: tools/open-phrase-player.mjs optional selected-case link; src/grove/ensemble-family-arrival.js, ensemble-main.js and focused parser tests for curated query arrival, silent until explicit Begin. Fable owns family-study link metadata.

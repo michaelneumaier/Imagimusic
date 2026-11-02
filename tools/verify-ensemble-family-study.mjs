@@ -41,6 +41,7 @@ export async function verifyFamilyStudy(directory){
   assert.equal(item.peak,peak);assert.equal(item.peakDbfs,+(20*Math.log10(peak)).toFixed(1));
   assert.equal(item.frames,289200);assert.equal(item.recordSha256,sha(text));assert.equal(item.wavSha256,sha(wav));
   assert.equal(buttons[i][1],item.file);assert.equal(buttons[i][2],sha(wav));
+  assert.equal(buttons[i][0].match(/data-play-href="([^"]+)"/)?.[1],`../../ensemble.html?family=${seed}`,'playable arrival matches this example');
   checks.push({seed,frames:item.frames,peakDbfs:item.peakDbfs,wavSha256:sha(wav),recordSha256:sha(text),independentMixByteExact:true});
  }
  return {scope:'Authored records, anatomy and gesture invariants, report/file identities and exact independent mix; no hearing, preference or device-performance verdict. Envelope-share measurements are not independently recomputed here.',checks};

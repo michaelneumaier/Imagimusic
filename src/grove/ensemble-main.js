@@ -1,3 +1,4 @@
+import {ensembleFamilyFromSearch} from './ensemble-family-arrival.js';
 import {mountEnsembleFamily} from './ensemble-family-mount.js';
 import {bindBodyTap} from './body-tap.js';
 import {createBodyPicker} from './body-picking.js';
@@ -20,7 +21,10 @@ import {stereoWav} from '../loom/model.js';
 const $=id=>document.getElementById(id),keys=['a','s','d'],holdControls=[],held=[false,false,false],reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const familyNames={3:'Pair and neighbour · 3',7:'Chain · 7',11:'Close triangle · 11'};
 const familyGroves=seed=>[48,51,55].map(note=>retuneGroveCluster(composeGrove({seed}),note));
-let groves=familyGroves(3);
+// Read once for this empty visit; later Begin uses the chooser, never the URL.
+const arrivalFamily=ensembleFamilyFromSearch(location.search);
+$('family-select').value=String(arrivalFamily);
+let groves=familyGroves(arrivalFamily);
 const familyName=()=>familyNames[groves[0].seed]??`Family ${groves[0].seed}`;
 let bodyTap=null,selectedPart=null,world=null,scenes=[],busy=false,saving=false,quietWanted=false,operation=0,animation,demonstration=false,listeningBack=false,listeningReturn=false,returnSession=null,continuationSource=null,continuationKeep=null,continued=false,handoffShown=false,sourceSoundController=null;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').dataset.error=String(error);};
