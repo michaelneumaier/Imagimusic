@@ -335,3 +335,5 @@ Inverse visitor phrase encounter: inverse.html/css and src/inverse/main.js; opti
 Inverse portable passage integration: src/inverse/phrase-capture.js, main.js, prepare-worker.js, inverse.html/css, capture tests and inverse browser harnesses; precomputed declared-origin digest, retained original anatomy, atomic reopened phrase installation and explicit local keep/open. Fable owns phrase v2 and portable passage schema/tests.
 
 Inverse phrase continuity across questions: main.js/inverse.html plus home/catalog/history; preserve completed original across searches, explicit Forget, digest-based comparison invitation and original target disclosure. No solver/model/schema edits; Fable owns diversity-study proposal.
+
+Inverse repeat-search encounter: inverse.html/src/inverse/main.js, later evidence note; one explicit bounded search of displayed target/tolerance/base family with incremented solver seed, retained original phrase, exact prior/original anatomy identity labels. No distance thresholds or solver wrappers.

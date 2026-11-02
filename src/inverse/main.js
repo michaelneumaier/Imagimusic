@@ -29,6 +29,7 @@ function controls(snapshot=state()){
  const ringing=occupied(snapshot),remembering=phraseCapture.snapshot.active;
  $('open-instrument').disabled=busy||ringing||remembering;
  $('search').disabled=busy||ringing||remembering;$('example').disabled=busy;
+ $('search-again').disabled=busy||ringing||remembering||!report;
  $('cancel').hidden=!busy;
  $('listen').disabled=busy||!instrument||(armed&&context?.state==='running');
  $('listen').textContent=armed&&context?.state==='running'?'Listening enabled':'Start listening';
@@ -61,15 +62,29 @@ $('search-form').onsubmit=async event=>{
  const original=values.every((f,i)=>f===example[i])&&decay===example[3];
  const target={version:1,kind:'three-resonance',normalFrequenciesHz:values,decaySeconds:decay,provenance:original?'Known seed 3, equal 0.02 kg masses, rounded declared target':'Visitor-declared frequencies and common decay'};
  try{validateInverseTarget(target);}catch(error){$('status').textContent='The target was refused: '+error.message+' Previous results retained.';return;}
+ await runSearch(target,{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}});
+};
+$('search-again').onclick=()=>{
+ if(busy||occupied()||phraseCapture.snapshot.active||!report)return;
+ const baseMidi=report.searchBaseMidi??report.savedRecord.discovery.baseMidi,seed=((report.seed??report.savedRecord.discovery.seed)+1)>>>0;
+ runSearch(report.target,{baseMidi,seed,tolerance:report.tolerance,budget:{restarts:6,iterations:300,maxEvaluations:60000}},true);
+};
+async function runSearch(target,options,repeat=false){
  const token=++generation,started=performance.now();busy=true;controls();$('status').textContent='Searching two possible layouts. You can cancel while it works…';
  try{
-  const next=await jobs.run({kind:'search',target,options:{baseMidi:Number($('base').value),seed:19,budget:{restarts:6,iterations:300,maxEvaluations:60000}}});
-  if(token!==generation)return;report=next;lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
+  const previousDigests=repeat?await Promise.all(report.candidates.filter(c=>c.grove).map(c=>inverseAnatomySha256(c.grove))):[];
+  if(token!==generation)return;
+  const next=await jobs.run({kind:'search',target,options});
+  if(token!==generation)return;
+  const digests=await Promise.all(next.candidates.map(c=>c.grove?inverseAnatomySha256(c.grove):null));
+  if(token!==generation)return;
+  next.candidates.forEach((c,i)=>{c.matchesPrevious=!!digests[i]&&previousDigests.includes(digests[i]);});
+  next.searchBaseMidi=options.baseMidi;report=next;lastTouch=null;lastGestureTopology=null;repeatInvitation();renderResults();$('results-section').scrollIntoView({block:'start'});
   if(phraseCapture.snapshot.phrase)phraseText('phrase-status','Your phrase is retained with its original anatomy. Prepare a new result to try the same touches there.');
   $('status').textContent=`${next.candidates.filter(c=>c.status==='accepted').length} layouts within tolerance. ${next.work.evaluations.toLocaleString()} evaluations in ${((performance.now()-started)/1000).toFixed(1)} s. ${next.bound.impossibleWithinTolerance?'This target exceeds the equal-mass family’s frequency-ratio bound, even with tolerance.':next.work.exhausted?next.verdict:'This bounded search does not establish uniqueness or a global optimum.'}`;
  }catch(error){if(token===generation)$('status').textContent=`Search did not finish: ${error.message} Previous results retained.`;}
  finally{if(token===generation){busy=false;controls();}}
-};
+}
 
 $('open-instrument').onchange=()=>{const file=$('open-instrument').files[0];$('open-instrument').value='';if(file)openInstrument(file);};
 async function openInstrument(file){
@@ -101,13 +116,15 @@ function keepCandidate(index){
 
 function renderResults(){
  $('results-section').hidden=false;$('results').replaceChildren();candidateButtons.length=0;
- $('target-snapshot').textContent=`${report.savedRecord?'Kept instrument for':'Results for'} ${report.target.normalFrequenciesHz.map(f=>f.toFixed(4)).join(' / ')} Hz; decay ${report.target.decaySeconds.toFixed(4)} s. ${report.target.provenance}. Tolerance: ±${report.tolerance.cents} cents; ${100*report.tolerance.decayRelative}% decay. Input edits do not change these results until you search again.`;
+ const family=Array.from($('base').options).find(o=>Number(o.value)===(report.searchBaseMidi??report.savedRecord?.discovery.baseMidi))?.textContent??'declared';
+ $('target-snapshot').textContent=`${report.savedRecord?'Kept instrument for':'Results for'} ${report.target.normalFrequenciesHz.map(f=>f.toFixed(4)).join(' / ')} Hz; decay ${report.target.decaySeconds.toFixed(4)} s. ${report.target.provenance}. Tolerance: ±${report.tolerance.cents} cents; ${100*report.tolerance.decayRelative}% decay. Ground-tuning family: ${family}. Input edits apply only when you choose Find possible bodies.`;
  for(const [index,candidate] of report.candidates.entries()){
   const card=document.createElement('article');card.className='candidate';
   const title=document.createElement('h3');title.textContent=candidate.topology;card.append(title);
   const fit=document.createElement('p');fit.textContent=candidate.status==='accepted'?'Within the declared tolerance':candidate.status==='impossible-in-family'?'Outside tolerance · target impossible in this family':candidate.status==='best-outside-tolerance'?'Best found · outside tolerance':candidate.status==='saved-outside-tolerance'?'Kept instrument · outside tolerance':'No admitted candidate found';card.append(fit);
   if(candidate.grove){
    card.append(createCandidateDiagram(candidate.grove));
+   if(candidate.matchesPrevious){const identity=document.createElement('p');identity.className='small';identity.textContent='Identical anatomy to a previous result.';card.append(identity);}
    if(report.savedRecord){const origin=document.createElement('p');const discovery=report.savedRecord.discovery;origin.textContent=`Kept instrument. Declared discovery: seed ${discovery.seed}, ${discovery.evaluations.toLocaleString()} evaluations. Fit above is recalculated.`;card.append(origin);}
    const residual=document.createElement('p');residual.textContent=`Largest resonance error: ${candidate.residual.maxAbsCents.toFixed(4)} cents. Decay error: ${(100*Math.abs(candidate.residual.decayRelative)).toFixed(4)}%.`;card.append(residual);
    const achieved=document.createElement('p');achieved.textContent=`Resonances: ${candidate.residual.achieved.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz.`;card.append(achieved);
