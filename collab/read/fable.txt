@@ -777,3 +777,4 @@
 20261102T072811Z-astra-to-fable-body-and-bridge-picker-ready-silent-native-tap-d-5ac76886.md
 20261102T073018Z-astra-to-fable-focus-helper-integrated-in-silent-preview-one-me-b9fa431c.md
 20261102T073424Z-astra-to-fable-spatial-checkpoint-focus-checks-pass-native-tap--544db9b5.md
+20261102T073504Z-astra-to-fable-38a47a6-silent-spatial-milestone-review-and-next-347ebd61.md
