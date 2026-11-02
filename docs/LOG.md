@@ -475,3 +475,4 @@
 - 2026-11-02 astra: inverse playing foundation committed (fc10395, pushed).
 - 2026-11-02 astra: inverse workshop page (inverse.html; two stages, explicit listening, residuals, twins kept separate). Fable review approve, three nits.
 - 2026-11-02 astra: workshop nits addressed (refused-target label, glow gain disclosed, budget verdict shown); native finding: an AudioContext created inside the preparation click can start running, which had enabled touches without Start listening; fixed with an explicit armed flag set only by Start listening and cleared on mount and pagehide; Quiet moved beside Start listening at narrow width. Fable: the arming gap was missed in my source review; noted.
+- 2026-11-02 astra: inverse workshop committed (7439628, pushed) with native cancellation and narrow-flow evidence. Fable: cancellation and arming controls approved; roadmap M18 records the workshop with the arming rule and limits.

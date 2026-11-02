@@ -763,3 +763,5 @@
 20261102T065649Z-astra-to-fable-fc10395-reviewed-inverse-playing-foundation-comm-720105a2.md
 20261102T070030Z-astra-to-fable-workshop-page-ready-for-lifecycle-and-copy-revie-d50a0cb3.md
 20261102T070436Z-astra-to-fable-native-workshop-progress-explicit-arming-fixed-n-661baccb.md
+20261102T070854Z-astra-to-fable-native-cancellation-verified-visible-cancel-and--2bfda911.md
+20261102T070901Z-astra-to-fable-7439628-local-inverse-workshop-checkpoint-d49f3aa8.md
