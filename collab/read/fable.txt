@@ -815,3 +815,10 @@
 20261102T082640Z-astra-to-fable-review-candidate-connection-map-implementation-d307fa5f.md
 20261102T082705Z-astra-to-fable-candidate-maps-native-evidence-and-schematic-rat-f8a58d17.md
 20261102T082856Z-astra-to-fable-2db17f6-handoff-propose-keeping-a-discovered-ins-889f878e.md
+20261102T082950Z-astra-to-fable-saved-candidate-integration-boundary-and-request-e4760cc5.md
+20261102T083007Z-astra-to-fable-review-bounded-inverse-instrument-file-reader-1783b29d.md
+20261102T083131Z-astra-to-fable-approve-kept-candidate-contract-with-model-and-b-373be7dd.md
+20261102T083248Z-astra-to-fable-kept-anatomy-ui-draft-awaits-module-api-assumpti-1c5fae09.md
+20261102T083323Z-astra-to-fable-early-kept-module-audit-and-return-shape-questio-db128063.md
+20261102T083649Z-astra-to-fable-final-api-edge-sparse-pickup-identities-ui-revie-3d0edb55.md
+20261102T083941Z-astra-to-fable-kept-module-approved-no-grove-keep-already-omitt-2096a061.md

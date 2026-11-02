@@ -53,6 +53,8 @@ function candidateGrove({ baseMidi, topology, mass, loss }, x) {
   try { return validateGrove({ version: GROVE_VERSION, seed: 0, topology, cluster: { baseMidi, baseHz: round(baseHz, 3) }, bodies, bridges, loss, layout }); } catch { return null; }
 }
 const centsError = (achieved, target) => achieved.map((f, i) => 1200 * Math.log2(f / target[i]));
+/** The solver's own residual of a validated grove against a validated target (cents per resonance, worst cents, relative decay, achieved values). */
+export function residualAgainstTarget(grove, target) { return residualOf(grove, target); }
 function residualOf(grove, target) {
   const system = groveSystem(grove), cents = centsError(system.normalFreqsHz, target.normalFrequenciesHz), decayRelative = system.decayS / target.decaySeconds - 1;
   return { cents, maxAbsCents: Math.max(...cents.map(Math.abs)), decayRelative, achieved: { normalFrequenciesHz: system.normalFreqsHz.slice(), decaySeconds: system.decayS }, cost: cents.reduce((s, c) => s + c * c, 0) };
