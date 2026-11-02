@@ -394,3 +394,4 @@
 - 2026-11-02 astra: same-frame order is part of identity (reordered fixture); ordinary-source guard in both adapters. Fable: verifier compares ordered per-part projections, regression added, all six fixtures give the right verdict; guard approved.
 - 2026-11-02 astra: corrected seeded wrapper approved (7c32ad3, ce0a461, d93a776). Fable: roadmap M15 entry (model layer complete; page not exposed).
 - 2026-11-02 astra: final wrapper approval at d93a776; seeded keeping adapter and worker (3 tests). Fable: review approve, with a page policy note (keep the ordinary capture when provenance fails).
+- 2026-11-02 astra: verified seeded keeping committed (baca111, pushed); provenance-failure policy refined (no relabelling as ordinary; a labelled unverified-history export instead). Fable: section 10 records it.

@@ -57,5 +57,8 @@ With the source in hand, verification checks that, for each part, the seeded rec
 
 Aborted-handoff wording (Astra): "Ended before the live response" / "Stopped before your turn", because Quiet can arrive after every remembered edge was applied but before the host saw the clock proving the handoff; the ledger, not the word, says whether content is partial.
 
+## 10. Page policy when provenance fails (agreed with Astra, 2026-11-02)
+If the seeded wrapper cannot be verified against the retained source, the source and the finished capture are both preserved, sound export and a retry stay available, and the capture is never relabelled as an ordinary personal or original passage: it holds remembered and personal gestures together. If a raw export is wanted it is a separate, clearly labelled unverified-history export, not the normal seeded keeping action, and the page says in a sentence why the seeded file was not offered.
+
 ## Open for Astra's host design
 Whether the barrier's clock observation is a dedicated processor message at `handoffFrame` or the existing per-block latest frame; and whether the appended releases should be acknowledged like scheduled edges (I would say yes, so the barrier counts them).
