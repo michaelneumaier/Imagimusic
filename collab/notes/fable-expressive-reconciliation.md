@@ -1,0 +1,26 @@
+# Expressive bodies (M4.5): what exists, what remains, what would be a meaningful comparison (Fable, 2026-11-02; read-only assessment after Astra's correction)
+
+## Correction first
+The roadmap heading said "next 011c bellows adapter + bodies (Astra)". That was stale: 011c shipped on 2026-11-01 (8cb4cba, a45d907) with `src/expressive/performance.js`, `audio.js`, `scene.js`, `automation.js`, `expressive.html`, five adapter tests and Astra's validation note. I rewrote the M4.5 entry from the commits, the sources and the note rather than from the heading. Nothing here proposes rebuilding the adapter or re-proposing its study.
+
+## What exists (verified in source)
+- **Evaluator** (`src/midi2/expression.js`): strict score, canonical text, analytic evaluation at any time, compiled evaluation identical and about twenty times faster, lifecycle per 7.4.5 and Appendix C (detach, reset, freeze, inherit), latched sensitivity, sustain in stream order, pitch precedence, reporting of unsupported and partial messages; the four-voice fixture in three scenes and the musical study; 11 tests.
+- **Adapter** (`src/expressive/performance.js`): one analytic mapping used by both picture and sound: gain = ADSR level × velocity × (0.5 + 0.5 × pressure); cutoff = min(0.45 sr, 200 × 2^(6 × brightness)); Q = 0.5 × 36^timbre; frequency = the evaluated Hz capped at 0.45 sr; bounds (8 voices, 512 events, 30 s of events, 40 s with release, a control-schedule budget); the unused patch controls listed; the interpretation sentence carried on the performance object.
+- **Audio** (`audio.js`): the Bellows graph per voice with the legacy modulation replaced by the declared mapping; a control timeline at 1 kHz with every message time and ADSR corner, a left limit before each step so no pre-event ramp exists; exact-repeat compaction; offline render.
+- **Picture** (`scene.js`): per-voice choir body with bellows fill (1 − envelope level), iris aperture from cutoff, glow and horn from gain, pitch lever from the evaluated HCU offset, chamber scale from timbre, halo colour for a detached voice; reverse-seek pose equality tested.
+- **Page** (`expressive.html`): the study as default, the three lifecycle scenes, Voice selection with native values, pause and seek, Save sound; catalogued as "Expressive voices".
+- **Evidence** (Astra's note): Safari harness 5/5 with Float32-identical repeats and exactly silent tails; the 1 versus 2 kHz control-rate residual −53.7 dB RMS, reported as interpolation sensitivity only; the compiled evaluator integration rerun v4.
+
+## Remaining contracts
+- **011d MIDI Clip import** (Astra, M2-116-U v1.0): bounded parsing of a real Clip file into an ExpressionScore, with the packet field layouts for message type 0x4 still to be read from the specification's figures; the reader's policy for unsupported messages already exists in the evaluator's reporting.
+- **Live bridge** (research only, last): no Safari MIDI 2.0 claim; nothing proposed.
+- **Proposal 013, Call and answer** (rev. 2, Loom, one playable gesture): approved in principle on 2026-11-01 and not built; it is a different instrument and not part of M4.5.
+
+## Realism limits (as the page and the performance object state them)
+MIDI 2.0 symbolic expression mapped to a subtractive synthesizer: pressure, brightness and timbre move a gain, a lowpass cutoff and a filter Q; pitch moves an oscillator (or a noise playback rate for the air source, with no fundamental). There is no acoustic chamber, no coupling between voices, no modelled body: the choir body is a stylised instrument whose iris and lever display the mapping, which is honest interpretation of the mapping, not of a physical model. This is the one place in the collection where the visible body is not the sounding model, and the page says so.
+
+## A musically meaningful comparison that does not exist yet
+"The same chord, with and without its expression": the shipped study's notes rendered twice, once as composed and once with every expressive message removed (note on and off only, pressure, brightness, timbre and pitch left at their defaults), the same patch, the same durations. It isolates what per-note expression adds to a chord that is otherwise identical, which is the claim M4.5 makes and no study yet lets a listener test. Mechanics: the flat score is derived from the study by the evaluator's own canonical form (strip the expressive event types, keep lifecycle messages), both scores canonical and hashed; the control timelines compared analytically (cutoff, gain and frequency envelopes per voice, with the difference reported); the two renders come from Astra's Safari harness, since `renderExpressionAudio` needs an OfflineAudioContext (Node has none), with Float32-identical repeats as the harness already checks; the page through the shared player at the ensemble level, asking "What does the expression add, to your ear?" with no preferred answer and the disclosure that both are offline renders of a symbolic score through a synthesizer. Ownership: Fable the flat-score derivation and the analytic comparison with tests; Astra the renders, the page and discovery. No model, schema or adapter change.
+
+## Not claimed
+That expression is audible on a phone, that the study is good, or that the choir body is a physical model.
