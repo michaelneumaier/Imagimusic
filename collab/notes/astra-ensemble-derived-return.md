@@ -81,3 +81,66 @@ Five focused tests pass, covering caller/job mutation, repeated preparation,
 late cancellation, failed retry, source replacement, disposal, invalid cloning
 and empty job results. This module is not yet wired into the encounter; the
 model/schema handoff and separate worker remain the next integration steps.
+
+## Worker preparation and first listening pair (working tree)
+
+The worker adapter prepares a separate canonical derived wrapper and exact PCM
+within256KiB,8..48k and120s+fade bounds. Parsing bounds are shared with the
+ordinary reader; identity/admission checks still run in the model. Ten focused
+preparation/import/session tests passed against the model working tree.
+
+Local renders/ensemble-return-study/ compares the authored short introduction
+with its rotated return, both321200frames at48k, same mix and listening level,
+no normalization. Original WAV SHA-256 remains
+1eb28041b3cf742e4794e5ff1b5d7f610cccad202ea318222d67c06fe26e5270;
+return WAV is b68fb3218d1fc1cbeae0f853c3018e680b27a6491c0323db062a8edc05e7eb3d.
+Both canonical gesture files and a verification report are retained locally.
+Native Safari starts idle, both examples play only on selection, the return
+ends naturally, and the shared saved+10dB preference is respected. This checks
+operation, not subjective hearing or appeal. The study's Play link points to
+Three Groves; other generated players keep their existing default destination.
+
+An independent model review reproduced an asynchronous source-consistency
+issue: caller mutation during the hash await can mismatch the declared source
+fingerprint and the histories used for rotation. Fable has been asked to take
+source snapshots before awaiting and to audit verification similarly. The
+adapters/study remain uncommitted pending the finalized model and review.
+
+## Derived-file reader (working tree)
+
+The existing reader now recognizes a strict derived wrapper, bounds the inner
+record before model reconstruction, and retains the original256KiB/8..48k/
+120s+fade limits. Return preparation explicitly refuses a derived wrapper as
+its source. Derived imports show A DERIVED RETURN, their complete declared
+source fingerprint and absent-source verification wording. Sound downloads
+use imagimusic-ensemble-return.wav. An ordinary successful import clears the
+fingerprint and restores A SAVED ENSEMBLE.
+
+Six focused preparation/import tests passed, including exact reconstructed PCM,
+strict wrapper rejection and the distinction between a valid declared hash and
+verification against a supplied source. Native Safari opened return.json,
+remained idle until Listen, then completed playback. The downloaded1,284,844-byte
+WAV equals the study's return.wav byte for byte; report:
+renders/ensemble-return-study/safari-derived-reader-verification.json.
+Opening original.json afterward restored A SAVED ENSEMBLE and removed the
+fingerprint. This is reconstruction/UI evidence, not device output capture.
+
+Fable's source and verification-pair snapshots are visible in the working tree.
+A combined model/preparation/import/session test run is still active as of this
+entry; final model review and integration commit wait for that result and the
+peer handoff. Existing prepared study files used a stable source and remain
+valid; their source hash and audio do not depend on the race reproducer.
+
+The combined run finished:15 model/preparation/import/session tests passed,
+including the source-mutation regression. Astra formal review approves246b576
+plus the observed snapshot fix:
+collab/reviews/20261102T0211Z-astra-reviews-derived-ensemble.md. The final fix
+commit and Fable's adapter review are still pending at this log entry.
+
+The snapshot dependency is committed as34f4c26. Fable approved the preparation,
+worker, parsing split, generated study and derived reader in
+collab/reviews/20261102T0208Z-fable-reviews-return-adapters-and-study.md, including
+independent verification of both source/derived records and both WAVs. The
+new comparison is now listed on the project homepage and included in the local
+study-preparation command; --check reports all four generated studies ready.
+Native Safari shows an enabled Open A passage returns link to the study.

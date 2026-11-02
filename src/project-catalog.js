@@ -17,12 +17,13 @@ const entries=[
  ['The Conservatory','stage.html','Composition & keeping','Playable','A shared score, mechanical performers, causal inspection, and local performance rendering.'],
  ['Bring a score','midi.html','Composition & keeping','In progress','Map a local MIDI file to available instruments and inspect the mapping.'],
  ['Reopen a passage','reopen.html','Composition & keeping','Tool','Return to supported saved Grove and Rest records. Ensemble records are not supported here yet.'],
- ['Return to three voices','ensemble-reopen.html','Composition & keeping','Tool','Rebuild and hear a saved three-Grove ensemble. Local files up to two minutes plus their fade, at 8–48 kHz and up to 256 KiB; explicit playback and sound download.'],
+ ['Return to three voices','ensemble-reopen.html','Composition & keeping','Tool','Rebuild a saved three-Grove ensemble or labelled derived return. Local files up to two minutes plus their fade, at 8–48 kHz and up to 256 KiB; explicit playback and sound download.'],
  ['Listening room','audition.html','Listening studies','Study','Compare prepared examples from the earlier instrument work.'],
  ['A changed structure','variant-audition.html','Listening studies','Study','Compare the same gesture on a fixed one-connection variant at equal output gain.'],
  ['Repeated adaptation','adaptation-audition.html','Listening studies','Study','Explore the bounded adaptation comparison and its declared conditions.'],
  ['Room for an answer','renders/open-phrase-study/index.html','Listening studies','Rendered study','The same opening with a neighboring answer at three different delays. Optional private listening notes.'],
  ['One more return','renders/open-phrase-recurrence/index.html','Listening studies','Rendered study','Compare one and two cycles of the opening, alone and with the same delayed answer.'],
+ ['A passage returns','renders/ensemble-return-study/index.html','Listening studies','Rendered study','An authored passage and its derived return: identical gesture timing carried by different voices, with a shared listening level.'],
  ['Three Groves','renders/harmonic-groves/index.html','Listening studies','Rendered study','Three intact instruments: a shared pitch center versus C–E♭–G, with matched gestures and a fixed mix.']
 ];
 const studyAvailability=new Map();
