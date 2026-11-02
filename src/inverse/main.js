@@ -7,6 +7,7 @@ const source=composeGrove({seed:3});source.bodies.forEach(body=>body.mass=.02);
 const sourceSystem=groveSystem(source),example=[...sourceSystem.normalFreqsHz.map(f=>Number(f.toFixed(6))),Number(sourceSystem.decayS.toFixed(8))];
 let context=null,transport=null,instrument=null,report=null,busy=false,generation=0,armed=false,raf=0;
 const candidateButtons=[],bodyButtons=[];
+let spatial=null,world=null,tap=null,pictureResize=null,pictureFailed=false;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function restore(){example.slice(0,3).forEach((f,i)=>$('f'+i).value=f);$('decay').value=example[3];$('base').value='48';}
 restore();
@@ -64,7 +65,10 @@ async function prepare(candidate,card){
   if(!context){context=new AudioContext();transport=createInverseTransport(context);context.onstatechange=()=>controls();}
   const prepared=await jobs.run({kind:'candidate',grove:candidate.grove,sampleRate:context.sampleRate});
   if(token!==generation)return;
-  const next=transport.mount(prepared);instrument=next;armed=false;
+  await ensureSpatial();
+  if(token!==generation)return;
+  const next=spatial&&!pictureFailed?spatial.mount(prepared,transport):transport.mount(prepared);instrument=next;armed=false;
+  if(spatial&&!pictureFailed){configureViews();document.querySelector('.playing').classList.add('spatial-ready');}
   document.querySelectorAll('.candidate').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');drawBodies();
   $('identity').textContent=`${candidate.topology[0].toUpperCase()+candidate.topology.slice(1)} · ${candidate.status==='accepted'?'within tolerance':'outside tolerance'} · ${context.sampleRate.toLocaleString()} Hz playback. Pickups: left body 1, right body 3. Prepared resonances: ${instrument.normalFrequenciesHz.map(f=>f.toFixed(3)).join(' / ')} Hz; decay ${instrument.decaySeconds.toFixed(4)} s.`;
   $('status').textContent=`${candidate.topology} prepared silently in ${((performance.now()-started)/1000).toFixed(1)} s, including buffer validation. Largest resonance error ${candidate.residual.maxAbsCents.toFixed(4)} cents.`;
@@ -85,6 +89,40 @@ function strike(body){
  try{const admitted=transport.strike(body);$('gesture').textContent=admitted?`Touched body ${body+1}. Left pickup: ${body+1} → 1; right pickup: ${body+1} → 3.`:'Eight strikes are still ringing. This touch was ignored; wait or choose Quiet.';}
  catch(error){$('gesture').textContent=error.message;}controls();
 }
+async function ensureSpatial(){
+ if(spatial||pictureFailed)return;
+ try{
+  const [{createGroveWorld},{createInverseSpatialView},{createInversePicker},{bindBodyTap}]=await Promise.all([
+   import('../grove/world.js'),import('./spatial-view.js'),import('./picking.js'),import('../grove/body-tap.js')]);
+  $('spatial-panel').hidden=false;
+  world=createGroveWorld($('anatomy'));world.controls.enabled=false;
+  spatial=createInverseSpatialView({world});
+  pictureResize=new ResizeObserver(()=>renderPicture(state()));pictureResize.observe($('anatomy'));
+  const pick=createInversePicker({canvas:$('anatomy'),camera:world.camera,getScene:()=>spatial.scene});
+  tap=bindBodyTap($('anatomy'),{pick,enabled:()=>!busy&&!document.hidden&&!pictureFailed,onTap:target=>{
+   if(target.kind==='body'){if(armed&&context?.state==='running')strike(target.body);else $('gesture').textContent='Choose Start listening before touching a body.';}
+   else{spatial.scene.setBridgeHighlight(spatial.scene.bridges[target.index].spec);$('connection').textContent=`Connection ${target.a+1}–${target.b+1} · coupling ratio ${target.coupling} (dimensionless). Inspection only; no strike.`;}
+  }});
+ }catch(error){
+  releasePicture();
+  $('spatial-panel').hidden=true;$('picture-status').textContent='Spatial picture unavailable. The numbered anatomy remains playable.';
+ }
+}
+function releasePicture(){
+ pictureFailed=true;pictureResize?.disconnect();pictureResize=null;document.querySelector('.playing').classList.remove('spatial-ready');
+ for(const resource of [tap,spatial,world]){try{resource?.dispose();}catch{}}
+ tap=null;spatial=null;world=null;
+}
+function configureViews(){
+ $('spatial-view').replaceChildren();
+ const choices=[['playing','Bodies and connections'],['overview','Whole support'],...instrument.grove.bodies.map((_,i)=>['body:'+i,'Body '+(i+1)]),...instrument.grove.bridges.map((edge,i)=>['bridge:'+i,`Connection ${edge.a+1}–${edge.b+1}`])];
+ for(const [value,label] of choices){const option=document.createElement('option');option.value=value;option.textContent=label;$('spatial-view').append(option);}
+ $('connection').textContent='Tap a connection to inspect what it joins.';viewCaption();
+}
+function viewCaption(){
+ $('view-caption').textContent=$('spatial-view').value==='playing'?'All three bodies and their connections. Ornamental supports may be cropped; the camera stays fixed during a response.':$('spatial-view').value==='overview'?'Whole support. The camera stays fixed while the instrument responds.':'Fixed close view. Other bodies or ornamental supports may be outside the picture; all three numbered controls remain below.';
+}
+$('spatial-view').onchange=()=>{tap?.cancel();spatial?.select($('spatial-view').value);viewCaption();};
 function drawBodies(){
  $('empty').hidden=true;$('bodies').replaceChildren();$('bridges').replaceChildren();bodyButtons.length=0;
  const positions=instrument.grove.layout.map(p=>({x:50+p.x*36,y:50+p.z*36}));
@@ -97,8 +135,14 @@ function drawBodies(){
   const button=document.createElement('button');button.className='body';button.style.left=p.x+'%';button.style.top=p.y+'%';button.textContent=body+1;button.setAttribute('aria-label',`Strike body ${body+1}`);button.onclick=()=>strike(body);$('bodies').append(button);bodyButtons.push(button);
  });
 }
+function renderPicture(snapshot){
+ if(!spatial||pictureFailed)return;
+ try{spatial.update(snapshot,{reducedMotion:reduced.matches});}
+ catch(error){releasePicture();$('spatial-panel').hidden=true;$('picture-status').textContent='Spatial picture interrupted. The numbered anatomy remains playable.';}
+}
 function tick(){
  const snapshot=state();controls(snapshot);
+ renderPicture(snapshot);
  bodyButtons.forEach((button,body)=>{
   const envelope=snapshot.strikes.reduce((sum,strike)=>sum+strike.envelope[body],0);
   const glow=Math.min(1,envelope*1800);button.style.setProperty('--glow',glow);button.style.setProperty('--scale',reduced.matches?1:1+.14*glow);
@@ -106,10 +150,11 @@ function tick(){
  raf=requestAnimationFrame(tick);
 }
 addEventListener('pagehide',()=>{
+ tap?.cancel();
  const wasBusy=busy;cancel(wasBusy?'Preparation cancelled while leaving the page.':'Listening paused while away. Prepared instrument and results retained.');
  transport?.quiet();armed=false;context?.suspend();
  $('gesture').textContent=instrument?'Quiet. Choose Start listening before touching a body again.':'Search, then choose an anatomy to prepare it.';
  cancelAnimationFrame(raf);
 });
 addEventListener('pageshow',()=>{cancelAnimationFrame(raf);tick();});
-controls();
+tick();

@@ -3,3 +3,7 @@
 #playing-title:focus{outline:none}.playing{scroll-margin-top:18px}
 
 #cancel{position:fixed;right:20px;bottom:20px;z-index:20;background:var(--bg);border-color:var(--mint);box-shadow:0 3px 24px #0008;max-width:calc(100vw - 40px)}
+
+#anatomy{display:block;width:100%;height:380px;border:1px solid var(--line);border-radius:12px;touch-action:pan-y}#spatial-panel label{margin-top:12px}#picture-status:empty{display:none}@media(max-width:750px){#anatomy{height:360px}}
+
+.playing.spatial-ready .surface{height:76px;border-radius:0;background:none}.spatial-ready #bridges{display:none}.spatial-ready #bodies{display:flex;justify-content:center;gap:12px;padding-top:5px}.spatial-ready .body{position:static;flex-shrink:0;transform:scale(var(--scale,1))}@media(prefers-reduced-motion:reduce){.spatial-ready .body{transform:none}}

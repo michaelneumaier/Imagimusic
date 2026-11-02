@@ -291,3 +291,7 @@ Inverse spatial prototype: src/inverse/picture.js, src/inverse/scene.js, tests/i
 Inverse close framing: src/inverse/scene.js, tests/inverse-scene-bounds.test.js and existing silent preview; fixed body/bridge/halo/touch-mark bounds separate from ornamental support, compare overview and closer framing without changing geometry or sound.
 
 Inverse spatial picking: src/inverse/picking.js and tests/inverse-picking.test.js; stable raycast identities for actual shell/core meshes and bridge tubes, no support/halo/cue targets, no audio side effects. Fable requested to own focus-bounds.js and its tests separately.
+
+Inverse spatial mount: src/inverse/spatial-view.js and tests/inverse-spatial-view.test.js; synchronous preflight picture plus transactional transport mount, retained prior scene/focus on failure, resource cleanup and static view selection. Production integration in inverse.html/css/main.js follows these checks; numbered controls remain available.
+
+Inverse spatial discovery: project.html and src/project-catalog.js; extend the existing workshop entry and history, link the evidence note without a duplicate catalog card.
