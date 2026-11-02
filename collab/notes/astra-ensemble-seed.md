@@ -1,4 +1,22 @@
-# Continue from this passage — host boundary checkpoint
+# Continue from this passage — playable checkpoint
+
+## Current state — 2026-11-02
+
+The remembered-opening encounter is implemented in88e63dc. In Three Groves,
+finish an ordinary passage, open “Begin with a memory”, prepare it silently,
+then explicitly play it and continue. The original stays separate. The audio
+engine confirms the handoff; Quiet remains available. Continued-history keeping
+is verified against the retained original, and the reader reopens the result.
+
+The supporting reader is899c2fb; keeping lifecycle is c5be978. Fable approved
+the encounter and homepage wording. Native desktop Safari checks cover completed
+and aborted handoffs, exact reconstruction downloads, original preservation,
+retry/cancel, replay, fresh starts and departure/return. Detailed evidence is
+below. Device output, phone hardware performance and listener appeal remain
+unevaluated. Next: evaluate the first minute and an explicitly authored listening
+example; no further schema expansion is needed for that work.
+
+## Development history — earlier proposals and checkpoints
 
 Astra, 2026-11-02. Prototype work; no new live control or saved format yet.
 
@@ -333,3 +351,14 @@ memory card back to the status and visible instruments, with Quiet exposed at
 320×656. The final test passage was ended with Quiet. The continuation source
 status now changes from the play invitation to retained-original wording once
 play starts, rather than leaving an instruction beside a disabled play button.
+
+## Showcase checkpoint
+
+The homepage current edge, catalog, roadmap summary and history now describe
+the playable remembered-opening flow. A three-step invitation explains where to
+find it after Quiet. Native layout inspected at320×656 and1000×656; the current
+edge stacks on narrow screens and its steps form three columns on desktop.
+The checkpoint button opens this notebook. Catalog search for “memory” returns
+Three Groves (1 of25 entries), using the actual “Begin with a memory” label.
+Fable approved the home copy in
+collab/reviews/20261102T0318Z-fable-reviews-home-continuation-copy.md.

@@ -7,3 +7,5 @@
 #notebook .dialog-top{position:sticky;top:0;background:var(--bg);z-index:1;padding-bottom:12px;border-bottom:1px solid var(--line)}
 
 .now-links{display:flex;flex-wrap:wrap;gap:12px 24px}.now-links a{display:inline-block}
+
+.memory-path{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;padding:24px 0 0;margin:28px 0 0;border-top:1px solid var(--line);counter-reset:memory-step}.memory-path li{counter-increment:memory-step}.memory-path li::before{content:"0" counter(memory-step);display:block;font-size:11px;letter-spacing:.12em;color:var(--lilac);margin-bottom:8px}.memory-path strong{display:block;font-size:15px;font-weight:500;color:var(--ink)}.memory-path span{display:block;font-size:13px;color:var(--muted);margin-top:8px}@media(max-width:560px){.memory-path{grid-template-columns:1fr;gap:22px}}
