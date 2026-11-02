@@ -273,3 +273,63 @@ collab/reviews/20261102T0305Z-fable-reviews-continuation-keep-session.md.
 His UI nit is accepted: result availability, not state==='ready', governs the
 verified download button. A failed retry may leave state error and a previous
 verified result; keep that download available beside the retry error sentence.
+
+## Playable encounter evidence
+
+The optional “Begin with a memory” disclosure now prepares an ordinary finished
+passage silently, then offers explicit playback and continuation on fresh
+instances of the same three instruments. Its original card remains outside the
+host capture's keeping section. Original gestures and worker-rebuilt original
+sound remain independently downloadable. The rate must match before scheduling.
+Ordinary input stays locked until the host barrier completes; Quiet is always
+available. A completed mixed capture has separately verified gesture keeping,
+retry and cancellation, explicit origin and continued sound filenames. It cannot
+be exported as an ordinary original or used as a new transformation source.
+Successful ordinary Begin clears the visit's memory; failed starts preserve it.
+
+Fable approved the code in
+collab/reviews/20261102T0310Z-fable-reviews-continuation-encounter.md, reporting
+541/541 suite tests with the working tree. Astra ran 24 focused host, actual
+processor and source/keeping lifecycle tests, all passing. Syntax/diff checks
+pass. His wording nits are handled: Begin again was observed after continuation,
+and rate-refusal wording says “here”, independent of card placement.
+
+Desktop Safari responsive 320×656 checks:
+- Authored demonstration → silent source preparation → explicit playback.
+  Controls stayed locked during memory and enabled at the acknowledged handoff.
+- A live G response followed, then Quiet. The verified wrapper independently
+  verifies against the downloaded retained original. Its WAV is byte-exact to
+  the canonical render: 3029804 bytes, SHA-256
+  a029f8b3f6500b75e921e1a6ede0fa2bf4d4072f50b3bc65b26a282cb40f6afa.
+  The first remembered strike was112 frames late; that actual timing is retained
+  and verification reports timingChanged. The UI now explains late/partial
+  outcomes when applicable.
+- Original JSON matches the authored study and original WAV remains byte-exact
+  (1284844 bytes). Verification retry+Escape preserves the prior verified
+  download. Explicit replay+Escape preserves both passages.
+- Early Quiet before handoff never enables live controls and says “Stopped
+  before your turn”. This run had accepted all five edges but had not reached
+  the handoff; it is correctly aborted without falsely claiming truncation.
+  Independent verification passes; its WAV is exact (1074924 bytes, SHA-256
+  42b3b3bda6b5469c7f4552226eefca96b98725fa683fd793912041e315a2ec7f).
+- Project-home navigation and browser Back preserve the original, capture and
+  verified download without resuming playback. Successful ordinary Begin clears
+  continued identity and restores fresh personal controls. Source preparation
+  cancelled by Escape retains the ordinary passage and can be retried.
+
+Evidence: renders/ensemble-continuation-live/{source.json,continued.json,
+continued.wav,report.json,early-quiet.json,early-quiet-report.json}.
+No phone hardware, output-loopback, subjective listening or realtime-performance
+clearance is claimed. A hardware sample-rate change was not available natively;
+that refusal was code-reviewed, not observed on changed audio hardware.
+
+Native layout refinement groups continued-gesture keeping with sound keeping,
+keeps authored source origin visible there, and retains “Stopped before the live
+response” after verification for aborted captures. Explicit continuation start
+focuses/scrolls to the instrument status with a narrow-view sticky-control offset;
+this avoids leaving the visitor at the bottom-page memory card during handoff.
+Final native check confirms explicit start moves focus and scroll from the
+memory card back to the status and visible instruments, with Quiet exposed at
+320×656. The final test passage was ended with Quiet. The continuation source
+status now changes from the play invitation to retained-original wording once
+play starts, rather than leaving an instruction beside a disabled play button.

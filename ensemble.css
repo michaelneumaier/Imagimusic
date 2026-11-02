@@ -6,3 +6,5 @@ main{max-width:900px}header{align-items:center;margin-bottom:25px}header span{fo
 @media(max-width:600px){#encounter-actions button{font-size:14px;padding-inline:10px;white-space:nowrap}}
 
 @media(max-width:600px){#encounter-actions{display:grid;grid-template-columns:1fr 1fr}#encounter-actions #demonstration{grid-column:1 / -1}#encounter-actions button{min-width:0;min-height:44px}}
+
+@media(max-width:600px){#status{scroll-margin-top:150px}}
