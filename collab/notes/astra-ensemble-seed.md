@@ -158,3 +158,40 @@ seeded wrapper and remain independently reviewable. When adding seeded reader
 support, explicitly refuse both seeded and derived wrappers as new continuation
 or derived-return sources before unwrapping; generic reader support must not
 silently widen the source policy.
+
+Fable approved d745678's source-retention/preparation layers in
+collab/reviews/20261102T0245Z-fable-reviews-continuation-source-and-prepare.md,
+independently running all seven tests. A follow-up guard now requires the raw
+input kind to be an ordinary ensemble before either continuation or derived
+return preparation calls generic reader parsing. Both adapters explicitly reject
+seeded wrappers, protecting the source policy when reader support is added.
+Five adapter tests pass, including new seeded-source refusal cases.
+
+At7c32ad3 all four saved verifier counterexamples correctly fail and the five
+seeded tests pass. Remaining review cases: zero-duration contact closure at an
+aborted Quiet and reversed same-frame strike order; evidence and exact findings
+are in the seeded-wrapper review addendum. No seeded reader or keeping adapter
+is integrated until this gate clears.
+
+The verifier gate is now cleared at d93a776, after ce0a461's contact-closure and
+monotonicity fix. Astra independently ran seven seeded tests and all saved
+counterexamples; final approval is in the seeded-wrapper review addendum.
+Fable also approved the explicit ordinary-source guards in both preparation
+adapters as an addendum to the source/preparation review.
+
+The new worker-side seeded keeping adapter snapshots the bounded original,
+finished ordinary capture and host continuation metadata before async work.
+It builds the model wrapper, verifies it against the retained original, and
+only then returns canonical download text (256KiB bound). Three focused tests
+pass: all-input mutation during hashing, source hash identity, refusal of an
+invented remembered strike even in a structurally valid capture, and source/
+reader bounds. No audio is prepared and no page imports it yet. Fable review
+requested; next integrate a labelled reader before exposing continuation keeping.
+
+Fable approved the keeping adapter in
+collab/reviews/20261102T0253Z-fable-reviews-seeded-keep.md after reviewing the
+three tests. Page policy: a provenance failure must preserve both the finished
+capture and original, with sound keeping and retry still available. Do not
+silently label the mixed capture as a wholly personal/original passage. Any raw
+export fallback would need an explicit unverified-history label; it is not part
+of this adapter. No playable UI has changed in this slice.

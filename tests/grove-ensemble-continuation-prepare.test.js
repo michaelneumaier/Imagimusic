@@ -21,6 +21,7 @@ test('source text, identity and plan refer to one original snapshot even when ca
 test('source preparation refuses wrong rate, wrapped sources and oversized input before any playable result',async()=>{
  await assert.rejects(prepareEnsembleContinuation(source(),{sampleRate:48000}),/same rate/);
  await assert.rejects(prepareEnsembleContinuation({kind:'imagimusic-grove-ensemble-derived',ensemble:source()}));
+ await assert.rejects(prepareEnsembleContinuation({kind:'imagimusic-grove-ensemble-seeded',ensemble:source()}),/original ensemble/);
  await assert.rejects(prepareEnsembleContinuation({...source(),padding:'x'.repeat(256*1024)}),/256 KiB/);
  const long=source();long.ended.frame=21*8000;long.parts.forEach(p=>p.record.ended.frame=long.ended.frame);
  await assert.rejects(prepareEnsembleContinuation(long),/longer than 20 s/);

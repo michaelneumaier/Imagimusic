@@ -33,6 +33,7 @@ test('preparation enforces browser bounds and refuses already-derived or invalid
  await assert.rejects(prepareEnsembleReturn({...record,ended:{frame:120*8000+1,fadeFrames:1}}),/two minutes/);
  await assert.rejects(prepareEnsembleReturn({...record,padding:'x'.repeat(256*1024)}),/256 KiB/);
  await assert.rejects(prepareEnsembleReturn({kind:'imagimusic-grove-ensemble-derived',ensemble:record}),/saved ensemble/);
+ await assert.rejects(prepareEnsembleReturn({kind:'imagimusic-grove-ensemble-seeded',ensemble:record}),/saved ensemble/);
  record.parts[0].record.events[0].velocity=2;
  await assert.rejects(prepareEnsembleReturn(record),/velocity/);
 });

@@ -2,9 +2,11 @@ import {parseEnsembleImport} from './ensemble-import.js';
 import {REST_IMPORT_MAX_BYTES} from './read-rest-file.js';
 import {rotateEnsembleVoices,canonicalDerivedEnsemble} from '../score/grove-ensemble-derived.js';
 import {renderEnsembleMix} from './ensemble-mix.js';
+import {ENSEMBLE_RECORD_KIND} from '../score/grove-ensemble-record.js';
 
 /** Worker-side only: separate derived file + sound, with no playback or source replacement. */
 export async function prepareEnsembleReturn(source){
+ if(source?.kind!==ENSEMBLE_RECORD_KIND)throw new Error('Choose an original saved ensemble as the source of a return.');
  const {record,duration}=parseEnsembleImport(JSON.stringify(source),{allowDerived:false});
  const derived=await rotateEnsembleVoices(record);
  const text=canonicalDerivedEnsemble(derived)+'\n';
