@@ -20,23 +20,32 @@ export const INVERSE_SHARED_GESTURE = deepFreeze({
   invitation: 'Hear a gesture: body 2, then bodies 1 and 3 together. About twenty seconds to settle, or choose Quiet.',
 });
 
-/** Shape and bounds of a gesture: 1..8 events, bodies 0..2, offsets finite within 0..8 s, first at 0, non-decreasing, span consistent. */
+/** The shared core: 1..8 events, bodies 0..2, offsets finite within 0..8 s, first at 0, non-decreasing, no holes; returns the last offset.
+ * `offsetKey` names the time field ('offsetSeconds' for a gesture, 'at' for a phrase). */
+export function validateTouchEvents(events, { what = 'events', offsetKey = 'offsetSeconds', maxEvents = INVERSE_GESTURE_MAX_EVENTS, maxSpanSeconds = INVERSE_GESTURE_MAX_SPAN_SECONDS } = {}) {
+  const fail = m => { throw new Error(`${what}: ${m}`); };
+  if (!Array.isArray(events) || events.length < 1 || events.length > maxEvents) fail(`events must be 1..${maxEvents}.`);
+  let last = 0;
+  for (let i = 0; i < events.length; i++) {                           // indexed, so a sparse array (holes) cannot pass: forEach would skip holes
+    if (!Object.hasOwn(events, i)) fail(`event ${i} is missing (sparse events are refused).`);
+    const e = events[i];
+    if (!e || typeof e !== 'object' || Object.keys(e).sort().join() !== ['body', offsetKey].sort().join()) fail(`event ${i} must have exactly body and ${offsetKey}.`);
+    if (![0, 1, 2].includes(e.body)) fail(`event ${i}: body must be 0, 1 or 2.`);
+    const t = e[offsetKey];
+    if (typeof t !== 'number' || !Number.isFinite(t) || t < 0 || t > maxSpanSeconds) fail(`event ${i}: offset must be within 0..${maxSpanSeconds} s.`);
+    if (i === 0 && t !== 0) fail('the first event must be at offset 0.');
+    if (t < last) fail(`event ${i}: offsets must not decrease.`);
+    last = t;
+  }
+  return last;
+}
+
+/** Shape and bounds of a gesture: kind and version, the shared event rules, span consistent. */
 export function validateInverseGesture(g) {
   const fail = m => { throw new Error(`Inverse gesture: ${m}`); };
   if (!g || typeof g !== 'object') fail('must be an object.');
   if (g.kind !== INVERSE_GESTURE_KIND || g.version !== INVERSE_GESTURE_VERSION) fail(`kind must be ${INVERSE_GESTURE_KIND} v${INVERSE_GESTURE_VERSION}.`);
-  if (!Array.isArray(g.events) || g.events.length < 1 || g.events.length > INVERSE_GESTURE_MAX_EVENTS) fail(`events must be 1..${INVERSE_GESTURE_MAX_EVENTS}.`);
-  let last = 0;
-  for (let i = 0; i < g.events.length; i++) {                       // indexed, so a sparse array (holes) cannot pass: forEach would skip holes
-    if (!Object.hasOwn(g.events, i)) fail(`event ${i} is missing (sparse events are refused).`);
-    const e = g.events[i];
-    if (!e || typeof e !== 'object' || Object.keys(e).sort().join() !== 'body,offsetSeconds') fail(`event ${i} must have exactly body and offsetSeconds.`);
-    if (![0, 1, 2].includes(e.body)) fail(`event ${i}: body must be 0, 1 or 2.`);
-    if (typeof e.offsetSeconds !== 'number' || !Number.isFinite(e.offsetSeconds) || e.offsetSeconds < 0 || e.offsetSeconds > INVERSE_GESTURE_MAX_SPAN_SECONDS) fail(`event ${i}: offset must be within 0..${INVERSE_GESTURE_MAX_SPAN_SECONDS} s.`);
-    if (i === 0 && e.offsetSeconds !== 0) fail('the first event must be at offset 0.');
-    if (e.offsetSeconds < last) fail(`event ${i}: offsets must not decrease.`);
-    last = e.offsetSeconds;
-  }
+  const last = validateTouchEvents(g.events, { what: 'Inverse gesture', offsetKey: 'offsetSeconds' });
   if (g.spanSeconds !== last) fail('spanSeconds must equal the last offset.');
   return g;
 }
@@ -47,3 +56,4 @@ export function inverseGestureTransportEvents(gesture = INVERSE_SHARED_GESTURE) 
 validateInverseGesture(INVERSE_SHARED_GESTURE);
 /** The same events as a bare frozen array, the name Astra's page and harness consume. */
 export const INVERSE_SHARED_GESTURE_EVENTS = inverseGestureTransportEvents();
+
