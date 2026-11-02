@@ -48,3 +48,29 @@ test('production early Quiet yields a partial remembered capture, no completed b
  assert.equal(record.parts[0].record.events.length,1);assert.equal(record.parts[0].record.contacts[0].end,record.ended.frame);
  assert.equal(record.parts[2].record.events.length,0);assert.equal(host.continuation.refused,1,'release after Quiet is recorded as refused, not lost');host.dispose();
 });
+
+test('visible acknowledged marks distinguish remembered and newly played strikes without changing their lifetime',async()=>{
+ const {host,until,verify}=fixture();await host.enable([grove,grove,grove]);
+ host.scheduleContinuation(steps,{handoffFrame:500});
+ assert.deepEqual(host.visual().map(part=>part.strikes),[[],[],[]],'queued strikes are not yet visible');
+ until(()=>host.continuation.state==='completed');
+ const remembered=host.visual()[0].strikes[0];
+ assert.equal(remembered.remembered,true);assert.ok(remembered.age>=0&&remembered.age<.3);
+ host.send(2,steps[0].command);
+ until(()=>host.visual()[2].strikes.length===1);
+ const played=host.visual()[2].strikes[0];
+ assert.equal(played.remembered,false);assert.ok(played.age>=0&&played.age<.3);
+ until(()=>host.visual().every(part=>part.strikes.length===0));
+ host.quiet();until(()=>host.state==='ended');
+ const record=verify();
+ assert.equal(JSON.stringify(record).includes('remembered'),false,'visual interpretation does not enter the sound record');
+ host.dispose();
+});
+
+test('newly played authored demonstration strikes are not labelled remembered',async()=>{
+ const {host,until}=fixture();await host.enable([grove,grove,grove]);
+ host.scheduleOpening([{part:0,time:0,command:steps[0].command},{part:0,time:1,command:{kind:'quiet',fadeFrames:8}}]);
+ until(()=>host.visual()[0].strikes.length===1);
+ assert.equal(host.visual()[0].strikes[0].remembered,false);
+ host.quiet();until(()=>host.state==='ended');host.dispose();
+});

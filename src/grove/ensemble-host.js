@@ -39,7 +39,7 @@ export function createEnsembleHost({createContext=()=>new AudioContext(),createN
      }
      if(ack.accepted){
       if(ack.event.kind==='strike'||(ack.event.kind==='contact'&&ack.event.zone!==null)){origin=origin===null?ack.appliedFrame:Math.min(origin,ack.appliedFrame);if(state==='ready')state='playing';}
-      if(ack.event.kind==='strike')strikes[part].push({frame:ack.appliedFrame,body:ack.event.body,strikeU:recipes[part].positions[ack.event.position],velocity:ack.event.velocity});
+      if(ack.event.kind==='strike')strikes[part].push({frame:ack.appliedFrame,body:ack.event.body,strikeU:recipes[part].positions[ack.event.position],velocity:ack.event.velocity,remembered:continuation?.steps.some(step=>step.part===part&&step.id===ack.id)??false});
       if(ack.event.kind==='quiet')state='ending';
      }
      onDecision({part,...ack});
