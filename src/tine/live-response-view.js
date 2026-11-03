@@ -29,6 +29,6 @@ export function createTineLiveResponseView({details,svg,selector,slider,previous
   if(selector.value==='candidate'&&!candidate)selector.value='original';draw();
  }
  zoom.addEventListener('change',draw);details.addEventListener('toggle',draw);selector.addEventListener('change',draw);slider.addEventListener('input',draw);
- previous.addEventListener('click',()=>{slider.value=Math.max(0,Number(slider.value)-1);draw();});next.addEventListener('click',()=>{slider.value=Math.min(Number(slider.max),Number(slider.value)+1);draw();});
+ previous.addEventListener('click',()=>{const focused=document.activeElement===previous;slider.value=Math.max(0,Number(slider.value)-1);draw();if(focused&&previous.disabled)slider.focus({preventScroll:true});});next.addEventListener('click',()=>{const focused=document.activeElement===next;slider.value=Math.min(Number(slider.max),Number(slider.value)+1);draw();if(focused&&next.disabled)slider.focus({preventScroll:true});});
  draw();return {setSources};
 }
