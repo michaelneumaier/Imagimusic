@@ -516,3 +516,5 @@ Live comparison controls: owns live-comparison-session.js/tests and playing-page
 Candidate playing continuation: owned play-main/tine-play link from prepared comparison candidate to quiet body-only playing in a new tab. Preserve source page and kept pass; no implied performance transfer or automatic body switch.
 
 Signed live-phrase spatial inspection: owns live-response.js/tests. Pure frame-addressed analytic reconstruction from accepted events, signed bending/velocity and combined modal energy; verify against streaming state and PCM before visual UI. No display-rate oscillation or invented slow-motion claim.
+
+Still spatial inspection UI: owns live-response-view.js and playing-page optional frame/record selector. Fixed x/displacement scales, original/candidate same sample frame, explicit mechanical-versus-faded-audio distinction; no autoplay or auto-animation.
