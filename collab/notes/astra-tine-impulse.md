@@ -370,3 +370,9 @@ Native390px preview: Soft selected before Begin, touch acknowledged as0.025, kep
 Keys1/2/3 now select and strike Soft/Light/Firm only while the enabled pad has focus. Modifiers are ignored, repeated keydown is suppressed, and no global key listener is installed. Space/click/tap use the selected next-touch impulse. Instructions and aria-keyshortcuts disclose the controls.
 
 Native Safari390px keyboard path: focus Begin, Space moves focus to the enabled pad, then1,2,3 and a650ms held1 produce exactly four accepted touches. Kept address carries strengths[.025,.05,.1,.025], applied frames[15360,15360,16000,16128] at48kHz, natural fadeStart382800. Same-frame first events remain individually recorded, without invented spacing. An earlier tool-separated attempt exceeded the four-second window and ended empty; the successful sequence was executed within one active window. This is input/record evidence, not hardware-latency evidence or listener feedback. Home/catalog/M18 now reflect selectable accents.
+
+### Reading a completed phrase — 2026-11-03
+
+A closed-by-default “Read the touches in this pass” disclosure presents the original completed record as touch number, accepted time (rounded milliseconds) and impulse. The table distinguishes Soft/Light/Firm where applicable and preserves arbitrary valid recorded strengths numerically. It does not quantize events, infer beats or follow playback. It updates only when capture installs a new completed source; pending/failing replacement retains the previous reading alongside the previous replay. Body comparison does not own this table.
+
+Native Safari reopened the four-accent kept record and displayed ordered times[.320,.320,.333,.336]s and strengths[.025,.05,.1,.025], correctly retaining simultaneous events.390px screenshot verified readable columns without clipping; table has semantic caption/headers and the precision/latency limitation is stated. No new model/transport behavior or listener claim.

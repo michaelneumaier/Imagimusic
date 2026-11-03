@@ -9,3 +9,6 @@
 .listening-control{margin:1.5rem 0}.listening-control label{display:flex;justify-content:space-between;gap:1rem}.listening-control input{width:100%;margin:.75rem 0}.listening-control output{color:#d7bc8a}
 
 .touch-dynamics{margin-top:1rem}.touch-dynamics select{max-width:100%;margin:.5rem 0}.touch-dynamics .caption{margin:.5rem 0}
+
+#touch-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.9rem}#touch-table caption{text-align:left;color:#d7bc8a;margin:.7rem 0}#touch-table th,#touch-table td{text-align:left;padding:.65rem .3rem;border-bottom:1px solid #33454b}
+#touch-table td{overflow-wrap:anywhere}

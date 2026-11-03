@@ -19,8 +19,18 @@ function controls(state,touches){const active=liveActive(state),listening=replay
 }
 let comparisonSource=null;
 const bodyName=record=>`${record.design.lengthMm} × ${record.design.widthMm} mm`;
+function showTouchReading(pcm){
+ const record=pcm.record,rows=record.events.map((event,index)=>{
+  const row=document.createElement('tr');
+  const name=new Map([[.025,'Soft'],[.05,'Light'],[.1,'Firm']]).get(event.strength);
+  for(const text of [String(index+1),`${(event.frame/record.sampleRate).toFixed(3)} s`,`${name?name+' · ':''}${event.strength}`]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}
+  return row;
+ });
+ $('touch-rows').replaceChildren(...rows);$('touch-table').hidden=false;
+ $('touch-reading-note').textContent=`${bodyName(record)} · ${record.events.length} ${record.events.length===1?'touch':'touches'} · ${pcm.seconds.toFixed(2)}-second completed pass. These are the original touches used by replay and body comparison.`;
+}
 function showCapture({current,pending,message}){
- if(current&&current!==comparisonSource){comparisonSource=current;for(const key of ['length','width'])$('compare-'+key).value=current.record.design[key+'Mm'];showDraft();comparison.setSource(current.record);}
+ if(current&&current!==comparisonSource){showTouchReading(current);comparisonSource=current;for(const key of ['length','width'])$('compare-'+key).value=current.record.design[key+'Mm'];showDraft();comparison.setSource(current.record);}
  $('capture-note').textContent=message?`The latest pass could not be prepared. ${current?'The previous pass is still available. ':''}${message}`:pending?`Preparing this pass quietly…${current?' The previous completed pass remains available.':''}`:current?`${current.record.events.length} ${current.record.events.length===1?'touch':'touches'} · ${current.seconds.toFixed(2)} seconds · ready to replay. A new completed pass with touches replaces this replay; the address changes only when you choose Keep.`:'A completed pass with touches will appear here. Use Keep this pass to put it in the address before leaving.';
  controls(session.state,session.touches);
 }
