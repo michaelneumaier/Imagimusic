@@ -10,6 +10,10 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
+const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
+$('camera-motion').checked=!motionPreference.matches;
+$('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
+motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-motion').checked=!motionPreference.matches;});
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
@@ -31,8 +35,9 @@ function touch(){if(!session||$('touch').disabled)return;session.strike(.1).catc
 function animate(){
  raf=0;const repeat=listening(),t=repeat?replay.time():session.time(),response=repeat?replayResponse:liveResponse;
  if(repeat&&unfolding){
-  const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} remembered touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
-  if(lastPart!==frame.part){lastPart=frame.part;const title={opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'}[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',frame.part==='answer'?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':'The original 80 mm blade, playing your phrase alone.');}
+  const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked,$('camera-motion').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} remembered touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
+  const wideVisible=!$('camera-motion').checked||frame.cameraOpen>0,chapterKey=frame.part+':'+wideVisible;
+  if(lastPart!==chapterKey){lastPart=chapterKey;const title={opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'}[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',wideVisible?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':'The original 80 mm blade, playing your phrase alone.');}
   if(listening())raf=requestAnimationFrame(animate);return;
  }
  if(response&&$('reveal').checked)world?.response(response.at(t).points);
@@ -124,7 +129,7 @@ for(const button of bodyButtons)button.addEventListener('click',async()=>{
  if(lengthMm===80){comparison.cancel();selectPCM(capture.current);controls();return;}
  try{await comparison.prepare({lengthMm,widthMm:10});}catch(error){$('body-note').textContent=error.message;}
 });
-$('reveal').addEventListener('change',()=>{if(!$('reveal').checked){if(unfolding&&arrangementView)world?.arrangementFrame(arrangementView.at(replay.time()),false);else world?.response(null);}});
+$('reveal').addEventListener('change',()=>{if(!$('reveal').checked){if(unfolding&&arrangementView)world?.arrangementFrame(arrangementView.at(replay.time()),false,$('camera-motion').checked);else world?.response(null);}});
 $('touch').addEventListener('click',touch);
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('quiet').addEventListener('click',()=>{

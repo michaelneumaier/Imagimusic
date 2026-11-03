@@ -626,3 +626,9 @@ Living arrangement foundation and discovery complete: deterministic renderer, wo
 Living interactive round: owns src/living/scene.js/main.js, new arrangement-view.js and tests, living.html/css. Refactor procedural body construction for three independent instances and connect original-phrase worker playback with cancellation and shared Quiet.
 
 Living interactive round complete as a playable prototype: visitor-source worker, three-body scene and lifecycle evidence recorded; claim released.
+
+Living camera continuity: owns arrangement-view.js/tests, scene.js/main.js and living.html. Audio-clock easing during the silent interlude gaps, with opt-out and reduced-motion default.
+
+Flagship checkpoint reconciliation: owns project.html flagship/roadmap/history summaries and docs/ROADMAP.md M19. Record implemented encounter separately from outstanding polish and persistence.
+
+Living camera continuity and flagship checkpoint reconciliation complete: native desktop/home evidence and full792 regression recorded; claims released.

@@ -17,3 +17,15 @@ test('each body uses its own local event clock, clears at its ending and returns
  const gap=view.at(plan.returnStart/rate-.1);assert.ok(gap.bodies.every(b=>b.points===null&&!b.touched));
  const end=view.at(plan.frames/rate);assert.equal(end.touches,10);assert.ok(end.bodies.every(b=>b.points===null));assert.throws(()=>view.at(NaN));
 });
+
+test('camera opens and returns only in the silent gaps, with deterministic bounded easing',()=>{
+ const plan=createLivingArrangement(source),view=createLivingArrangementView(plan),rate=plan.sampleRate;
+ const a=plan.voices[0].endFrame,b=plan.roundStart,c=plan.voices[3].endFrame,d=plan.returnStart;
+ for(const f of [0,a])assert.equal(view.at(f/rate).cameraOpen,0);
+ for(const f of [b,c])assert.equal(view.at(f/rate).cameraOpen,1);
+ for(const f of [d,plan.frames])assert.equal(view.at(f/rate).cameraOpen,0);
+ assert.ok(Math.abs(view.at((a+b)/2/rate).cameraOpen-.5)<1e-12);
+ assert.ok(Math.abs(view.at((c+d)/2/rate).cameraOpen-.5)<1e-12);
+ let previous=0;for(let i=0;i<=100;i++){const value=view.at((a+(b-a)*i/100)/rate).cameraOpen;assert.ok(value>=previous&&value<=1);previous=value;}
+ previous=1;for(let i=0;i<=100;i++){const value=view.at((c+(d-c)*i/100)/rate).cameraOpen;assert.ok(value<=previous&&value>=0);previous=value;}
+});
