@@ -664,3 +664,9 @@ Living recipe reopening and milestone reconciliation complete: bounded reader, q
 Living listening-first introduction: owns greeting.js, main.js, living.html/css and greeting tests. Explicit authored example on shared arrangement/replay path, no capture replacement; clear example labels and return to selected visitor body. Also correct initial no-hash restore dispatch so opening remains quiet rather than reporting interruption.
 
 Living listening-first introduction and home/catalog/M19 reconciliation complete: authored source, shared playback adapter and native source-separation/return evidence recorded; claims released. Next: artistic comparison of sound, framing and reveal; listener evaluation remains open.
+
+Living sound-space study: owns src/living/space-study.js, tests/living-space-study.test.js, tools/render-living-space-study.mjs and ignored renders/living-space-study/. Compare fixed-gain dry, close and wide artistic delay treatments from one unchanged greeting; no inferred room/acoustic claim or live effect switch yet.
+
+Sound-space study discovery: owns src/project-catalog.js, tools/prepare-project-home.mjs and living.html model-details link. Register the local generated study and keep production audio unchanged.
+
+Living sound-space study and discovery complete: three treatments, exact source/report/WAVs,3 focused checks, independent file checks and native player/layout/parking evidence recorded. Claims released; no production-effect choice or listener verdict claimed.

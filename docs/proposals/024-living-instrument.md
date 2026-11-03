@@ -108,7 +108,7 @@ These directions reinforce each other. A person changes a body, hears a new poss
 
 ## Current checkpoint and next creative milestone
 
-The synthesis now has a working [local encounter](../../living.html): touch an 80 mm tine, replay the exact accepted phrase, hear it through 95 and 65 mm bodies, unfold it into three visible voices, return to the original, and keep a versioned address that reopens quietly. Camera movement and the magnified envelope are optional. The [project home](../../project.html) holds 42 catalog entries. The current full regression checkpoint passes 799 tests, including the recipe and film-source additions.
+The synthesis now has a working [local encounter](../../living.html): touch an 80 mm tine, replay the exact accepted phrase, hear it through 95 and 65 mm bodies, unfold it into three visible voices, return to the original, and keep a versioned address that reopens quietly. Camera movement and the magnified envelope are optional. The [project home](../../project.html) holds 43 catalog entries. The current full regression checkpoint passes 799 tests, including the recipe and film-source additions.
 
 The [72-second sketch and six scene boards](../../renders/flagship-sketch/index.html) remain an authored artistic reference, with [score and storyboard](025-first-encounter-storyboard.md). The interactive scene uses the visitor’s own phrase. Its present answer is a fixed, staggered arrangement of three independent bodies. The visible response is a magnified modal displacement bound on a static body; it is not resolved high-frequency bending, acoustic radiation, or energy flowing between the instruments.
 
@@ -129,6 +129,8 @@ Use the same short phrase for three tightly bounded studies. Each study gets one
 These studies should refine one shared scene, not become three more flagship menus. Compare the authored fixture, a single touch, a crowded phrase, and widely spaced touches. A treatment that only works with the demonstration phrase is insufficient for a playable encounter. Preserve arrangement version1 for existing keepsakes; any changed score needs a new explicit version or a separate experimental renderer.
 
 Spirituality can enter through sustained attention and the return to something personally made. Psychedelia can enter through a coherent shift in scale and the recognition of recurrence across bodies. Let the listener choose their interpretation. The visual direction should make those relationships perceptible before adding decorative complexity.
+
+The first sound comparison is now available: [A little air around a phrase](../../renders/living-space-study/index.html) holds the authored encounter fixed while comparing dry, close and wider artistic reflections. Shared gain and exact settings make the changes inspectable; a listening preference remains to be established. The playable scene still uses its dry source.
 
 ### Finish and evaluate the first minute
 
