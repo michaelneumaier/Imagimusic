@@ -612,3 +612,7 @@ Living response veil complete as a prototype:18 focused tests and native narrow 
 Living phrase continuity: owns src/living/main.js, living.html/css and response boundary alignment. Reuse worker capture and Grove replay for in-place repeat with shared Quiet and model-derived veil.
 
 Living phrase continuity complete: in-place replay, shared lifecycle and native narrow evidence recorded; claim released.
+
+Living alternate bodies: owns src/living/main.js/scene.js and living.html/css. Preserve original phrase while preparing65/95mm variants through existing comparison worker; change drawn length only between performances.
+
+Living alternate bodies complete: original/longer/shorter discovery and native return evidence recorded; claim released.

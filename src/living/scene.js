@@ -22,6 +22,7 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  const cradle=new T.ExtrudeGeometry(shape,{depth:1.8,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.1,bevelThickness:.1,curveSegments:128});
  mesh(cradle,ceramic,[-.75,0,-.9]);
  // Exposed span x=0…8, width1, thickness.1; another .8 enters the clamp.
+ let length=8;
  const blade=mesh(new T.BoxGeometry(8.8,.1,1),steel,[3.6,3.5,0]);blade.name='steel-blade';
  const marker=mesh(new T.SphereGeometry(.075,20,12),new T.MeshBasicMaterial({color:0xe9b56c}),[6.8,3.64,0]);marker.visible=false;
  const veil=new T.Group();objects.add(veil);veil.visible=false;
@@ -34,7 +35,7 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  for(const sign of [-1,1])for(const z of [-.51,.51]){const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(81*3),3));const line=new T.Line(g,new T.LineBasicMaterial({color:sign>0?0xc1dfdf:0x73aeb9,transparent:true,opacity:.65,depthWrite:false}));line.position.z=z;veil.add(line);edges.push({line,sign});}
  function response(points){
   veil.visible=!!points;
-  if(points){for(let i=0;i<81;i++){const x=points[i].u*8,h=points[i].boundM*1e7;veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
+  if(points){for(let i=0;i<81;i++){const x=points[i].u*length,h=points[i].boundM*1e7;veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
    veilGeometry.attributes.position.needsUpdate=true;veilGeometry.computeBoundingSphere();for(const {line} of edges){line.geometry.attributes.position.needsUpdate=true;line.geometry.computeBoundingSphere();}}
   render();
  }
@@ -51,7 +52,7 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  const camera=new T.PerspectiveCamera(34,1,.1,100),controls=new OrbitControls(camera,canvas);
  controls.enableDamping=false;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.48;
  let selected='opening',width=0,height=0,disposed=false;
- const poses={opening:{target:[2.8,2,0],direction:[10,6.5,14],radius:5.8},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
+ const poses={opening:{target:[3.5,2,0],direction:[10,6.5,14],radius:6.6},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
  function place(){const p=poses[selected],vertical=T.MathUtils.degToRad(camera.fov/2),horizontal=Math.atan(Math.tan(vertical)*camera.aspect),distance=p.radius/Math.sin(Math.min(vertical,horizontal));controls.target.fromArray(p.target);camera.position.copy(controls.target).add(new T.Vector3(...p.direction).normalize().multiplyScalar(distance));controls.update();}
  function render(){if(!disposed)renderer.render(scene,camera);}
  function resize(){const r=canvas.getBoundingClientRect();if(r.width===width&&r.height===height)return;width=r.width;height=r.height;renderer.setSize(Math.max(1,width),Math.max(1,height),false);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();place();render();}
@@ -63,8 +64,13 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  function up(event){const p=pointer;pointer=null;if(!p||p.id!==event.pointerId||p.moved)return;const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new T.Vector2(2*(event.clientX-r.left)/r.width-1,1-2*(event.clientY-r.top)/r.height),camera);if(raycaster.intersectObject(blade).length)onTouch();}
  function cancel(){pointer=null;}
  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',cancel);
+ function setLength(mm){
+  if(![65,80,95].includes(mm))throw Error('Unknown opening body length.');
+  length=mm/10;blade.scale.x=(length+.8)/8.8;blade.position.x=(length-.8)/2;marker.position.x=.85*length;marker.visible=false;veil.visible=false;
+  poses.end.target[0]=length-2.2;if(selected==='end')place();render();
+ }
  function acknowledgeTouch(value=true){marker.visible=value;render();}
  const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
  function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,response,acknowledgeTouch,dispose};
+ return {view,render,response,setLength,acknowledgeTouch,dispose};
 }

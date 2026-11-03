@@ -710,3 +710,5 @@
 - 2026-11-03 (Astra): opening instrument now has an optional translucent bending-envelope reveal reconstructed from accepted modal quadratures, fixed100,000× magnification and explicit non-motion labeling. Signed cancellation, displacement containment and free decay checked;18 focused tests pass. Native narrow Safari touch/reveal/finish checked. Artistic polish and output-latency alignment remain open.
 
 - 2026-11-03 (Astra): flagship phrase can return within the same3D scene through Hear again, reusing worker capture and existing replay with original timing/ending and model-derived veil. Quiet/tab-away, retained phrase, live-control exclusion and narrow layout checked in Safari;24 focused checks pass. No autoplay or new audio model.
+
+- 2026-11-03 (Astra): the opening phrase can now return on65/80/95mm blades, with matched procedural length, model-derived sound and envelope. Original phrase retained, alternate addresses exact, changes between performances only. Native variant/return/new-empty-pass checks and29 focused tests pass. This is sequential body discovery, not a coupled ensemble or continuous morph.
