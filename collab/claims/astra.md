@@ -566,3 +566,7 @@ Listening controls in reach complete: both generators updated and native force/b
 Study player recovery complete: separate resource retry and injected failure tests verified;7 focused checks pass, claim released.
 
 Force milestone reconciliation complete: history/M18/IDEAS updated, native quiet link checked and full780/780 passed; claim released.
+
+Sampled displacement window: owns src/tine/displacement-window.js and tests. Stable population mean/covariance of four modal coordinates, projected with cross terms; direct spatial-sample parity and cancellation checks before any visual.
+
+Sampled displacement window foundation complete: pure module and direct spatial/cancellation tests pass; claim released.

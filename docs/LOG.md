@@ -690,3 +690,5 @@
 - 2026-11-03 — Astra: both tine studies keep native player/status visible during lower-page exploration; force phrase links wrap cleanly and focus scroll margins added. Native390px dock and immediate pause actions verified for force/body examples; no audio/transport change.
 - 2026-11-03 — Astra: fixed study-player retry after media-source initialization failure; added injected source/connection recovery tests preserving selected level without bypass playback. Player/shared-stage7/7 passes.
 - 2026-11-03 — Astra: finite-force study milestone reconciled in home history/M18; native history link opens quietly, catalog40/40, generated studies ready. Full regression780/780 at concurrency2 in160.775s, no failures/cancellations/skips. Next interval-based visual research recorded separately in IDEAS.
+
+- 2026-11-03 (Astra, solo): added tested sampled displacement statistics retaining cross-mode covariance; direct spatial and cancellation checks pass (5 focused tests including existing response). Foundation only, no visual/audio behavior change; interval spread is not an extrema envelope or camera exposure.
