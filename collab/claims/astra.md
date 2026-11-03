@@ -604,3 +604,7 @@ Opening scene construction and home link complete; native narrow/desktop views a
 Living instrument touch integration: owns living.html/css and src/living/main.js/scene.js. Reuse validated live session, accepted-touch marker, pointer click-vs-orbit gating, quiet lifecycle and original-pass handoff to existing replay page.
 
 Living instrument touch integration complete: focused tests and native button/blade/drag/handoff/interruption evidence recorded; claim released.
+
+Living response veil: owns src/living/response.js, tests/living-response.test.js and living scene/main/html integration. Reconstruct accepted-event modal quadratures and display an explicitly magnified displacement bound, never slowed physical vibration.
+
+Living response veil complete as a prototype:18 focused tests and native narrow interaction evidence recorded; claim released.

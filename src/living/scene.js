@@ -2,7 +2,8 @@ import * as T from '../../vendor/three/build/three.module.js';
 import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import {createSurfaceLighting} from '../stage/surface-lighting.js';
 
-/** Static design study. One drawing unit = 10 mm. No physical motion here. */
+/** One drawing unit = 10 mm. The solid body stays still; the optional veil
+ * shows a conservative displacement envelope at 100,000× magnification. */
 export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;
@@ -23,6 +24,20 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  // Exposed span x=0…8, width1, thickness.1; another .8 enters the clamp.
  const blade=mesh(new T.BoxGeometry(8.8,.1,1),steel,[3.6,3.5,0]);blade.name='steel-blade';
  const marker=mesh(new T.SphereGeometry(.075,20,12),new T.MeshBasicMaterial({color:0xe9b56c}),[6.8,3.64,0]);marker.visible=false;
+ const veil=new T.Group();objects.add(veil);veil.visible=false;
+ const veilGeometry=new T.BufferGeometry(),veilPositions=new Float32Array(81*2*3),indices=[];
+ for(let i=0;i<80;i++){const a=2*i;indices.push(a,a+1,a+2,a+1,a+3,a+2);}
+ veilGeometry.setAttribute('position',new T.BufferAttribute(veilPositions,3));veilGeometry.setIndex(indices);
+ const veilMaterial=new T.MeshBasicMaterial({color:0x85c6cc,transparent:true,opacity:.16,side:T.DoubleSide,depthWrite:false});
+ for(const z of [-.51,.51]){const m=new T.Mesh(veilGeometry,veilMaterial);m.position.z=z;veil.add(m);}
+ const edges=[];
+ for(const sign of [-1,1])for(const z of [-.51,.51]){const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(81*3),3));const line=new T.Line(g,new T.LineBasicMaterial({color:sign>0?0xc1dfdf:0x73aeb9,transparent:true,opacity:.65,depthWrite:false}));line.position.z=z;veil.add(line);edges.push({line,sign});}
+ function response(points){
+  veil.visible=!!points;
+  if(points){for(let i=0;i<81;i++){const x=points[i].u*8,h=points[i].boundM*1e7;veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
+   veilGeometry.attributes.position.needsUpdate=true;veilGeometry.computeBoundingSphere();for(const {line} of edges){line.geometry.attributes.position.needsUpdate=true;line.geometry.computeBoundingSphere();}}
+  render();
+ }
  mesh(chamferedBox(.8,.32,1.45),bronze,[-.4,3.71,0]);
  mesh(chamferedBox(.8,.25,1.45),bronze,[-.4,3.325,0]);
  for(const z of [-.46,.46]){
@@ -51,5 +66,5 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  function acknowledgeTouch(value=true){marker.visible=value;render();}
  const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
  function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,acknowledgeTouch,dispose};
+ return {view,render,response,acknowledgeTouch,dispose};
 }

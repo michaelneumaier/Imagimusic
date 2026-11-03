@@ -706,3 +706,5 @@
 - 2026-11-03 (Astra): first local Living Instrument3D form now exists at living.html: explicit cantilever proportions, artistic cradle/clamp, demand-rendered camera presets. Native narrow/root and desktop/opening/free-end checks recorded; material polish and playable sound integration remain open.
 
 - 2026-11-03 (Astra): Living Instrument opening is playable through the existing accepted-impulse session. Button/direct blade input, orbit suppression, previous-phrase retention, quiet replay handoff and tab-away interruption checked in native Safari;13 focused tests pass. Fixed gold acknowledgement is explicitly not vibration. Artistic response, material polish and larger encounter remain open; Fable review pending.
+
+- 2026-11-03 (Astra): opening instrument now has an optional translucent bending-envelope reveal reconstructed from accepted modal quadratures, fixed100,000× magnification and explicit non-motion labeling. Signed cancellation, displacement containment and free decay checked;18 focused tests pass. Native narrow Safari touch/reveal/finish checked. Artistic polish and output-latency alignment remain open.
