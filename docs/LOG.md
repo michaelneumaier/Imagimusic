@@ -649,3 +649,6 @@
 - 2026-11-03 — Astra: full regression through timing passes 739/739 at concurrency 2 in 169.038 seconds, zero failures/cancellations/skips. Next: explicit body-and-rhythm return while preserving body-only addresses.
 
 - 2026-11-03 — Astra: separate strict body-and-rhythm address now keeps successfully prepared geometry and committed gaps; older body-only addresses keep their default return behavior. Native draft-versus-committed keep, quiet reopen, 6.2s returned phrase, body-only fallback and malformed recovery verified. Two new round-trip/refusal tests bring affected group to18/18; homepage/catalog copy updated.
+
+- 2026-11-03 — Astra: both tine keep choices and saved identity checked at390×656. Project history now records visitor-shaped rhythm and quiet body/phrase return. Code audit distinguishes old garden slow artistic tine motion from new SI state; next proposed live foundation must add impulses to continuing modal state and record applied frames before claiming replay fidelity.
+- 2026-11-03 — Astra: compound-return milestone regression passes741/741 at concurrency2 in141.127s, zero failures/cancellations/skips. Roadmap now summarizes current tine capabilities and explicit next live-state/reconstruction work, with chronology retained in evidence notes.
