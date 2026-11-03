@@ -554,3 +554,5 @@ Force convergence complete: tool/reference refinement and four-case/four-mode co
 Force listening study complete: generator, shared caption and local files verified; claim released.
 
 Force-study discovery complete: catalog40/40 and regeneration ready; claim released.
+
+Force input picture complete: actual-input plot/table, visual/native checks and plot/no-plot parity recorded; claim released.
