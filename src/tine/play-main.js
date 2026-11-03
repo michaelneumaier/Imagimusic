@@ -1,14 +1,15 @@
 import {createTineDesign,tineAddressFragment} from './address.js';
 import {readTineReturn} from './phrase-address.js';
 import {createTineLiveSession} from './live-session.js';
+import {readTineLiveAddress,tineLiveFragment} from './live-address.js';
 import {createTineLiveCapture} from './live-capture.js';
 import {createGroveReplay} from '../grove/replay.js';
 const $=id=>document.getElementById(id);let design=null,raf=0,wantsFocus=false,returnFocus=false;
 const liveActive=state=>['preparing','playing','ringing','ending'].includes(state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
-function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||!capture.current;}
+function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;}
 function showCapture({current,pending,message}){
- $('capture-note').textContent=message?`The latest pass could not be prepared. ${current?'The previous pass is still available. ':''}${message}`:pending?`Preparing this pass quietly…${current?' The previous completed pass remains available.':''}`:current?`${current.record.events.length} ${current.record.events.length===1?'touch':'touches'} · ${current.seconds.toFixed(2)} seconds · available for this visit. A new completed pass with touches replaces this one.`:'A completed pass with touches will appear here. Leaving or reloading this page does not save it.';
+ $('capture-note').textContent=message?`The latest pass could not be prepared. ${current?'The previous pass is still available. ':''}${message}`:pending?`Preparing this pass quietly…${current?' The previous completed pass remains available.':''}`:current?`${current.record.events.length} ${current.record.events.length===1?'touch':'touches'} · ${current.seconds.toFixed(2)} seconds · ready to replay. A new completed pass with touches replaces this replay; the address changes only when you choose Keep.`:'A completed pass with touches will appear here. Use Keep this pass to put it in the address before leaving.';
  controls(session.state,session.touches);
 }
 const capture=createTineLiveCapture({onChange:showCapture});
@@ -38,16 +39,19 @@ const session=createTineLiveSession({onChange:event=>{
 $('begin').addEventListener('click',async()=>{capture.cancel();replay.park();wantsFocus=document.activeElement===$('begin');$('last-touch').textContent='Touches are counted when the audio processor accepts them.';$('progress').value=0;try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('status').textContent=error.message;}});
 $('touch').addEventListener('click',()=>session.strike().catch(error=>{if(error.name!=='AbortError')$('last-touch').textContent=error.message;}));
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
+$('keep-pass').addEventListener('click',()=>{if(!capture.current)return;try{const pcm=capture.current;history.replaceState(null,'',location.pathname+location.search+tineLiveFragment(pcm.record));$('keep-note').textContent=`Address now keeps ${pcm.record.events.length} ${pcm.record.events.length===1?'touch':'touches'} and the ${pcm.seconds.toFixed(2)}-second ending with this body. Bookmark or copy it for a quiet return. New playing does not change this address.`;}catch(error){$('keep-note').textContent=error.message;}});
 $('replay').addEventListener('click',async()=>{replayFocus=document.activeElement===$('replay');try{await replay.play(capture.current);}catch(error){$('status').textContent=error.message;}});
 $('quiet').addEventListener('click',()=>{if(replayActive()){const focused=document.activeElement===$('quiet');replay.stop();$('status').textContent='Replay stopped. The completed pass is unchanged.';if(focused)$('replay').focus({preventScroll:true});return;}session.quiet().catch(error=>{if(error.name!=='AbortError')$('status').textContent=error.message;});});
 function park(){wantsFocus=false;replayFocus=false;capture.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);window.addEventListener('hashchange',()=>location.reload());
 try{
- design=readTineReturn(location.hash)?.design??createTineDesign();$('back').href='tine.html'+tineAddressFragment(design);
+ const kept=location.hash.startsWith('#tine-live=')?readTineLiveAddress(location.hash):null;
+ design=kept?.design??readTineReturn(location.hash)?.design??createTineDesign();$('back').href='tine.html'+tineAddressFragment(design);
  $('identity').textContent=`${design.lengthMm} × ${design.widthMm} × 1 mm · strike ${design.activation.toFixed(2)} · pickup ${design.pickup.toFixed(2)}`;
  const svg=$('body'),L=design.lengthMm*5.5,W=design.widthMm*5.5;
  const add=(tag,attrs)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,v);svg.append(el);};
  add('rect',{x:25,y:20,width:35,height:160,fill:'#64716d'});add('rect',{x:60,y:100-W/2,width:L,height:W,fill:'#bed5c42a',stroke:'#bed5c4','stroke-width':2});
  for(const [u,color,dash] of [[design.activation,'#e2b777','6 4'],[design.pickup,'#90ccd8','none']])add('line',{x1:60+u*L,x2:60+u*L,y1:25,y2:175,stroke:color,'stroke-width':dash==='none'?2:4,'stroke-dasharray':dash});
  controls('idle',0);
+ if(kept){$('keep-note').textContent='This address carries a kept pass. It opens quietly; choose Replay when ready. New playing does not change the address.';capture.load(kept).catch(error=>{$('keep-note').textContent=error.message;});}
 }catch(error){design=null;controls('error',0);$('status').textContent=error.message+' Return to Shape the body to choose a valid instrument.';}

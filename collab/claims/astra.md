@@ -504,3 +504,7 @@ Tine live host and playing surface: owns new live-session.js/tests, tine-play.ht
 Tine live reconstruction: owns new src/tine/live-record.js and tests/tine-live-record.test.js; strict body/sample-frame/ending record, all-or-refuse validation and exact same-pass reconstruction before keep/replay UI. Browser live harness integration owned.
 
 Tine replay integration: owns live-capture.js/live-render-worker.js, capture tests and play-main.js/tine-play.html controls. Preserve prior complete PCM across pending/failed/interrupted attempts, asynchronous reconstruction, explicit replay and Quiet, no portable record UI yet.
+
+Tine live quiet return: owns live-address.js/tests, live-capture record loader and play-main/tine-play keep/reopen integration. Explicit address update from completed capture only; strict bounded fragment, silent asynchronous reconstruction, no autoplay or implicit overwrite.
+
+Live tine discovery: owns project.html and src/project-catalog.js copy/catalog update for the completed shape→play→replay→keep route and its history milestone; local preview only.
