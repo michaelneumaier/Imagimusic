@@ -616,3 +616,9 @@ Living phrase continuity complete: in-place replay, shared lifecycle and native 
 Living alternate bodies: owns src/living/main.js/scene.js and living.html/css. Preserve original phrase while preparing65/95mm variants through existing comparison worker; change drawn length only between performances.
 
 Living alternate bodies complete: original/longer/shorter discovery and native return evidence recorded; claim released.
+
+Living phrase arrangement foundation: owns src/living/arrangement.js, arrangement-worker.js, tests/living-arrangement.test.js and tools/render-living-arrangement.mjs. Render solo/three-body answer/return from exact accepted phrase with explicit stereo staging, no mechanical coupling.
+
+Living arrangement discovery: owns living.html listening-sketch link and tools/prepare-project-home.mjs registration.
+
+Living arrangement foundation and discovery complete: deterministic renderer, worker, tests and local listening proof saved; claims released. Interactive adapter/ensemble scene remain next work.
