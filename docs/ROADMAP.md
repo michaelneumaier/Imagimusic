@@ -183,7 +183,9 @@ Implemented locally at living.html: procedural steel blade/clamp/cradle; accepte
 
 Evidence and limits: collab/notes/astra-living-instrument.md carries exact source frames, numerical/native checks and commit trail. Existing model/capture/replay modules reused; no new hammer contact, radiation, acoustic room, physical coupling, continuous morph or carryover of still-ringing state across separately ended passes. The veil is a conservative retained-mode displacement bound at100,000×, not slow vibration or measured blur. Camera/light/material choices and stereo pan are artistic. Native Safari evidence is not a physical-phone or calibrated audio/display-latency claim. Fable review is pending, not assumed.
 
-Next sequence: refine the first minute’s composition and presentation; extend the kept recipe into local file/film export; render/reopen a film from that recipe; evaluate with listeners before expanding the world. Existing catalog routes and scientific studies remain available. Proposal024 is a flagship direction, not a replacement for the existing model contracts.
+Film keeping is now available from the visitor’s original phrase: silent worker preparation, canonical720p/30fps scene, H.264/AAC film plus source PCM16 WAV, recipe and manifest downloads. Cancel/Quiet preserve the original and prior successful film. Source fingerprints identify a render; measured cross-engine Float32 differences are documented. The recipe file is archival/reconstructable through the tools; browser reopening currently uses the address.
+
+Next sequence: refine the first minute’s composition and presentation; make the file recipe directly reopenable; evaluate with listeners before expanding the world. Existing catalog routes and scientific studies remain available. Proposal024 is a flagship direction, not a replacement for the existing model contracts.
 
 ## M18: One sound, possible bodies, an honest inverse-design foundation (status: local inverse workshop, source audition and returnable resonance sketches; 2026-11-03; arbitrary-recording interpretation remains research)
 

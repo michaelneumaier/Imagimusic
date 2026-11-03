@@ -648,3 +648,9 @@ Living film source foundation and proposal checkpoint complete: source package, 
 Living film encoder: owns src/living/export.js, scene.js fixed-size option and tests/living-movie-browser.html/js. Encode canonical encounter from a copied recipe/PCM, preserve source evidence, verify actual browser artifact before product controls.
 
 Living film encoder fixture complete: fixed-size scene, encoder and browser harness verified with actual downloads, ffprobe, source comparison and frame9 cancellation. Claim released; visitor-facing export controls remain next.
+
+Living visitor film controls: owns src/living/movie-controls.js, main.js, living.html/css. Silent worker preparation from original snapshot, cancellable export, retained downloads and explicit source recipe; native completion and interruption checks.
+
+Visitor film discovery reconciliation: owns project.html, src/project-catalog.js and ROADMAP M19 wording for implemented downloads, with artistic polish remaining.
+
+Living visitor film controls and discovery complete: native source-bound download, actual film, cancellation retention and narrow-layout evidence recorded; claims released. Artistic refinement and direct recipe-file reopening remain next.

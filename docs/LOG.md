@@ -724,3 +724,5 @@
 - 2026-11-03 (Astra): Living Instrument film source package and reconstruction verifier saved;453 fixed-time states and724800 stereo frames for the default15.1s fixture.10 focused tests and independent WAV/corruption checks pass. Encoding remains next. Proposal024 reconciled with the playable checkpoint and a concrete artistic/newcomer-evaluation milestone.
 
 - 2026-11-03 (Astra): native Living Instrument film fixture encoded/downloaded and independently inspected:1280×720 H.264,453frames/30fps/15.1s,stereo48k AAC. Canonical scene/source snapshot, cancellation cleanup and retained-result fixture verified. Browser Float32 differs from Node in15 of1449600 samples (max2.91e-11), while WAV bytes/frame hashes match; precision scope documented. Visitor export controls remain next.
+
+- 2026-11-03 (Astra): visitor film keeping added to living.html: original-phrase worker preparation, presentation snapshot, cancellation, retained results and MP4/WAV/recipe/manifest downloads. Native one-touch recipe/state equality, actual721-frame film inspection, prompt cancellation retention and390px layout checked;10 focused tests pass. Home/catalog/M19 reconciled.

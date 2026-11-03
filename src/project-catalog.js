@@ -1,6 +1,6 @@
 import {renderNotebook} from './project-notebook.js';
 const entries=[
- ['The Living Instrument','living.html','Encounters','Prototype','Play a steel blade, carry your phrase into longer and shorter bodies, then unfold three independent voices and return to the original. Optional magnified response veils and camera journey. Keep the versioned encounter in its address for a quiet return. Four-mode physical model; no acoustic radiation or coupling between the three bodies.'],
+ ['The Living Instrument','living.html','Encounters','Prototype','Play a steel blade, carry your phrase into longer and shorter bodies, then unfold three independent voices and return to the original. Optional magnified response veils and camera journey. Keep the versioned encounter in its address for a quiet return, or prepare a local film with soundtrack and recipe downloads. Four-mode physical model; no acoustic radiation or coupling between the three bodies.'],
  ['Start here','welcome.html','Encounters','Playable','Three gentle doors into the project: listen, play, and rest a hand.'],
  ['Listen','listen.html','Encounters','Playable','Follow a sound between connected bodies in a short guided encounter.'],
  ['The Grove','grove.html','Encounters','Playable','One instrument with three connected bodies. Strike one and watch the others respond. Choose its original voice or explore a voice with higher partials.'],

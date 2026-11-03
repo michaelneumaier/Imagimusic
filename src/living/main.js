@@ -1,3 +1,4 @@
+import {createLivingMovieControls} from './movie-controls.js';
 import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
 import {createLivingArrangementView} from './arrangement-view.js';
@@ -17,12 +18,12 @@ $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
 motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-motion').checked=!motionPreference.matches;});
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
-let restoreVersion=0;
+let restoreVersion=0,movie=null;
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
- const state=session?.state??'idle',busy=active(state),repeat=listening();
+ const state=session?.state??'idle',busy=active(state)||!!movie?.busy,repeat=listening();
  $('begin').disabled=!world||busy||repeat;
  $('touch').disabled=repeat||state!=='playing'||session.touches>=8;
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
@@ -31,6 +32,7 @@ function controls(){
  $('keep-encounter').disabled=!world||busy||repeat||capture.pending||!capture.current;
  $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
  for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
+ movie?.refresh();
  if(repeat&&unfolding){$('touch-count').textContent='Your phrase unfolding';return;}
  $('touch-count').textContent=repeat?`${replayCount} / ${selectedPCM.record.events.length} remembered ${selectedPCM.record.events.length===1?'touch':'touches'}`:`${session?.touches??0} / 8 touches`;
 }
@@ -137,13 +139,15 @@ $('reveal').addEventListener('change',()=>{if(!$('reveal').checked){if(unfolding
 $('touch').addEventListener('click',touch);
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('quiet').addEventListener('click',()=>{
+ if(movie?.busy){movie.cancel();return;}
  if(listening()){cancelArrangement();replay.stop();$('playing-status').textContent='Replay stopped. Your phrase is unchanged.';return;}
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});
-function park(){restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
+function park(){movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
+movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!!capture.current,onChange:controls});
 controls();
 
 $('keep-encounter').addEventListener('click',()=>{
