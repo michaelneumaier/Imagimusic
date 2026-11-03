@@ -164,3 +164,9 @@ Native Safari opened the named After the rain file silently, selected a left clo
 Separated the return page's Listen/Quiet transport from its keeping actions and made that two-button group sticky within the passage section. The WAV/gesture actions retain their own labeled group. This keeps the action that stops listening reachable when scrolling to inspect a body, without making export controls occupy the narrow view. Playback handlers and record data are unchanged.
 
 Native Safari responsive preview at 390 × 656 opened the existing named gesture file, selected the left close view, started original playback and scrolled over the scene. A screenshot showed the full scene with the pinned Listen/Quiet row; replay was at 4.9/17.7 seconds. Clicking the pinned Quiet changed the state to READY at 11.8 seconds, disabled Quiet and reported that the saved passage is unchanged. Responsive preview was exited afterward. This is a concrete narrow desktop-preview check, not a real-phone test. Diff validation passes; no new tests were added for the HTML/CSS grouping change.
+
+## November 3 — The chosen name leads the return
+
+The returned-passage heading now presents the filename's label without the app's standard prefix or JSON extension. The opened filename remains on a separate wrapping source line, and export names continue to derive from the unchanged session filename. An unnamed default file reads A kept passage. This is display treatment only: it does not infer authorship, comparison provenance or embedded metadata from a filename.
+
+Native Safari reopened imagimusic-touch-After the rain.json silently and showed After the rain as the heading, the source filename below it, and unchanged paired download names. Syntax/diff checks pass; no new tests were added for this display-only edit. The reader's pre-existing bounded filename handling is unchanged.

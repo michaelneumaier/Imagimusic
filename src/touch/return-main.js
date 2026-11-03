@@ -35,7 +35,9 @@ function sync(){
 }
 function show(result){
  visual=rebuildTouchRecord(result.record).session;shown=result;played=null;
- $('passage').hidden=false;$('name').textContent=result.name;
+ $('passage').hidden=false;
+ const label=result.name.replace(/\.json$/i,'').replace(/^imagimusic-touch(?:-|$)/,'').trim();
+ $('name').textContent=label||'A kept passage';$('source-name').textContent='Opened from '+result.name;
  $('version').textContent=result.targetId?`COMPARISON · ${result.targetTitle}`:'THE ORIGINAL CONNECTION';
  $('save').textContent=result.targetId?`Keep ${result.targetTitle} WAV ↓`:'Keep original WAV ↓';
  $('save-gestures').textContent=result.targetId?`Keep ${result.targetTitle} gestures ↓`:'Keep original gestures ↓';

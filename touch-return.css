@@ -4,3 +4,5 @@
 .view-choice{display:flex;align-items:center;gap:10px;margin-top:24px;font-size:14px;color:#d8c8e5}.view-choice input{accent-color:#d8c8e5;width:18px;height:18px}
 
 #replay-transport{position:sticky;top:0;z-index:5;background:#141a22;padding:12px 0;margin-bottom:16px;border-bottom:1px solid #59616c}#replay-transport #quiet{flex:0 0 auto}#replay-transport #listen{flex:1 1 auto}@media(min-width:601px){#replay-transport #listen{flex:0 1 auto}}
+
+#source-name{overflow-wrap:anywhere}
