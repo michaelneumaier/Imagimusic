@@ -1,4 +1,5 @@
 import {createInverseJobs} from '../src/inverse/jobs.js';
+import {prepareTineRequest} from '../src/tine/preparation.js';
 import {renderTinePhrase} from '../src/tine/phrase.js';
 import {renderTineImpulse} from '../src/tine/render.js';
 import {createGroveReplay} from '../src/grove/replay.js';
@@ -27,5 +28,9 @@ try{
  assert(bundle.single.channels[0].every((x,i)=>x===reference.channels[0][i])&&bundle.phrase.channels[0].every((x,i)=>x===phrase.channels[0][i])&&bundle.phrase.frames===phrase.frames,'Bundle sample mismatch');
  try{await jobs.run({kind:'unknown',geometry,options});throw Error('Unknown kind accepted');}catch(error){assert(error.message.includes('Unsupported tine'),'Wrong kind refusal');}
  const phraseError=await checkGraph(bundle.phrase,phrase);
- document.getElementById('result').textContent=`PASS 8/8\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nAtomic single/phrase bundle matches direct samples; unknown kinds refuse.\nFull phrase offline replay graph: maximum sample error ${phraseError}.\nNo hardware output or live latency measured.`;
+ const pairRequest={kind:'phrase-pair',timing:{firstGapMs:2000,secondGapMs:200},bodies:[{geometry,options},{geometry:{...geometry,widthM:.02},options}]};
+ const pair=await jobs.run(pairRequest),pairReference=prepareTineRequest(pairRequest);
+ assert(pair.phrases.every((p,k)=>p.channels[0].every((x,i)=>x===pairReference.phrases[k].channels[0][i])),'Timing pair worker mismatch');
+ const timingError=await checkGraph(pair.phrases[0],pairReference.phrases[0]);
+ document.getElementById('result').textContent=`PASS 10/10\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nAtomic single/phrase bundle matches direct samples; unknown kinds refuse.\nFull phrase offline replay graph: maximum sample error ${phraseError}.\nChanged timing pair matches both direct renders; offline error ${timingError}.\nNo hardware output or live latency measured.`;
 }catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}finally{jobs.cancel();replay?.dispose();}

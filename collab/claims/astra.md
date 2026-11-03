@@ -490,3 +490,5 @@ Tine phrase foundation: owns new src/tine/phrase.js and tests/tine-phrase.test.j
 Tine phrase integration: owns envelope.js/response-view.js/render-worker.js/main.js/tine.html plus tine browser and envelope tests. Prepare single and phrase atomically; comparison audition choice is explicit; pictures sum only arrived impulse bounds, preserving fixed scale and quiet saved return.
 
 Homepage geometry invitation: owns project.html and existing homepage evidence/roadmap/log. Feature the now-playable geometry comparison among the two primary invitations; retain the expressive route nearby and give a concrete prepare/hold/change/keep path without implying acoustic recovery or measured appeal.
+
+Tine timing variation: owns src/tine/timing.js, preparation.js, tests/tine-timing.test.js and existing worker integration. Two bounded gaps vary timing with unchanged strengths; prepare both comparison phrases as one result so no partial rhythm update is installed.

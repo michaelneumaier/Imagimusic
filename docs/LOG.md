@@ -643,3 +643,5 @@
 - 2026-11-03 — Astra: complete phrase offline replay verifies every sample at zero error; Safari harness 8/8. Native 390×656 layout and keyboard phrase selection, Listen→Quiet→Listen focus and stop-on-choice pass. Full regression 737/737, concurrency 2, 156.574 s; no hardware/listener or phone claim.
 
 - 2026-11-03 — Astra: project home features the geometry-derived returning phrase beside Touch, with a collapsible first-comparison/keep guide. Expressive voices remains linked nearby. Native desktop and 390×656 guide layout inspected; featured link verified to land quietly on unprepared tine. No runtime change or new appeal claim.
+
+- 2026-11-03 — Astra: optional tine timing editor stages two gaps and atomically prepares one shared rhythm for current/held bodies. Strengths and final four-second tail stay fixed; rhythm remains visit-local. All 361 timing pairs checked, affected group 16/16; Safari harness 10/10 with changed-timing graph error0, desktop keyboard staging/apply/focus and held identity verified.
