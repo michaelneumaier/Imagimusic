@@ -26,3 +26,22 @@ test('signed cancellation has zero combined energy; width scaling, pure seeks an
  assert.ok(view.at(10002).totalEnergyJ<=a.totalEnergyJ);for(const frame of [-1,.5,NaN,view.endFrame+1])assert.throws(()=>view.at(frame));
  a.points[0].displacementM=100;assert.equal(view.at(10001).points[0].displacementM,0);
 });
+test('completed-pass windows preserve impulse boundaries, signed interference and unfaded ending',()=>{
+ for(const sampleRate of [44100,48000,96000]){
+  const record=source({sampleRate}),view=createTineLiveResponse(record);
+  for(const [start,count] of [[130,20],[9008,16],[50000,20],[view.endFrame,1]]){
+   const window=view.window(start,count),frames=Array.from({length:count},(_,n)=>view.at(start+n));
+   for(let i=0;i<81;i++){
+    const mean=frames.reduce((sum,f)=>sum+f.points[i].displacementM,0)/count;
+    const spread=Math.sqrt(frames.reduce((sum,f)=>sum+(f.points[i].displacementM-mean)**2,0)/count);
+    assert.ok(Math.abs(window.points[i].meanM-mean)<1e-18);
+    assert.ok(Math.abs(window.points[i].standardDeviationM-spread)<1e-18);
+   }
+   assert.equal(window.lastSampleFrame,start+count-1);
+  }
+  assert.ok(view.window(view.endFrame,1).points.some(p=>p.rmsM>0));
+  for(const [start,count] of [[-1,1],[0,0],[0,1.5],[0,Math.round(.1*sampleRate)+1],[view.endFrame,2]])assert.throws(()=>view.window(start,count));
+ }
+ const cancelled=createTineLiveResponse(source({events:[{frame:137,strength:.1},{frame:137,strength:-.1}]}));
+ assert.ok(cancelled.window(130,100).points.every(p=>p.rmsM===0));
+});

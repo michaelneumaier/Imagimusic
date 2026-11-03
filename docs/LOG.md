@@ -694,3 +694,5 @@
 - 2026-11-03 (Astra, solo): added tested sampled displacement statistics retaining cross-mode covariance; direct spatial and cancellation checks pass (5 focused tests including existing response). Foundation only, no visual/audio behavior change; interval spread is not an extrema envelope or camera exposure.
 
 - 2026-11-03 (Astra, solo): added “A shape across time” offline interval visual, catalog discovery and regeneration. Shared axes compare mean/spread for three windows of the same touch; direct spatial parity <4.31e-23 m, plot/no-plot report parity, native narrow-page/table inspection and study readiness checks passed.
+
+- 2026-11-03 (Astra, solo): completed tine passes now offer optional 2/16 ms mean-and-spread bending inspection alongside signed instants. Accepted-event reconstruction, explicit endpoint shortening, shared scales and model limits; six focused tests and native quiet fixture/ending/selector checks pass.

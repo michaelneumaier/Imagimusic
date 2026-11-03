@@ -576,3 +576,9 @@ Offline displacement study: owns tools/render-tine-displacement-study.mjs and to
 Displacement study discovery: owns src/project-catalog.js and tools/prepare-project-home.mjs additions for the offline visual page.
 
 Offline displacement study and discovery complete: generator/plot, catalog/preparation, numerical and native narrow checks recorded; claims released.
+
+Completed-pass interval inspection: owns src/tine/live-response.js, live-response-view.js, play-main.js, tine-play.html and response tests. Add bounded sampled windows and optional mean/spread display using actual accepted events.
+
+Completed-pass interval catalog wording: owns the Touch a ringing body description update in src/project-catalog.js.
+
+Completed-pass interval inspection and catalog update complete; focused and native fixture checks recorded, claims released.

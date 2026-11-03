@@ -8,7 +8,7 @@ import {createTineComparisonSession} from './live-comparison-session.js';
 import {createTineLiveResponseView} from './live-response-view.js';
 import {createGroveReplay} from '../grove/replay.js';
 const $=id=>document.getElementById(id);let design=null,raf=0,wantsFocus=false,returnFocus=false;
-const spatial=createTineLiveResponseView({details:$('spatial-inspection'),svg:$('spatial-picture'),selector:$('spatial-source'),slider:$('spatial-frame'),previous:$('spatial-previous'),next:$('spatial-next'),caption:$('spatial-caption'),reading:$('spatial-reading'),zoom:$('spatial-zoom'),scale:$('spatial-scale')});
+const spatial=createTineLiveResponseView({details:$('spatial-inspection'),svg:$('spatial-picture'),selector:$('spatial-source'),slider:$('spatial-frame'),previous:$('spatial-previous'),next:$('spatial-next'),caption:$('spatial-caption'),reading:$('spatial-reading'),zoom:$('spatial-zoom'),scale:$('spatial-scale'),interval:$('spatial-interval')});
 const liveActive=state=>['preparing','playing','ringing','ending'].includes(state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('touch-strength').disabled=!design||listening||(active&&state!=='playing');$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;$('download-pass').disabled=active||capture.pending||!capture.current;
