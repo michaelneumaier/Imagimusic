@@ -9,3 +9,5 @@
 .film-downloads{display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0}.film-downloads a{padding:.7rem 1rem;border:1px solid #62777c;border-radius:.35rem}.film p{max-width:65ch}
 
 .recipe-open input{display:block;max-width:100%;margin:1rem 0;font:inherit;color:inherit}
+
+.intro .intro-note{font-size:.9rem;line-height:1.6;max-width:40ch;color:#a9b6b9}.intro #hear-first{margin-top:1rem;pointer-events:auto}

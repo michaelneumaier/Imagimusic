@@ -133,3 +133,12 @@ Native Safari390×656: the actual downloaded recipe restored frame144128/strengt
 The reopened still-view source also entered explicit Hear again playback on the80mm body; file input disabled during replay, and Quiet stopped it while restoring replay/file availability.
 
 Full keepsake checkpoint:799/799 tests pass, zero failures/cancellations/skips,214.274236459seconds with concurrency2; log /tmp/imagimusic-living-keepsake-suite.log. This establishes tested mechanics and lifecycle contracts, not musical appeal or physical-device performance.
+
+
+## A listening-first invitation
+
+Hear it first now plays a15.1s authored source through the same solo/three-body/return arrangement, worker and audio-clock scene. greeting.js declares touches at0.5/1.15/2.2s with strengths0.1/0.025/0.05 and a4s ended phrase. The source is separate from capture/comparison; no example is offered as the visitor’s own record. Example labels cover chapter/status/counts, Quiet remains available, and completion invites Begin without automatically mounting live input. Current reveal/camera/listening preferences apply.
+
+Native Safari390×656: fresh page remains quiet, Hear it first starts0/15 example touches, and the return reached15/15. Natural completion focused Begin; Hear again/Unfold/Keep remained unavailable on the empty visitor session. A subsequent real touch at frame45568 and ending263936/48k was captured, then95mm selected. Hear it first used the80mm example; Quiet restored the95mm selection, enabled visitor replay/keeping, and left the original80mm handoff record exact. This establishes source separation and interaction, not an audience judgment or calibrated listening result.
+
+The first pointer attempt exposed inherited pointer-events:none on the intro region; the new button explicitly enables pointer events, then native playback passed. Initial no-hash load now avoids calling park/restore, preventing a misleading interruption message on arrival.12 focused greeting/arrangement/view/replay tests pass; new greeting test checks a fresh bounded source, exact motif timing and exact original solo/return samples. Last full suite remains799 from the preceding checkpoint; no new full800 claim.

@@ -660,3 +660,7 @@ Living recipe reopening: owns src/living/recipe-file.js, tests/living-recipe-fil
 Recipe reopening milestone reconciliation: owns project/catalog, M19, proposal024 current checkpoint and append-only evidence for the completed quiet file return path.
 
 Living recipe reopening and milestone reconciliation complete: bounded reader, quiet file return, presentation restoration, wrong-kind retention and native replay verified; full799 regression passes. Claims released. Next: compose the listening-first introduction and refine the first minute.
+
+Living listening-first introduction: owns greeting.js, main.js, living.html/css and greeting tests. Explicit authored example on shared arrangement/replay path, no capture replacement; clear example labels and return to selected visitor body. Also correct initial no-hash restore dispatch so opening remains quiet rather than reporting interruption.
+
+Living listening-first introduction and home/catalog/M19 reconciliation complete: authored source, shared playback adapter and native source-separation/return evidence recorded; claims released. Next: artistic comparison of sound, framing and reveal; listener evaluation remains open.
