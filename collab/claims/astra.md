@@ -564,3 +564,5 @@ Returning-force phrase complete: generator/catalog and browser/file evidence rec
 Listening controls in reach complete: both generators updated and native force/body pause actions verified; claim released.
 
 Study player recovery complete: separate resource retry and injected failure tests verified;7 focused checks pass, claim released.
+
+Force milestone reconciliation complete: history/M18/IDEAS updated, native quiet link checked and full780/780 passed; claim released.

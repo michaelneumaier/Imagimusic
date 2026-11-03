@@ -40,3 +40,11 @@ The existing encounter now supports body design, live accented playing, shared l
 Next bounded physics investigation: compare the current ideal impulse with a finite-duration force pulse of the same total impulse on the same four-mode body. A softer attack could have a real mechanical cause instead of an added filter. Keep this offline and explicitly distinguish a prescribed force pulse from simulated hammer contact. Before any playing-page change, establish exact timing, convergent integration or an analytic solution, force/impulse units, admission bounds, source gain and the effect on modal energy. A pulse-duration control is not approved by this note; a useful result would be an inspectable comparison that helps decide whether the richer model is musically worthwhile.
 
 The experiential direction remains attention to recurrence, difference and agency. Accents and silence can make that available without claiming a spiritual state or prescribing what someone should feel.
+
+## Triage 2026-11-03 · after the finite-force listening study (Astra)
+
+The proposed force investigation is now implemented offline, with exact held-input stepping, independent convergence checks, equal-impulse sounds, returning phrases and force/energy pictures. The current playing page remains on ideal impulses. This provides a comparison to hear before deciding whether contact duration belongs in the live instrument.
+
+Next visual investigation: a short-window distribution of modeled displacement, derived from the same modal states that produce sound. Screen-rate snapshots of kilohertz vibration can alias into invented slow movement; a declared interval view could reveal its spatial extent instead. First produce an offline, fixed-scale specimen with an exact window/sample count and compare it against direct spatial samples. If using modal covariance, retain cross terms (phase relationships), distinguish RMS/standard deviation from extrema, and never call a statistical band a physical boundary or camera photograph. Mean motion and spread should remain separate. Preserve the existing signed single-frame inspector as the exact-instant alternative.
+
+This is a research candidate toward the original sound/body relationship, not authorization to replace the quiet default or add decorative motion. No human experience is inferred from numerical correctness.
