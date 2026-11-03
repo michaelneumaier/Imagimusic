@@ -111,3 +111,14 @@ Native Safari changed the Loom controls to observed values frequency 600, coupli
 The Loom control handler now replaces the current URL with the existing validated composition URL after each tuning input. It preserves the composition's enabled flags and other settings, as well as unrelated source query parameters, rather than creating a new history entry for every slider movement. The notes explain that a bookmark/link keeps settings only, opens quietly, and does not preserve notes or audio.
 
 Native Safari dragged the frequency slider from 600 to 311 Hz. The address changed to frequency 311 with coupling 0, detune -120 and loss 0.2 unchanged. Reload restored all four displayed values and READY · STRIKE EITHER BODY. This verifies an actual input event and reload, not merely a manually constructed URL. Five existing composition-link checks pass, including independent FM flags, instrument parameters and score preservation; syntax/diff checks pass. No new persistence store or file schema was introduced.
+
+
+## 2026-11-03 — Loom first-use layout and independent continuation
+
+Michael reports that Fable has run out of credits and explicitly asks Astra to continue without them for now. Development continues independently; outstanding peer reviews retain their actual pending status. Fable-owned uncommitted work and the canonical mailbox are preserved. This is not a peer approval or a project completion checkpoint.
+
+The Loom strike, conversation and Quiet controls now precede the scene. A page-scoped stylesheet bounds scene height and lets the primary controls wrap at narrow widths. Wheel zoom is disabled only for this Loom instance so scrolling over the scene can reach tuning and explanatory content; drag orbit remains available. Shared world controls and stage styles are unchanged.
+
+Native Safari on November 3 showed all four primary controls above both bodies on entry. Scrolling over the canvas moved the page scrollbar from 0 to 0.6940994. A subsequent fresh visit and horizontal drag visibly rotated the bodies and platform. Strike left entered STRIKE LEFT with advancing time and enabled Save stereo WAV; Quiet returned READY. These are desktop interaction observations, not phone-touch or acoustic-quality validation. The sound model and its stated realism limitations are unchanged. Syntax and whitespace checks passed; this layout-only change does not warrant a new signal-processing regression suite.
+
+The next creative milestone should consolidate the existing design → play → keep → return path into a coherent invitation. The six-connection listening study and history-reading exercise remain useful evidence sources, with human appeal and interpretation still unestablished. Spirituality and psychedelia should emerge through attention, agency, resonance and returning to one's own gestures, without prescribing a psychological result.

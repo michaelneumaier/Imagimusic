@@ -11,6 +11,7 @@ let initialSettings={...DEFAULT_LOOM},initialComposition={version:1,loom:{enable
 try{initialComposition=readCompositionSearch(location.search);initialSettings=initialComposition.loom.settings;}catch(error){$('status').textContent=error.message+'. Using the default Loom.';}
 let settings=initialSettings,study=makeLoom(settings),context,source,gain,origin=0,playing=false,pcm=null,request=0,passage=null,renderJob=null,studyTime=0,studying=false;
 const world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;
+world.controls.enableZoom=false;
 world.rail.visible=false;world.camera.position.set(6,4.5,9);world.controls.target.set(0,1.1,1);world.controls.update();
 const loom=world.loom;loom.root.position.set(0,0,1);loom.root.scale.setScalar(1);loom.root.visible=true;
 const inspector=mountStudyInspector({world,canvas:$('world'),bindings:LOOM_BINDINGS,getPatch:()=>({loom:{...settings,score:passage?.events??[{time:0,body:study.body,velocity:1}]}}),parts:[

@@ -1,0 +1,2 @@
+.loom-play{padding:0 0 18px;border-bottom:0}.stage canvas{height:clamp(260px,48vh,520px)}
+@media(max-width:760px){.loom-play button{flex:1;min-width:110px}.stage canvas{height:clamp(240px,42svh,420px)}}
