@@ -459,3 +459,9 @@ Completed spatial sketch construction study (stable): src/sketch/spatial.js, tes
 Completed first spatial sketch page (stable): sketch-space.html/css, src/sketch/space-main.js and spatial-worker.js, tests/sketch-space-browser.html/js, owned sketch.html/main.js handoff. Explicit kept-source handoff, staged activation/pickup profiles and signed weights, worker-rendered fixed-gain audition, node silence, Quiet/visibility cancellation, source-return link; spatial positions remain visit-local and are labelled as such.
 
 Completed spatial pair comparison (stable): owned sketch-space.html and space-main.js. Explicit visit-local held pair, current/held audition through one replay lifecycle, exact prepared identities and fixed gain, draft independence and release; no new persistence or model change.
+
+Completed spatial narrow-layout refinement (stable): owned sketch-space.html/css. Adjacent current/held listening choices, preparation next to position controls, direct listening/position navigation and an optional numerical table; preserve visible authored profiles and all existing IDs/transport behavior.
+
+Completed spatial layout navigation (stable), src/sketch/space-main.js: scroll buttons preserve the source-bearing URL fragment.
+
+Completed spatial checkpoint reconciliation (stable): docs/ROADMAP.md and owned project.html history; record completed spatial study and preserve remaining geometry ambition.
