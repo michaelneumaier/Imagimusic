@@ -61,3 +61,11 @@ Updated the current-edge and catalog dates, added an optional three-step design/
 The roadmap now names a coherent first encounter as the next milestone: first gesture, understandable response, recognizable kept passage and clear return. Its evidence link opens the six-connection study as research, without promoting its measured signal differences into claims of appeal or new production presets. The history includes the custom-setting and naming milestones, concrete Safari checks, open device/listening questions and independent continuation while Fable is unavailable. Pending reviews remain pending.
 
 Native Safari verified the November 3 current-edge label, the expanded three-step guide, the new history heading and the roadmap study button opening the correct notebook content/source. Syntax and diff checks pass. This is discoverability and accurate project documentation, not a visitor reading result.
+
+## November 3 — Listening research is discoverable
+
+Added Room between touches and A touch meets a ring to the listening-study catalog using its existing generated-file availability checks. Their labels distinguish controlled authored examples from playable encounters and avoid claims about preference or consciousness. Both evidence notes are available in the project notebook. The generated studies remain reproducible local artifacts rather than committed media.
+
+Native Safari showed both enabled study links; searching “milliseconds” narrowed the collection to the interference study (1 of 34 entries). The recurrence notebook button loaded its correct rendered note and source link. A local reference check found all 59 unique project-home/catalog file references present in this working copy. This does not establish availability in another checkout; the catalog retains its existing availability checks.
+
+After the November 3 naming, timing-study and cue-clarification changes, the complete npm test suite passed 692/692 with zero failures, cancellations or skips in 78.83 seconds. Log: /tmp/imagimusic-astra-nov3-suite.log. The suite includes five added checks since the prior 687-test checkpoint: three filename tests, one recurrence-study test and one meeting-audit test. Manual Safari and Python WAV checks remain separate evidence. Fable review, human listening, and broader device evaluation remain open.
