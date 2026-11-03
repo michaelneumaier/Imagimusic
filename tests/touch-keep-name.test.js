@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {touchKeepNames} from '../src/touch/keep-name.js';
+import {touchKeepNames,touchReturnKeepNames} from '../src/touch/keep-name.js';
 test('optional passage names pair sound and gestures while preserving recognizable Unicode',()=>{
  assert.deepEqual(touchKeepNames(),{sound:'imagimusic-touch.wav',gestures:'imagimusic-touch.json'});
  const names=touchKeepNames('  Cafe\u0301 after rain 🌙  ');
@@ -18,4 +18,21 @@ test('download labels stay bounded single filenames with their declared extensio
   assert.ok(names.sound.endsWith('.wav'));assert.ok(names.gestures.endsWith('.json'));
  }
  assert.deepEqual(touchKeepNames(' ... '),touchKeepNames());
+});
+
+test('named original and comparison filenames survive reopening without losing their label',()=>{
+ for(const name of ['After the rain','🌙'.repeat(40),'']){
+  const original=touchKeepNames(name);
+  assert.deepEqual(touchReturnKeepNames(original.gestures),original);
+  const comparison=touchReturnKeepNames(original.gestures,{targetId:'distant-cousins'});
+  assert.ok(comparison.gestures.endsWith('-distant-cousins-comparison.json'));
+  assert.notEqual(comparison.gestures,original.gestures);
+  assert.deepEqual(touchReturnKeepNames(comparison.gestures),comparison);
+ }
+ const foreign=touchReturnKeepNames('../CON/🌙'.repeat(100)+'.JSON',{targetId:'tight-weave'});
+ for(const name of Object.values(foreign)){
+  assert.ok(Buffer.byteLength(name)<255);assert.ok(!/[\/]/.test(name));
+  assert.ok(name.includes('-tight-weave-comparison.'));
+ }
+ assert.throws(()=>touchReturnKeepNames('name.json',{targetId:'../invalid'}));
 });

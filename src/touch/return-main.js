@@ -1,3 +1,4 @@
+import {touchReturnKeepNames} from './keep-name.js';
 import {touchConnectionHref} from './connection-link.js';
 import {createTouchReturnSession} from './return-session.js';
 import {rebuildTouchRecord} from './record.js';
@@ -32,6 +33,8 @@ function show(result){
  $('save').textContent=result.targetId?`Keep ${result.targetTitle} WAV ↓`:'Keep original WAV ↓';
  $('save-gestures').textContent=result.targetId?`Keep ${result.targetTitle} gestures ↓`:'Keep original gestures ↓';
  $('keep-note').textContent=result.targetId?'The gesture file reopens this connection as a standalone passage. It does not include the original or comparison history; keep your original file separately.':'The gesture file keeps this passage for another visit. Open it here to return to its sound and picture.';
+ const names=touchReturnKeepNames(result.name,{targetId:result.targetId});
+ $('keep-filenames').textContent=names.sound+' · '+names.gestures;
  const record=result.record,s=record.settings;
  $('facts').textContent=`${record.events.length} ${record.events.length===1?'gesture':'gestures'} · ${result.duration.toFixed(2)} seconds · ${record.sampleRate.toLocaleString()} Hz · ${record.ended?'saved Quiet ending':'natural ending'}`;
  $('settings').textContent=`${s.frequency} Hz base tuning · ${s.detune} cents detuning · coupling ${s.coupling} · loss ${s.loss}/s. Fixed output gain ${record.outputGain}; model pickup scale ${result.pickupScale.toPrecision(6)}.`;
@@ -74,8 +77,8 @@ $('prepare-comparison').onclick=async()=>{
  finally{if(own===comparisonGeneration){comparisonBusy=false;sync();}}
 };
 $('quiet').onclick=()=>{replay.stop();status('Quiet. The saved passage is unchanged.');};
-$('save').onclick=()=>{const result=shown;if(!result||session.state==='preparing'||comparisonBusy)return;const url=URL.createObjectURL(new Blob([stereoWav(result.pcm)],{type:'audio/wav'})),link=document.createElement('a');link.href=url;link.download=result.targetId?`imagimusic-touch-${result.targetId}-comparison.wav`:'imagimusic-touch-return.wav';link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
-$('save-gestures').onclick=()=>{const result=shown;if(!result||session.state==='preparing'||comparisonBusy)return;const url=URL.createObjectURL(new Blob([JSON.stringify(result.record,null,2)+'\n'],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download=result.targetId?`imagimusic-touch-${result.targetId}-gestures.json`:'imagimusic-touch-original-gestures.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+$('save').onclick=()=>{const result=shown;if(!result||session.state==='preparing'||comparisonBusy)return;const url=URL.createObjectURL(new Blob([stereoWav(result.pcm)],{type:'audio/wav'})),link=document.createElement('a');link.href=url;link.download=touchReturnKeepNames(result.name,{targetId:result.targetId}).sound;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+$('save-gestures').onclick=()=>{const result=shown;if(!result||session.state==='preparing'||comparisonBusy)return;const url=URL.createObjectURL(new Blob([JSON.stringify(result.record,null,2)+'\n'],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download=touchReturnKeepNames(result.name,{targetId:result.targetId}).gestures;link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
 window.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();if(session.state==='preparing')$('cancel').click();if(comparisonBusy)$('cancel-comparison').click();replay.stop();status('Quiet.'+(shown?' Your passage is still here.':''));}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)replay.stop();});
 window.addEventListener('pagehide',event=>{generation++;session.cancel();cancelComparison();if(event.persisted){replay.park();return;}closed=true;session.dispose();replay.dispose();world?.dispose();});
