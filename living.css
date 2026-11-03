@@ -7,3 +7,5 @@
 .bodies{margin:30px 0;padding:22px 0;border-top:1px solid #344047}.body-choices{display:flex;gap:10px;flex-wrap:wrap}.bodies p:not(.eyebrow){color:#aab8b5;font-size:14px;line-height:1.7;max-width:650px}.bodies a{font-size:14px}
 
 .film-downloads{display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0}.film-downloads a{padding:.7rem 1rem;border:1px solid #62777c;border-radius:.35rem}.film p{max-width:65ch}
+
+.recipe-open input{display:block;max-width:100%;margin:1rem 0;font:inherit;color:inherit}

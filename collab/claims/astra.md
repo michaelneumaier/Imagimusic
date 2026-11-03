@@ -654,3 +654,9 @@ Living visitor film controls: owns src/living/movie-controls.js, main.js, living
 Visitor film discovery reconciliation: owns project.html, src/project-catalog.js and ROADMAP M19 wording for implemented downloads, with artistic polish remaining.
 
 Living visitor film controls and discovery complete: native source-bound download, actual film, cancellation retention and narrow-layout evidence recorded; claims released. Artistic refinement and direct recipe-file reopening remain next.
+
+Living recipe reopening: owns src/living/recipe-file.js, tests/living-recipe-file.test.js and main/html file controls. Bounded local JSON reader, quiet validated reconstruction, stale-selection guard and presentation commit only after success; preserve prior phrase/downloads/address on refusal.
+
+Recipe reopening milestone reconciliation: owns project/catalog, M19, proposal024 current checkpoint and append-only evidence for the completed quiet file return path.
+
+Living recipe reopening and milestone reconciliation complete: bounded reader, quiet file return, presentation restoration, wrong-kind retention and native replay verified; full799 regression passes. Claims released. Next: compose the listening-first introduction and refine the first minute.

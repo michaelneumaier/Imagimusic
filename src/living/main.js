@@ -1,3 +1,4 @@
+import {readLivingRecipeFile} from './recipe-file.js';
 import {createLivingMovieControls} from './movie-controls.js';
 import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
@@ -25,6 +26,7 @@ const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
  const state=session?.state??'idle',busy=active(state)||!!movie?.busy,repeat=listening();
  $('begin').disabled=!world||busy||repeat;
+ $('open-recipe').disabled=!world||busy||repeat;
  $('touch').disabled=repeat||state!=='playing'||session.touches>=8;
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
  $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||!selectedPCM;
@@ -155,17 +157,25 @@ $('keep-encounter').addEventListener('click',()=>{
  try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
  catch(error){$('keep-note').textContent=error.message;}
 });
-async function restoreAddress(){
- if(!location.hash)return;
+async function restoreRecord(record,origin,note=$('keep-note')){
  park();const own=restoreVersion;
- try{
-  const record=readLivingAddress(location.hash);
-  $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
-  unfolding=false;world?.clearArrangement();$('keep-note').textContent='Opening your kept encounter quietly…';
-  await capture.load(record.source);if(own!==restoreVersion)return;
-  if(!capture.current||JSON.stringify(capture.current.record)!==JSON.stringify(record.source)){$('keep-note').textContent='This encounter could not be prepared. The original address is unchanged.';return;}
-  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
-  $('keep-note').textContent='Kept encounter reopened quietly: original touches, arrangement version and reveal choice restored. Listening level and manual camera position are not saved.'+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'');
- }catch(error){if(own===restoreVersion)$('keep-note').textContent='Could not open this encounter. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
+ unfolding=false;world?.clearArrangement();note.textContent='Opening your kept encounter quietly…';
+ await capture.load(record.source);if(own!==restoreVersion)return;
+ if(!capture.current||JSON.stringify(capture.current.record)!==JSON.stringify(record.source)){note.textContent='This encounter could not be prepared. Your previous phrase and address remain available.';return;}
+ // Commit presentation only after source reconstruction succeeds.
+ $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
+ $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
+ note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, arrangement version and reveal choice restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
 }
+async function restoreAddress(){
+ park();if(!location.hash)return;
+ try{await restoreRecord(readLivingAddress(location.hash),'this address');}
+ catch(error){$('keep-note').textContent='Could not open this encounter. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
+}
+$('open-recipe').addEventListener('change',async()=>{
+ const file=$('open-recipe').files?.[0];$('open-recipe').value='';if(!file)return;
+ park();const own=restoreVersion;$('recipe-note').textContent='Reading the selected recipe locally…';
+ try{const record=await readLivingRecipeFile(file);if(own!==restoreVersion)return;await restoreRecord(record,'a recipe file',$('recipe-note'));}
+ catch(error){if(own===restoreVersion)$('recipe-note').textContent='Could not open this recipe. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
+});
 window.addEventListener('hashchange',restoreAddress);restoreAddress();
