@@ -3,3 +3,5 @@
 .section-jump{background:transparent;border:0;color:#c6ded2;padding:8px 0;text-decoration:underline;text-underline-offset:4px}#shape,#hear{scroll-margin-top:16px}@media(max-width:540px){h1{font-size:2.8rem;margin:18px 0}.lead{font-size:1.25rem;line-height:1.45}header{padding-bottom:10px}main{padding-top:10px}.eyebrow{font-size:.68rem;letter-spacing:.1em}}
 
 .follow-choice{display:flex;gap:12px;align-items:center;margin:18px 0}.follow-choice input{width:20px;height:20px;accent-color:#bad6b8}#response-envelope{min-height:160px}#response-caption{min-height:4.8em}
+
+.reading-guide{padding:12px 0}.response-scale{margin:8px 0 18px}#picture-mode{max-width:440px}#response-caption{min-height:0}

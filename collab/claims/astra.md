@@ -480,3 +480,5 @@ Completed tine full-control-range admission (stable): owns render.js gain correc
 Completed first tine response picture (stable): owns src/tine/envelope.js, response-view.js, tests/tine-envelope.test.js and owned tine.html/css/main.js integration. Optional fixed-scale modal displacement-envelope bands follow the replay clock; distinguish bound from signed phase, mechanical decay from audition ending, prepared identity from draft.
 
 Tine response checkpoint also updates owned catalog copy, M18 and evidence notes.
+
+Completed tine response reading (stable): owns tine.html/css and response-view.js; picture-only modal selector, readable HTML scale and compact explanation. Audio remains the four-mode prepared response; inspect narrow layout and mode switching.
