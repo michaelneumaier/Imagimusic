@@ -415,3 +415,5 @@ Touch meeting audit: tools/audit-touch-meeting.mjs and tests/touch-meeting-audit
 Two-millisecond touch listening study: tools/study-touch-interference.mjs and its evidence note. Local rendered controls with identical prefix, one added right gesture or its two-millisecond shift; source records and WAVs only, no production behavior edits.
 
 Touch close views: src/touch/view-framing.js, tests/touch-view-framing.test.js and owned Touch UI. Optional body-specific fixed framing, stable full-admission bounds, previous orbit restoration, visual-only isolation with both pads and audio retained.
+
+Saved Touch close-view continuity: touch-return.html/src/touch/return-main.js and shared touch-view.css. Reuse live camera bounds and control styles; focus choice changes only the picture during original/comparison replay.

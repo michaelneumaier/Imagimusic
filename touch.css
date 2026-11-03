@@ -8,8 +8,6 @@
 
 .passage-name{margin-top:24px;max-width:640px}.passage-name label{display:block;font-size:14px;margin-bottom:8px}.passage-name label span{color:var(--muted)}.passage-name input{box-sizing:border-box;width:100%;max-width:400px;background:#17282b;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:12px;font:16px system-ui}.passage-name input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.passage-name p{font:12px/1.6 system-ui;color:var(--muted);margin:8px 0}.passage-name #keep-filenames{overflow-wrap:anywhere;font-family:ui-monospace,monospace}
 
-.touch-view{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.touch-view[hidden]{display:none}.touch-view button{font-size:12px;padding:10px 14px}.touch-view button[aria-pressed=true]{border-color:var(--accent);background:#35514b}.touch-view span{font-size:12px;color:var(--muted)}
 
 /* Touch sizes the scene container; the canvas must use that same visible area. */
 .experience canvas{height:100%}
-@media(max-width:700px){.touch-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.touch-view button{padding:10px 4px;font-size:11px}.touch-view span{grid-column:1/-1;line-height:1.5;min-height:3em}}

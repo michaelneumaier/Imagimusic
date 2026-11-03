@@ -1,0 +1,2 @@
+.touch-view{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.touch-view[hidden]{display:none}.touch-view button{font-size:12px;padding:10px 14px}.touch-view button[aria-pressed=true]{border-color:var(--accent,#d8c8e5);background:#35514b}.touch-view span{font-size:12px;color:var(--muted,#b7bdc6)}
+@media(max-width:700px){.touch-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.touch-view button{padding:10px 4px;font-size:11px}.touch-view span{grid-column:1/-1;line-height:1.5;min-height:3em}}
