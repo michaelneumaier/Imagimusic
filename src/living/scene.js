@@ -1,3 +1,4 @@
+import {LIVING_LOOKS} from './looks.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import {createSurfaceLighting} from '../stage/surface-lighting.js';
@@ -94,8 +95,15 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   for(let i=0;i<3;i++){bodies[i].response(reveal?frame.bodies[i].points:null);bodies[i].acknowledgeTouch(frame.bodies[i].touched);}
   render();
  }
+ function setLook(name){
+  const look=LIVING_LOOKS[name];if(!look)throw Error('Unknown visual treatment.');
+  scene.background.setHex(look.background);scene.fog.color.setHex(look.background);floor.material.color.setHex(look.floor);
+  ceramic.color.setHex(look.ceramic);bronze.color.setHex(look.bronze);steel.color.setHex(look.steel);
+  renderer.toneMappingExposure=look.exposure;scene.environmentIntensity=look.environment;
+  key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
+ }
  function clearArrangement(){controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
  function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,dispose};
+ return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,dispose};
 }

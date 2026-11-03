@@ -670,3 +670,9 @@ Living sound-space study: owns src/living/space-study.js, tests/living-space-stu
 Sound-space study discovery: owns src/project-catalog.js, tools/prepare-project-home.mjs and living.html model-details link. Register the local generated study and keep production audio unchanged.
 
 Living sound-space study and discovery complete: three treatments, exact source/report/WAVs,3 focused checks, independent file checks and native player/layout/parking evidence recorded. Claims released; no production-effect choice or listener verdict claimed.
+
+Living visual atmosphere workshop: owns src/living/looks.js, scene.js presentation-only setter, living-look.html and src/living/look-main.js. Compare unchanged geometry/timeline under three material/light palettes; silent still inspection, explicit shared audio and local PNG capture. Production defaults/film recipe remain unchanged.
+
+Visual workshop discovery: owns living.html model-details link and project.html flagship milestone link; keep one flagship catalog route rather than a new top-level entry.
+
+Living visual atmosphere workshop and discovery complete: native palette/PNG/time/playback/parking evidence recorded; claims released. Next: consolidate a visual direction around silhouette, support readability and veil contrast; no production treatment change yet.

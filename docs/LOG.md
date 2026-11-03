@@ -732,3 +732,5 @@
 - 2026-11-03 (Astra): Hear it first adds a15.1s authored entrance to the Living Instrument, preserving visitor capture and selected alternate body. Native empty-session completion, explicit Begin, retained-source/95mm restoration on Quiet checked;12 focused tests pass. This is a listening-first prototype, with artistic/listener evaluation still ahead.
 
 - 2026-11-03 (Astra): A little air around a phrase compares dry/close/wide artistic reflections from one unchanged Living greeting. Three deterministic WAVs/report and local manual-listening page generated;3 focused tests, independent dry-byte/hash/format checks and native narrow playback/pause/tab-away checks pass. Production sound stays dry; catalog43, preparation helper registered.
+
+- 2026-11-03 (Astra): local visual atmosphere workshop compares three light/material palettes around identical Living encounter state. Silent chapter/scrub, shared explicit audio and native1280×720 PNG capture verified; three stills inspected and playback/chapter/tab-away behavior checked. Production look stays unchanged; flagship/home links added.

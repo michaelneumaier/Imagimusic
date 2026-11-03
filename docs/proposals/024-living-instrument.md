@@ -132,6 +132,8 @@ Spirituality can enter through sustained attention and the return to something p
 
 The first sound comparison is now available: [A little air around a phrase](../../renders/living-space-study/index.html) holds the authored encounter fixed while comparing dry, close and wider artistic reflections. Shared gain and exact settings make the changes inspectable; a listening preference remains to be established. The playable scene still uses its dry source.
 
+The [visual atmosphere workshop](../../living-look.html) now compares warm studio, blue hour and pale morning at identical musical moments, with optional shared playback and PNG capture. Initial still inspection suggests a tradeoff: the pale support is easier to read while darker surroundings give the response veils more separation. This is an art-direction observation, not a visitor preference result. Production keeps the original look.
+
 ### Finish and evaluate the first minute
 
 1. Maintain the completed keeping loop while refining the piece: visitor-bound film/source downloads, quiet recipe-file reopening and prior-result retention are implemented. Actual films and cancellation have been checked. A source-state hash does not verify pixels or lossy AAC.
