@@ -1,10 +1,24 @@
+import {createGroveReplay} from '../grove/replay.js';
 import {readInverseSoundFile} from './sound-file.js';
 import {createInverseJobs} from './jobs.js';
 const $=id=>document.getElementById(id);
 const jobs=createInverseJobs({makeWorker:()=>new Worker(new URL('./sound-worker.js',import.meta.url),{type:'module'})});
 let generation=0,controller=null,current=null;
-function busy(value){$('cancel').hidden=!value;$('sound-file').disabled=value;$('clear').disabled=!current;}
-function cancel(){generation++;controller?.abort();controller=null;jobs.cancel();busy(false);}
+let playbackFrame=0;
+function playbackStatus(){
+ const active=['preparing','playing','suspended'].includes(replay.state);
+ $('listen').disabled=!current||!!controller||active;$('quiet').disabled=!active;
+ const labels={idle:'Ready when you are.',preparing:'Preparing to listen…',playing:'Listening',suspended:'Audio interrupted. Choose Quiet, then listen again.',ended:'The recording has ended.',error:'Playback unavailable. Try listening again.'};
+ const label=labels[replay.state];if($('playback-status').textContent!==label)$('playback-status').textContent=label;
+ $('playback-position').textContent=current?`${(['idle','preparing'].includes(replay.state)?0:replay.time()).toFixed(1)} / ${current.duration.toFixed(1)} s`:'';
+ cancelAnimationFrame(playbackFrame);playbackFrame=0;
+ if(replay.state==='playing')playbackFrame=requestAnimationFrame(playbackStatus);
+}
+const replay=createGroveReplay({onChange:playbackStatus});
+$('listen').onclick=async()=>{if(!current||controller)return;try{$('status').textContent='The selected recording remains local. No resonance target has been inferred.';await replay.play(current.audition);}catch(error){$('playback-status').textContent=error.message;}};
+$('quiet').onclick=()=>replay.stop();
+function busy(value){$('cancel').hidden=!value;$('sound-file').disabled=value;$('clear').disabled=!current;playbackStatus();}
+function cancel(){replay.stop();generation++;controller?.abort();controller=null;jobs.cancel();busy(false);}
 function field(label,value){const term=document.createElement('dt'),definition=document.createElement('dd');term.textContent=label;definition.textContent=value;$('details').append(term,definition);}
 function draw(canvas,wave,range,color){
  const width=1280,height=240;canvas.width=width;canvas.height=height;
@@ -18,6 +32,7 @@ function draw(canvas,wave,range,color){
 function render(){
  $('sound').hidden=!current;if(!current)return;
  $('sound-title').textContent=current.name;
+ $('listening-scale').textContent=`Listening level: ${(20*Math.log10(current.audition.gain)).toFixed(1)} dB relative to file samples, with one shared gain for all channels. Quiet recordings are not boosted. The waveform and file details remain unscaled.`;
  $('description').textContent=`${current.duration.toFixed(3)} seconds · ${current.waveforms.length===1?'mono':'two channels'} · ${current.sampleRate.toLocaleString()} Hz · ${current.encoding}`;
  $('waveforms').replaceChildren();const range=Math.max(1,current.peak);
  for(const [index,wave] of current.waveforms.entries()){
@@ -35,6 +50,12 @@ $('sound-file').onchange=async()=>{
  finally{if(own===generation){controller=null;busy(false);}}
 };
 $('cancel').onclick=()=>{cancel();$('status').textContent='Opening cancelled.'+(current?' The previous sound remains visible.':'');};
-$('clear').onclick=()=>{cancel();current=null;$('waveforms').replaceChildren();$('details').replaceChildren();$('sound-title').textContent='';$('description').textContent='';$('scale').textContent='';render();busy(false);$('status').textContent='Sound cleared. Choose another whenever you like.';};
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&controller)$('cancel').click();});
-window.addEventListener('pagehide',()=>cancel());
+$('clear').onclick=()=>{
+ cancel();current=null;
+ $('waveforms').replaceChildren();$('details').replaceChildren();
+ for(const id of ['sound-title','description','scale','listening-scale','playback-position'])$(id).textContent='';
+ render();busy(false);$('status').textContent='Sound cleared. Choose another whenever you like.';
+};
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){replay.stop();if(controller)$('cancel').click();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)replay.stop();});
+window.addEventListener('pagehide',()=>{cancel();replay.park();});

@@ -59,3 +59,21 @@ Independent reference: installed FFmpeg generated a 0.1 s, 48 kHz two-channel PC
 ### Extensible file through the real picker
 
 Native Safari opened `/tmp/imagimusic-extensible-reference.wav` through its file chooser on the production page after reload. The result reported 0.100 seconds, two channels, 48,000 Hz, PCM24 and 4,800 samples per channel. Expanded details showed Extensible, 24 valid bits in 24-bit containers, and mask 0x00000003 with file order preserved. The displayed SHA-256 was `05577cefcf2be9d798827dc4839e93bcb53a235be5cb92a492be7575d82393d7`, exactly matching an independent `shasum -a 256` of the selected file. Opening remained silent. This closes native selection and metadata verification for that generated PCM24 fixture, not all DAW exports or the extensible float branch.
+
+## November 3: audition the selected recording
+
+The page now offers explicit **Listen from start** and **Quiet** controls. Opening remains silent. This supersedes the earlier no-playback scope; no resonance estimation has been added.
+
+The existing disposable worker prepares a separate Float32 listening copy of the decoded channels, using the shared scalar `0.25 / max(1, peak)`. This attenuates ordinary files by about 12 dB and attenuates above-unity float files further; it never boosts a quiet file. Sample peaks in this copy are at most 0.25, which is not an acoustic loudness or intersample-peak guarantee. Waveform samples, summary statistics, exact-file hash and original bytes remain unscaled. The displayed listening gain is explicit. This is not a loudness-matched reference to future instrument suggestions.
+
+Playback reuses the existing Grove replay owner. Quiet and Escape stop it, selecting a replacement stops it before preparation, hiding the page stops it, and pagehide releases the audio context. Clear stops playback and removes the current sound. The source sample rate is preserved in the prepared buffer; the audio device may resample. Channels keep file order, but the declared spatial mask is not rendered. Float32 conversion may reduce precision relative to PCM32 analysis samples.
+
+Evidence:
+
+- 15 focused tests passed across audition-copy invariants, WAV parsing and replay lifecycle. They cover no source mutation, shared channel scaling, quiet/silent inputs, above-unity values and a large finite float value; replay checks include pending resume cancellation and context parking.
+- The real Safari worker harness passed 5/5 after adding a check for the transferred attenuated Float32 copy alongside the known exact-file hash, malformed replacement and cancellation/retry behavior.
+- Native Safari opened an eight-second generated two-channel 8 kHz PCM16 fixture silently, displayed both 64,000-sample waveforms and the −12 dB listening level, then entered Listening only after the button was pressed.
+- Native Quiet, Escape and switching to a temporary tab stopped playback. Clearing during playback initially exposed a null-access bug in metadata cleanup; after fixing it, a fresh reload and repeat showed the sound section removed, Clear disabled and “Sound cleared” status.
+- Desktop screenshot inspection showed readable controls, gain disclosure and channel waveform. No phone-device, acoustic-output or human listening-quality claim is made.
+
+The catalog now describes explicit audition and silent opening. Future interpretation must retain this source reference and make any changes to gain, decay, channels or inferred resonances visible.

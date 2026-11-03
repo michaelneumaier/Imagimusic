@@ -12,10 +12,11 @@ try{
  try{await pending;throw new Error('Cancelled read completed.');}catch(error){if(error.name!=='AbortError')throw error;}
  const summary=await jobs.run({bytes:opened.bytes});
  if(summary.sha256!=='0d967ed12e62abd76345cb65683289f554a3dee562df77c4e3289f8b76d90e80'||summary.byteLength!==opened.bytes.byteLength||summary.waveforms.length!==2||summary.frameCount!==3)throw new Error('Worker identity or summary mismatch.');
+ if(summary.audition.gain!==.25||summary.audition.sampleRate!==48000||!(summary.audition.channels[0] instanceof Float32Array)||Math.abs(summary.audition.channels[0][0]+.125)>1/32768)throw new Error('Worker audition copy mismatch.');
  const malformed=new Uint8Array(opened.bytes.byteLength+1);malformed.set(new Uint8Array(opened.bytes));
  try{await jobs.run({bytes:malformed.buffer});throw new Error('Malformed bytes accepted.');}catch(error){if(!error.message.includes('container length'))throw error;}
  const cancelled=jobs.run({bytes:opened.bytes});jobs.cancel();
  try{await cancelled;throw new Error('Cancelled worker completed.');}catch(error){if(error.name!=='AbortError')throw error;}
  const retried=await jobs.run({bytes:opened.bytes});if(retried.sha256!==summary.sha256)throw new Error('Worker retry changed file identity.');
- result.textContent='PASS 5/5\nReal File → selected bytes → stereo PCM samples.\nCancellation during the asynchronous File read refuses the result.\nActual module worker returns the known exact-byte SHA-256 and stereo summary.\nMalformed replacement bytes are refused.\nWorker cancellation rejects, and a fresh worker retries successfully.\nNo native-picker or sound-analysis claim.';
+ result.textContent='PASS 5/5\nReal File → selected bytes → stereo PCM samples.\nCancellation during the asynchronous File read refuses the result.\nActual module worker returns the known exact-byte SHA-256 and stereo summary, plus the attenuated Float32 audition copy.\nMalformed replacement bytes are refused.\nWorker cancellation rejects, and a fresh worker retries successfully.\nNo native-picker or sound-analysis claim.';
 }catch(error){result.textContent='FAIL: '+error.message;}finally{jobs.cancel();}
