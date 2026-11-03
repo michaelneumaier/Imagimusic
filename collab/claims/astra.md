@@ -510,3 +510,5 @@ Tine live quiet return: owns live-address.js/tests, live-capture record loader a
 Live tine discovery: owns project.html and src/project-catalog.js copy/catalog update for the completed shape→play→replay→keep route and its history milestone; local preview only.
 
 Live tine phrase/body comparison: owns live-comparison.js, live-comparison-worker.js and tests. Preserve the source record, exact event frames/strengths/rate/ending and relative positions; vary dimensions only, re-admit the entire candidate, fixed pickup gain and no loudness matching. UI follows verified pair rendering.
+
+Live comparison controls: owns live-comparison-session.js/tests and playing-page optional comparison disclosure. Source-bound pair ownership, staged dimensions, preserved pair on cancel/failure, explicit auditions and original live/kept identity.
