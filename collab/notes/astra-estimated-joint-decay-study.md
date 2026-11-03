@@ -43,3 +43,7 @@ node tools/study-estimated-joint-decay.mjs > estimated-joint-report.json
 The complete CLI ran 24 observations. Five focused tests cover the estimated-prefix boundary and joint-fit controls. This adds two tests after the earlier three joint-fit tests; the last full-suite checkpoint of 699 predates both groups.
 
 The next experiment should allow bounded frequency refinement while preserving its starting estimates and mode count, then compare genuinely withheld samples. That can test the fixed-frequency phase-error limitation. It cannot recover an omitted mode by itself; mode-count alternatives need their own explicit evidence and comparison. A future interface should preserve source listening, candidate lineage and refusals instead of reducing all this to a single confidence label. The product source page remains inspection/audition only.
+
+### Follow-up: bounded frequency refinement
+
+`tools/study-refined-modes.mjs` and `collab/notes/astra-refined-mode-study.md` now test the fixed-frequency limitation. Refinement greatly improves the clean separated control's continuation, but makes missing-mode controls' later predictions worse while improving their observed residuals. Initial candidates and mode count are retained. The next question is explicit model alternatives with withheld validation, not simply more optimization.

@@ -433,3 +433,5 @@ Completed joint decay research (stable): tools/study-joint-decay.mjs, tests/join
 Completed joint-fit listening study (stable): tools/render-joint-decay-study.mjs, generated local renders/joint-decay-study, own evidence note and catalog entry. Same-gain source/reconstruction WAVs, actual withheld noisy suffix metrics, explicit supplied-frequency limitations; one player and no automatic target handoff.
 
 Completed estimated-frequency fit study (stable): tools/study-estimated-joint-decay.mjs and focused tests/evidence note. Feed all threshold-passing spectral candidates into the bounded joint fit without ground-truth selection, refuse counts outside its 1..4-mode scope, and score actual withheld observations only afterward. No production promotion.
+
+Completed bounded frequency-refinement study (stable): tools/study-refined-modes.mjs and focused tests/evidence note. Preserve initial spectral candidate count and estimates, jointly vary frequencies within explicit non-crossing bounds and decays within 0.1..8 s, then score unseen suffixes. No new production acceptance rule.
