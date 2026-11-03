@@ -32,5 +32,8 @@ try{
  const pair=await jobs.run(pairRequest),pairReference=prepareTineRequest(pairRequest);
  assert(pair.phrases.every((p,k)=>p.channels[0].every((x,i)=>x===pairReference.phrases[k].channels[0][i])),'Timing pair worker mismatch');
  const timingError=await checkGraph(pair.phrases[0],pairReference.phrases[0]);
- document.getElementById('result').textContent=`PASS 10/10\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nAtomic single/phrase bundle matches direct samples; unknown kinds refuse.\nFull phrase offline replay graph: maximum sample error ${phraseError}.\nChanged timing pair matches both direct renders; offline error ${timingError}.\nNo hardware output or live latency measured.`;
+ const pendingPair=jobs.run(pairRequest);jobs.cancel();
+ try{await pendingPair;throw Error('Pair cancellation ignored');}catch(error){assert(error.name==='AbortError','Wrong pair cancellation result');}
+ assert(pair.phrases[0].channels[0].every((x,i)=>x===pairReference.phrases[0].channels[0][i]),'Cancellation changed the prior pair');
+ document.getElementById('result').textContent=`PASS 11/11\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nAtomic single/phrase bundle matches direct samples; unknown kinds refuse.\nFull phrase offline replay graph: maximum sample error ${phraseError}.\nChanged timing pair matches both direct renders; offline error ${timingError}.\nCancelled pair rejects and leaves the prior result intact.\nNo hardware output or live latency measured.`;
 }catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}finally{jobs.cancel();replay?.dispose();}
