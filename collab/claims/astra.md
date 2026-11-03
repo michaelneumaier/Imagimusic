@@ -570,3 +570,9 @@ Force milestone reconciliation complete: history/M18/IDEAS updated, native quiet
 Sampled displacement window: owns src/tine/displacement-window.js and tests. Stable population mean/covariance of four modal coordinates, projected with cross terms; direct spatial-sample parity and cancellation checks before any visual.
 
 Sampled displacement window foundation complete: pure module and direct spatial/cancellation tests pass; claim released.
+
+Offline displacement study: owns tools/render-tine-displacement-study.mjs and tools/plot-tine-displacement.py; generate explicit sampled interval comparison and local accessible page.
+
+Displacement study discovery: owns src/project-catalog.js and tools/prepare-project-home.mjs additions for the offline visual page.
+
+Offline displacement study and discovery complete: generator/plot, catalog/preparation, numerical and native narrow checks recorded; claims released.

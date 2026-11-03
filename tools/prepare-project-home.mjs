@@ -5,6 +5,7 @@ import {spawn} from 'node:child_process';
 import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['A shape across time','renders/tine-displacement','tools/render-tine-displacement-study.mjs',[],true],
  ['The time within a touch','renders/tine-force','tools/render-tine-force-study.mjs'],
  ['One phrase, four bodies','renders/tine-bodies','tools/study-tine-bodies.mjs'],
  ['What continues beyond the glimpse?','renders/joint-decay-study','tools/render-joint-decay-study.mjs',['--audio-dir','renders/joint-decay-study']],
@@ -18,24 +19,25 @@ const studies=[
 ];
 const args=process.argv.slice(2);
 if(args.some(arg=>arg!=='--check'))throw new Error('Usage: node tools/prepare-project-home.mjs [--check]');
-async function available(directory){
+async function available(directory,visual=false){
  try{
   const html=await fs.readFile(path.join(root,directory,'index.html'),'utf8');
   const files=[...html.matchAll(/data-file="([^"]+\.wav)"/g)].map(m=>m[1]);
-  if(!files.length)return false;
+  if(!files.length&&!visual)return false;
+  if(visual)files.push(...[...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(m=>m[1]));
   await Promise.all(files.map(file=>fs.access(path.join(root,directory,file))));
   await fs.access(path.join(root,directory,'report.json'));
   return true;
  }catch{return false;}
 }
 let missing=0;
-for(const [title,directory,script,scriptArgs=[]] of studies){
- if(await available(directory)){console.log('Ready: '+title);continue;}
+for(const [title,directory,script,scriptArgs=[],visual=false] of studies){
+ if(await available(directory,visual)){console.log('Ready: '+title);continue;}
  missing++;
  if(args.includes('--check')){console.log('Missing: '+title);continue;}
  console.log('Preparing: '+title+' (physical rendering may take a few minutes)');
  await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script,...scriptArgs],{cwd:root,stdio:['ignore','ignore','inherit']});child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(title+' preparation failed: '+(signal??code))));});
- if(!await available(directory))throw new Error(title+' renderer did not produce a complete listening page');
+ if(!await available(directory,visual))throw new Error(title+' renderer did not produce a complete study page');
  missing--;
  console.log('Ready: '+title);
 }

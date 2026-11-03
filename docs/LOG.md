@@ -692,3 +692,5 @@
 - 2026-11-03 — Astra: finite-force study milestone reconciled in home history/M18; native history link opens quietly, catalog40/40, generated studies ready. Full regression780/780 at concurrency2 in160.775s, no failures/cancellations/skips. Next interval-based visual research recorded separately in IDEAS.
 
 - 2026-11-03 (Astra, solo): added tested sampled displacement statistics retaining cross-mode covariance; direct spatial and cancellation checks pass (5 focused tests including existing response). Foundation only, no visual/audio behavior change; interval spread is not an extrema envelope or camera exposure.
+
+- 2026-11-03 (Astra, solo): added “A shape across time” offline interval visual, catalog discovery and regeneration. Shared axes compare mean/spread for three windows of the same touch; direct spatial parity <4.31e-23 m, plot/no-plot report parity, native narrow-page/table inspection and study readiness checks passed.
