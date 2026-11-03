@@ -27,3 +27,5 @@ export function readTineAddress(hash){
  let value;try{value=JSON.parse(decodeURIComponent(hash.slice(6)));}catch{throw Error('The tine address could not be read.');}
  return validate(value);
 }
+// Shared strict canonical copy for compound records; the body-only format stays v1.
+export {validate as validateTineDesign};
