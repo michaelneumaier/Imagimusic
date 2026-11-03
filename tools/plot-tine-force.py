@@ -40,3 +40,28 @@ for text in legend.get_texts():
 fig.savefig(sys.argv[2], facecolor=fig.get_facecolor())
 fig.savefig(str(Path(sys.argv[2]).with_suffix('.png')), dpi=160, facecolor=fig.get_facecolor())
 plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(7, 5), layout='constrained')
+fig.patch.set_facecolor('#142028')
+ax.set_facecolor('#142028')
+bottom = [0.0] * len(data['rows'])
+for i, (color, hatch) in enumerate(zip(['#e4bc7b', '#c9b3e4', '#8ed1c3', '#82a9d6'], ['', '//', '..', 'xx'])):
+    values = [row['comparisonModes'][i]['energyJ'] * 1e12 for row in data['rows']]
+    if not all(math.isfinite(x) and x >= 0 for x in values):
+        raise ValueError('Invalid modal energy')
+    ax.bar(range(len(values)), values, bottom=bottom, color=color, edgecolor='#142028', hatch=hatch, label=f"Mode {i+1} · {data['frequenciesHz'][i]:.0f} Hz")
+    bottom = [a + b for a, b in zip(bottom, values)]
+ax.set_xticks(range(4), ['Impulse', '0.5 ms', '1 ms', '4 ms'])
+ax.set_ylabel('Stored mechanical energy (pJ)', fontsize=14, color='#eee8dc')
+ax.tick_params(colors='#eee8dc', labelsize=13)
+ax.set_axisbelow(True)
+ax.grid(axis='y', alpha=.2, color='#b9c9cd')
+for spine in ax.spines.values():
+    spine.set_color('#70858b')
+legend = ax.legend(fontsize=11, ncol=2, loc='lower left', bbox_to_anchor=(0, 1.01), facecolor='#142028', edgecolor='#70858b')
+for text in legend.get_texts():
+    text.set_color('#eee8dc')
+energy_path = Path(sys.argv[2]).with_name('energy.svg')
+fig.savefig(energy_path, facecolor=fig.get_facecolor())
+fig.savefig(energy_path.with_suffix('.png'), dpi=160, facecolor=fig.get_facecolor())
+plt.close(fig)

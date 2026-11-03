@@ -556,3 +556,5 @@ Force listening study complete: generator, shared caption and local files verifi
 Force-study discovery complete: catalog40/40 and regeneration ready; claim released.
 
 Force input picture complete: actual-input plot/table, visual/native checks and plot/no-plot parity recorded; claim released.
+
+Force energy reading complete: common-time accounting, figures/tables, native accessibility and unchanged-audio checks recorded; claim released.
