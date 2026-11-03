@@ -37,3 +37,19 @@ test('node count, zero activations, failed starts and malformed preparation are 
  const bad=prepareSketchPlayback(parameters,8000);bad.buffers[0][0]=2;assert.throws(()=>createSketchTransport(g.context,bad),/PCM/);
  const wrong=prepareSketchPlayback(parameters,8000);wrong.sampleRate=16000;assert.throws(()=>createSketchTransport(g.context,wrong),/context/);
 });
+
+test('shared gesture uses one audio-clock origin, stays visually silent before onset, and Quiet cancels future voices',()=>{
+ const f=fixture(),gesture=f.transport.playSharedGesture();assert.equal(gesture.accepted,true);
+ gesture.receipts.forEach((r,i)=>assert.ok(Math.abs(r.time-[.05,.95,2.15][i])<1e-12));
+ assert.deepEqual(gesture.receipts.map(r=>r.strength),[.35,.2,.35]);
+ assert.equal(gesture.end,6.15);assert.equal(f.transport.snapshot().modes[0].envelope,0);
+ assert.equal(f.transport.playSharedGesture().reason,'settle-first');assert.equal(f.nodes.length,3);
+ f.context.currentTime=.15;assert.ok(Math.abs(f.transport.snapshot().modes[0].envelope-.35*Math.exp(-.1/2))<1e-12);
+ f.transport.quiet();assert.equal(f.nodes[1].stopped,.15);assert.equal(f.nodes[2].stopped,.15);
+ assert.equal(f.transport.snapshot().active,1);f.context.currentTime=.181;assert.equal(f.transport.snapshot().active,0);
+ assert.equal(f.transport.playSharedGesture().accepted,true);f.transport.dispose();
+ const g=fixture();assert.throws(()=>g.transport.activate({at:-1}),/time/);assert.throws(()=>g.transport.activate({at:9}),/time/);
+ g.context.state='suspended';assert.throws(()=>g.transport.playSharedGesture(),/Start listening/);assert.equal(g.nodes.length,0);
+ const h=fixture();let starts=0;const create=h.context.createBufferSource.bind(h.context);h.context.createBufferSource=()=>{const node=create();node.start=()=>{if(++starts===2)throw Error('second start failed');};return node;};
+ assert.throws(()=>h.transport.playSharedGesture(),/second start failed/);assert.equal(h.transport.snapshot().active,0);assert.ok(h.nodes.every(node=>node.disconnected));
+});

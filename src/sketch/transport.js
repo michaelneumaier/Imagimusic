@@ -1,6 +1,10 @@
 import {createResonanceSketch} from './model.js';
 export const SKETCH_MIX_BOUND=.8;
 export const SKETCH_MAX_ACTIVE=32;
+// Same all-mode activations for every interpretation; no source-specific timing.
+export const SKETCH_SHARED_GESTURE=Object.freeze([
+ Object.freeze({offset:0,strength:.35}),Object.freeze({offset:.9,strength:.2}),Object.freeze({offset:2.1,strength:.35})
+]);
 export function prepareSketchPlayback(parameters,sampleRate,{seconds=4}={}){
  const sketch=createResonanceSketch(parameters),all=sketch.render({sampleRate,seconds});
  return {parameters:{frequencies:sketch.modes.map(m=>m.frequency),decays:sketch.modes.map(m=>m.decay),coefficients:sketch.modes.flatMap(m=>[m.a,m.b])},
@@ -24,24 +28,35 @@ export function createSketchTransport(context,prepared){
  const retire=entry=>{if(!active.delete(entry))return;entry.node.onended=null;entry.node.disconnect();entry.gain.disconnect();};
  const prune=now=>{for(const entry of active)if(now>=entry.end)retire(entry);};
  const allocated=()=>[...active].reduce((sum,e)=>sum+e.bound,0);
- function activate({mode=null,strength=.35}={}){
+ function activate({mode=null,strength=.35,at=null}={}){
   live();if(context.state!=='running')throw Error('Start listening before activating a sketch.');
   if(mode!==null&&(!Number.isInteger(mode)||mode<0||mode>=sketch.modes.length)||!Number.isFinite(strength)||strength<0||strength>1)throw Error('Invalid sketch activation.');
-  const now=context.currentTime;prune(now);const index=mode===null?0:mode+1;
+  const now=context.currentTime;prune(now);const time=at===null?now:at;
+  if(!Number.isFinite(time)||time<now||time>now+8)throw Error('Activation time must be within the next eight seconds.');
+  const index=mode===null?0:mode+1;
   if(!strength||!bounds[index])return {accepted:false,reason:'zero-strength'};
   if(active.size>=SKETCH_MAX_ACTIVE)return {accepted:false,reason:'voice-count'};
   const bound=(bounds[index]+1e-7)*strength;
   if(allocated()+bound>SKETCH_MIX_BOUND)return {accepted:false,reason:'headroom'};
-  const node=context.createBufferSource(),gain=context.createGain(),entry={node,gain,mode,strength,bound,start:now,end:now+frames/rate,quietAt:null};
+  const node=context.createBufferSource(),gain=context.createGain(),entry={node,gain,mode,strength,bound,start:time,end:time+frames/rate,quietAt:null};
   try{
    node.buffer=buffers[index];gain.gain.value=strength;node.connect(gain);gain.connect(output);
-   node.onended=()=>retire(entry);active.add(entry);node.start(now);
-   return {accepted:true,time:now,mode,strength};
+   node.onended=()=>retire(entry);active.add(entry);node.start(time);
+   return {accepted:true,time,mode,strength};
   }catch(error){try{node.stop();}catch{}if(active.has(entry))retire(entry);else{node.disconnect();gain.disconnect();}throw error;}
+ }
+ function playSharedGesture(){
+  live();prune(context.currentTime);
+  if(active.size)return {accepted:false,reason:'settle-first'};
+  const origin=context.currentTime+.05,receipts=[];
+  try{
+   for(const event of SKETCH_SHARED_GESTURE){const receipt=activate({strength:event.strength,at:origin+event.offset});if(!receipt.accepted)throw Error('Shared gesture could not be admitted.');receipts.push(receipt);}
+   return {accepted:true,receipts,end:origin+SKETCH_SHARED_GESTURE.at(-1).offset+frames/rate};
+  }catch(error){for(const entry of [...active]){try{entry.node.stop();}catch{}retire(entry);}throw error;}
  }
  function quiet(){
   live();const now=context.currentTime;prune(now);
-  for(const entry of active){if(entry.quietAt!==null)continue;entry.quietAt=now;entry.end=Math.min(entry.end,now+.03);
+  for(const entry of [...active]){if(entry.start>now){entry.node.stop(now);retire(entry);continue;}if(entry.quietAt!==null)continue;entry.quietAt=now;entry.end=Math.min(entry.end,now+.03);
    entry.gain.gain.cancelScheduledValues(now);entry.gain.gain.setValueAtTime(entry.strength,now);entry.gain.gain.linearRampToValueAtTime(0,now+.025);entry.node.stop(entry.end);
   }
  }
@@ -49,6 +64,7 @@ export function createSketchTransport(context,prepared){
   live();const now=context.currentTime;prune(now);
   const modes=sketch.modes.map(()=>({displacement:0,velocity:0,envelope:0}));
   for(const entry of active){
+   if(now<entry.start)continue;
    const age=Math.max(0,now-entry.start),ending=Math.max(0,Math.min(1,(frames-1-age*rate)/(fadeFrames-1)));
    const quieting=entry.quietAt===null?1:Math.max(0,1-(now-entry.quietAt)/.025);
    const strength=entry.strength*ending*quieting;
@@ -58,5 +74,5 @@ export function createSketchTransport(context,prepared){
   return {time:now,active:active.size,allocatedBound:allocated(),modes,pickupGain:sketch.pickupGain};
  }
  function dispose(){if(disposed)return;for(const entry of [...active]){try{entry.node.stop();}catch{}retire(entry);}output.disconnect();disposed=true;}
- return {activate,quiet,snapshot,dispose,sketch,duration:frames/rate};
+ return {activate,playSharedGesture,quiet,snapshot,dispose,sketch,duration:frames/rate};
 }

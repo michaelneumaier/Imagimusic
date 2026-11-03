@@ -445,3 +445,5 @@ Completed sketch playback transport (stable): src/sketch/transport.js and tests/
 Completed sketch worker/browser boundary (stable): src/sketch/prepare-worker.js and tests/sketch-transport-browser.html/js. Real worker transfer/cancellation and silent OfflineAudioContext graph checks; fixed scheduling clock explicitly scoped, no hardware-output claim.
 
 Completed first playable resonance-sketch page (stable): sketch.html, sketch.css, src/sketch/main.js and owned project catalog. Six explicitly supplied study interpretations, worker preparation, user-started listening, individual/whole activation and optional envelope picture. Model limits and per-sketch pickup gain visible; no automatic inference or geometric recovery.
+
+Completed shared sketch gesture (stable): owned src/sketch/transport.js, main.js, sketch.html and transport Node/browser harnesses. One explicit authored three-activation pattern on the audio clock, future envelopes remain silent, Quiet cancels queued activations, and busy sketches refuse comparison playback. Preserve distinct source interpretations and declared gain differences.
