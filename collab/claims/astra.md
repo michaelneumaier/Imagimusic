@@ -590,3 +590,9 @@ Interval milestone reconciliation complete; native comparison/discovery and full
 Flagship synthesis plan at Michael’s request: owns new docs/proposals/024-living-instrument.md and its project-home notebook link. Proposal only; preserve existing VISION/contracts and working instruments. Fable unavailable.
 
 Flagship synthesis proposal complete: proposal024 saved, relative links checked, home notebook button opens full plan in native Safari; claim released. Artistic direction remains a proposal, no contract replacement or peer review claimed.
+
+Flagship artistic proof: owns assets/flagship/opening-body-v1.png, docs/proposals/025-first-encounter-storyboard.md, tools/render-flagship-sketch.mjs and local renders/flagship-sketch output. Concept art and authored audio, not implemented flagship.
+
+Flagship proof discovery: owns project.html direct artistic-proof link and preparation-helper native-audio source check. Six-panel image and prompt also under assets/flagship.
+
+Flagship artistic proof complete as a first sketch: audio/figures/prompts, six-scene proposal and discovery saved; technical/file/native checks recorded. Claims released. No listening-quality or functioning3D-scene claim.
