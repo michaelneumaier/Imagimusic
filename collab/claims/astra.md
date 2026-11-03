@@ -532,3 +532,5 @@ Completed-pass audio export checkpoint complete: src/tine/wav.js, tests and play
 Export discovery complete: project.html and src/project-catalog.js wording checked in Safari,39/39 entries; claim released.
 
 Export milestone evidence complete: M18, log and evidence updated; full771/771 and native fresh/narrow export checked. Claim released.
+
+Shared live listening level checkpoint complete: host/tests and playing UI released;15 focused checks and native+10dB lifecycle/export evidence recorded.

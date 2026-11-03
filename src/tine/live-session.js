@@ -1,12 +1,26 @@
+import {createListeningLevel,listeningGain} from '../grove/listening-level.js';
 import {requestForTineDesign,validateTineDesign} from './address.js';
 const aborted=()=>Object.assign(Error('Playing pass cancelled.'),{name:'AbortError'});
-export function createTineLiveSession({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-tine-live',options),onChange=()=>{}}={}){
+export function createTineLiveSession({createContext=()=>new AudioContext(),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-tine-live',options),createListeningStage=createListeningLevel,listeningDb=null,onChange=()=>{}}={}){
  let active=null,state='idle',touches=0,lastFinished=null;
+ if(listeningDb!==null)listeningGain(listeningDb);
+ function stageFor(s,db){
+  const stage=createListeningStage(s.context,{db});
+  try{stage.output.connect(s.context.destination);}catch(error){stage.dispose();throw error;}
+  return stage;
+ }
+ function setListeningDb(db){
+  listeningGain(db);
+  if(active?.listening)active.listening.setDb(db);
+  else if(active?.node){const s=active,next=stageFor(s,db);try{s.node.disconnect();s.node.connect(next.input);}catch(error){next.dispose();fail(s,error);throw error;}s.listening=next;}
+  listeningDb=db;
+ }
  const emit=extra=>onChange({state,touches,...extra});
  function release(s,error=aborted()){
   if(!s)return;clearTimeout(s.watchdog);clearTimeout(s.finishTimer);
   for(const pending of s.pending.values()){clearTimeout(pending.timer);pending.reject(error);}s.pending.clear();
   if(s.node){s.node.port.onmessage=null;s.node.onprocessorerror=null;s.node.disconnect();s.node.port.close();}
+  s.listening?.dispose();
   s.context.onstatechange=null;Promise.resolve(s.context.close()).catch(()=>{});
   if(active===s)active=null;
  }
@@ -42,7 +56,8 @@ export function createTineLiveSession({createContext=()=>new AudioContext(),crea
      s.finishTimer=setTimeout(()=>{if(active!==s)return;lastFinished={design,sampleRate:s.context.sampleRate,...data};release(s);state='ended';emit({finished:lastFinished});},drainMs);
     }
    };
-   s.node.connect(context.destination);await ready;if(active!==s)throw aborted();
+   if(listeningDb!==null)s.listening=stageFor(s,listeningDb);
+   s.node.connect(s.listening?.input??context.destination);await ready;if(active!==s)throw aborted();
    await command(s,'start');if(active!==s)throw aborted();state='playing';emit();
    s.watchdog=setTimeout(()=>fail(s,Error('The playing pass did not finish. Start another pass.')),11000);
   }catch(error){if(s&&active===s)fail(s,error);else if(!s){state='error';emit({message:error.message});}throw error;}
@@ -59,5 +74,5 @@ export function createTineLiveSession({createContext=()=>new AudioContext(),crea
   if(s.context.state!=='running'){park('interrupted');return;}
   state='ending';emit();return command(s,'quiet');
  }
- return {start,strike,quiet,park,dispose(){park('idle');},time(){return active&&active.origin!==undefined?Math.max(0,Math.min(8,active.context.currentTime-active.origin)):lastFinished?lastFinished.snapshot.frame/lastFinished.sampleRate:0;},get state(){return state;},get touches(){return touches;},get finished(){return lastFinished;}};
+ return {start,strike,quiet,park,setListeningDb,dispose(){park('idle');},time(){return active&&active.origin!==undefined?Math.max(0,Math.min(8,active.context.currentTime-active.origin)):lastFinished?lastFinished.snapshot.frame/lastFinished.sampleRate:0;},get state(){return state;},get touches(){return touches;},get finished(){return lastFinished;}};
 }

@@ -342,3 +342,11 @@ Native Safari Begin → Touch → Quiet produced one accepted touch at frame1578
 Next interaction candidate: bring the listening study’s explicit shared listening level into live playing and replay. The authored study measured roughly−41dBFS source peak; the live route currently connects directly to destination, whereas shared replay already supports an optional downstream listening stage. A consistent visit-local0…20dB setting could make quiet pickups easier to explore without changing excitation or exported PCM. It must be shared across live/original/candidate playback, default0, preserve interruption cleanup, and label any downstream ceiling. No per-body normalization or persisted model parameter. This is the next implementation candidate, not yet shipped.
 
 Full regression through export:771/771 pass at concurrency2 in151.837seconds, zero failures/cancellations/skips; `/tmp/imagimusic-astra-export-suite.log`. Native playing/download/layout evidence above is separate from Node regression.
+
+### Shared playing-page listening level — 2026-11-03
+
+One visit-local0…20dB slider, default0, now feeds the same downstream listening-stage design for live playing and all replay/comparison auditions. The live host creates/disposes its stage with each pass and retains only the preference across passes/parking. The renderer, accepted events, kept addresses and exported WAV remain unchanged. The stage has a0.95 sample ceiling (possible distortion, not loudness matching or a true-peak guarantee). No per-body normalization.
+
+Fifteen focused tests pass: host lifecycle plus new level-persistence/source-separation and failed-connection cleanup/retry tests, shared replay and WAV checks. Safari explicitly selected+10dB, replayed a kept pass, completed a fresh live touch and earlyQuiet, prepared/auditioned a width20 comparison, and returned from an actual tab switch quietly with+10dB and both prepared identities retained. Exported original file hash remains `640f52adbb0f34b1d548f8f313a67c0bbf320affc4594a0f05599fd121dbfdab` before/after changing listening level. This verifies UI/lifecycle and file independence, not a hardware listening preference or physical latency.
+
+Follow-up: narrow view of the new level control and offline browser graph checks can strengthen the evidence. Broader musical/listener assessment remains open; Fable peer review pending.

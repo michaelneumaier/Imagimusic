@@ -5,3 +5,5 @@
 .comparison-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.comparison-fields label{display:grid;gap:.5rem}.comparison-fields input{width:100%;min-width:0}.comparison-fields output{color:#d7bc8a}@media(max-width:540px){.comparison-fields{grid-template-columns:1fr}}
 
 #spatial-picture{display:block;width:100%;background:#142028;border-radius:12px}#spatial-frame{display:block;width:100%;margin:1rem 0}#spatial-source{max-width:100%;margin:.7rem 0}#spatial-inspection label{display:block}#spatial-caption{font-size:.85rem;color:#b8c9c7}
+
+.listening-control{margin:1.5rem 0}.listening-control label{display:flex;justify-content:space-between;gap:1rem}.listening-control input{width:100%;margin:.75rem 0}.listening-control output{color:#d7bc8a}

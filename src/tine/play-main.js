@@ -32,7 +32,7 @@ const comparison=createTineComparisonSession({onChange:({current,pending,message
  controls(session.state,session.touches);
 }});
 let replayFocus=false,replayButton='replay',replayLabel='the completed pass';
-const replay=createGroveReplay({onChange:({state})=>{
+const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  const quietFocused=document.activeElement===$('quiet');
  controls(session.state,session.touches);
  if(state==='preparing')$('status').textContent='Preparing to replay the completed pass…';
@@ -42,7 +42,7 @@ const replay=createGroveReplay({onChange:({state})=>{
 }});
 
 function animate(){raf=0;const time=session.time();$('progress').value=time;$('clock').textContent=time<4?`${Math.max(0,4-time).toFixed(1)} s to touch`:'Letting it ring';if(['playing','ringing','ending'].includes(session.state))raf=requestAnimationFrame(animate);}
-const session=createTineLiveSession({onChange:event=>{
+const session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const wasTouch=document.activeElement===$('touch'),wasQuiet=document.activeElement===$('quiet');if(event.state==='ending'&&(wasTouch||wasQuiet))returnFocus=true;controls(event.state,event.touches);
  const messages={idle:'Opening is quiet. Begin when you are ready.',preparing:'Preparing the body for touch…',playing:'The body is listening for your touches.',ringing:'The touch window has closed. Let it ring, or choose Quiet.',ending:'Ending gently…',ended:'This pass has ended. Begin another when you choose.',interrupted:'Playing stopped while audio or the page was away. Begin another pass when you return.',cancelled:'Preparation cancelled. Begin when you choose.',error:event.message};
  $('status').textContent=messages[event.state]??event.state;
@@ -54,6 +54,10 @@ const session=createTineLiveSession({onChange:event=>{
  if(['ended','interrupted','error','cancelled'].includes(event.state)){cancelAnimationFrame(raf);raf=0;$('clock').textContent='Quiet';$('progress').value=session.time();if(wasTouch||wasQuiet||returnFocus)$('begin').focus({preventScroll:true});returnFocus=false;}
  else if(event.state==='playing'&&!raf)raf=requestAnimationFrame(animate);
 }});
+$('listening-level').addEventListener('input',()=>{
+ const db=Number($('listening-level').value);session.setListeningDb(db);replay.setListeningDb(db);
+ $('listening-value').textContent=`+${db} dB`;
+});
 $('begin').addEventListener('click',async()=>{$('touch').scrollIntoView({block:'center',behavior:'instant'});comparison.cancel();capture.cancel();replay.park();wantsFocus=document.activeElement===$('begin');$('last-touch').textContent='Touches are counted when the audio processor accepts them.';$('progress').value=0;try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('status').textContent=error.message;}});
 $('touch').addEventListener('click',()=>session.strike().catch(error=>{if(error.name!=='AbortError')$('last-touch').textContent=error.message;}));
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});

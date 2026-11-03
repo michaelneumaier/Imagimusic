@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createTineLiveSession} from '../src/tine/live-session.js';
 import {createTineDesign} from '../src/tine/address.js';
-function fixture({moduleGate}={}){
+function fixture({moduleGate,...options}={}){
  const contexts=[],nodes=[],changes=[];
- const host=createTineLiveSession({onChange:e=>changes.push(e),createContext:()=>{const c={state:'suspended',sampleRate:48000,destination:{},onstatechange:null,closed:0,audioWorklet:{addModule:()=>moduleGate??Promise.resolve()},resume:async()=>{c.state='running';},close:async()=>{c.state='closed';c.closed++;}};contexts.push(c);return c;},createNode:()=>{
-  const node={closed:0,disconnected:0,commands:[],connect(){queueMicrotask(()=>node.send({type:'ready',sampleRate:48000}));},disconnect(){node.disconnected++;},send(data){node.port.onmessage?.({data});},port:{onmessage:null,close(){node.closed++;},postMessage(data){node.commands.push(data);if(data.type==='start')queueMicrotask(()=>node.send({type:'applied',id:data.id,command:'start',frame:0,state:'playing'}));}}};nodes.push(node);return node;
+ const host=createTineLiveSession({...options,onChange:e=>changes.push(e),createContext:()=>{const c={state:'suspended',sampleRate:48000,destination:{},onstatechange:null,closed:0,audioWorklet:{addModule:()=>moduleGate??Promise.resolve()},resume:async()=>{c.state='running';},close:async()=>{c.state='closed';c.closed++;}};contexts.push(c);return c;},createNode:()=>{
+  const node={closed:0,disconnected:0,commands:[],connect(target){node.target=target;queueMicrotask(()=>node.send({type:'ready',sampleRate:48000}));},disconnect(){node.disconnected++;},send(data){node.port.onmessage?.({data});},port:{onmessage:null,close(){node.closed++;},postMessage(data){node.commands.push(data);if(data.type==='start')queueMicrotask(()=>node.send({type:'applied',id:data.id,command:'start',frame:0,state:'playing'}));}}};nodes.push(node);return node;
  }});return {host,contexts,nodes,changes};
 }
 test('session gates readiness, acknowledges touches, preserves source snapshot and closes once on completion',async()=>{
@@ -40,4 +40,19 @@ test('leaving during output drain closes immediately and cannot finish a later p
  assert.equal(f.host.state,'ending');f.host.park();assert.equal(f.contexts[0].closed,1);
  await f.host.start(createTineDesign());await new Promise(r=>setTimeout(r,100));
  assert.equal(f.host.state,'playing');assert.equal(f.host.finished,null);f.host.dispose();
+});
+
+test('shared downstream listening level persists across passes without entering commands or finished records',async()=>{
+ const stages=[],f=fixture({listeningDb:0,createListeningStage:(context,{db})=>{const stage={input:{},output:{connect(target){stage.destination=target;}},db,disposed:0,setDb(value){stage.db=value;},dispose(){stage.disposed++;}};stages.push(stage);return stage;}});
+ f.host.setListeningDb(12);await f.host.start(createTineDesign());
+ assert.equal(stages[0].db,12);assert.equal(f.nodes[0].target,stages[0].input);assert.equal(stages[0].destination,f.contexts[0].destination);
+ const commands=structuredClone(f.nodes[0].commands);f.host.setListeningDb(20);assert.equal(stages[0].db,20);assert.deepEqual(f.nodes[0].commands,commands);
+ assert.throws(()=>f.host.setListeningDb(21));assert.equal(stages[0].db,20);
+ f.nodes[0].send({type:'finished',snapshot:{frame:1200,events:[]}});await new Promise(r=>setTimeout(r,100));assert.equal(stages[0].disposed,1);assert.equal('listeningDb' in f.host.finished,false);
+ await f.host.start(createTineDesign());assert.equal(stages[1].db,20);f.host.park();assert.equal(stages[1].disposed,1);
+});
+test('listening connection failure releases the stage and context; the next pass can retry',async()=>{
+ let attempts=0,disposed=0;const f=fixture({listeningDb:0,createListeningStage:()=>({input:{},output:{connect(){if(attempts++===0)throw Error('connection failed');}},setDb(){},dispose(){disposed++;}})});
+ await assert.rejects(f.host.start(createTineDesign()),/connection failed/);assert.equal(f.host.state,'error');assert.equal(disposed,1);assert.equal(f.contexts[0].closed,1);
+ await f.host.start(createTineDesign());assert.equal(f.host.state,'playing');f.host.dispose();assert.equal(disposed,2);
 });
