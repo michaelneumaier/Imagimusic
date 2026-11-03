@@ -544,3 +544,5 @@ Focused accent keys complete: native four-touch/held-key record verified; input/
 Dynamics discovery complete: project/catalog/M18 wording reconciled; claim released.
 
 Completed phrase reading complete: optional source-bound table and native kept-record/narrow checks recorded; claim released.
+
+First-visit curation complete: home/history/M18 and IDEAS triage reconciled, native route checked and full774/774 passed; claim released.
