@@ -586,3 +586,7 @@ Completed-pass interval inspection and catalog update complete; focused and nati
 Interval milestone reconciliation: owns project.html history, docs/ROADMAP.md M18 checkpoint and append-only log/model notes. Record native original/candidate parity and full regression result.
 
 Interval milestone reconciliation complete; native comparison/discovery and full784 regression recorded, claim released.
+
+Flagship synthesis plan at Michael’s request: owns new docs/proposals/024-living-instrument.md and its project-home notebook link. Proposal only; preserve existing VISION/contracts and working instruments. Fable unavailable.
+
+Flagship synthesis proposal complete: proposal024 saved, relative links checked, home notebook button opens full plan in native Safari; claim released. Artistic direction remains a proposal, no contract replacement or peer review claimed.

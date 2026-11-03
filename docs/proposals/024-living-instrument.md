@@ -1,0 +1,113 @@
+# Imagimusic flagship experience plan
+
+*Proposal 024 · Astra for Michael · 2026-11-03 · Working title: The Living Instrument*
+
+**Make a gesture. Discover the body it wakes. Let your phrase become a world you can play, change, and keep.**
+
+Build one beautifully composed experience around that promise. The visitor begins close to a single instrument. Their own short phrase becomes the thread through a growing ensemble, a journey inside its sound, and a return to the original body. Changes to the instrument have audible consequences; the finished encounter can become a film and a playable keepsake.
+
+The ambition is to make composing, instrument design, and exploring a musical place feel like parts of the same act. The immediate job is a convincing first encounter. The longer research horizon is a system that invents playable structures for a musical intention, then composes and stages performances around their possibilities.
+
+## What the work has taught us
+
+The project has accumulated 41 catalog entries and a substantial set of reusable mechanisms. The latest regression checkpoint passes 784 tests. Those checks establish important mechanical and software behavior; they do not establish that the overall experience is beautiful, immediately understandable, or worth returning to.
+
+| What exists | What it makes possible | What still needs integration |
+| --- | --- | --- |
+| Geometry-derived tine with modal mass, accepted live impulses, signed state and interval statistics | One gesture can produce both a sound and a traceable spatial response | A compelling sound and a finished three-dimensional body, presented together |
+| Grove, Loom and Rest coupling, damping and passage records | Play can reveal relationships and let silence have a physical cause | A unified encounter; coupling between the current spatial tine models is new work |
+| Preserved gestures, alternate-body auditions and derived returns | A phrase can keep its identity while its instrument changes | A transformation that reads as one musical journey |
+| Procedural performers, camera direction and verified movie prototypes | A performance can be staged and kept as a film | Art direction, expressive choreography and a new flagship export adapter |
+| Synth mechanisms, expressive scores and inverse studies | Richer voices and multiple possible interpretations of a sound | Clear family boundaries; arbitrary sound-to-geometry remains research |
+
+The most valuable discoveries are continuity and consequence. A small change matters when a listener remembers what came before. A return matters when it restores something they made. An explanation can deepen the mystery when it reveals that an unexpected movement belongs to the sound.
+
+Our next major investment should bring these discoveries together. Existing studies remain the laboratory and reference library; the flagship gets its own focused entrance.
+
+## The first encounter
+
+The following is a proposed three-to-five-minute experience, with a shorter watch-only route. Times describe a storyboard, not a countdown imposed on the player.
+
+**An object waits.** A carefully lit resonant structure occupies a quiet space. Its form suggests where to touch. One invitation says “Touch to begin.” Sound begins only through a deliberate action. A nearby “Hear it first” option plays a short authored greeting for someone who prefers to listen.
+
+**A touch has a life.** The gesture makes an immediate sound. The point of excitation is clear; a restrained reading of vibration reveals where the body responds. A second touch joins the first ring. The camera holds long enough for the visitor to notice that the instrument continues between gestures. No score, instructions panel or parameter grid competes with this moment.
+
+**A phrase becomes recognizable.** The visitor can keep a few touches as a phrase, without quantization by default. The exact original remains available. A lightweight invitation offers “Let it answer.” The system proposes a clearly distinct response using the phrase’s actual timing and the instrument’s available voices. It leaves space for the visitor to answer again. Authored fallback music supports people who do not wish to perform.
+
+**The instrument opens.** Choosing “Unfold” reveals a small family of related bodies. The phrase returns through them with deliberately composed changes of register, articulation and space. A long blade gives one part of the motif a different voice; a shorter body answers. New parts are introduced when they become musically relevant. The visitor can interrupt, return to the original, or keep playing. This is the principal reveal: their small action now has an architecture they recognize and can influence.
+
+**The listener can enter the sound.** “Look closer” offers a calm movement from the whole body toward its vibrating structure and then a clearly identified modal reading. The sound continues on the same timeline. A separate optional presentation can gather a phrase into a spatial memory, so recurrence becomes a place the visitor can explore. Returning restores the grounded body view and familiar orientation.
+
+**The world folds back to the first gesture.** The ensemble settles. The opening body and the visitor’s phrase return with enough silence to hear them differently. The person can play again, keep the playable encounter, or render a short film. The ending is part of the composition, not a results screen.
+
+## The artistic direction
+
+Begin with a tangible object: fine metal blades, dark ceramic supports, a few warm joints, and air around it. Use a coherent material vocabulary with contact shadows, deliberate silhouettes and a readable scale. Material appearance is artistic unless that material is part of the sound model. A beautiful glass-like surface must not quietly imply simulated glass acoustics.
+
+Give the environment a memorable spatial idea: a small suspended instrument whose supporting architecture gradually reveals room for an ensemble. Avoid a field of identical objects. Each introduced voice should have a recognizable form, location and musical role. A camera should often remain still; movement earns its place by revealing a relationship or changing the listener’s perspective.
+
+The sonic identity deserves equal authorship. Curate a small range that is compelling in dry playback, with quiet details and controlled contrasts. Optional space processing can provide intimacy or scale, labeled as an audio effect rather than inferred room acoustics. Preserve dry reconstruction for inspection. Evaluate tiny speakers and headphones separately; loudness alone must not make a comparison seem better.
+
+Michael’s spirituality and psychedelia direction can live in the structure of the experience: attention, participation, recurrence, a shift of scale, and return. The person moves from making a sound to recognizing themselves in an unfolding pattern. That is an artistic invitation, with room for playful, unsettling, intimate or contemplative readings. It does not require sacred symbols or a prescribed emotional outcome.
+
+Keep perceptual presentation named and reversible. A stable view remains available throughout. Explanatory detail belongs in “Look closer,” while the main encounter uses direct language and clear actions. Keyboard access, reduced motion, visual focus and an always-available quiet control are part of the composition from the beginning.
+
+## The technical idea that can grow beyond this encounter
+
+The long-term core is a **playable anatomy**: a structural model that determines sound, exposes meaningful places to act, and supplies the state needed to depict its behavior. A musical phrase is a separate object that can inhabit several anatomies. A director reads the resulting performance and chooses how to reveal it.
+
+```text
+Body design + accepted gestures → mechanical performance → sound
+                                           ↓
+                              spatial and modal observations
+                                           ↓
+                            body, performers and camera
+
+Saved phrase → another admitted anatomy → a distinct, returnable performance
+```
+
+Keep four identities explicit: the body, the visitor’s original phrase, a proposed arrangement, and the presentation. A new arrangement must not overwrite the visitor’s phrase. A visual treatment must not alter source sound. A structural change must rebuild the sound-producing model, not merely stretch the picture.
+
+For the first geometry-based scene, a family of independent tines can share a composition without pretending they physically exchange energy. A later compliant-bridge model could connect their modal coordinates, using the coupling work as a reference. Only then should the picture show mechanical transfer through those bridges. This is a substantial modeling milestone, not an aesthetic wiring task.
+
+Structural transformations initially occur at clear phrase boundaries. A ringing old body remains visible and sounding until it ends; a new body begins its own admitted state. Seamless deformation while a body rings needs a separate treatment of state transfer and work supplied by the deformation. Crossfading sound while displaying one continuously changing physical body would obscure that distinction.
+
+At display rate, high-frequency vibration needs an explicit spatial observation: energy, sampled displacement statistics, or a dedicated slowed inspection. Audio presentation time, source frames, display time and export time require a tested mapping. Live gestures receive immediate acknowledgment; anticipatory performer motion belongs to known future score events and cannot precede an unpredictable human touch truthfully.
+
+The first flagship remains local and uses the established browser stack. Reuse validated model math, records, deterministic rendering and performer planning behind small adapters. Do not assume current page-specific record formats or movie verifiers already support the new experience. Add a flagship recipe only after the first encounter establishes which choices actually need preserving.
+
+## Build toward a memorable proof
+
+| Milestone | Concrete result | What decides the next step |
+| --- | --- | --- |
+| 1. Compose the reveal | A 60–90 second audio sketch, six scene boards, and one finished still of the opening body | The phrase remains recognizable through the transformation; sound and silhouette are worth developing before adding controls |
+| 2. Finish one playable minute | One polished three-dimensional body, direct touch, visible consequence, quiet, and exact replay in a single scene | A newcomer can start, stop, play and recognize their replay without an explanation; investigate unwanted timbre, latency and visual ambiguity before expanding |
+| 3. Let the phrase unfold | Three deliberately chosen bodies, one proposed answer, one ensemble reveal, and an immediate route back | The visitor recognizes their contribution and can distinguish playing, arranging and changing the body; surprise survives repeated visits |
+| 4. Make one world returnable | A saved recipe, reliable reopening, optional close view and short film export | Reopening preserves the encounter; video and audio use the declared performance timeline; cancellation and failure preserve the original |
+| 5. Extend the physical vocabulary | A tested coupled spatial body or a carefully scoped second family | The added mechanism produces a musically useful relationship that the visitor can hear and affect; it earns its complexity |
+
+Work on sound and appearance together in the first milestone. Compare a small number of deliberately different artistic treatments around the same phrase, then commit to one. A polished minute is the first release target; the larger journey grows from that successful scene. Keep experimental alternatives in the laboratory rather than placing all of them in the flagship menu.
+
+For the first slice, limit the vocabulary to one model family, a few curated body designs, touch dynamics, one response, and one way to transform the phrase. Do not depend on arbitrary recording inference, microphone input, accounts, social features, many skins or an unlimited procedural universe. These can be future extensions after the core experience earns attention.
+
+## What polish must mean in practice
+
+The opening must communicate where to act. Every gesture needs consistent visual acknowledgment and audible behavior; the existing system’s accepted sample timing does not prove hardware latency. The scene must remain legible on a small screen, and a still camera must remain a complete experience.
+
+The first sound should be intentionally designed, with useful dynamics and a satisfying decay. The reveal should be musically composed, not generated by multiplying objects. Empty, sparse and repeated input need graceful outcomes. A listener who chooses not to play should still encounter a complete piece.
+
+Every return must be dependable. Keep the original through failed comparisons, cancelled renders and scene changes. Clearly distinguish a playable recipe, a sound recording and a film. Asset loading, unavailable audio devices, background tabs and reduced performance need finished behavior rather than raw errors.
+
+Use a small formative evaluation before broadening the experience. Observe whether several newcomers can enter, make a phrase, transform it and return unaided. Ask what they thought was happening, which moment they would show someone else, and whether they want another turn. Record their language and disagreements. These sessions guide revisions; they cannot certify universal appeal. Numerical tests continue to protect the mechanics underneath.
+
+## Research with the greatest potential
+
+Three research directions could make this more than a well-presented instrument. **Design through listening:** preserve a phrase while searching for bodies that satisfy a specified change in pitch, decay or brightness. Begin with the bounded geometry family; present alternatives rather than a uniquely recovered object. **Composition through structure:** generate musical responses from the actual resonances, couplings and playable regions of an anatomy. **Performance as a spatial object:** keep the gesture, instrument and staging together so a musical moment can be revisited, reinterpreted and played into again.
+
+These directions reinforce each other. A person changes a body, hears a new possibility, receives a musically appropriate response, and keeps the result as an inhabitable performance. The flagship gives that larger research program a concrete experience to serve.
+
+## Immediate next work and checkpoint
+
+The next work is the first milestone: choose a phrase, develop its sonic transformation, storyboard the encounter, and produce a finished opening-body visual target. Assess what the existing tine can contribute and what the broader Grove vocabulary teaches about richer relationships. Do not start by merging all 41 pages or rewriting every engine.
+
+The current technical checkpoint is `f44d559`, following the interval inspector at `6a21eef`. All 784 tests pass; native checks verify same-window original/comparison readings, quiet return and home discovery. Detailed evidence is in [the tine model notes](../../collab/notes/astra-tine-impulse.md). Existing commitments remain in [VISION](../VISION.md) and [the roadmap](../ROADMAP.md). This proposal sets a direction for synthesis; it does not silently replace those contracts. Fable’s review is pending while they are unavailable, and Michael’s response can shape the artistic commitment before the flagship expands.

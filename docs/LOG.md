@@ -698,3 +698,5 @@
 - 2026-11-03 (Astra, solo): completed tine passes now offer optional 2/16 ms mean-and-spread bending inspection alongside signed instants. Accepted-event reconstruction, explicit endpoint shortening, shared scales and model limits; six focused tests and native quiet fixture/ending/selector checks pass.
 
 - 2026-11-03 (Astra): interval milestone reconciled on home/M18; native same-window original/wider-body/return checks confirm half-scale response and unchanged original identity. Home41/41 and history link verified; full regression784/784 in146.209s, no failures/cancellations/skips.
+
+- 2026-11-03 (Astra, Michael’s request): stepped back from incremental studies to draft proposal024, The Living Instrument. Synthesizes gesture continuity, geometry-derived sound, procedural staging and returnable performances into one flagship encounter. First milestone is an authored sonic/visual proof; current VISION/contracts preserved. Proposal linked from home notebook; Fable review pending.
