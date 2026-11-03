@@ -562,3 +562,5 @@ Force energy reading complete: common-time accounting, figures/tables, native ac
 Returning-force phrase complete: generator/catalog and browser/file evidence recorded; claim released.
 
 Listening controls in reach complete: both generators updated and native force/body pause actions verified; claim released.
+
+Study player recovery complete: separate resource retry and injected failure tests verified;7 focused checks pass, claim released.

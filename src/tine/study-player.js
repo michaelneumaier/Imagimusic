@@ -4,10 +4,11 @@ export function createTineStudyPlayer({audio,createContext=()=>new AudioContext(
  function stop(){version++;audio.pause();}
  async function play(url){
   stop();const own=version;
-  if(!context){context=createContext();source=context.createMediaElementSource(audio);}
+  if(!context)context=createContext();
+  if(!source)source=context.createMediaElementSource(audio);
   if(!stage){const next=createStage(context,{db});try{source.connect(next.input);next.output.connect(context.destination);}catch(error){source.disconnect();next.dispose();throw error;}stage=next;}
   await context.resume();if(own!==version)return false;
-  if(context.state!=='running')throw Error('Audio is interrupted. Choose a body again when audio is available.');
+  if(context.state!=='running')throw Error('Audio is interrupted. Choose an example again when audio is available.');
   audio.src=url;await audio.play();if(own!==version)return false;return true;
  }
  function setDb(value){listeningGain(value);stage?.setDb(value);db=value;}
