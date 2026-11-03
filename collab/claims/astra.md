@@ -600,3 +600,7 @@ Flagship artistic proof complete as a first sketch: audio/figures/prompts, six-s
 Flagship opening scene: owns living.html, living.css and src/living/scene.js/main.js. Local static3D geometry/material/camera prototype, demand-rendered and explicit prototype limits, before playing integration.
 
 Opening scene construction and home link complete; native narrow/desktop views and limits recorded in collab/notes/astra-living-instrument.md. Claim released.
+
+Living instrument touch integration: owns living.html/css and src/living/main.js/scene.js. Reuse validated live session, accepted-touch marker, pointer click-vs-orbit gating, quiet lifecycle and original-pass handoff to existing replay page.
+
+Living instrument touch integration complete: focused tests and native button/blade/drag/handoff/interruption evidence recorded; claim released.

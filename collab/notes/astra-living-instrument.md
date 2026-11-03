@@ -13,3 +13,13 @@ Initial native Safari390×656 review found the support hiding the clamp and flat
 A test navigation used Command-Home expecting page-top; Safari opened its home page. Returned directly to the local scene; use scrolling rather than that shortcut in future. No task data was transmitted.
 
 No playing, vibration display, ensemble reveal or film export exists on this page yet. Next integrate the existing accepted-impulse host and a deliberate causal response presentation; do not make an arbitrary slow blade oscillation stand in for high-frequency vibration. Keep initialization quiet and preserve the standalone playing page. Home links directly to this form study without expanding the working catalog count.
+
+## First playable opening
+
+The scene now reuses the existing four-mode tine live session: Begin deliberately starts audio, up to eight accepted impulses in four seconds, an eight-second maximum ring, gentle Quiet and interruption parking. Both the Touch button and a direct blade click request the same fixed-strength impulse at the same fixed 85% position. Orbit dragging does not strike. The gold spot acknowledges an accepted worklet event; it is explicitly not a vibration or energy display. No mechanical model or source gain changed.
+
+A successful pass produces a strict original-record link into tine-play.html, where replay, body comparisons, inspection and keeping already exist. A later empty pass retains that previous link. New successful passes replace the visit link; this page is not a persistent archive. The home and authored-proof links now describe this playable opening.
+
+Validation: 13/13 live-session, live-record and live-address tests passed; both new scripts pass syntax checking and the diff passes whitespace checks. Native Safari button input accepted frame31360 at48kHz; a direct rendered-blade click accepted frame34176, with fadeStart83072. A subsequent camera drag yielded zero events and retained that exact previous record. Opening the retained phrase showed one touch,1.76seconds, quiet initial replay controls and+0dB. At390×656, tab-away during playing returned to the interrupted message, Begin enabled and Touch/Quiet disabled. This verifies desktop Safari at a narrow viewport, not physical-phone touch behavior. No peer review while Fable is unavailable.
+
+Still open: real-time model-derived response presentation, material/shadow refinement, a coherent musical transition to alternate bodies, ensemble reveal and film export. The currently static blade must not acquire arbitrary slow oscillation presented as its actual vibration. The next creative milestone should make one accepted gesture visibly legible and emotionally satisfying before widening the world.

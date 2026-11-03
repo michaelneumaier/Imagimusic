@@ -3,7 +3,7 @@ import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitContr
 import {createSurfaceLighting} from '../stage/surface-lighting.js';
 
 /** Static design study. One drawing unit = 10 mm. No physical motion here. */
-export function createLivingScene(canvas){
+export function createLivingScene(canvas,{onTouch=()=>{}}={}){
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
@@ -22,6 +22,7 @@ export function createLivingScene(canvas){
  mesh(cradle,ceramic,[-.75,0,-.9]);
  // Exposed span x=0…8, width1, thickness.1; another .8 enters the clamp.
  const blade=mesh(new T.BoxGeometry(8.8,.1,1),steel,[3.6,3.5,0]);blade.name='steel-blade';
+ const marker=mesh(new T.SphereGeometry(.075,20,12),new T.MeshBasicMaterial({color:0xe9b56c}),[6.8,3.64,0]);marker.visible=false;
  mesh(chamferedBox(.8,.32,1.45),bronze,[-.4,3.71,0]);
  mesh(chamferedBox(.8,.25,1.45),bronze,[-.4,3.325,0]);
  for(const z of [-.46,.46]){
@@ -41,7 +42,14 @@ export function createLivingScene(canvas){
  function resize(){const r=canvas.getBoundingClientRect();if(r.width===width&&r.height===height)return;width=r.width;height=r.height;renderer.setSize(Math.max(1,width),Math.max(1,height),false);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();place();render();}
  function view(name){if(!poses[name])throw Error('Unknown instrument view.');selected=name;place();render();}
  controls.addEventListener('change',render);
+ const raycaster=new T.Raycaster();let pointer=null;
+ function down(event){if(event.isPrimary&&event.button===0)pointer={id:event.pointerId,x:event.clientX,y:event.clientY,moved:false};else pointer=null;}
+ function move(event){if(pointer&&event.pointerId===pointer.id&&Math.hypot(event.clientX-pointer.x,event.clientY-pointer.y)>6)pointer.moved=true;}
+ function up(event){const p=pointer;pointer=null;if(!p||p.id!==event.pointerId||p.moved)return;const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new T.Vector2(2*(event.clientX-r.left)/r.width-1,1-2*(event.clientY-r.top)/r.height),camera);if(raycaster.intersectObject(blade).length)onTouch();}
+ function cancel(){pointer=null;}
+ canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',cancel);
+ function acknowledgeTouch(value=true){marker.visible=value;render();}
  const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
- function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,dispose};
+ function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
+ return {view,render,acknowledgeTouch,dispose};
 }
