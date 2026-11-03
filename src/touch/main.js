@@ -1,3 +1,4 @@
+import {createTouchView} from './view-framing.js';
 import {touchKeepNames} from './keep-name.js';
 import {compositionPageURL} from '../stage/composition-link.js';
 import {touchConnectionHref,readTouchConnection} from './connection-link.js';
@@ -13,10 +14,16 @@ let customConnection=null;
 const selectedConnection=()=>$('bridge').value==='custom'?customConnection:getLoomJourney($('bridge').value);
 let visualAveraged=false;
 const restingHint=()=>settings.coupling===0?'These bodies ring independently; coupling is zero.':'Both bodies belong to the same ringing system.';
+let pictureView,focusView='both';
 let world,settings,stillAt=0,lastPhase='',lastGesture=null,connectionPending=false;
 $('still-picture').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function describeView(){const still=$('still-picture').checked;$('world').setAttribute('aria-label',still?'A still view of two bodies.':visualAveraged?'Two bodies showing averaged modeled vibration envelopes.':'Two bodies whose width and glow follow modeled vibration envelopes.');$('view-note').textContent=still?'A still view. Sound, gestures and pad feedback are unchanged.':visualAveraged?'Fast beating: width and glow show averaged envelopes, not each beat. Sound is unchanged.':'Width and glow follow the modeled response.';}
+function describeView(){const still=$('still-picture').checked;$('world').setAttribute('aria-label',focusView!=='both'?`Close view of the ${focusView} body. ${still?'Still picture.':visualAveraged?'Averaged modeled envelope.':'Modeled displacement envelope.'} Both bodies remain audible.`:still?'A still view of two bodies.':visualAveraged?'Two bodies showing averaged modeled vibration envelopes.':'Two bodies whose width and glow follow modeled vibration envelopes.');$('view-note').textContent=still?'A still view. Sound, gestures and pad feedback are unchanged.':visualAveraged?'Fast beating: width and glow show averaged envelopes, not each beat. Sound is unchanged.':'Width and glow follow the modeled response.';}
 $('still-picture').onchange=describeView;describeView();
+for(const button of document.querySelectorAll('[data-view]'))button.onclick=()=>{
+ focusView=button.dataset.view;describeView();
+ for(const choice of document.querySelectorAll('[data-view]'))choice.setAttribute('aria-pressed',String(choice===button));
+ $('focus-note').textContent=focusView==='both'?'Both bodies in view.':`Close view of the ${focusView} body. Both bodies remain audible and playable.`;
+};
 function status(text,error=false){$('status').textContent=text;$('status').dataset.error=String(error);}
 function controls({state,recording}){
  const playable=!connectionPending&&['ready','playing'].includes(state),has=!!recording?.events.length;
@@ -93,9 +100,9 @@ try{const requested=readTouchConnection(location.search);if(requested.custom){cu
 configure();
 if(routeError)status(`Could not open the linked connection: ${routeError.message} Close kin is selected instead. Choose a connection and enter when ready.`,true);
 else if(customConnection)status('Your custom connection is selected. Enter to begin a new passage; no saved gestures were carried over.');
-try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();}catch(error){$('world').hidden=true;status('The 3D view is unavailable; the pads can still play the connection.');}
+try{world=createWorld($('world'));for(const body of [...world.garden,...world.choir,world.tine])body.root.visible=false;world.rail.visible=false;world.loom.root.position.set(0,0,1);world.loom.root.scale.setScalar(1);world.loom.root.visible=true;world.camera.position.set(0,3.6,10);world.controls.target.set(0,1.1,1);world.controls.update();pictureView=createTouchView(world);$('view-controls').hidden=false;}catch(error){$('world').hidden=true;status('The 3D view is unavailable; the pads can still play the connection.');}
 function draw(){
- const t=transport.time();if(world){world.loom.bridge.visible=settings.coupling>0;const zoom=Math.min(1,$('world').clientWidth/Math.max(1,$('world').clientHeight)/1.5);if(world.camera.zoom!==zoom){world.camera.zoom=zoom;world.camera.updateProjectionMatrix();}const still=$('still-picture').checked;const resting={time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]};const frame=still?resting:transport.session?.visual(t)??resting;applyLoomScene(loomSceneFrame(frame,settings,{active:!still}),world.loom);world.render();}
+ const t=transport.time();if(world){pictureView.update({focus:focusView,width:$('world').clientWidth,height:$('world').clientHeight});world.loom.bodies.forEach((body,i)=>{body.body.parent.visible=focusView==='both'||i===(focusView==='left'?0:1);});world.loom.bridge.visible=settings.coupling>0&&focusView==='both';const still=$('still-picture').checked;const resting={time:0,envelope:[0,0],displacement:[0,0],averaged:false,strikes:[]};const frame=still?resting:transport.session?.visual(t)??resting;applyLoomScene(loomSceneFrame(frame,settings,{active:!still}),world.loom);world.render();}
  for(const [body,hold] of held)pads[body].style.setProperty('--hold',`${holdVelocity(performance.now()-hold.start)*100}%`);
  const phase=transport.state==='ended'?'QUIET':lastGesture&&t<stillAt?(settings.coupling===0?'LISTEN TO THE TOUCHED BODY':'LISTEN ACROSS THE CONNECTION'):transport.state==='preparing'?'PREPARING':transport.state==='idle'?'READY WHEN YOU ARE':'STILL';if(phase!==lastPhase){$('phase').textContent=phase;lastPhase=phase;}
  requestAnimationFrame(draw);
