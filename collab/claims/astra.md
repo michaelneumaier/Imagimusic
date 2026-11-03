@@ -534,3 +534,5 @@ Export discovery complete: project.html and src/project-catalog.js wording check
 Export milestone evidence complete: M18, log and evidence updated; full771/771 and native fresh/narrow export checked. Claim released.
 
 Shared live listening level checkpoint complete: host/tests and playing UI released;15 focused checks and native+10dB lifecycle/export evidence recorded.
+
+Listening integration evidence complete: browser harness, narrow UI and M18 checkpoint verified; claim released.

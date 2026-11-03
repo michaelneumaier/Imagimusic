@@ -350,3 +350,9 @@ One visit-local0…20dB slider, default0, now feeds the same downstream listenin
 Fifteen focused tests pass: host lifecycle plus new level-persistence/source-separation and failed-connection cleanup/retry tests, shared replay and WAV checks. Safari explicitly selected+10dB, replayed a kept pass, completed a fresh live touch and earlyQuiet, prepared/auditioned a width20 comparison, and returned from an actual tab switch quietly with+10dB and both prepared identities retained. Exported original file hash remains `640f52adbb0f34b1d548f8f313a67c0bbf320affc4594a0f05599fd121dbfdab` before/after changing listening level. This verifies UI/lifecycle and file independence, not a hardware listening preference or physical latency.
 
 Follow-up: narrow view of the new level control and offline browser graph checks can strengthen the evidence. Broader musical/listener assessment remains open; Fable peer review pending.
+
+### Listening graph and narrow-control verification — 2026-11-03
+
+The actual Safari offline-worklet harness now splits one worklet into dry and downstream listening channels. Natural0dB and early20dB cases pass2/2, retaining zero dry/reference, record, worker and comparison errors. Listening output differs from the explicit float-gain/curve calculation by at most5.960464477539063e-8; a separate offline replay of the saved PCM through the same stage matches the live listening channel exactly (zero observed error). This verifies the same-engine graph, not cross-engine reconstruction identity.
+
+The existing standalone browser listening-stage check also passes at0/20dB with peak0.949999988079071 and max errors4.842877388000488e-8 /1.0244548320770264e-8. This includes larger inputs exercising the ceiling; the tine fixture alone is below it. Shared-stage/host/replay Node checks15/15. At390×656 Safari responsive preview the label, numeric level, slider and explanatory paragraph fit without clipping; changing the level leaves entry quiet.
