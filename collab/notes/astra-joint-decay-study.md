@@ -47,3 +47,26 @@ node tools/study-joint-decay.mjs > joint-decay-report.json
 Three tests pass: signed quadrature recovery and independent sample reconstruction, rank refusal and budget accounting, and optimized clean-mixture recovery with an unused continuation. The CLI ran all 12 cases successfully. The preceding 699-test full-suite checkpoint predates these three new tests.
 
 Next: prepare source/reconstruction listening pairs at one shared level and compare predictions on genuinely withheld noisy observations. Frequency discovery, unknown mode count, attacks, changing pitch, pickup/radiation and room effects remain outside this experiment. The source page remains inspection and explicit audition only. No fitted mixture has been promoted to a declared physical-instrument target.
+
+## Listening comparison and actual withheld noisy samples
+
+`node tools/render-joint-decay-study.mjs --audio-dir renders/joint-decay-study` creates eight local listening tracks and a report: the full noisy source, its known clean synthetic reference, and each of the three supplied-frequency models fitted to 0.5 or 2 seconds. Every fit receives an actual prefix of the same four-second noisy recording. The remaining noisy samples are withheld from fitting, with the clean continuation reported separately as an oracle.
+
+This listening version uses 8 kHz samples, not the earlier experiment's 2 kHz. It retains the same declared modes, noise level, seed and decay search. The actual noise samples and their relationship to time consequently differ; the slightly wrong model's lower training residual from the earlier run must not be carried over as a result here.
+
+| Model and observed duration | Observed error % | Withheld noisy error % | Withheld clean error % |
+|---|---:|---:|---:|
+| Supplied true frequencies, 0.5 s | 2.2997 | 4.5847 | 0.8975 |
+| Middle shifted 0.1 Hz, 0.5 s | 2.3001 | 5.5516 | 3.2865 |
+| Middle omitted, 0.5 s | 2.9803 | 24.2388 | 23.8564 |
+| Supplied true frequencies, 2 s | 3.0210 | 6.5816 | 0.1199 |
+| Middle shifted 0.1 Hz, 2 s | 3.1602 | 6.6372 | 0.8952 |
+| Middle omitted, 2 s | 5.2549 | 6.9624 | 2.3607 |
+
+Different observed durations leave different suffix intervals; these normalized residuals should not be compared as though their reference windows were identical. Noise persists while the clean signal decays, so even a close signal reconstruction has a substantial noisy-suffix residual. These are sample metrics, not perceived-difference measurements.
+
+All tracks are dual-mono PCM16, 32,000 frames, four seconds at 8 kHz, with one fixed 0.1 gain and the same final 200-frame linear fade. The fade applies only to listening WAVs; fitting and measurements use unfaded Float64 signals. There is no per-track normalization, truncation of the predicted continuation, or conversion to a Grove record. The page uses one explicit HTML audio player and pauses on departure. Each model names the observed duration and the duration it predicts. The clean source is labeled as a synthetic reference unavailable from an arbitrary recording.
+
+Independent Python verification checked all eight WAV hashes, dimensions, identical left/right channels and final zero samples. It reconstructed all six fitted waveforms from the report's signed quadratures and decays, applying the declared gain/fade, with maximum decoded-PCM difference 0.0000214644 (less than one 16-bit sample step). The project preparer's read-only check reports this study ready and can regenerate it with its explicit audio-directory argument. The catalog and notebook link expose the study locally; generated audio remains untracked.
+
+Native Safari check: the generated page opened with the player stopped and all eight choices visible. Explicit source selection entered playback; selecting the half-second omitted-mode reconstruction changed the single player to a four-second track at its beginning, and Pause stopped it. Catalog search for “glimpse” returned exactly 1 of 35 entries with an enabled local study link. These establish page selection/transport and discovery, not audible device output or a human assessment of the differences.

@@ -5,6 +5,7 @@ import {spawn} from 'node:child_process';
 import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['What continues beyond the glimpse?','renders/joint-decay-study','tools/render-joint-decay-study.mjs',['--audio-dir','renders/joint-decay-study']],
  ['Room for an answer','renders/open-phrase-study','tools/render-open-phrase-study.mjs'],
  ['One more return','renders/open-phrase-recurrence','tools/render-open-phrase-recurrence.mjs'],
  ['Three Groves','renders/harmonic-groves','tools/render-harmonic-groves.mjs'],
@@ -26,12 +27,12 @@ async function available(directory){
  }catch{return false;}
 }
 let missing=0;
-for(const [title,directory,script] of studies){
+for(const [title,directory,script,scriptArgs=[]] of studies){
  if(await available(directory)){console.log('Ready: '+title);continue;}
  missing++;
  if(args.includes('--check')){console.log('Missing: '+title);continue;}
  console.log('Preparing: '+title+' (physical rendering may take a few minutes)');
- await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script],{cwd:root,stdio:['ignore','ignore','inherit']});child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(title+' preparation failed: '+(signal??code))));});
+ await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script,...scriptArgs],{cwd:root,stdio:['ignore','ignore','inherit']});child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(title+' preparation failed: '+(signal??code))));});
  if(!await available(directory))throw new Error(title+' renderer did not produce a complete listening page');
  missing--;
  console.log('Ready: '+title);

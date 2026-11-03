@@ -429,3 +429,5 @@ Completed source listening position (stable): owned inverse-sound page and inspe
 Completed solo continuation checkpoint (stable): docs/ROADMAP.md M18 heading/current checkpoint and append-only docs/LOG.md, plus owned project history. Lead-maintained status reconciliation while Fable is unavailable; preserve historical entries and distinguish shipped local behavior, research and pending reviews.
 
 Completed joint decay research (stable): tools/study-joint-decay.mjs, tests/joint-decay-study.test.js and own evidence note. Bounded fixed-frequency exponential mixture fit with explicit supplied frequencies, independent residual reconstruction, and known-answer controls; no production estimator or shared physics edits.
+
+Completed joint-fit listening study (stable): tools/render-joint-decay-study.mjs, generated local renders/joint-decay-study, own evidence note and catalog entry. Same-gain source/reconstruction WAVs, actual withheld noisy suffix metrics, explicit supplied-frequency limitations; one player and no automatic target handoff.
