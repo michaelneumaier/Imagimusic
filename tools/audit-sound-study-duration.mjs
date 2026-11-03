@@ -7,7 +7,8 @@ import {estimate,synthesize} from './study-sound-file-target.mjs';
 const modes=[{hz:140,amplitude:1,decay:.8},{hz:190,amplitude:1,decay:2.4},{hz:260,amplitude:1,decay:5}];
 const fixture=synthesize({modes,seconds:8,sampleRate:8000});
 const describe=result=>({
- heuristicCount:result.supported,
+ heuristicCount:result.candidateCount,
+ spectralWindowSeconds:result.spectralWindowSeconds, decayWindowSeconds:result.decayWindowSeconds,
  peaks:result.peaks.map(p=>({hz:p.hz,decaySeconds:p.decay,fitFrames:p.frames,fitResidualDb:p.decayFitDb??null})),
 });
 const pairs=[];
@@ -15,13 +16,14 @@ for(const seconds of [.25,.375,.5,1,2,4,8]){
  const prefix=fixture.samples.slice(0,Math.round(seconds*fixture.sampleRate));
  const short=estimate(prefix,fixture.sampleRate,seconds,{window:'hann'});
  const full=estimate(fixture.samples,fixture.sampleRate,seconds,{window:'hann'});
- // The spectral input is identical. Any difference in fitted decay/count
- // comes from the samples made available outside that spectral window.
+ const extended=estimate(fixture.samples,fixture.sampleRate,seconds,{window:'hann',decayWindowSeconds:8});
+ // Default fits must ignore all samples outside the selected prefix.
+ assert.deepEqual(describe(short),describe(full));
  assert.deepEqual(short.peaks.map(p=>p.hz),full.peaks.map(p=>p.hz));
  assert.equal(short.W,full.W);
  pairs.push({spectralWindowSeconds:short.W,shortAvailableSeconds:prefix.length/fixture.sampleRate,
  fullAvailableSeconds:fixture.samples.length/fixture.sampleRate,
- truncatedFile:describe(short),fullFile:describe(full)});
+ truncatedFile:describe(short),fullFile:describe(full),explicitExtendedDecay:describe(extended)});
 }
 assert.deepEqual(pairs.at(-1).truncatedFile,pairs.at(-1).fullFile);
 console.log(JSON.stringify({

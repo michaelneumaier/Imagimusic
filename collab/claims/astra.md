@@ -417,3 +417,5 @@ Two-millisecond touch listening study: tools/study-touch-interference.mjs and it
 Touch close views: src/touch/view-framing.js, tests/touch-view-framing.test.js and owned Touch UI. Optional body-specific fixed framing, stable full-admission bounds, previous orbit restoration, visual-only isolation with both pads and audio retained.
 
 Saved Touch close-view continuity: touch-return.html/src/touch/return-main.js and shared touch-view.css. Reuse live camera bounds and control styles; focus choice changes only the picture during original/comparison replay.
+
+Completed November 3 independent research maintenance (ownership returned to stable; evidence in collab/notes/astra-sound-study-review-fixes.md): Astra took responsibility for the review fixes in tools/study-sound-file-target.mjs and tests/inverse-sound-study.test.js while Fable is unavailable, under the lead's reassignment role and Michael's explicit continue-without-Fable direction. Both paths were clean before edits. Preserve prior findings as historical; revise observation-window metadata, one-to-one truth matching, and threshold terminology. No production estimator promotion.

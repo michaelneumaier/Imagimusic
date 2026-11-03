@@ -6,12 +6,12 @@ import { createInverseInstrument } from '../src/inverse/instrument.js';
 import { familyRatioBound } from '../src/score/grove-inverse.js';
 
 export const STUDY_DEFINITIONS = Object.freeze({
-  window: 'W seconds from the note\'s first sample, either rectangular (no taper; best resolution, main-lobe half-width fs/W, first sidelobe −13 dB) or Hann (half-width 2 fs/W, first sidelobe −31 dB), zero-padded to the next power of two of at least 4 W fs for interpolation; W in {0.25, 0.5, 1, 2, 4, 8} s, limited to the signal length; both windows are run on every case so resolution and dynamic range can be compared',
-  peaks: 'local maxima of the magnitude spectrum between 20 Hz and fs/2 that exceed 6 dB above the median magnitude of the window\'s spectrum and are at least one full rectangular main lobe (2 fs/W Hz) from a stronger accepted peak; and exceed every stronger accepted peak\'s sidelobe envelope by 3.5 dB at any distance (rectangular: 1/(π·max(d − 0.5, 0.5)) with d in half-widths; Hann: a flat −31 dB), which is also the study\'s dynamic-range limit: a true mode weaker than a stronger mode\'s skirt at its distance is not certified by that window; frequency refined by quadratic interpolation of log magnitude over the three bins around the maximum; at most eight peaks reported, strongest first',
-  decay: 'per accepted peak, the amplitude of a 0.25 s rectangular frame hopped by 0.125 s at the peak\'s refined frequency (projection on the complex exponential), fitted by least squares on log amplitude over frames whose amplitude exceeds 1 % of the first; decay = −1/slope in seconds; reported with the fit\'s RMS residual in dB; frames fewer than three give no decay',
+  window: 'W seconds from the note\'s first sample, either rectangular (no taper; best resolution, main-lobe half-width 1/W Hz, first sidelobe −13 dB) or Hann (half-width 2/W Hz, first sidelobe −31 dB), zero-padded to the next power of two of at least 4 W fs for interpolation; W in {0.25, 0.5, 1, 2, 4, 8} s, limited to the signal length; both windows are run on every case so resolution and dynamic range can be compared',
+  peaks: 'local maxima of the magnitude spectrum between 20 Hz and fs/2 that exceed 6 dB above the median magnitude of the window\'s spectrum and are at least one full main lobe of the chosen window (2/W Hz rectangular, 4/W Hz Hann) from a stronger accepted peak; and exceed every stronger accepted peak\'s sidelobe envelope by 3.5 dB at any distance (rectangular: 1/(π·max(d − 0.5, 0.5)) with d in half-widths; Hann: a flat −31 dB), which is also the study\'s dynamic-range limit: a true mode weaker than a stronger mode\'s skirt at its distance is rejected by this heuristic; frequency refined by quadratic interpolation of log magnitude over the three bins around the maximum; at most eight peaks reported, strongest first',
+  decay: 'Uses the same bounded prefix as the spectrum by default; an explicit decayWindowSeconds can request a different prefix, with both actual durations and total available duration reported. Per accepted peak, the amplitude of a 0.25 s rectangular frame hopped by 0.125 s at the peak\'s refined frequency (projection on the complex exponential), fitted by least squares on log amplitude over frames whose amplitude exceeds 1 % of the first; decay = −1/slope in seconds; reported with the fit\'s RMS residual in dB; frames fewer than three give no decay',
   commonDecay: 'never averaged automatically: each mode\'s decay is reported separately with the spread (max/min); a common decay is a declaration the visitor would make',
   smithPrediction: 'the rectangular-window rule from Smith (SASP, Frequency Resolution): two sinusoids need W ≥ 2 / Δf (Abe and Smith: 1.44 / Δf for accurate peak frequency); printed per case as the predicted minimum W for the case\'s closest true pair, and compared with what the study found',
-  evidence: 'supported estimates = accepted peaks at least 20 dB above the window\'s median magnitude that have a decay fit (weaker peaks are listed but not counted); fewer than three means insufficient evidence for a three-resonance target and nothing is invented; because the rectangular window lists beating sidelobes of a merged cluster as peaks, the Hann count is the evidence count and the rectangular pass is the resolution probe',
+  evidence: 'candidateCount counts accepted peaks at least 20 dB above the spectrum median with a negative-slope decay fit. supported is a compatibility alias. These are heuristic study thresholds, not certified physical resonances; residuals are reported but do not gate the count. Neither window guarantees a three-resonance target or a common decay.',
 });
 
 const fail = m => { throw new Error(`sound-file study: ${m}`); };
@@ -26,7 +26,10 @@ export function synthesize({ modes, seconds = 4, sampleRate = 48000, noiseDb = n
   return { samples: x, sampleRate };
 }
 
-export function estimate(samples, sampleRate, W, { window = 'rect' } = {}) {
+export function estimate(samples, sampleRate, W, { window = 'rect', decayWindowSeconds = W } = {}) {
+  if (!Number.isFinite(sampleRate) || sampleRate < 8 || !Number.isFinite(W) || W <= 0 || !Number.isFinite(decayWindowSeconds) || decayWindowSeconds <= 0) fail('positive finite sample rate and observation durations required');
+  if (!['rect', 'hann'].includes(window)) fail('unknown window');
+  const decayLen = Math.min(samples.length, Math.round(decayWindowSeconds * sampleRate));
   const len = Math.min(samples.length, Math.round(W * sampleRate)); if (len < 64) fail('window too short');
   let size = 1; while (size < 4 * len) size <<= 1;
   const re = new Float64Array(size), im = new Float64Array(size);
@@ -38,26 +41,48 @@ export function estimate(samples, sampleRate, W, { window = 'rect' } = {}) {
   for (let k = lo + 1; k < bins - 1; k++) if (mag[k] > floor && mag[k] >= mag[k - 1] && mag[k] > mag[k + 1]) candidates.push(k);
   candidates.sort((a, b) => mag[b] - mag[a]);
   const peaks = [];
-  // Sidelobe rejection for the rectangular window: a sinusoid's magnitude at an offset Δ beyond its main lobe falls as 1/(π Δ / lobeHz), so a weaker
-  // candidate within 16 lobes of a stronger accepted peak is rejected when its magnitude is below that envelope times 1.5 (a 3.5 dB margin).
   // Sidelobe rejection at any distance d (in half-widths) from a stronger accepted peak, with a 3.5 dB margin: rectangular envelope
   // 1/(π·max(d−0.5, 0.5)) (the first sidelobe sits near d = 1.43 at −13 dB; the −0.5 keeps the envelope above it), Hann envelope a flat −31 dB
-  // (its first sidelobe), so a weaker true mode under a stronger mode's skirt is not certified: the study's dynamic-range limit.
+  // (its first sidelobe), so a weaker true mode under a stronger mode's skirt is rejected by this heuristic.
   const sidelobe = (strong, k) => { const d = Math.abs(strong.bin - k) * hzPerBin / lobeHz; if (d < 1) return false; const envelope = window === 'hann' ? 10 ** (-31 / 20) : 1 / (Math.PI * Math.max(d - 0.5, 0.5)); return mag[k] < 1.5 * mag[strong.bin] * envelope; };
   for (const k of candidates) { if (peaks.length >= 8) break; if (peaks.some(p => Math.abs(p.bin - k) < lobe)) continue; if (peaks.some(p => sidelobe(p, k))) continue;
     const a = Math.log(mag[k - 1]), b = Math.log(mag[k]), c = Math.log(mag[k + 1]), d = (a - 2 * b + c) === 0 ? 0 : 0.5 * (a - c) / (a - 2 * b + c);
     peaks.push({ bin: k, hz: (k + d) * hzPerBin, magnitudeDb: 20 * Math.log10(mag[k] / (len / 2)), aboveMedianDb: 20 * Math.log10(mag[k] / med) }); }
   for (const p of peaks) {   // decay from frame projections at the refined frequency
     const frame = Math.round(0.25 * sampleRate), hop = Math.round(0.125 * sampleRate), amps = [], times = [];
-    for (let start = 0; start + frame <= samples.length; start += hop) { let sr = 0, si = 0; for (let i = 0; i < frame; i++) { const t = (start + i) / sampleRate; sr += samples[start + i] * Math.cos(2 * Math.PI * p.hz * t); si -= samples[start + i] * Math.sin(2 * Math.PI * p.hz * t); } amps.push(2 * Math.hypot(sr, si) / frame); times.push((start + frame / 2) / sampleRate); }
+    for (let start = 0; start + frame <= decayLen; start += hop) { let sr = 0, si = 0; for (let i = 0; i < frame; i++) { const t = (start + i) / sampleRate; sr += samples[start + i] * Math.cos(2 * Math.PI * p.hz * t); si -= samples[start + i] * Math.sin(2 * Math.PI * p.hz * t); } amps.push(2 * Math.hypot(sr, si) / frame); times.push((start + frame / 2) / sampleRate); }
     const used = []; for (let i = 0; i < amps.length; i++) if (amps[i] > 0.01 * amps[0]) used.push(i); else break;
     if (used.length >= 3) { const xs = used.map(i => times[i]), ys = used.map(i => Math.log(amps[i])), mx = xs.reduce((s, v) => s + v) / xs.length, my = ys.reduce((s, v) => s + v) / ys.length; const slope = xs.reduce((s, x, i) => s + (x - mx) * (ys[i] - my), 0) / xs.reduce((s, x) => s + (x - mx) ** 2, 0); const res = Math.sqrt(ys.reduce((s, y, i) => s + (y - (my + slope * (xs[i] - mx))) ** 2, 0) / xs.length); p.decay = slope < 0 ? -1 / slope : null; p.decayFitDb = 20 * res / Math.log(10); p.frames = used.length; } else { p.decay = null; p.frames = used.length; } }
-  // 'supported' counts only peaks at least 20 dB above the window's median magnitude with a decay fit; weaker listed peaks are shown but not counted
-  return { W: len / sampleRate, window, hzPerBin, mainLobeHz: lobeHz, peaks, supported: peaks.filter(p => p.decay !== null && p.aboveMedianDb >= 20).length };
+  const candidateCount = peaks.filter(p => p.decay !== null && p.aboveMedianDb >= 20).length;
+  return { W: len / sampleRate, availableSeconds: samples.length / sampleRate,
+    spectralWindowSeconds: len / sampleRate, decayWindowSeconds: decayLen / sampleRate,
+    window, hzPerBin, mainLobeHz: lobeHz, peaks, candidateCount, supported: candidateCount };
 }
 
-export function compare(found, truth) {   // match each true mode to the nearest found peak within the main-lobe half-width fs/W; report cents and decay error
-  return truth.map(t => { let best = null; for (const p of found.peaks) { const cents = 1200 * Math.log2(p.hz / t.hz); if (Math.abs(p.hz - t.hz) <= found.mainLobeHz && (!best || Math.abs(cents) < Math.abs(best.cents))) best = { cents, decayErrorPct: p.decay && t.decay ? 100 * (p.decay - t.decay) / t.decay : null, peak: p }; } return { hz: t.hz, decay: t.decay, matched: !!best, ...(best ?? {}) }; });
+// Injective matching: maximize the number within the chosen main-lobe half-width,
+// then minimize total absolute cents. A single observed peak never counts twice.
+export function compare(found, truth) {
+  if (found.peaks.length > 8) fail('comparison accepts at most eight study peaks');
+  const memo = new Map();
+  const solve = (i, used) => {
+    if (i === truth.length) return { count: 0, cost: 0, matches: [] };
+    const key = `${i}:${used}`;
+    if (memo.has(key)) return memo.get(key);
+    const rest = solve(i + 1, used);
+    let best = { ...rest, matches: [null, ...rest.matches] };
+    found.peaks.forEach((p, peakIndex) => {
+      if ((used & (1 << peakIndex)) || Math.abs(p.hz - truth[i].hz) > found.mainLobeHz) return;
+      const cents = 1200 * Math.log2(p.hz / truth[i].hz);
+      const tail = solve(i + 1, used | (1 << peakIndex));
+      const candidate = { count: tail.count + 1, cost: tail.cost + Math.abs(cents),
+        matches: [{ peakIndex, peak: p, cents,
+          decayErrorPct: p.decay && truth[i].decay ? 100 * (p.decay - truth[i].decay) / truth[i].decay : null }, ...tail.matches] };
+      if (candidate.count > best.count || (candidate.count === best.count && candidate.cost < best.cost)) best = candidate;
+    });
+    memo.set(key, best);
+    return best;
+  };
+  return solve(0, 0).matches.map((match, i) => ({ hz: truth[i].hz, decay: truth[i].decay, matched: !!match, ...(match ?? {}) }));
 }
 
 export function smithMinimumWindow(truth) { let min = Infinity; for (let i = 0; i < truth.length; i++) for (let j = i + 1; j < truth.length; j++) min = Math.min(min, Math.abs(truth[i].hz - truth[j].hz)); return Number.isFinite(min) ? { closestPairHz: min, twoCyclesSeconds: 2 / min, abeSmithSeconds: 1.44 / min } : null; }
@@ -76,7 +101,7 @@ export function cases() {
     { name: 'synthetic: missing mode (only two resonances at 150 and 240 Hz)', ...synthesize({ modes: [{ hz: 150, amplitude: 1, decay: 2 }, { hz: 240, amplitude: 1, decay: 2 }], seconds: 8 }), truth: [{ hz: 150, decay: 2 }, { hz: 240, decay: 2 }], expect: 'insufficient evidence for three' },
     { name: 'synthetic: the chain resonances with white noise at −30 dB', ...synthesize({ modes: f.map(hz => ({ hz, amplitude: 1, decay: tau })), seconds: 8, noiseDb: -30 }), truth: truthChain, expect: 'noise' },
     { name: 'negative: four resonances (120, 160, 230, 310 Hz)', ...synthesize({ modes: [120, 160, 230, 310].map(hz => ({ hz, amplitude: 1, decay: 2 })), seconds: 8 }), truth: [120, 160, 230, 310].map(hz => ({ hz, decay: 2 })), expect: 'more than the model holds: report, do not force' },
-    { name: 'negative: white noise only', ...synthesize({ modes: [], seconds: 8, noiseDb: null }), truth: [], expect: 'no supported estimates' },
+    { name: 'negative: white noise only', ...synthesize({ modes: [], seconds: 8, noiseDb: null }), truth: [], expect: 'no candidates passing thresholds' },
   ].map(c => { if (c.name.includes('noise only')) { const s = synthesize({ modes: [{ hz: 1, amplitude: 1e-9, decay: 1 }], seconds: 8, noiseDb: 0 }); c.samples = s.samples; } return c; });
 }
 
@@ -85,9 +110,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const c of cases()) {
     const pred = smithMinimumWindow(c.truth);
     console.log(`\n### ${c.name}\nexpect: ${c.expect}${pred ? `; Smith prediction for the closest pair (${pred.closestPairHz.toFixed(2)} Hz): W ≥ ${pred.twoCyclesSeconds.toFixed(2)} s (two cycles), ${pred.abeSmithSeconds.toFixed(2)} s (1.44 cycles)` : ''}; family ratio bound ${bound.toFixed(4)}`);
-    console.log('| window W s | peaks (Hz, dB above median, τ s) | supported | per true mode: matched, cents, decay s (error %) |\n|---|---|---|---|');
+    console.log('| window / spectral s / decay s / available s | peaks (Hz, dB above median, τ s) | candidates passing thresholds | per true mode: matched, cents, decay s (error %) |\n|---|---|---|---|');
     for (const window of ['rect', 'hann']) for (const W of [0.25, 0.5, 1, 2, 4, 8]) { if (W * c.sampleRate > c.samples.length + 1) continue; const r = estimate(c.samples, c.sampleRate, W, { window }), m = compare(r, c.truth);
-      console.log(`| ${window} ${r.W.toFixed(2)} | ${r.peaks.map(p => `${p.hz.toFixed(2)} (${p.aboveMedianDb.toFixed(0)})${p.decay ? ' τ' + p.decay.toFixed(2) : ''}`).join(', ') || 'none'} | ${r.supported} | ${m.map(t => t.matched ? `${t.hz.toFixed(1)}: ${t.cents.toFixed(1)} c${t.decayErrorPct !== null ? `, ${t.peak.decay.toFixed(2)} s (${t.decayErrorPct.toFixed(0)} %)` : ', no decay'}` : `${t.hz.toFixed(1)}: unmatched`).join('; ') || 'no truth'} |`); }
+      console.log(`| ${window} / ${r.spectralWindowSeconds.toFixed(2)} / ${r.decayWindowSeconds.toFixed(2)} / ${r.availableSeconds.toFixed(2)} | ${r.peaks.map(p => `${p.hz.toFixed(2)} (${p.aboveMedianDb.toFixed(0)})${p.decay ? ' τ' + p.decay.toFixed(2) : ''}`).join(', ') || 'none'} | ${r.candidateCount} | ${m.map(t => t.matched ? `${t.hz.toFixed(1)}: ${t.cents.toFixed(1)} c${t.decayErrorPct !== null ? `, ${t.peak.decay.toFixed(2)} s (${t.decayErrorPct.toFixed(0)} %)` : ', no decay'}` : `${t.hz.toFixed(1)}: unmatched`).join('; ') || 'no truth'} |`); }
   }
   console.log('\nDefinitions:'); for (const [k, v] of Object.entries(STUDY_DEFINITIONS)) console.log(`- ${k}: ${v}`);
 }
