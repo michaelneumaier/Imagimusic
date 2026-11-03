@@ -4,9 +4,11 @@ import {createSurfaceLighting} from '../stage/surface-lighting.js';
 
 /** One drawing unit = 10 mm. The solid body stays still; the optional veil
  * shows a conservative displacement envelope at 100,000× magnification. */
-export function createLivingScene(canvas,{onTouch=()=>{}}={}){
- const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;
+export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height:fixedHeight}={}){
+ const fixed=fixedWidth!==undefined||fixedHeight!==undefined;
+ if(fixed&&(!Number.isInteger(fixedWidth)||fixedWidth<1||!Number.isInteger(fixedHeight)||fixedHeight<1))throw Error('Fixed scene dimensions must be positive integers.');
+ const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:fixed});
+ renderer.setPixelRatio(fixed?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
  const scene=new T.Scene();scene.background=new T.Color(0x0c141a);scene.fog=new T.Fog(0x0c141a,30,65);
@@ -69,7 +71,7 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
   controls.target.copy(target);camera.position.copy(target).add(direction.multiplyScalar(distance));controls.update();
  }
  function render(){if(!disposed)renderer.render(scene,camera);}
- function resize(){const r=canvas.getBoundingClientRect();if(r.width===width&&r.height===height)return;width=r.width;height=r.height;renderer.setSize(Math.max(1,width),Math.max(1,height),false);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();place();render();}
+ function resize(){const r=fixed?{width:fixedWidth,height:fixedHeight}:canvas.getBoundingClientRect();if(r.width===width&&r.height===height)return;width=r.width;height=r.height;renderer.setSize(Math.max(1,width),Math.max(1,height),false);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();place();render();}
  function view(name){if(!poses[name])throw Error('Unknown instrument view.');selected=name;place();render();}
  controls.addEventListener('change',render);
  const raycaster=new T.Raycaster();let pointer=null;
@@ -93,7 +95,7 @@ export function createLivingScene(canvas,{onTouch=()=>{}}={}){
   render();
  }
  function clearArrangement(){controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);render();}
- const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
- function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
+ const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
+ function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
  return {view,render,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,dispose};
 }

@@ -644,3 +644,7 @@ Living film foundation: owns src/living/movie-plan.js, tests/living-movie-plan.t
 Living film source verifier: owns tools/verify-living-movie-source.mjs and append-only evidence. Flagship synthesis reconciliation: updates proposal024 current checkpoint and next artistic experiment; preserves historical baseline and shared VISION.
 
 Living film source foundation and proposal checkpoint complete: source package, verifier and10 focused checks saved; claims released. Actual video encoding and artistic studies remain next.
+
+Living film encoder: owns src/living/export.js, scene.js fixed-size option and tests/living-movie-browser.html/js. Encode canonical encounter from a copied recipe/PCM, preserve source evidence, verify actual browser artifact before product controls.
+
+Living film encoder fixture complete: fixed-size scene, encoder and browser harness verified with actual downloads, ffprobe, source comparison and frame9 cancellation. Claim released; visitor-facing export controls remain next.
