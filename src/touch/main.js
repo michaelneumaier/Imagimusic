@@ -1,3 +1,4 @@
+import {touchKeepNames} from './keep-name.js';
 import {compositionPageURL} from '../stage/composition-link.js';
 import {touchConnectionHref,readTouchConnection} from './connection-link.js';
 import {createTouchTransport} from './transport.js';
@@ -46,7 +47,7 @@ function configure(){
  $('model-detail').textContent=`This connection uses ${settings.frequency} Hz base tuning, ${settings.detune} cents detuning, coupling ${settings.coupling}, and loss ${settings.loss}/s.`+reading;
  const url=new URL(location.href),route=new URL(touchConnectionHref(settings),location.href);url.searchParams.delete('bridge');url.searchParams.delete('connection');for(const [key,value] of route.searchParams)url.searchParams.set(key,value);history.replaceState(null,'',url);stillAt=0;lastGesture=null;
 }
-async function enter(){clearHolds();if(transport.state==='suspended'&&!connectionPending){try{await transport.resume();status('The connection is open again. Your passage is still here.');}catch(error){status(error.message,true);}return;}status('Preparing the two responses…');try{await transport.enable(selectedConnection().settings);configure();connectionPending=false;refreshControls();stillAt=0;lastGesture=null;$('hint').textContent=restingHint();status(settings.coupling===0?'Touch either pad, then release. Each body rings independently.':'Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
+async function enter(){clearHolds();if(transport.state==='suspended'&&!connectionPending){try{await transport.resume();status('The connection is open again. Your passage is still here.');}catch(error){status(error.message,true);}return;}status('Preparing the two responses…');try{const replacesPassage=!!transport.recording()?.events.length;await transport.enable(selectedConnection().settings);configure();if(replacesPassage){$('passage-name').value='';describeKeepNames();}connectionPending=false;refreshControls();stillAt=0;lastGesture=null;$('hint').textContent=restingHint();status(settings.coupling===0?'Touch either pad, then release. Each body rings independently.':'Touch either pad, then release. The other body is already connected.');if(world)$('world').parentElement.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}catch(error){status(error.message,true);}}
 $('begin').onclick=enter;$('bridge').onchange=()=>{
  clearHolds();
  if(!transport.session){configure();status('Connection selected. Enter the instrument when you are ready.');return;}
@@ -80,10 +81,13 @@ window.addEventListener('keydown',event=>{
 });
 window.addEventListener('keyup',event=>{const body={f:0,j:1}[event.key.toLowerCase()];if(body!==undefined){event.preventDefault();finish(body,`key-${body}`);}});
 window.addEventListener('blur',clearHolds);document.addEventListener('visibilitychange',()=>{if(document.hidden){clearHolds();transport.quiet();}});window.addEventListener('pagehide',()=>transport.quiet());
-$('quiet').onclick=()=>{clearHolds();transport.quiet();};$('new').onclick=()=>{clearHolds();transport.newPassage();stillAt=0;lastGesture=null;status('A new passage. Touch either body.');$('hint').textContent=restingHint();};
+$('quiet').onclick=()=>{clearHolds();transport.quiet();};$('new').onclick=()=>{clearHolds();transport.newPassage();$('passage-name').value='';describeKeepNames();stillAt=0;lastGesture=null;status('A new passage. Touch either body.');$('hint').textContent=restingHint();};
+function keepNames(){return touchKeepNames($('passage-name').value);}
+function describeKeepNames(){const names=keepNames();$('keep-filenames').textContent=names.sound+' · '+names.gestures;}
+$('passage-name').oninput=describeKeepNames;describeKeepNames();
 function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
-$('save').onclick=()=>{try{download(stereoWav(transport.saveAudio()),'audio/wav','imagimusic-touch.wav');status('The complete passage was saved as sound.');}catch(error){status(error.message,true);}};
-$('score').onclick=()=>download(JSON.stringify(transport.recording(),null,2),'application/json','imagimusic-touch.json');
+$('save').onclick=()=>{try{download(stereoWav(transport.saveAudio()),'audio/wav',keepNames().sound);status('Sound download requested. Keep the gestures too if you want to reopen the picture.');}catch(error){status(error.message,true);}};
+$('score').onclick=()=>{download(JSON.stringify(transport.recording(),null,2),'application/json',keepNames().gestures);status('Gesture download requested. Open this JSON in Return to saved Touch gestures to revisit the passage.');};
 let routeError=null;
 try{const requested=readTouchConnection(location.search);if(requested.custom){customConnection=requested;const option=document.createElement('option');option.value='custom';option.textContent=requested.title;$('bridge').append(option);}$('bridge').value=requested.id;}catch(error){routeError=error;$('bridge').value='close-kin';}
 configure();

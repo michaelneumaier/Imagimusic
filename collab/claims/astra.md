@@ -403,3 +403,5 @@ Touch connection discovery study: tools/study-touch-connections.mjs and collab/n
 Loom-to-Touch design handoff: loom.html/src/loom/main.js and owned Touch main/footer. Reuse existing settings URL contracts for a quiet bidirectional instrument handoff; no study score or old live gestures carried.
 
 Loom first-use layout: loom.html, loom.css and src/loom/main.js. Primary strike controls before the scene; bounded scene height; native wheel scroll remains page navigation, drag orbit retained. Shared world/stage styles untouched.
+
+Touch passage filenames: src/touch/keep-name.js, tests/touch-keep-name.test.js and owned live Touch UI. Optional local filename label, no record-schema or audio change; paired WAV/JSON names and visible download guidance.
