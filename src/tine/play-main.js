@@ -23,6 +23,7 @@ function showCapture({current,pending,message}){
 }
 const capture=createTineLiveCapture({onChange:showCapture});
 const comparison=createTineComparisonSession({onChange:({current,pending,message})=>{
+ $('candidate-path').hidden=!current;if(current){$('play-candidate').href='tine-play.html'+tineAddressFragment(current.candidate.record.design);$('play-candidate').textContent='Play this prepared body: '+bodyName(current.candidate.record)+' ↗';}
  $('comparison-note').textContent=message?`Comparison could not be prepared. ${current?'The previous pair remains available. ':''}${message}`:pending?'Preparing both bodies quietly…':current?`Prepared original: ${bodyName(current.original.record)}. Changed body: ${bodyName(current.candidate.record)}. Same ${current.original.record.events.length} ${current.original.record.events.length===1?'touch':'touches'} and ${current.original.seconds.toFixed(2)}-second ending.`:'Choose dimensions, then prepare. The original pass stays intact.';
  controls(session.state,session.touches);
 }});
