@@ -11,7 +11,7 @@ const $=id=>document.getElementById(id);let design=null,raf=0,wantsFocus=false,r
 const spatial=createTineLiveResponseView({details:$('spatial-inspection'),svg:$('spatial-picture'),selector:$('spatial-source'),slider:$('spatial-frame'),previous:$('spatial-previous'),next:$('spatial-next'),caption:$('spatial-caption'),reading:$('spatial-reading'),zoom:$('spatial-zoom'),scale:$('spatial-scale')});
 const liveActive=state=>['preparing','playing','ringing','ending'].includes(state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
-function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;$('download-pass').disabled=active||capture.pending||!capture.current;
+function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('touch-strength').disabled=!design||listening||(active&&state!=='playing');$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;$('download-pass').disabled=active||capture.pending||!capture.current;
  const blocked=active||listening||capture.pending||comparison.pending;
  $('prepare-comparison').disabled=blocked||!capture.current;
  for(const id of ['compare-length','compare-width'])$(id).disabled=blocked||!capture.current;
@@ -48,7 +48,7 @@ const session=createTineLiveSession({listeningDb:0,onChange:event=>{
  $('status').textContent=messages[event.state]??event.state;
  if(event.finished&&!event.finished.snapshot.events.length)$('status').textContent='This pass ended without touches.'+(capture.current?' The previous completed pass is still available.':' Begin another when you choose.');
  if(event.finished&&event.finished.snapshot.events.length)capture.accept(event.finished).catch(error=>showCapture({current:capture.current,message:error.message}));
- if(event.event)$('last-touch').textContent=`Touch ${event.touches} joined the vibration.`;
+ if(event.event)$('last-touch').textContent=`Touch ${event.touches} joined the vibration · ${event.event.strength} micro-newton second.`;
  if(event.state==='playing'&&wantsFocus&&!$('touch').disabled){wantsFocus=false;$('touch').focus({preventScroll:true});}
  if(wasTouch&&$('touch').disabled&&!$('quiet').disabled)$('quiet').focus({preventScroll:true});
  if(['ended','interrupted','error','cancelled'].includes(event.state)){cancelAnimationFrame(raf);raf=0;$('clock').textContent='Quiet';$('progress').value=session.time();if(wasTouch||wasQuiet||returnFocus)$('begin').focus({preventScroll:true});returnFocus=false;}
@@ -59,7 +59,7 @@ $('listening-level').addEventListener('input',()=>{
  $('listening-value').textContent=`+${db} dB`;
 });
 $('begin').addEventListener('click',async()=>{$('touch').scrollIntoView({block:'center',behavior:'instant'});comparison.cancel();capture.cancel();replay.park();wantsFocus=document.activeElement===$('begin');$('last-touch').textContent='Touches are counted when the audio processor accepts them.';$('progress').value=0;try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('status').textContent=error.message;}});
-$('touch').addEventListener('click',()=>session.strike().catch(error=>{if(error.name!=='AbortError')$('last-touch').textContent=error.message;}));
+$('touch').addEventListener('click',()=>session.strike(Number($('touch-strength').value)).catch(error=>{if(error.name!=='AbortError')$('last-touch').textContent=error.message;}));
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('keep-pass').addEventListener('click',()=>{if(!capture.current)return;try{const pcm=capture.current;history.replaceState(null,'',location.pathname+location.search+tineLiveFragment(pcm.record));$('keep-note').textContent=`Address now keeps ${pcm.record.events.length} ${pcm.record.events.length===1?'touch':'touches'} and the ${pcm.seconds.toFixed(2)}-second ending with this body. Bookmark or copy it for a quiet return. New playing does not change this address.`;}catch(error){$('keep-note').textContent=error.message;}});
 async function listen(pcm,button,label){if(!pcm)return;replayButton=button;replayLabel=label;replayFocus=document.activeElement===$(button);try{await replay.play(pcm);}catch(error){$('status').textContent=error.message;}}

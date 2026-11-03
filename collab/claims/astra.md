@@ -536,3 +536,5 @@ Export milestone evidence complete: M18, log and evidence updated; full771/771 a
 Shared live listening level checkpoint complete: host/tests and playing UI released;15 focused checks and native+10dB lifecycle/export evidence recorded.
 
 Listening integration evidence complete: browser harness, narrow UI and M18 checkpoint verified; claim released.
+
+Touch dynamics checkpoint complete: host/UI/tests and mixed-strength browser harness released.14 Node checks,2 actual worklet fixtures and native soft keep/reopen verified.

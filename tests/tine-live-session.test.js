@@ -56,3 +56,15 @@ test('listening connection failure releases the stage and context; the next pass
  await assert.rejects(f.host.start(createTineDesign()),/connection failed/);assert.equal(f.host.state,'error');assert.equal(disposed,1);assert.equal(f.contexts[0].closed,1);
  await f.host.start(createTineDesign());assert.equal(f.host.state,'playing');f.host.dispose();assert.equal(disposed,2);
 });
+
+test('each selected touch snapshots its impulse; invalid dynamics never consume an input slot',async()=>{
+ const f=fixture();await f.host.start(createTineDesign());
+ for(const bad of [0,-.1,.2,NaN,'0.1'])await assert.rejects(f.host.strike(bad),/Choose/);
+ assert.equal(f.nodes[0].commands.filter(c=>c.type==='strike').length,0);
+ for(const strength of [.025,.05,.1]){
+  const pending=f.host.strike(strength),command=f.nodes[0].commands.at(-1);assert.equal(command.strength,strength);
+  f.nodes[0].send({type:'applied',id:command.id,command:'strike',frame:128,strength});await pending;
+  assert.equal(f.changes.at(-1).event.strength,strength);
+ }
+ assert.equal(f.host.touches,3);f.host.dispose();
+});

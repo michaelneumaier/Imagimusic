@@ -62,10 +62,11 @@ export function createTineLiveSession({createContext=()=>new AudioContext(),crea
    s.watchdog=setTimeout(()=>fail(s,Error('The playing pass did not finish. Start another pass.')),11000);
   }catch(error){if(s&&active===s)fail(s,error);else if(!s){state='error';emit({message:error.message});}throw error;}
  }
- async function strike(){
+ async function strike(strength=.1){
+  if(![.025,.05,.1].includes(strength))throw Error('Choose a soft, light or firm touch.');
   const s=active;if(!s||state!=='playing'||touches+s.pendingTouches>=8)throw Error('This pass is not accepting another touch.');
   s.pendingTouches++;
-  try{return await command(s,'strike',.1);}finally{s.pendingTouches--;}
+  try{return await command(s,'strike',strength);}finally{s.pendingTouches--;}
  }
  async function quiet(){
   const s=active;if(!s)return;
