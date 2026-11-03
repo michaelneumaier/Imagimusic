@@ -488,3 +488,5 @@ Completed tine return record (stable): owns new src/tine/address.js, tests/tine-
 Tine phrase foundation: owns new src/tine/phrase.js and tests/tine-phrase.test.js. Bounded repeated impulses share one modal body; sum state before energy, preserve overlapping tails, explicit single ending and aggregate headroom/displacement refusal. No page change until core evidence exists.
 
 Tine phrase integration: owns envelope.js/response-view.js/render-worker.js/main.js/tine.html plus tine browser and envelope tests. Prepare single and phrase atomically; comparison audition choice is explicit; pictures sum only arrived impulse bounds, preserving fixed scale and quiet saved return.
+
+Homepage geometry invitation: owns project.html and existing homepage evidence/roadmap/log. Feature the now-playable geometry comparison among the two primary invitations; retain the expressive route nearby and give a concrete prepare/hold/change/keep path without implying acoustic recovery or measured appeal.

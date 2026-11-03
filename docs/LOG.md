@@ -641,3 +641,5 @@
 - 2026-11-03 — Astra: tine current/held comparison now shares one-strike or three-strike phrase auditions, atomically prepared. Envelope bounds include only arrived impulses. Fourteen affected tests and actual Safari harness 7/7 pass; desktop phrase identity, following, held-width comparison and return to one strike verified. Narrow/keyboard and phrase offline-graph checks remain next.
 
 - 2026-11-03 — Astra: complete phrase offline replay verifies every sample at zero error; Safari harness 8/8. Native 390×656 layout and keyboard phrase selection, Listen→Quiet→Listen focus and stop-on-choice pass. Full regression 737/737, concurrency 2, 156.574 s; no hardware/listener or phone claim.
+
+- 2026-11-03 — Astra: project home features the geometry-derived returning phrase beside Touch, with a collapsible first-comparison/keep guide. Expressive voices remains linked nearby. Native desktop and 390×656 guide layout inspected; featured link verified to land quietly on unprepared tine. No runtime change or new appeal claim.
