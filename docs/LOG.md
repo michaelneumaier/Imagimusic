@@ -639,3 +639,5 @@
 - 2026-11-03 — Astra: repeated-strike tine foundation adds overlapping SI modal response, combined-state energy, conservative aggregate admission and one final audition fade. Three new tests cover single-strike PCM parity, interference, width scaling and refusal; affected tine group 13/13. Default three-strike invitation stays below the page-wide fixed-gain bound. Page integration and listening assessment remain next.
 
 - 2026-11-03 — Astra: tine current/held comparison now shares one-strike or three-strike phrase auditions, atomically prepared. Envelope bounds include only arrived impulses. Fourteen affected tests and actual Safari harness 7/7 pass; desktop phrase identity, following, held-width comparison and return to one strike verified. Narrow/keyboard and phrase offline-graph checks remain next.
+
+- 2026-11-03 — Astra: complete phrase offline replay verifies every sample at zero error; Safari harness 8/8. Native 390×656 layout and keyboard phrase selection, Listen→Quiet→Listen focus and stop-on-choice pass. Full regression 737/737, concurrency 2, 156.574 s; no hardware/listener or phone claim.
