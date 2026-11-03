@@ -476,3 +476,7 @@ Completed tine discovery (stable): owned src/project-catalog.js entry; docs/ROAD
 Completed tine encounter refinement (stable): owns tine.html/css and src/tine/main.js. Bring preparation next to controls, add source-independent focus/scroll navigation, compact narrow introduction and verify keyboard preparation focus.
 Completed tine checkpoint reconciliation (stable): owns project.html history append and docs/ROADMAP.md current evidence; next visual response remains separate from static geometry.
 Completed tine full-control-range admission (stable): owns render.js gain correction, tine-render test and UI-range study tool. Uniform gain 100 instead of 200 admits all displayed settings without per-body normalization; update page captions and verify browser parity again.
+
+Completed first tine response picture (stable): owns src/tine/envelope.js, response-view.js, tests/tine-envelope.test.js and owned tine.html/css/main.js integration. Optional fixed-scale modal displacement-envelope bands follow the replay clock; distinguish bound from signed phase, mechanical decay from audition ending, prepared identity from draft.
+
+Tine response checkpoint also updates owned catalog copy, M18 and evidence notes.
