@@ -465,3 +465,5 @@ Completed spatial narrow-layout refinement (stable): owned sketch-space.html/css
 Completed spatial layout navigation (stable), src/sketch/space-main.js: scroll buttons preserve the source-bearing URL fragment.
 
 Completed spatial checkpoint reconciliation (stable): docs/ROADMAP.md and owned project.html history; record completed spatial study and preserve remaining geometry ambition.
+
+Completed geometry impulse study (stable): owns new src/tine/impulse.js, tests/tine-impulse.test.js, tools/study-tine-impulse.mjs and collab/notes/astra-tine-impulse.md. Consume Fable-owned geometry.js unchanged; dimensional modal mass, velocity-only point impulse, signed pickup and independent mechanical checks. Foundation before a page.
