@@ -411,3 +411,5 @@ Touch return filename continuity: owned return-main.js/touch-return.html and sha
 Touch recurrence study: tools/study-touch-recurrence.mjs and tests/touch-recurrence-study.test.js. Three authored timing patterns with identical instrument, alternating sides, strengths, first/last gesture and Quiet; local generated listening/gesture artifacts, no production model changes.
 
 Touch meeting audit: tools/audit-touch-meeting.mjs and tests/touch-meeting-audit.test.js. Compare the existing before/after cue against a matched no-new-touch window. Shared Fable-owned call-answer logic is unchanged; owned Touch copy clarifies the metric.
+
+Two-millisecond touch listening study: tools/study-touch-interference.mjs and its evidence note. Local rendered controls with identical prefix, one added right gesture or its two-millisecond shift; source records and WAVs only, no production behavior edits.
