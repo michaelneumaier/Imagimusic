@@ -520,3 +520,7 @@ Signed live-phrase spatial inspection: owns live-response.js/tests. Pure frame-a
 Still spatial inspection UI: owns live-response-view.js and playing-page optional frame/record selector. Fixed x/displacement scales, original/candidate same sample frame, explicit mechanical-versus-faded-audio distinction; no autoplay or auto-animation.
 
 Encounter clarity checkpoint: owned spatial-view endpoint keyboard focus, playing-page drawing/inspection wording and source reading accessibility; project home/catalog comparison-and-inspection milestone, local only.
+
+Dimensional listening study: owns tools/study-tine-bodies.mjs and generated ignored renders/tine-bodies/. One explicitly authored phrase, fixed source gain, four dimension cases, measured spectra/levels and local manual listening surface; no listener verdict invented.
+
+Dimensional study discovery: owned src/project-catalog.js and tools/prepare-project-home.mjs registration for regenerating the local study and suppressing missing-render links.
