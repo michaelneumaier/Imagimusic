@@ -447,3 +447,5 @@ Completed sketch worker/browser boundary (stable): src/sketch/prepare-worker.js 
 Completed first playable resonance-sketch page (stable): sketch.html, sketch.css, src/sketch/main.js and owned project catalog. Six explicitly supplied study interpretations, worker preparation, user-started listening, individual/whole activation and optional envelope picture. Model limits and per-sketch pickup gain visible; no automatic inference or geometric recovery.
 
 Completed shared sketch gesture (stable): owned src/sketch/transport.js, main.js, sketch.html and transport Node/browser harnesses. One explicit authored three-activation pattern on the audio clock, future envelopes remain silent, Quiet cancels queued activations, and busy sketches refuse comparison playback. Preserve distinct source interpretations and declared gain differences.
+
+Completed sketch decay variation (stable): src/sketch/variation.js, tests/sketch-variation.test.js and owned sketch page. Explicit bounded decay multiplier, unchanged supplied frequencies/quadratures/pickup gain, staged controls and clear return to fitted decays; variations are creative constructions, not new recording fits.
