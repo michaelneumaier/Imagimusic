@@ -19,7 +19,7 @@ export function createTineResponseView({svg,caption,details,follow,modeSelect,ge
  function cancel(){if(raf)cancelAnimationFrame(raf);raf=0;}
  function tick(){raf=0;const playback=getPlayback();state=playback.state;age=playback.time;draw();if(details.open&&follow.checked&&state==='playing')raf=requestAnimationFrame(tick);}
  function manage(){cancel();draw();if(pcm&&details.open&&follow.checked&&state==='playing')raf=requestAnimationFrame(tick);}
- function select(next,nextLabel){pcm=next;label=nextLabel;age=0;state='idle';envelope=cache.get(pcm);if(!envelope){envelope=createTineEnvelope(pcm.geometry,{count:pcm.count,activation:pcm.activation,impulseNs:pcm.impulseNs});cache.set(pcm,envelope);}
+ function select(next,nextLabel){pcm=next;label=nextLabel;age=0;state='idle';envelope=cache.get(pcm);if(!envelope){envelope=createTineEnvelope(pcm.geometry,{count:pcm.count,activation:pcm.activation,impulseNs:pcm.impulseNs,events:pcm.events});cache.set(pcm,envelope);}
   const previous=modeSelect.value;modeSelect.replaceChildren();for(const [value,text] of [['all','All mode envelopes'],...envelope.frequenciesHz.map((f,i)=>[String(i),`Mode ${i+1} · ${f.toFixed(2)} Hz`])]){const option=document.createElement('option');option.value=value;option.textContent=text;modeSelect.append(option);}modeSelect.value=previous==='all'||Number(previous)<pcm.count?previous:'all';modeSelect.disabled=false;
   svg.replaceChildren();paths=[];
   for(const offset of [-60,-30,0,30,60])add('line',{x1:60,x2:740,y1:120+offset,y2:120+offset,stroke:'#536369','stroke-opacity':offset===0?.8:.25});

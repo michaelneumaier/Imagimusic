@@ -27,3 +27,17 @@ test('envelope preserves fixed physical scale, source snapshots, modal decay and
  assert.ok(a.at(4,1).totalM>0,'mechanical envelope does not pretend audition fade ends the vibration');
  for(const args of [[-1,.5],[NaN,.5],[1,2],[3601,.5]])assert.throws(()=>a.at(...args));
 });
+
+test('phrase envelopes admit only arrived strikes and bound overlapping signed displacement',async()=>{
+ const {createTinePhrase}=await import('../src/tine/phrase.js');
+ const geometry={kind:'beam',support:'clamped-free',lengthM:.08,widthM:.01,thicknessM:.001,material:{E:200e9,rho:7850,eta:.0002}};
+ const events=[{time:.2,strength:.25},{time:.8,strength:-.15},{time:2.1,strength:.25}],envelope=createTineEnvelope(geometry,{events});
+ assert.equal(envelope.at(.199,.85).totalM,0);
+ assert.ok(envelope.at(.2,.85).totalM>0);
+ assert.ok(envelope.at(.8,.85).totalM>envelope.at(.799999,.85).totalM);
+ for(const pickup of [0,.2,.5,.85,1]){
+  const phrase=createTinePhrase(geometry,{events,pickup});
+  for(let k=0;k<=610;k++){const t=k/100;assert.ok(Math.abs(phrase.pointState(t).displacementM)<=envelope.at(t,pickup).totalM+1e-18);}
+ }
+ events[0].strength=1;assert.equal(envelope.at(.199,.85).totalM,0);
+});

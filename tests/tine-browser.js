@@ -1,4 +1,5 @@
 import {createInverseJobs} from '../src/inverse/jobs.js';
+import {renderTinePhrase} from '../src/tine/phrase.js';
 import {renderTineImpulse} from '../src/tine/render.js';
 import {createGroveReplay} from '../src/grove/replay.js';
 const geometry={kind:'beam',support:'clamped-free',lengthM:.08,thicknessM:.001,widthM:.01,material:{E:200e9,rho:7850,eta:.0002}};
@@ -17,5 +18,9 @@ try{
  const silent=await jobs.run({geometry,options:{...options,activation:0}});assert(silent.channels[0].every(x=>x===0)&&silent.pickupGain===pcm.pickupGain,'Clamp silence or gain mismatch');
  try{await jobs.run({geometry,options:{...options,sampleRate:8000}});throw Error('Aliasing accepted');}catch(error){assert(error.message.includes('retained mode'),'Wrong alias refusal');}
  const pending=jobs.run({geometry,options});jobs.cancel();try{await pending;throw Error('Cancellation ignored');}catch(error){assert(error.name==='AbortError','Wrong cancellation result');}
- document.getElementById('result').textContent=`PASS 5/5\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nNo hardware output or live latency measured.`;
+ const bundle=await jobs.run({kind:'body',geometry,options});
+ const phrase=renderTinePhrase(geometry,{...options,seconds:6.1});
+ assert(bundle.single.channels[0].every((x,i)=>x===reference.channels[0][i])&&bundle.phrase.channels[0].every((x,i)=>x===phrase.channels[0][i])&&bundle.phrase.frames===phrase.frames,'Bundle sample mismatch');
+ try{await jobs.run({kind:'unknown',geometry,options});throw Error('Unknown kind accepted');}catch(error){assert(error.message.includes('Unsupported tine'),'Wrong kind refusal');}
+ document.getElementById('result').textContent=`PASS 7/7\nActual worker samples match direct rendering.\nReal offline replay graph: maximum sample error ${maxError}.\nClamp is silent at unchanged gain.\nAliasing refuses; cancellation rejects.\nAtomic single/phrase bundle matches direct samples; unknown kinds refuse.\nNo hardware output or live latency measured.`;
 }catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}finally{jobs.cancel();replay?.dispose();}
