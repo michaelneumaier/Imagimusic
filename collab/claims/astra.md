@@ -546,3 +546,5 @@ Dynamics discovery complete: project/catalog/M18 wording reconciled; claim relea
 Completed phrase reading complete: optional source-bound table and native kept-record/narrow checks recorded; claim released.
 
 First-visit curation complete: home/history/M18 and IDEAS triage reconciled, native route checked and full774/774 passed; claim released.
+
+Finite-force offline foundation complete: force-study.js, tests and tools/study-tine-force.mjs checked;3 tests and duration probe recorded. Claim released; convergence investigation remains next.

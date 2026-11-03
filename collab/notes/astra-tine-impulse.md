@@ -382,3 +382,22 @@ Native Safari reopened the four-accent kept record and displayed ordered times[.
 The project home's previous preset-phrase instructions are replaced by a closed optional first-visit route through live accented playing, one-dimension comparison and keeping/downloading the original. This reuses the existing three-step layout, adds no experiment or mandatory onboarding, and explicitly leaves interpretation to the listener. A new history item records dynamics, shared listening level and optional phrase reading. Safari390px exposes all three steps and the correct local playing link; catalog remains39/39 and generated-study availability checker passes. IDEAS boundary triage records listener questions and a separate future offline finite-force investigation, not a new playable-model claim.
 
 Full regression through shared listening and per-touch dynamics:774/774 at concurrency2 in165.181seconds, zero failures/cancellations/skips (`/tmp/imagimusic-astra-dynamics-suite.log`). First-visit playing link opens quietly atFirm/+0dB; browser Back restores the expanded guide.
+
+### Prescribed finite-force foundation — 2026-11-03
+
+New offline-only `src/tine/force-study.js` advances the existing four-mode body under force held constant for one sample. For each mode, with transition matrix A and static equilibrium qe=F*phi(a)/K, q_next=A11*q+A12*v+(1−A11)*qe and v_next=A21*q+A22*v−A21*qe. The implementation evaluates1−A11 using expm1 and a half-angle sine to reduce cancellation. This is exact for the specified held force, up to floating-point arithmetic; it is not an exact continuous half-sine or a collision solver.
+
+A pulse helper supplies interval averages of F(t)=J*pi/(2T)*sin(pi*t/T). The average samples retain total signed impulse J. Admission uses the time integral of absolute force with the existing retained-mode impulse bounds: convolution cannot exceed the bound times integral|F|. Work per mode is F*phi(a)*(q_next−q), and reported cumulative damping loss is input work minus current stored energy from rest. No energy value is clipped into positivity. Source geometry is copied by the existing model; invalid force refuses before mutation.
+
+Independent RK4 (32 substeps per sample, directly integrating q,v,force work and damping loss) agrees over a1ms force pulse plus4ms free decay within1e-15m displacement,1e-10m/s velocity and1e-19J work/loss. Three tests pass, also covering exact half-width response/energy scaling, free decay, signed pulse integrals over multiple rates/counts, refusal immutability and caller-geometry isolation.
+
+Reproducible probe: `node tools/study-tine-force.mjs`. Default80×10mm body,48kHz,J=1e-7Ns. Energy at the pulse ending divided by energy from an ideal impulse at time0, by ascending mode:
+
+| Pulse duration | Mode1 | Mode2 | Mode3 | Mode4 |
+|---|---:|---:|---:|---:|
+|0.125ms|0.999500|0.979862|0.850807|0.528187|
+|0.5ms|0.992465|0.736453|0.053645|0.001954|
+|1ms|0.970109|0.270147|0.001492|0.000022|
+|4ms|0.605152|0.000425|0.000009|<0.000001|
+
+This measured fixture supports investigating duration as a cause of changed modal balance. It does not establish monotonic attenuation for all frequencies/durations, perceptual softness, hammer mechanics or radiation. Pulse onset/centroid and finite forcing change the energy history; equal total impulse is not equal injected work. No live format or page behavior changed. Next: quantify convergence to the intended continuous pulse, then consider an explicitly authored listening comparison at fixed source gain. Fable review remains pending.
