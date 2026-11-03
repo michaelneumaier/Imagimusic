@@ -1,0 +1,27 @@
+import {createInverseJobs} from '../inverse/jobs.js';
+import {createGroveReplay} from '../grove/replay.js';
+const $=id=>document.getElementById(id),ids=['length','width','activation','pickup'];
+const jobs=createInverseJobs({makeWorker:()=>new Worker(new URL('./render-worker.js',import.meta.url),{type:'module'})});
+let current=null,held=null,playing=null,role=null,busy=false,version=0;
+const name=pcm=>`${Math.round(pcm.geometry.lengthM*1000)} × ${Math.round(pcm.geometry.widthM*1000)} × 1 mm · strike ${pcm.activation.toFixed(2)} · pickup ${pcm.pickup.toFixed(2)}`;
+function controls(){const active=['preparing','playing','suspended'].includes(replay.state);ids.forEach(id=>$(id).disabled=busy);$('prepare').disabled=$('reset').disabled=busy;$('listen').disabled=!current||busy||(active&&role==='current');$('listen-held').disabled=!held||busy||(active&&role==='held');$('hold').disabled=!current||busy||active;$('release').disabled=!held||busy;$('quiet').disabled=!active;}
+const replay=createGroveReplay({onChange:()=>{controls();if(replay.state==='playing')$('status').textContent=`Playing ${role}: ${name(playing)}.${playing.outputBound===0?' Silent clamp response.':''}`;if(replay.state==='ended')$('status').textContent='The four-second audition ended.';if(replay.state==='suspended')$('status').textContent='Listening is suspended. Choose Quiet, then listen again.';}});
+function draft(){return {geometry:{kind:'beam',support:'clamped-free',lengthM:Number($('length').value)/1000,widthM:Number($('width').value)/1000,thicknessM:.001,material:{E:200e9,rho:7850,eta:.0002}},options:{activation:Number($('activation').value),pickup:Number($('pickup').value),sampleRate:48000,seconds:4}};}
+function draw(){const {geometry,options}=draft();for(const id of ids)$(id+'-value').textContent=id==='length'||id==='width'?$(id).value+' mm':Number($(id).value).toFixed(2);
+ const svg=$('body-plan'),length=geometry.lengthM/.12*660,width=geometry.widthM/.02*110,x=60,y=110-width/2;svg.replaceChildren();
+ const add=(tag,attrs,text)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(text)el.textContent=text;svg.append(el);};
+ add('rect',{x:25,y:35,width:35,height:150,fill:'#64716d'});add('rect',{x,y,width:length,height:width,fill:'#9eb6ac22',stroke:'#bad0c2','stroke-width':2});
+ for(const [u,color,dash] of [[options.activation,'#e2b777','6 4'],[options.pickup,'#90ccd8','none']])add('line',{x1:x+u*length,x2:x+u*length,y1:y-14,y2:y+width+14,stroke:color,'stroke-width':dash==='none'?1.5:4,'stroke-dasharray':dash});
+ add('text',{x:75,y:210},`${Math.round(geometry.lengthM*1000)} mm long · ${Math.round(geometry.widthM*1000)} mm wide · 1 mm thick`);
+ svg.setAttribute('aria-label',`Staged plan: ${$('length').value} millimeters long and ${$('width').value} wide; strike ${options.activation}, pickup ${options.pickup}.`);
+}
+ids.forEach(id=>$(id).addEventListener('input',draw));
+$('reset').addEventListener('click',()=>{$('length').value=80;$('width').value=10;$('activation').value=$('pickup').value=.85;draw();$('draft-note').textContent='Original dimensions and positions staged. Prepare to replace the current response.';});
+$('prepare').addEventListener('click',async()=>{const own=++version;replay.stop();busy=true;controls();$('status').textContent='Preparing silently…';try{const pcm=await jobs.run(draft());if(own!==version)return;current=pcm;$('prepared-name').textContent=name(pcm);$('gain').textContent='Fixed velocity pickup gain 200 · impulse 1 micro-N s · mono · four seconds.';$('mode-summary').textContent='Prepared natural frequencies: '+pcm.frequenciesHz.map(f=>f.toFixed(2)+' Hz').join(', ')+'.';$('status').textContent=pcm.outputBound===0?'Prepared a silent clamp response. Move the strike or pickup away from the clamp and prepare again.':'Prepared. Listen when you choose.';}catch(error){if(own===version&&error.name!=='AbortError')$('status').textContent=error.message+' Any previous prepared body remains available.';}finally{if(own===version){busy=false;controls();}}});
+async function listen(pcm,nextRole){if(!pcm)return;playing=pcm;role=nextRole;try{await replay.play(pcm);}catch(error){$('status').textContent=error.message;}}
+$('listen').addEventListener('click',()=>listen(current,'current'));$('listen-held').addEventListener('click',()=>listen(held,'held'));
+$('quiet').addEventListener('click',()=>{replay.stop();$('status').textContent='Quiet. Prepared bodies remain available.';});
+$('hold').addEventListener('click',()=>{held=current;$('held-name').textContent='Held: '+name(held);controls();$('status').textContent='Body held. Change a dimension or position and prepare another.';});
+$('release').addEventListener('click',()=>{if(role==='held')replay.stop();held=null;$('held-name').textContent='No body held.';controls();$('status').textContent='Held body released.';});
+function park(){version++;jobs.cancel();busy=false;replay.stop();controls();$('status').textContent='Listening paused while the page is away. Prepare again if preparation was interrupted.';}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',()=>{park();replay.park();});draw();controls();

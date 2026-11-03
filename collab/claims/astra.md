@@ -467,3 +467,8 @@ Completed spatial layout navigation (stable), src/sketch/space-main.js: scroll b
 Completed spatial checkpoint reconciliation (stable): docs/ROADMAP.md and owned project.html history; record completed spatial study and preserve remaining geometry ambition.
 
 Completed geometry impulse study (stable): owns new src/tine/impulse.js, tests/tine-impulse.test.js, tools/study-tine-impulse.mjs and collab/notes/astra-tine-impulse.md. Consume Fable-owned geometry.js unchanged; dimensional modal mass, velocity-only point impulse, signed pickup and independent mechanical checks. Foundation before a page.
+
+Completed tine audible boundary (stable): owns src/tine/render.js and render-worker.js, tests/tine-render.test.js and tine-browser.html/js. Fixed velocity pickup gain, explicit alias/headroom refusal, ending fade, real worker/offline replay parity before an encounter page.
+Completed first tine encounter (stable): owns new tine.html, tine.css, src/tine/main.js. Staged length/width/strike/pickup, static dimensioned plan view, explicit worker preparation, fixed-gain current/held comparison and quiet lifecycle. No changes to garden or shared model.
+
+Completed tine discovery (stable): owned src/project-catalog.js entry; docs/ROADMAP.md continuation evidence and next encounter boundary.
