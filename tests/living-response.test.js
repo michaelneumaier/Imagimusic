@@ -23,5 +23,11 @@ test('envelope preserves signed cancellation and exact free decay without displa
  view.accept({frame:0,strength:.1});const a=view.at(.1),b=view.at(.7);
  a.amplitudesM.forEach((v,i)=>assert.ok(Math.abs(b.amplitudesM[i]-v*Math.exp(-model.modes[i].gamma*.6))<1e-20));
  view.accept({frame:0,strength:-.1});assert.ok(view.at(.7).points.every(p=>p.boundM===0));
- assert.throws(()=>view.accept({frame:-1,strength:.1}));assert.throws(()=>view.accept({frame:192000,strength:.1}));assert.throws(()=>view.at(NaN));
+ assert.throws(()=>view.accept({frame:-1,strength:.1}));assert.throws(()=>view.accept({frame:192001,strength:.1}));assert.throws(()=>view.at(NaN));
+});
+
+test('completed-record boundary at four seconds is accepted without anticipating the touch',()=>{
+ const view=createLivingResponse(design,48000);view.accept({frame:192000,strength:.1});
+ assert.ok(view.at(4-1/48000).points.every(p=>p.boundM===0));
+ assert.ok(view.at(4).points.some(p=>p.boundM>0));
 });

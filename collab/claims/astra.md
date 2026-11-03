@@ -608,3 +608,7 @@ Living instrument touch integration complete: focused tests and native button/bl
 Living response veil: owns src/living/response.js, tests/living-response.test.js and living scene/main/html integration. Reconstruct accepted-event modal quadratures and display an explicitly magnified displacement bound, never slowed physical vibration.
 
 Living response veil complete as a prototype:18 focused tests and native narrow interaction evidence recorded; claim released.
+
+Living phrase continuity: owns src/living/main.js, living.html/css and response boundary alignment. Reuse worker capture and Grove replay for in-place repeat with shared Quiet and model-derived veil.
+
+Living phrase continuity complete: in-place replay, shared lifecycle and native narrow evidence recorded; claim released.

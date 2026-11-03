@@ -14,7 +14,7 @@ export function createLivingResponse(design,sampleRate){
  const events=[],positions=Array.from({length:81},(_,i)=>i/80);
  const shapes=positions.map(u=>model.modes.map(m=>Math.abs(m.shape(u))));
  function accept(event){
-  if(!event||!Number.isInteger(event.frame)||event.frame<0||event.frame>=4*sampleRate||!Number.isFinite(event.strength)||Math.abs(event.strength)>.1||event.strength===0||events.length>=8||event.frame<(events.at(-1)?.frame??0))throw Error('Invalid accepted touch.');
+  if(!event||!Number.isInteger(event.frame)||event.frame<0||event.frame>4*sampleRate||!Number.isFinite(event.strength)||Math.abs(event.strength)>.1||event.strength===0||events.length>=8||event.frame<(events.at(-1)?.frame??0))throw Error('Invalid accepted touch.');
   events.push({frame:event.frame,strength:event.strength});
  }
  function at(seconds){
