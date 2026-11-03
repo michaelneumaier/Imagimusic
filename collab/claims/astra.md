@@ -407,3 +407,5 @@ Loom first-use layout: loom.html, loom.css and src/loom/main.js. Primary strike 
 Touch passage filenames: src/touch/keep-name.js, tests/touch-keep-name.test.js and owned live Touch UI. Optional local filename label, no record-schema or audio change; paired WAV/JSON names and visible download guidance.
 
 Touch return filename continuity: owned return-main.js/touch-return.html and shared keep-name helper. Retain opened labels on original export; distinguish comparison filenames and expose both names before downloading.
+
+Touch recurrence study: tools/study-touch-recurrence.mjs and tests/touch-recurrence-study.test.js. Three authored timing patterns with identical instrument, alternating sides, strengths, first/last gesture and Quiet; local generated listening/gesture artifacts, no production model changes.
