@@ -1,0 +1,16 @@
+import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {createLivingMoviePlan,validateLivingMovieAudio} from '../src/living/movie-plan.js';
+import {createLivingRecord} from '../src/living/record.js';
+import {createTineDesign} from '../src/tine/address.js';
+import {renderLivingArrangement} from '../src/living/arrangement.js';
+import {groveMovieAudioEvidence} from '../src/grove/movie-audio.js';
+const directory=resolve(process.argv[2]??'renders/living-movie-source');
+const record=process.argv[3]?JSON.parse(readFileSync(process.argv[3],'utf8')):createLivingRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:24000,strength:.1},{frame:55200,strength:.025},{frame:105600,strength:.05}],fadeStart:190800});
+const plan=createLivingMoviePlan(record),pcm=renderLivingArrangement(plan.manifest.record.source);validateLivingMovieAudio(pcm,plan.manifest);
+const {wav,audio}=await groveMovieAudioEvidence(pcm,'source.wav');
+mkdirSync(directory,{recursive:true});
+writeFileSync(resolve(directory,'encounter.json'),JSON.stringify(plan.manifest.record,null,2)+'\n');
+writeFileSync(resolve(directory,'movie-source.json'),JSON.stringify({...plan.manifest,audio,artifact:'Source package only; no encoded movie produced.'},null,2)+'\n');
+writeFileSync(resolve(directory,'source.wav'),Buffer.from(wav));
+console.log(JSON.stringify({directory,frames:plan.times.length,duration:plan.manifest.duration,videoDuration:plan.manifest.videoDuration,audioSamples:pcm.frames,sourcePeak:pcm.peak,artifact:'Movie source package; encoding not yet performed.'},null,2));

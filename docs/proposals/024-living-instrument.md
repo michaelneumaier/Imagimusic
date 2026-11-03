@@ -10,7 +10,7 @@ The ambition is to make composing, instrument design, and exploring a musical pl
 
 ## What the work has taught us
 
-The project has accumulated 41 catalog entries and a substantial set of reusable mechanisms. The latest regression checkpoint passes 784 tests. Those checks establish important mechanical and software behavior; they do not establish that the overall experience is beautiful, immediately understandable, or worth returning to.
+At this proposal’s initial checkpoint, the project had accumulated 41 catalog entries and a substantial set of reusable mechanisms; its regression checkpoint passed 784 tests. The current implementation checkpoint is recorded below. Those checks establish important mechanical and software behavior; they do not establish that the overall experience is beautiful, immediately understandable, or worth returning to.
 
 | What exists | What it makes possible | What still needs integration |
 | --- | --- | --- |
@@ -106,10 +106,37 @@ Three research directions could make this more than a well-presented instrument.
 
 These directions reinforce each other. A person changes a body, hears a new possibility, receives a musically appropriate response, and keeps the result as an inhabitable performance. The flagship gives that larger research program a concrete experience to serve.
 
-## Immediate next work and checkpoint
+## Current checkpoint and next creative milestone
 
-The next work is the first milestone: choose a phrase, develop its sonic transformation, storyboard the encounter, and produce a finished opening-body visual target. Assess what the existing tine can contribute and what the broader Grove vocabulary teaches about richer relationships. Do not start by merging all 41 pages or rewriting every engine.
+The synthesis now has a working [local encounter](../../living.html): touch an 80 mm tine, replay the exact accepted phrase, hear it through 95 and 65 mm bodies, unfold it into three visible voices, return to the original, and keep a versioned address that reopens quietly. Camera movement and the magnified envelope are optional. The [project home](../../project.html) holds 42 catalog entries. The last full regression checkpoint passed 792 tests; later recipe and film-source additions have focused checks, rather than a new full-suite claim.
 
-The current technical checkpoint is `f44d559`, following the interval inspector at `6a21eef`. All 784 tests pass; native checks verify same-window original/comparison readings, quiet return and home discovery. Detailed evidence is in [the tine model notes](../../collab/notes/astra-tine-impulse.md). Existing commitments remain in [VISION](../VISION.md) and [the roadmap](../ROADMAP.md). This proposal sets a direction for synthesis; it does not silently replace those contracts. Fable’s review is pending while they are unavailable, and Michael’s response can shape the artistic commitment before the flagship expands.
+The [72-second sketch and six scene boards](../../renders/flagship-sketch/index.html) remain an authored artistic reference, with [score and storyboard](025-first-encounter-storyboard.md). The interactive scene uses the visitor’s own phrase. Its present answer is a fixed, staggered arrangement of three independent bodies. The visible response is a magnified modal displacement bound on a static body; it is not resolved high-frequency bending, acoustic radiation, or energy flowing between the instruments.
 
-First artistic proof: [72-second sketch and six scene boards](../../renders/flagship-sketch/index.html), with [score, storyboard and checks](025-first-encounter-storyboard.md). The concept is ready to assess; a playable flagship scene is still to be built.
+A reproducible film source package is now available through `node tools/prepare-living-movie.mjs`: the recipe, original-level stereo WAV, and a 1280×720, 30 fps frame-state manifest. `node tools/verify-living-movie-source.mjs` reconstructs its state and audio evidence. This is preparation for an encoder, not a finished film. The camera is canonical; manual orbit and visit listening gain are excluded. Implementation evidence lives in [the flagship notes](../../collab/notes/astra-living-instrument.md).
+
+The next creative milestone is **one encounter someone wants to show another person**. Its central moment should be recognizable: “I made that little phrase, and now I can hear its shape in this place.” This is the artistic hypothesis to test. Reliable reconstruction makes the experience returnable; it does not establish its appeal.
+
+### A composed reveal with a clear point of view
+
+Use the same short phrase for three tightly bounded studies. Each study gets one sound treatment, one camera sequence, and one ending. Keep their source gestures identical so the comparison is useful.
+
+| Study | Artistic question | Proposed treatment |
+| --- | --- | --- |
+| Intimacy | Does one object feel worth listening to before anything expands? | Close material detail, a held camera, dry attack and audible decay; leave space after the phrase |
+| Recognition | Does the answer feel related to what the visitor made? | Introduce each alternate body on its first musical entrance, preserve a recognizable timing pattern, let the original anchor the response |
+| Scale and return | Can a change of perspective make the familiar feel newly significant? | Reveal the ensemble gradually, hold the widest view through the response, settle back to the exact original with a deliberate silence |
+
+These studies should refine one shared scene, not become three more flagship menus. Compare the authored fixture, a single touch, a crowded phrase, and widely spaced touches. A treatment that only works with the demonstration phrase is insufficient for a playable encounter. Preserve arrangement version1 for existing keepsakes; any changed score needs a new explicit version or a separate experimental renderer.
+
+Spirituality can enter through sustained attention and the return to something personally made. Psychedelia can enter through a coherent shift in scale and the recognition of recurrence across bodies. Let the listener choose their interpretation. The visual direction should make those relationships perceptible before adding decorative complexity.
+
+### Finish and evaluate the first minute
+
+1. Finish film encoding from the verified source package. Check a real exported file’s duration, frame count and audio stream; exercise cancellation and preserve the original encounter on failure. A source-state hash does not verify pixels or lossy AAC.
+2. Build the three artistic studies and choose a treatment by listening and watching. Evaluate the attack, decay, phrase recognition and ending together. Keep processing separate from the physical source and document any added space effect.
+3. Simplify the entrance around Begin, touch, answer and return. Give a person who prefers to watch a complete authored greeting. Keep Quiet reachable and make the still-camera route equally composed.
+4. Observe a small group of newcomers using the encounter without coaching. Record where they act, what they think caused the sound, whether they recognize their phrase, which moment they would show someone, and whether they choose another turn. Their responses decide the next revision; do not replace them with test counts or an invented audience verdict.
+
+The readiness gate is a complete, locally reviewable encounter: a newcomer can enter and stop it, their own phrase survives the reveal, the sound and image form a deliberate piece, a saved encounter reopens, and a film can be kept. Hardware latency, small-speaker listening and phone performance still need direct evaluation. Only after that gate should we expand into a second physical family or a coupled spatial body.
+
+The larger ambition remains an instrument that can discover new playable forms with a person: preserve their musical idea, propose bodies with meaningful audible differences, and compose a world from those relationships. The first minute gives that ambition a concrete standard. Existing [VISION](../VISION.md) and [roadmap](../ROADMAP.md) contracts remain in force. Fable’s independent review is pending while they are unavailable.

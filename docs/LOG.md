@@ -720,3 +720,5 @@
 - 2026-11-03 (Astra): Living Instrument camera now opens/returns on the audio clock during silent gaps, with a wide-view opt-out and reduced-motion default. Desktop Safari on/off destination views and home milestone link checked; M19/history reconciled. Full regression792/792 passes with no failures/cancellations/skips (137.863s, concurrency2). Recipe/film persistence and artistic evaluation remain open.
 
 - 2026-11-03 (Astra): versioned Living Instrument address recipe now keeps original touches/ending, arrangement version and camera/reveal choices. Quiet reopen, explicit restored unfolding, malformed-address refusal and unchanged address after a new empty pass verified in Safari;19 focused tests pass including pinned v1 stereo output. Catalog now42 entries with the flagship marked Prototype.
+
+- 2026-11-03 (Astra): Living Instrument film source package and reconstruction verifier saved;453 fixed-time states and724800 stereo frames for the default15.1s fixture.10 focused tests and independent WAV/corruption checks pass. Encoding remains next. Proposal024 reconciled with the playable checkpoint and a concrete artistic/newcomer-evaluation milestone.

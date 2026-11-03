@@ -638,3 +638,9 @@ Living encounter keeping: owns src/living/record.js, tests/living-record.test.js
 Living keeping discovery: owns src/project-catalog.js entry, project.html current milestone wording and ROADMAP M19 keeping status.
 
 Living encounter keeping and discovery complete: recipe/address, native round-trip/failure/retention and catalog evidence recorded; claims released.
+
+Living film foundation: owns src/living/movie-plan.js, tests/living-movie-plan.test.js and tools/prepare-living-movie.mjs. Fixed30fps manifest and exact stereo evidence from a kept recipe, before browser encoding.
+
+Living film source verifier: owns tools/verify-living-movie-source.mjs and append-only evidence. Flagship synthesis reconciliation: updates proposal024 current checkpoint and next artistic experiment; preserves historical baseline and shared VISION.
+
+Living film source foundation and proposal checkpoint complete: source package, verifier and10 focused checks saved; claims released. Actual video encoding and artistic studies remain next.
