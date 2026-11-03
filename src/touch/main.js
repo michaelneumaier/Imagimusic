@@ -66,7 +66,7 @@ function play(body,velocity){
  const note=score.at(-1);lastGesture=note;stillAt=stillnessBound(settings,score,note.time).stillAt??Infinity;
  const response=meeting(settings,before.events.map(e=>({time:e.frame/before.sampleRate,body:e.body,velocity:e.velocity})),note);
  const side=body?'right':'left',other=body?'left':'right';
- $('hint').textContent=response.relation==='first'?(settings.coupling===0?`The ${side} body rings independently.`:`Listen for the ${other} body to respond.`):response.relation==='softens'?`The ${side} body softens with this touch.`:response.relation==='grows'?`The ${side} body grows with this touch.`:'This touch meets the ring already here.';
+ $('hint').textContent=response.relation==='first'?(settings.coupling===0?`The ${side} body rings independently.`:`Listen for the ${other} body to respond.`):response.relation==='softens'?`The ${side} body softens after this touch.`:response.relation==='grows'?`The ${side} body grows after this touch.`:'This touch meets the ring already here.';
  status('A gesture joins the passage. Keep listening, or touch again.');
 }
 for(const [body,pad] of pads.entries()){

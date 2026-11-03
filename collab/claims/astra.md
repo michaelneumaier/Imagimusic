@@ -409,3 +409,5 @@ Touch passage filenames: src/touch/keep-name.js, tests/touch-keep-name.test.js a
 Touch return filename continuity: owned return-main.js/touch-return.html and shared keep-name helper. Retain opened labels on original export; distinguish comparison filenames and expose both names before downloading.
 
 Touch recurrence study: tools/study-touch-recurrence.mjs and tests/touch-recurrence-study.test.js. Three authored timing patterns with identical instrument, alternating sides, strengths, first/last gesture and Quiet; local generated listening/gesture artifacts, no production model changes.
+
+Touch meeting audit: tools/audit-touch-meeting.mjs and tests/touch-meeting-audit.test.js. Compare the existing before/after cue against a matched no-new-touch window. Shared Fable-owned call-answer logic is unchanged; owned Touch copy clarifies the metric.
