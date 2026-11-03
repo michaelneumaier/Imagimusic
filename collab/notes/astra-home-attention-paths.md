@@ -53,3 +53,11 @@ Native Safari loaded the roadmap and opened both new notebook destinations. The 
 The home invitation now links directly to tuning a connection in Loom and explains the separate ways of keeping a design (address) and a performance (gesture file). Catalog descriptions for Loom, Touch and Touch return reflect custom-settings playing and still-picture choice; Touch is no longer described merely as an earlier study. Native Safari rendered the new home link and all three revised descriptions. Research history/circle studies remain outside the playable catalog.
 
 Loom's URL write was moved from each input event to the completed change event, while the model/readouts still update during the adjustment. A native drag changed frequency 311 → 410 Hz; after release the URL contained 410 and a reload restored it in READY state. This reduces repeated history writes during a drag without changing the settings handoff. Script syntax and diff checks passed. No publication or new listener-evaluation claim.
+
+## 2026-11-03 — One encounter across the existing pages
+
+Updated the current-edge and catalog dates, added an optional three-step design/play/keep/return guide, and brought Touch catalog descriptions up to date with named downloads. The guide starts at Loom and explicitly follows its settings handoff into Touch; it does not insert a generic Touch link that would discard a customized instrument. It distinguishes a design address, gesture JSON and listening WAV, names quiet entry and explains the reduced physical model.
+
+The roadmap now names a coherent first encounter as the next milestone: first gesture, understandable response, recognizable kept passage and clear return. Its evidence link opens the six-connection study as research, without promoting its measured signal differences into claims of appeal or new production presets. The history includes the custom-setting and naming milestones, concrete Safari checks, open device/listening questions and independent continuation while Fable is unavailable. Pending reviews remain pending.
+
+Native Safari verified the November 3 current-edge label, the expanded three-step guide, the new history heading and the roadmap study button opening the correct notebook content/source. Syntax and diff checks pass. This is discoverability and accurate project documentation, not a visitor reading result.
