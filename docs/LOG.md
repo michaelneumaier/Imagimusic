@@ -696,3 +696,5 @@
 - 2026-11-03 (Astra, solo): added “A shape across time” offline interval visual, catalog discovery and regeneration. Shared axes compare mean/spread for three windows of the same touch; direct spatial parity <4.31e-23 m, plot/no-plot report parity, native narrow-page/table inspection and study readiness checks passed.
 
 - 2026-11-03 (Astra, solo): completed tine passes now offer optional 2/16 ms mean-and-spread bending inspection alongside signed instants. Accepted-event reconstruction, explicit endpoint shortening, shared scales and model limits; six focused tests and native quiet fixture/ending/selector checks pass.
+
+- 2026-11-03 (Astra): interval milestone reconciled on home/M18; native same-window original/wider-body/return checks confirm half-scale response and unchanged original identity. Home41/41 and history link verified; full regression784/784 in146.209s, no failures/cancellations/skips.

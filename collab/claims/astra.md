@@ -582,3 +582,7 @@ Completed-pass interval inspection: owns src/tine/live-response.js, live-respons
 Completed-pass interval catalog wording: owns the Touch a ringing body description update in src/project-catalog.js.
 
 Completed-pass interval inspection and catalog update complete; focused and native fixture checks recorded, claims released.
+
+Interval milestone reconciliation: owns project.html history, docs/ROADMAP.md M18 checkpoint and append-only log/model notes. Record native original/candidate parity and full regression result.
+
+Interval milestone reconciliation complete; native comparison/discovery and full784 regression recorded, claim released.
