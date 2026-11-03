@@ -60,7 +60,13 @@ $('listening-level').addEventListener('input',()=>{
 });
 $('begin').addEventListener('click',async()=>{$('touch').scrollIntoView({block:'center',behavior:'instant'});comparison.cancel();capture.cancel();replay.park();wantsFocus=document.activeElement===$('begin');$('last-touch').textContent='Touches are counted when the audio processor accepts them.';$('progress').value=0;try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('status').textContent=error.message;}});
 $('touch').addEventListener('click',()=>session.strike(Number($('touch-strength').value)).catch(error=>{if(error.name!=='AbortError')$('last-touch').textContent=error.message;}));
-$('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
+$('touch').addEventListener('keydown',event=>{
+ if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();
+ const strength={'1':.025,'2':.05,'3':.1}[event.key];
+ if(strength===undefined||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||$('touch').disabled)return;
+ event.preventDefault();if(event.repeat)return;
+ $('touch-strength').value=String(strength);$('touch').click();
+});
 $('keep-pass').addEventListener('click',()=>{if(!capture.current)return;try{const pcm=capture.current;history.replaceState(null,'',location.pathname+location.search+tineLiveFragment(pcm.record));$('keep-note').textContent=`Address now keeps ${pcm.record.events.length} ${pcm.record.events.length===1?'touch':'touches'} and the ${pcm.seconds.toFixed(2)}-second ending with this body. Bookmark or copy it for a quiet return. New playing does not change this address.`;}catch(error){$('keep-note').textContent=error.message;}});
 async function listen(pcm,button,label){if(!pcm)return;replayButton=button;replayLabel=label;replayFocus=document.activeElement===$(button);try{await replay.play(pcm);}catch(error){$('status').textContent=error.message;}}
 $('download-pass').addEventListener('click',()=>{

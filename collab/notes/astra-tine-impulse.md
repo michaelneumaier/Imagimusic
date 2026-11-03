@@ -364,3 +364,9 @@ The playing page now offers Soft (.025), Light (.05) and Firm (.1) micro-newton-
 Host tests refuse invalid strength before command admission and check each applied acknowledgement’s value. Host/record/comparison group14/14 passes. Actual Safari offline-worklet fixtures now combine a firm first touch with light or soft second touches; both natural/early cases pass2/2 with exact dry, reconstructed, worker and comparison output and live/replay listening parity.
 
 Native390px preview: Soft selected before Begin, touch acknowledged as0.025, kept record contains frame187648/strength0.025/fadeStart191872 at48kHz, and reload prepares its4.02s pass quietly. Next-touch selector returns to Firm for new playing; this does not modify the kept soft performance. Narrow selector/description/pad fit inspected. Changing accents during the four-second window remains a usability follow-up; a focused-pad keyboard gesture may be more fluid than opening a menu. No pressure/hardware or listener-appeal claim.
+
+### Focused-pad accent keys — 2026-11-03
+
+Keys1/2/3 now select and strike Soft/Light/Firm only while the enabled pad has focus. Modifiers are ignored, repeated keydown is suppressed, and no global key listener is installed. Space/click/tap use the selected next-touch impulse. Instructions and aria-keyshortcuts disclose the controls.
+
+Native Safari390px keyboard path: focus Begin, Space moves focus to the enabled pad, then1,2,3 and a650ms held1 produce exactly four accepted touches. Kept address carries strengths[.025,.05,.1,.025], applied frames[15360,15360,16000,16128] at48kHz, natural fadeStart382800. Same-frame first events remain individually recorded, without invented spacing. An earlier tool-separated attempt exceeded the four-second window and ended empty; the successful sequence was executed within one active window. This is input/record evidence, not hardware-latency evidence or listener feedback. Home/catalog/M18 now reflect selectable accents.

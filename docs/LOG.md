@@ -678,3 +678,4 @@
 - 2026-11-03 — Astra: playing page now shares an explicit visit-local0…20dB listening level across live/replay/comparison, leaving records and exports unchanged. Focused checks15/15; native+10dB live/replay/candidate and quiet tab-return checks pass, original WAV hash unchanged.
 - 2026-11-03 — Astra: actual offline worklet dry/listening split and saved-PCM replay match at0/20dB (2/2; replay error0); separate peak-ceiling fixture passes. Narrow listening control fits390px. Node stage/host/replay checks15/15.
 - 2026-11-03 — Astra: next-touch Soft/Light/Firm impulses add preserved dynamics to live tine phrases without changing record schema or maximum input. Node affected14/14; actual mixed-strength browser fixtures2/2; native soft touch keep/reopen and390px layout checked.
+- 2026-11-03 — Astra: focused-pad1/2/3 accent keys preserve exact per-touch strengths and suppress held repeats. Native keyboard four-touch record verified at390px; home/catalog/M18 updated.

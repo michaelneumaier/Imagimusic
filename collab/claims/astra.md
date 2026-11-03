@@ -538,3 +538,7 @@ Shared live listening level checkpoint complete: host/tests and playing UI relea
 Listening integration evidence complete: browser harness, narrow UI and M18 checkpoint verified; claim released.
 
 Touch dynamics checkpoint complete: host/UI/tests and mixed-strength browser harness released.14 Node checks,2 actual worklet fixtures and native soft keep/reopen verified.
+
+Focused accent keys complete: native four-touch/held-key record verified; input/UI claim released.
+
+Dynamics discovery complete: project/catalog/M18 wording reconciled; claim released.
