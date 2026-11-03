@@ -437,3 +437,5 @@ Completed estimated-frequency fit study (stable): tools/study-estimated-joint-de
 Completed bounded frequency-refinement study (stable): tools/study-refined-modes.mjs and focused tests/evidence note. Preserve initial spectral candidate count and estimates, jointly vary frequencies within explicit non-crossing bounds and decays within 0.1..8 s, then score unseen suffixes. No new production acceptance rule.
 
 Completed explicit mode alternatives study (stable): tools/study-mode-alternatives.mjs, focused tests and evidence. Fixed hypothesis grid around spectral candidates, train/validation/final-test split, no final-test-guided selection and no automatic physical target declaration.
+
+Completed playable resonance-sketch foundation (stable): src/sketch/model.js and tests/resonance-sketch.test.js. Construct independent unit-mass damped oscillators from explicitly supplied fitted modes; retain quadratures as displacement/velocity initial conditions, declared pickup scaling and bounded audition renders. This does not identify geometry or imply an impulse-only exciter.
