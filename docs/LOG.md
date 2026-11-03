@@ -714,3 +714,5 @@
 - 2026-11-03 (Astra): the opening phrase can now return on65/80/95mm blades, with matched procedural length, model-derived sound and envelope. Original phrase retained, alternate addresses exact, changes between performances only. Native variant/return/new-empty-pass checks and29 focused tests pass. This is sequential body discovery, not a coupled ensemble or continuous morph.
 
 - 2026-11-03 (Astra): deterministic solo/three-body-round/return renderer and cancellable-worker entry point added for original live phrases.15.1second example listening proof, exact timeline/report and local discovery available. Three new tests plus independent WAV equality/hash checks and native quiet/Play/Pause/narrow layout pass. Interactive ensemble scene and musical-quality evaluation remain open.
+
+- 2026-11-03 (Astra): Unfold your phrase now renders the visitor’s original record into solo/three-visible-body-answer/return inside living.html. Shared replay/Quiet lifecycle, worker cancellation guard and independent local-clock veils added;33 focused checks and native narrow complete/Quiet/tab-away checks pass. Camera cuts and material/light refinement remain open.

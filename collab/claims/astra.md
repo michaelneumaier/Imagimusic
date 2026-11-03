@@ -622,3 +622,7 @@ Living phrase arrangement foundation: owns src/living/arrangement.js, arrangemen
 Living arrangement discovery: owns living.html listening-sketch link and tools/prepare-project-home.mjs registration.
 
 Living arrangement foundation and discovery complete: deterministic renderer, worker, tests and local listening proof saved; claims released. Interactive adapter/ensemble scene remain next work.
+
+Living interactive round: owns src/living/scene.js/main.js, new arrangement-view.js and tests, living.html/css. Refactor procedural body construction for three independent instances and connect original-phrase worker playback with cancellation and shared Quiet.
+
+Living interactive round complete as a playable prototype: visitor-source worker, three-body scene and lifecycle evidence recorded; claim released.

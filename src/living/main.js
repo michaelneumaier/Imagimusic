@@ -1,3 +1,5 @@
+import {createAudioRenderJob} from '../audio-render-job.js';
+import {createLivingArrangementView} from './arrangement-view.js';
 import {createLivingResponse} from './response.js';
 import {createLivingScene} from './scene.js';
 import {createTineLiveSession} from '../tine/live-session.js';
@@ -10,6 +12,7 @@ const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-s
 const design=createTineDesign();
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
+let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
@@ -19,11 +22,19 @@ function controls(){
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
  $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||!selectedPCM;
  for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
+ $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
+ for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
+ if(repeat&&unfolding){$('touch-count').textContent='Your phrase unfolding';return;}
  $('touch-count').textContent=repeat?`${replayCount} / ${selectedPCM.record.events.length} remembered ${selectedPCM.record.events.length===1?'touch':'touches'}`:`${session?.touches??0} / 8 touches`;
 }
 function touch(){if(!session||$('touch').disabled)return;session.strike(.1).catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});}
 function animate(){
  raf=0;const repeat=listening(),t=repeat?replay.time():session.time(),response=repeat?replayResponse:liveResponse;
+ if(repeat&&unfolding){
+  const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} remembered touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
+  if(lastPart!==frame.part){lastPart=frame.part;const title={opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'}[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',frame.part==='answer'?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':'The original 80 mm blade, playing your phrase alone.');}
+  if(listening())raf=requestAnimationFrame(animate);return;
+ }
  if(response&&$('reveal').checked)world?.response(response.at(t).points);
  if(repeat){
   const record=selectedPCM.record,count=record.events.filter(e=>e.frame/record.sampleRate<=t).length;
@@ -32,7 +43,7 @@ function animate(){
  }else $('remaining').textContent=t<4?`${Math.max(0,4-t).toFixed(1)} seconds to touch`:'Letting it ring';
  if(active(session.state)||repeat)raf=requestAnimationFrame(animate);
 }
-function stopView(){cancelAnimationFrame(raf);raf=0;world?.response(null);$('remaining').textContent='Quiet';}
+function stopView(){cancelAnimationFrame(raf);raf=0;world?.response(null);if(unfolding){lastPart=null;world?.clearArrangement();status.textContent='80 × 10 × 1 mm · drag to look around';canvas.setAttribute('aria-label','Three-dimensional 80 mm steel blade clamped at one end on a dark ceramic arch.');}$('remaining').textContent='Quiet';}
 function runView(){if(!raf)raf=requestAnimationFrame(animate);}
 try{
  world=createLivingScene(canvas,{onTouch:touch});status.textContent='80 × 10 × 1 mm · drag to look around';
@@ -62,9 +73,9 @@ const capture=createTineLiveCapture({onChange:({current,pending,message})=>{
 const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  const quietFocused=document.activeElement===$('quiet');controls();
  if(state==='preparing')$('playing-status').textContent='Preparing your phrase…';
- if(state==='playing'){$('playing-status').textContent=`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
+ if(state==='playing'){$('playing-status').textContent=unfolding?'Your phrase is unfolding…':`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
  if(state==='suspended'){$('playing-status').textContent='Replay was interrupted. Choose Quiet, then hear it again.';stopView();}
- if(!listening()){stopView();if(state==='ended')$('playing-status').textContent='Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$('again').focus({preventScroll:true});replayFocus=false;}
+ if(!listening()){stopView();if(state==='ended')$('playing-status').textContent='Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:true});replayFocus=false;}
 }});
 session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const touchFocused=document.activeElement===$('touch'),quietFocused=document.activeElement===$('quiet');
@@ -81,13 +92,14 @@ session=createTineLiveSession({listeningDb:0,onChange:event=>{
  else if(event.state==='playing')runView();
 }});
 $('begin').addEventListener('click',async()=>{
- comparison.cancel();capture.cancel();replay.park();selectPCM(capture.current);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
+ cancelArrangement();unfolding=false;comparison.cancel();capture.cancel();replay.park();selectPCM(capture.current);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
  $('touch-note').textContent='Touches join the vibration already ringing. The gold spot appears only after a touch is accepted.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
 });
 $('again').addEventListener('click',async()=>{
  const pcm=selectedPCM;if(!pcm||$('again').disabled)return;
+ cancelArrangement();unfolding=false;replayReturnButton='again';
  replayResponse=createLivingResponse(pcm.record.design,pcm.sampleRate);pcm.record.events.forEach(event=>replayResponse.accept(event));replayCount=0;
  world?.acknowledgeTouch(false);$('touch-note').textContent='Returning to your original touches, including their timing and ending.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
@@ -95,20 +107,32 @@ $('again').addEventListener('click',async()=>{
  const playing=replay.play(pcm);replayFocus=true;
  try{await playing;}catch(error){$('playing-status').textContent=error.message;}
 });
+function cancelArrangement(){arrangementJob?.cancel();arrangementJob=null;}
+$('unfold').addEventListener('click',async()=>{
+ if($('unfold').disabled)return;
+ selectPCM(capture.current);world?.view('opening');for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view==='opening'));
+ unfolding=true;lastPart=null;replayReturnButton='unfold';arrangementPCM=null;arrangementView=null;
+ let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),capture.current.record);}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
+ const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingArrangementView(pcm.plan);return pcm;});
+ $('touch-note').textContent='Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
+ document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
+ const playing=replay.play(prepared);replayFocus=true;controls();
+ try{await playing;}catch(error){cancelArrangement();if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
+});
 for(const button of bodyButtons)button.addEventListener('click',async()=>{
- if(button.disabled)return;const lengthMm=Number(button.dataset.length);
+ if(button.disabled)return;unfolding=false;const lengthMm=Number(button.dataset.length);
  if(lengthMm===80){comparison.cancel();selectPCM(capture.current);controls();return;}
  try{await comparison.prepare({lengthMm,widthMm:10});}catch(error){$('body-note').textContent=error.message;}
 });
-$('reveal').addEventListener('change',()=>{if(!$('reveal').checked)world?.response(null);});
+$('reveal').addEventListener('change',()=>{if(!$('reveal').checked){if(unfolding&&arrangementView)world?.arrangementFrame(arrangementView.at(replay.time()),false);else world?.response(null);}});
 $('touch').addEventListener('click',touch);
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('quiet').addEventListener('click',()=>{
- if(listening()){replay.stop();$('playing-status').textContent='Replay stopped. Your phrase is unchanged.';return;}
+ if(listening()){cancelArrangement();replay.stop();$('playing-status').textContent='Replay stopped. Your phrase is unchanged.';return;}
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});
-function park(){wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
+function park(){cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
 controls();
