@@ -496,3 +496,5 @@ Tine timing variation: owns src/tine/timing.js, preparation.js, tests/tine-timin
 Tine body-and-rhythm return: owns new phrase-address.js/tests plus address.js validation export and existing main/html/catalog integration. Separate strict phrase record preserves v1 body-only interpretation; capture successful prepared identity and committed timing, quiet rehydrate with explicit preparation.
 
 Tine live-state foundation: owns new src/tine/live-kernel.js and tests/tine-live-kernel.test.js. Four-mode exact homogeneous state transition, impulses applied at current sample frame, bounded eight-touch/four-second admission and eight-second render span. Verify analytic parity and rejected-event immutability before any live browser integration.
+
+Tine live-pass lifecycle: owns new src/tine/live-pass.js, live-worklet.js and tests/tine-live-pass.test.js. Explicit one-shot start, four-second touch window/eight-second total pass, sample-defined 25 ms ending, acknowledged command identity and applied frames. No live user interface until actual browser worklet validation.
