@@ -659,3 +659,4 @@
 
 - 2026-11-03 — Astra: Full regression including the final live host/drain revision passes 752/752 at concurrency 2 in 183.121 seconds; zero failures, cancellations or skips. Log: `/tmp/imagimusic-astra-live-page-suite.log`.
 - 2026-11-03 — Astra: strict live tine record and sample-frame reconstruction foundation. Three new tests cover multiple rates, endings, ordered overlap and refusal; affected live group 14/14. Actual Safari offline-worklet natural/early records both rebuild at zero sample error (2/2). No keep/replay UI or cross-runtime bit-identity claim yet.
+- 2026-11-03 — Astra: visit-local live tine replay, quietly reconstructed in a worker; previous completed pass survives failed/cancelled/interrupted/empty attempts. Affected tests 16/16, real Safari worker/worklet parity 2/2 at zero error. Native capture→replay, keyboard focus, empty-pass/tab-away preservation and 390×656 card verified. Portable keeping remains next.

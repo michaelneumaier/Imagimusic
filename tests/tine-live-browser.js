@@ -1,3 +1,4 @@
+import {createAudioRenderJob} from '../src/audio-render-job.js';
 import {tineLiveRecordFromFinished,renderTineLiveRecord} from '../src/tine/live-record.js';
 import {createTineLivePass} from '../src/tine/live-pass.js';
 import {createTineDesign,requestForTineDesign} from '../src/tine/address.js';
@@ -24,6 +25,10 @@ async function run(early){
  const saved=tineLiveRecordFromFinished({design:createTineDesign(),sampleRate:rate,...finished}),rebuilt=renderTineLiveRecord(saved);
  let recordError=0;for(let i=0;i<audio.length;i++)recordError=Math.max(recordError,Math.abs(audio[i]-(rebuilt.channels[0][i]??0)));
  assert(recordError===0,`Saved reconstruction differs: ${recordError}`);
- node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError,recordError};
+ const workerPCM=await createAudioRenderJob(new URL('../src/tine/live-render-worker.js',import.meta.url),saved).promise;
+ assert(workerPCM.frames===rebuilt.frames,'Worker frame count mismatch');
+ let workerError=0;for(let i=0;i<rebuilt.frames;i++)workerError=Math.max(workerError,Math.abs(workerPCM.channels[0][i]-rebuilt.channels[0][i]));
+ assert(workerError===0,`Worker reconstruction differs: ${workerError}`);
+ node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError,recordError,workerError};
 }
 try{const natural=await run(false),early=await run(true);document.getElementById('result').textContent='PASS 2/2\n'+JSON.stringify({natural,early,note:'Actual offline worklet samples and applied frames; no live latency or hardware measurement.'},null,2);}catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}

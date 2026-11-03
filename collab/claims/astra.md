@@ -502,3 +502,5 @@ Tine live-pass lifecycle: owns new src/tine/live-pass.js, live-worklet.js and te
 Tine live host and playing surface: owns new live-session.js/tests, tine-play.html/css and play-main.js plus prepared-body link in owned tine page. One context per pass, explicit readiness, bounded input, applied acknowledgements, quiet ending and interruption cleanup; capture remains internal until reconstruction is verified.
 
 Tine live reconstruction: owns new src/tine/live-record.js and tests/tine-live-record.test.js; strict body/sample-frame/ending record, all-or-refuse validation and exact same-pass reconstruction before keep/replay UI. Browser live harness integration owned.
+
+Tine replay integration: owns live-capture.js/live-render-worker.js, capture tests and play-main.js/tine-play.html controls. Preserve prior complete PCM across pending/failed/interrupted attempts, asynchronous reconstruction, explicit replay and Quiet, no portable record UI yet.
