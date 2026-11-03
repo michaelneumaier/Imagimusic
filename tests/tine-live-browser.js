@@ -1,3 +1,4 @@
+import {tineLiveRecordFromFinished,renderTineLiveRecord} from '../src/tine/live-record.js';
 import {createTineLivePass} from '../src/tine/live-pass.js';
 import {createTineDesign,requestForTineDesign} from '../src/tine/address.js';
 const {geometry}=requestForTineDesign(createTineDesign());
@@ -20,6 +21,9 @@ async function run(early){
  assert(maxError===0,`Worklet output differs: ${maxError}`);assert(finished.snapshot.frame===pass.frame,'Ended frame mismatch');
  assert(finished.originAudioFrame===0,'Unexpected offline origin');
  assert(finished.snapshot.events[1].frame===second.frame,'Applied event identity mismatch');assert(audio.subarray(pass.frame).every(x=>x===0),'Post-ending signal');
- node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError};
+ const saved=tineLiveRecordFromFinished({design:createTineDesign(),sampleRate:rate,...finished}),rebuilt=renderTineLiveRecord(saved);
+ let recordError=0;for(let i=0;i<audio.length;i++)recordError=Math.max(recordError,Math.abs(audio[i]-(rebuilt.channels[0][i]??0)));
+ assert(recordError===0,`Saved reconstruction differs: ${recordError}`);
+ node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError,recordError};
 }
 try{const natural=await run(false),early=await run(true);document.getElementById('result').textContent='PASS 2/2\n'+JSON.stringify({natural,early,note:'Actual offline worklet samples and applied frames; no live latency or hardware measurement.'},null,2);}catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}

@@ -500,3 +500,5 @@ Tine live-state foundation: owns new src/tine/live-kernel.js and tests/tine-live
 Tine live-pass lifecycle: owns new src/tine/live-pass.js, live-worklet.js and tests/tine-live-pass.test.js. Explicit one-shot start, four-second touch window/eight-second total pass, sample-defined 25 ms ending, acknowledged command identity and applied frames. No live user interface until actual browser worklet validation.
 
 Tine live host and playing surface: owns new live-session.js/tests, tine-play.html/css and play-main.js plus prepared-body link in owned tine page. One context per pass, explicit readiness, bounded input, applied acknowledgements, quiet ending and interruption cleanup; capture remains internal until reconstruction is verified.
+
+Tine live reconstruction: owns new src/tine/live-record.js and tests/tine-live-record.test.js; strict body/sample-frame/ending record, all-or-refuse validation and exact same-pass reconstruction before keep/replay UI. Browser live harness integration owned.
