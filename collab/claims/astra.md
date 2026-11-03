@@ -472,3 +472,7 @@ Completed tine audible boundary (stable): owns src/tine/render.js and render-wor
 Completed first tine encounter (stable): owns new tine.html, tine.css, src/tine/main.js. Staged length/width/strike/pickup, static dimensioned plan view, explicit worker preparation, fixed-gain current/held comparison and quiet lifecycle. No changes to garden or shared model.
 
 Completed tine discovery (stable): owned src/project-catalog.js entry; docs/ROADMAP.md continuation evidence and next encounter boundary.
+
+Completed tine encounter refinement (stable): owns tine.html/css and src/tine/main.js. Bring preparation next to controls, add source-independent focus/scroll navigation, compact narrow introduction and verify keyboard preparation focus.
+Completed tine checkpoint reconciliation (stable): owns project.html history append and docs/ROADMAP.md current evidence; next visual response remains separate from static geometry.
+Completed tine full-control-range admission (stable): owns render.js gain correction, tine-render test and UI-range study tool. Uniform gain 100 instead of 200 admits all displayed settings without per-body normalization; update page captions and verify browser parity again.

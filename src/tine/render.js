@@ -1,6 +1,6 @@
 import {createTineImpulse} from './impulse.js';
 // An authored pickup conversion, not radiated sound pressure or loudness matching.
-export const TINE_PICKUP_GAIN=200; // digital amplitude per meter/second
+export const TINE_PICKUP_GAIN=100; // digital amplitude per meter/second
 export const TINE_OUTPUT_BOUND=.8;
 export function renderTineImpulse(geometry,{sampleRate=48000,seconds=4,count=4,activation=.85,pickup=.85,impulseNs=1e-6}={}){
  if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>96000)throw Error('Sample rate must be an integer within 8000…96000.');

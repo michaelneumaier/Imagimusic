@@ -23,3 +23,13 @@ test('invalid or excessive playback requests refuse rather than drop modes, clip
  for(const extra of [{seconds:NaN},{seconds:9},{sampleRate:48000.1},{pickup:NaN},{pickup:-.1}])assert.throws(()=>renderTineImpulse(geometry,{...options,...extra}));
  const three=renderTineImpulse(geometry,{...options,sampleRate:8000,count:3});assert.equal(three.frequenciesHz.length,3);
 });
+
+test('every displayed dimension and position fits the fixed gain and 48 kHz mode guard',async()=>{
+ const {studyTineRange}=await import('../tools/study-tine-range.mjs');
+ const report=studyTineRange();
+ assert.equal(report.configurations,91728);assert.ok(report.withinHeadroom);assert.ok(report.withinAliasGuard);
+ const peak=report.maxDigitalVelocityBound;
+ const pcm=renderTineImpulse({...geometry,lengthM:peak.length/1000,widthM:peak.width/1000},{activation:peak.activation,pickup:peak.pickup,sampleRate:48000,seconds:.05});
+ assert.equal(pcm.outputBound,peak.value);
+ assert.ok(Math.max(...pcm.channels[0].map(Math.abs))<=.8);
+});
