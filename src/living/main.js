@@ -1,3 +1,4 @@
+import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
 import {createLivingArrangementView} from './arrangement-view.js';
 import {createLivingResponse} from './response.js';
@@ -16,6 +17,7 @@ $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
 motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-motion').checked=!motionPreference.matches;});
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
+let restoreVersion=0;
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
@@ -26,6 +28,7 @@ function controls(){
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
  $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||!selectedPCM;
  for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
+ $('keep-encounter').disabled=!world||busy||repeat||capture.pending||!capture.current;
  $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
  for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
  if(repeat&&unfolding){$('touch-count').textContent='Your phrase unfolding';return;}
@@ -97,6 +100,7 @@ session=createTineLiveSession({listeningDb:0,onChange:event=>{
  else if(event.state==='playing')runView();
 }});
 $('begin').addEventListener('click',async()=>{
+ restoreVersion++;
  cancelArrangement();unfolding=false;comparison.cancel();capture.cancel();replay.park();selectPCM(capture.current);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
  $('touch-note').textContent='Touches join the vibration already ringing. The gold spot appears only after a touch is accepted.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
@@ -137,7 +141,27 @@ $('quiet').addEventListener('click',()=>{
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});
-function park(){cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
+function park(){restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
 controls();
+
+$('keep-encounter').addEventListener('click',()=>{
+ if($('keep-encounter').disabled)return;
+ try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
+ catch(error){$('keep-note').textContent=error.message;}
+});
+async function restoreAddress(){
+ if(!location.hash)return;
+ park();const own=restoreVersion;
+ try{
+  const record=readLivingAddress(location.hash);
+  $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
+  unfolding=false;world?.clearArrangement();$('keep-note').textContent='Opening your kept encounter quietly…';
+  await capture.load(record.source);if(own!==restoreVersion)return;
+  if(!capture.current||JSON.stringify(capture.current.record)!==JSON.stringify(record.source)){$('keep-note').textContent='This encounter could not be prepared. The original address is unchanged.';return;}
+  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
+  $('keep-note').textContent='Kept encounter reopened quietly: original touches, arrangement version and reveal choice restored. Listening level and manual camera position are not saved.'+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'');
+ }catch(error){if(own===restoreVersion)$('keep-note').textContent='Could not open this encounter. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
+}
+window.addEventListener('hashchange',restoreAddress);restoreAddress();

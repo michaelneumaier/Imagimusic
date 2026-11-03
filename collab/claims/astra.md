@@ -632,3 +632,9 @@ Living camera continuity: owns arrangement-view.js/tests, scene.js/main.js and l
 Flagship checkpoint reconciliation: owns project.html flagship/roadmap/history summaries and docs/ROADMAP.md M19. Record implemented encounter separately from outstanding polish and persistence.
 
 Living camera continuity and flagship checkpoint reconciliation complete: native desktop/home evidence and full792 regression recorded; claims released.
+
+Living encounter keeping: owns src/living/record.js, tests/living-record.test.js and main/html integration. Versioned source-and-presentation recipe in a bounded address, quiet reopen, explicit original PCM identity.
+
+Living keeping discovery: owns src/project-catalog.js entry, project.html current milestone wording and ROADMAP M19 keeping status.
+
+Living encounter keeping and discovery complete: recipe/address, native round-trip/failure/retention and catalog evidence recorded; claims released.
