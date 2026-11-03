@@ -673,3 +673,4 @@
 - 2026-11-03 — Astra: dimensional listening study gets explicit shared0…20dB playback level, default0; unchanged source WAV hashes and relative levels. Three player lifecycle tests plus shared-stage tests5/5; Safari switching, paused return and native Play restart verified. No loudness/preference claim.
 
 - 2026-11-03 — Astra: completed live pass gains mono float32 WAV download at unchanged source level. Encoder/capture checks4/4; Safari download verified with independent parser. One tiny cross-engine reconstruction difference documented separately from exact encoder preservation. Local only, no new peer review.
+- 2026-11-03 — Astra: native comparison/export identity check preserves original WAV hash after width20 candidate preparation; project homepage and catalog now expose original-sound export alongside playable-address keeping.

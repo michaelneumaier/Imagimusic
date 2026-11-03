@@ -528,3 +528,5 @@ Dimensional study discovery: owned src/project-catalog.js and tools/prepare-proj
 Tine listening-level study: owns study-player.js/study-main.js and tests, plus generated study template. One shared explicit0…20dB downstream stage, default0, unchanged WAVs; no per-body normalization, no auto-resume on return.
 
 Completed-pass audio export checkpoint complete: src/tine/wav.js, tests and playing-page download controls released. Original completed pass only; float32 source samples preserved.
+
+Export discovery complete: project.html and src/project-catalog.js wording checked in Safari,39/39 entries; claim released.
