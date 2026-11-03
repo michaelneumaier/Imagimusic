@@ -37,3 +37,7 @@ node tools/study-refined-modes.mjs > refined-mode-report.json
 Two tests pass: a single-mode frequency-offset control corrects its frequency while preserving the input and starting estimates, and a capped close-frequency case reports its work budget while keeping frequency neighborhoods disjoint. Invalid ordering and out-of-range decays are refused. The CLI completed all six before/after trials. Syntax and diff checks passed; the earlier 699-test full-suite checkpoint predates these research additions.
 
 Next: compare explicit alternative mode counts using a training/validation split, rather than assuming the threshold peak count is complete or minimizing training residual alone. Record each candidate's starting model, complexity and validation error. Choosing among those alternatives still needs evidence on noise and non-exponential signals; one best numerical fit must not be represented as the unique physical anatomy of a recording. No change to the source-listening page or physical workshop is made by this experiment.
+
+### Follow-up: model alternatives with separated validation
+
+`tools/study-mode-alternatives.mjs` and `collab/notes/astra-mode-alternatives-study.md` compare the original candidate with explicit one-extra-mode hypotheses. Validation improves missing-mode predictions, but also selects extra modes in true two-mode controls; selected searches include exhausted budgets and bound contact. Raw validation ranking is not a mode-count certificate. A real regression verifies that changing the final interval cannot affect fitting or selection.
