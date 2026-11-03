@@ -453,3 +453,5 @@ Completed sketch decay variation (stable): src/sketch/variation.js, tests/sketch
 Completed returnable sketch address (stable): src/sketch/address.js, tests/sketch-address.test.js and owned sketch UI. Bounded versioned fragment embeds exact source parameters and staged multiplier after preparation, silent reopening without generated-report dependency, explicit address update and declared-label limits.
 
 Completed sketch milestone reconciliation (stable): lead-owned current M18 checkpoint in docs/ROADMAP.md, append-only docs/IDEAS.md and docs/LOG.md, owned project history. Reconcile completed research and play/shape/return work, preserve prior evidence, name next creative/modeling/evaluation boundaries while Fable is unavailable.
+
+Completed spatial sketch construction study (stable): src/sketch/spatial.js, tests/sketch-spatial.test.js, tools/study-sketch-space.mjs and own evidence note. Authored sine mode shapes on a dimensionless line, signed activation/pickup projections, one source gain across positions, zero-node behavior and explicit absence of inferred geometry/local material law. No existing page or kept-address schema change in this foundation slice.
