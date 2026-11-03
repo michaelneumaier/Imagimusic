@@ -526,3 +526,5 @@ Dimensional listening study: owns tools/study-tine-bodies.mjs and generated igno
 Dimensional study discovery: owned src/project-catalog.js and tools/prepare-project-home.mjs registration for regenerating the local study and suppressing missing-render links.
 
 Tine listening-level study: owns study-player.js/study-main.js and tests, plus generated study template. One shared explicit0…20dB downstream stage, default0, unchanged WAVs; no per-body normalization, no auto-resume on return.
+
+Completed-pass audio export checkpoint complete: src/tine/wav.js, tests and playing-page download controls released. Original completed pass only; float32 source samples preserved.

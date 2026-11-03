@@ -1,3 +1,4 @@
+import {tineFloatWav} from './wav.js';
 import {createTineDesign,tineAddressFragment} from './address.js';
 import {readTineReturn} from './phrase-address.js';
 import {createTineLiveSession} from './live-session.js';
@@ -10,7 +11,7 @@ const $=id=>document.getElementById(id);let design=null,raf=0,wantsFocus=false,r
 const spatial=createTineLiveResponseView({details:$('spatial-inspection'),svg:$('spatial-picture'),selector:$('spatial-source'),slider:$('spatial-frame'),previous:$('spatial-previous'),next:$('spatial-next'),caption:$('spatial-caption'),reading:$('spatial-reading'),zoom:$('spatial-zoom'),scale:$('spatial-scale')});
 const liveActive=state=>['preparing','playing','ringing','ending'].includes(state);
 const replayActive=()=>['preparing','playing','suspended'].includes(replay.state);
-function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;
+function controls(state,touches){const active=liveActive(state),listening=replayActive();$('begin').disabled=!design||active||listening;$('quiet').disabled=(!active&&!listening)||(active&&state==='ending');$('touch').disabled=state!=='playing'||touches>=8;$('count').textContent=`${touches} / 8 touches`;$('replay').disabled=active||listening||capture.pending||!capture.current;$('keep-pass').disabled=active||!capture.current;$('download-pass').disabled=active||capture.pending||!capture.current;
  const blocked=active||listening||capture.pending||comparison.pending;
  $('prepare-comparison').disabled=blocked||!capture.current;
  for(const id of ['compare-length','compare-width'])$(id).disabled=blocked||!capture.current;
@@ -58,6 +59,14 @@ $('touch').addEventListener('click',()=>session.strike().catch(error=>{if(error.
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('keep-pass').addEventListener('click',()=>{if(!capture.current)return;try{const pcm=capture.current;history.replaceState(null,'',location.pathname+location.search+tineLiveFragment(pcm.record));$('keep-note').textContent=`Address now keeps ${pcm.record.events.length} ${pcm.record.events.length===1?'touch':'touches'} and the ${pcm.seconds.toFixed(2)}-second ending with this body. Bookmark or copy it for a quiet return. New playing does not change this address.`;}catch(error){$('keep-note').textContent=error.message;}});
 async function listen(pcm,button,label){if(!pcm)return;replayButton=button;replayLabel=label;replayFocus=document.activeElement===$(button);try{await replay.play(pcm);}catch(error){$('status').textContent=error.message;}}
+$('download-pass').addEventListener('click',()=>{
+ const pcm=capture.current;if(!pcm||capture.pending||liveActive(session.state))return;
+ try{const url=URL.createObjectURL(new Blob([tineFloatWav(pcm)],{type:'audio/wav'})),link=document.createElement('a');
+ link.href=url;link.download=`imagimusic-tine-${pcm.record.design.lengthMm}x${pcm.record.design.widthMm}-${pcm.frames}frames.wav`;
+ document.body.append(link);try{link.click();}finally{link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+ $('download-note').textContent=`WAV download requested: original completed pass, ${pcm.seconds.toFixed(2)} seconds, ${pcm.sampleRate} Hz, mono 32-bit float. Fixed source level; no normalization. Keep the address separately to return to the playable recipe.`;
+ }catch(error){$('download-note').textContent=`Download could not be prepared. ${error.message}`;}
+});
 $('replay').addEventListener('click',()=>listen(capture.current,'replay','the completed pass'));
 $('listen-original').addEventListener('click',()=>listen(comparison.current?.original,'listen-original','the original body: '+bodyName(comparison.current.original.record)));
 $('listen-candidate').addEventListener('click',()=>listen(comparison.current?.candidate,'listen-candidate','the changed body: '+bodyName(comparison.current.candidate.record)));

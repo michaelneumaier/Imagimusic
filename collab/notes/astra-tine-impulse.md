@@ -324,3 +324,11 @@ The study now offers0…20dB downstream listening gain, default0, shared by all 
 `study-player.js` owns one media source/context/stage across body switches, validates levels before mutation, invalidates pending resume on pause/page-away, and does not let a stale play promise pause a newer selection. Page-away pauses and suspends; returning does not resume automatically. An explicit native-player Play resumes the existing context through its play event. Three lifecycle tests plus two shared-stage tests pass5/5. These checks do not measure hardware loudness.
 
 Native Safari verifies quiet+0 entry, explicit keyboard selection of+20, opening→wider playback retaining+20, tab-away/return paused with that setting retained, and (after loading the final handler) native Play restarting after a tab-away. No hearing preference or perceived-loudness result is inferred. This makes low-level examples more accessible for a listening exercise while leaving comparison level differences intact.
+
+### Completed-pass float WAV export — 2026-11-03
+
+The playing page now downloads the original completed capture as mono IEEE float32 RIFF/WAVE with an explicit fact frame count. No normalization, integer quantization, resampling or candidate substitution. Download does not keep the playable record; the adjacent Keep action remains separate. Controls refuse active/pending capture, and old completed audio remains available after a failed replacement.
+
+Verification: two encoder tests plus two capture lifecycle tests pass (4/4). Three sample rates round-trip every supplied Float32 sample exactly through the independent sound-file parser, including tiny values and signed zero; inputs are unchanged. Native Safari quiet reopen and Download produce a 73,014-byte, 18,239-frame, 48 kHz mono float32 file with a zero ending. Cross-engine comparison against a fresh Node render differs at one sample by 2.9103830456733704e-11: do not claim cross-engine bit-identical reconstruction. Encoder sample preservation is distinct from numerical differences in independent renderers. No DAW compatibility or hardware listening claim.
+
+Next useful checkpoint: exercise a real newly played pass export and a changed-body comparison, check narrow-screen action wrapping, then reconcile homepage capabilities. Fable is unavailable; no peer review claimed.
