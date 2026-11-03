@@ -144,3 +144,30 @@ The [visual atmosphere workshop](../../living-look.html) now compares warm studi
 The readiness gate is a complete, locally reviewable encounter: a newcomer can enter and stop it, their own phrase survives the reveal, the sound and image form a deliberate piece, a saved encounter reopens, and a film can be kept. Hardware latency, small-speaker listening and phone performance still need direct evaluation. Only after that gate should we expand into a second physical family or a coupled spatial body.
 
 The larger ambition remains an instrument that can discover new playable forms with a person: preserve their musical idea, propose bodies with meaningful audible differences, and compose a world from those relationships. The first minute gives that ambition a concrete standard. Existing [VISION](../VISION.md) and [roadmap](../ROADMAP.md) contracts remain in force. Fable’s independent review is pending while they are unavailable.
+
+
+### Next milestone: one encounter worth showing
+
+The first-screen consolidation now puts the invitation, transport and whole opening body together at the checked390×656 and1100×656 viewports. Begin/Touch/Quiet behavior is preserved. This improves access to the instrument; it does not by itself deliver the promised sense of wonder.
+
+The next reviewable artifact should be one directed encounter with a clear emotional arc: **attention → authorship → expansion → recognition → rest**. Its central question is whether the visitor can hear their own contribution inside the expansion and feel the return as meaningful. This is an artistic hypothesis to test, not an audience result.
+
+Work in this order:
+
+1. **Compose the answer.** Compare the current staggered round with one restrained alternative that leaves more space between entrances. Use actual visitor intervals, retain the untouched original at either end, and keep the alternative in an experimental renderer until it earns a versioned arrangement. Listen to whole phrases before optimizing individual sounds. The existing finite reflections study can inform a presentation choice after the arrangement is convincing.
+2. **Direct attention.** Refine one opening silhouette and the first entrance of each body. Combine readable support surfaces with enough separation for the response veil. Evaluate the warm and pale workshop evidence in one consistent treatment; avoid adding a palette menu to the main encounter. Keep static-camera composition complete. A camera move should reveal a musical relationship.
+3. **Finish the return.** Give the exact original room to ring, followed by a quiet invitation to play again or keep it. Check that the ending remains satisfying for a single touch and a crowded phrase. Keep technical explanations available below the experience.
+4. **Review the whole encounter.** Keep a local film and playable recipe for each case below, alongside brief artistic notes and the known model limits. Then observe newcomers without coaching. Choose the next revision from their behavior and their own descriptions.
+
+| Input case | What the directed encounter must handle |
+| --- | --- |
+| Authored three-touch greeting | Complete watch-only arc; clearly separate from visitor authorship |
+| Single touch | A purposeful answer with enough silence; no pressure to produce more notes |
+| Eight closely spaced touches | Distinct entrances and controlled density; original remains recognizable |
+| Widely spaced touches | The visitor's timing remains apparent; gaps feel intentional |
+| Quiet during expansion | Prompt gentle stop and intact original; another turn remains easy |
+| Still camera on a narrow screen | Every active body remains legible; no essential meaning depends on movement |
+
+The deliverable is one recommended artistic treatment, its local film/recipe evidence, and a short record of remaining weaknesses. Existing workshops stay accessible through the project home and model details. This milestone adds no new physical family, arbitrary recording inference, or sharing service. Those remain later opportunities once the first encounter is compelling.
+
+The longer-term leap is **design through musical intention**: a person keeps a phrase and asks for a brighter, softer, stranger or more connected anatomy, then hears and plays the consequences. Our current alternate-body and inverse studies supply pieces of that path. Turning them into a coherent creative instrument still requires bounded design objectives, admitted models and direct listening evaluation. The first encounter should establish trust in that relationship before promising an unlimited world.

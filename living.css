@@ -10,4 +10,25 @@
 
 .recipe-open input{display:block;max-width:100%;margin:1rem 0;font:inherit;color:inherit}
 
-.intro .intro-note{font-size:.9rem;line-height:1.6;max-width:40ch;color:#a9b6b9}.intro #hear-first{margin-top:1rem;pointer-events:auto}
+/* First encounter: the instrument and transport share the first screen. */
+header{padding-top:18px;padding-bottom:14px}
+.intro{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:14px;pointer-events:auto}
+.intro h1{font:clamp(34px,4.5vw,58px)/1.05 Georgia;margin:0 0 10px;letter-spacing:-.035em}
+.intro .intro-copy p{font-size:15px;line-height:1.5;margin:0;color:#b6c0bd}
+.intro-listen{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.intro-listen span{font-size:12px;line-height:1.6;color:#aab8b5}
+.intro #hear-first{margin:0;pointer-events:auto;white-space:nowrap}
+.playing{margin-top:20px}
+.scene{height:clamp(280px,calc(100svh - 290px),560px);min-height:0;margin-top:12px}
+@media(max-width:700px){
+ header{padding-top:14px;padding-bottom:10px;gap:12px}
+ header a{font-size:21px}header span{font-size:9px;max-width:160px}
+ .intro{display:block;margin-top:12px}
+ .intro h1{font-size:34px;margin-bottom:7px}
+ .intro .intro-copy p{font-size:13px}
+ .intro-listen{margin-top:14px;gap:12px}
+ .intro-listen span{font-size:11px;line-height:1.45}
+ .playing{margin-top:16px}
+ .scene{height:clamp(240px,calc(100svh - 310px),440px)}
+ .views{margin-top:8px}
+}

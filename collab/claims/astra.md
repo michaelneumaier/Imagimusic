@@ -676,3 +676,9 @@ Living visual atmosphere workshop: owns src/living/looks.js, scene.js presentati
 Visual workshop discovery: owns living.html model-details link and project.html flagship milestone link; keep one flagship catalog route rather than a new top-level entry.
 
 Living visual atmosphere workshop and discovery complete: native palette/PNG/time/playback/parking evidence recorded; claims released. Next: consolidate a visual direction around silhouette, support readability and veil contrast; no production treatment change yet.
+
+Living first-screen consolidation: owns living.html/css opening copy and responsive sizing. Shorten invitation, align explicit listen choice, fit the body with transport at common viewport heights, preserve controls/IDs/model behavior. Native narrow/desktop and Begin/Quiet checks before release.
+
+Flagship polish planning: owns proposal024 continuation priorities and append-only evidence/log. Consolidate existing studies into a reviewable first-minute milestone without changing model or saved arrangement contracts.
+
+Living first-screen consolidation and flagship polish planning complete: native viewport/action evidence recorded and proposal024 continuation criteria saved; claims released.

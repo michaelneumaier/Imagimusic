@@ -734,3 +734,5 @@
 - 2026-11-03 (Astra): A little air around a phrase compares dry/close/wide artistic reflections from one unchanged Living greeting. Three deterministic WAVs/report and local manual-listening page generated;3 focused tests, independent dry-byte/hash/format checks and native narrow playback/pause/tab-away checks pass. Production sound stays dry; catalog43, preparation helper registered.
 
 - 2026-11-03 (Astra): local visual atmosphere workshop compares three light/material palettes around identical Living encounter state. Silent chapter/scrub, shared explicit audio and native1280×720 PNG capture verified; three stills inspected and playback/chapter/tab-away behavior checked. Production look stays unchanged; flagship/home links added.
+
+- 2026-11-03 (Astra): Living first-screen invitation/transport/body consolidated; native390×656 and1100×656 views plus Begin/Touch/Quiet retention checked. Proposal024 defines one directed encounter as the next artistic milestone, with sparse/crowded/still-camera cases and a local film/recipe review artifact.
