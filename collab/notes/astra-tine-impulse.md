@@ -97,3 +97,13 @@ At 390×656, the initial overlay made small modal bands difficult to distinguish
 Scale information is now readable HTML beside the figure. A shorter caption retains source identity, model time, selected/summed bound and “not instantaneous bending.” Supporting explanation is in “How to read these bands.” The numerical bound uses three significant digits, with exact zero shown as zero, so tiny higher-mode bounds do not round misleadingly to 0.000. A visually small band stays small on the fixed scale; isolation does not magnify it.
 
 Native Safari responsive preview verifies the mode menu, the isolated second-mode picture at 798.42 Hz, its small pickup bound, restored summed view, and readable figure/caption/scale with pinned playback controls. With Follow enabled, the second-mode caption advanced during the full audition; opening the menu did not restart it, and returning to All after its ending showed time 4.00 s and summed bound ±0.365 µm. Screenshot inspection covers layout, not a human comprehension result. Responsive mode exited; page left quiet. The two envelope tests remain passing; no mechanical or audio model changed.
+
+## Keeping a body for another visit
+
+The version 1 `#tine=` record keeps page-grid length, width, strike and pickup positions. Its request builder pins the existing thickness, material, loss, four modes, impulse, 48 kHz / four-second rendering and fixed gain 100. Only successful preparation replaces the keepable snapshot. Held comparison, unfinished draft, playback and picture choices are visit-local. Keeping uses replaceState; reopening stages the design quietly and requires explicit preparation and listening. Unsupported, malformed, oversized and off-grid records refuse; an explicit original-dimensions action clears the refused address.
+
+Two tests verify full rendered-sample identity after a non-default 95×7 mm design round trip, snapshot independence, exact schema/version/grid refusal and endpoint records. All ten affected tests pass. Native Safari prepared 80×10 mm, held it, staged length 90 mm and kept: the URL retained 80×10 mm. Reload restored 80×10 mm with no prepared or held body and disabled listening. A malformed address disabled preparation; Stage original dimensions cleared it and restored the controls quietly. These are software checks, not listener or acoustic validation.
+
+Native Safari also verifies that keeping during current-body playback leaves the player in Playing with Quiet available; the address updates without a reload.
+
+Full regression after the return integration: 733/733 pass, zero failures/cancellations/skips, concurrency 2, 141.910 seconds (`/tmp/imagimusic-astra-tine-return-suite.log`).

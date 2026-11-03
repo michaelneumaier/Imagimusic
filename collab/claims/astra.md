@@ -482,3 +482,5 @@ Completed first tine response picture (stable): owns src/tine/envelope.js, respo
 Tine response checkpoint also updates owned catalog copy, M18 and evidence notes.
 
 Completed tine response reading (stable): owns tine.html/css and response-view.js; picture-only modal selector, readable HTML scale and compact explanation. Audio remains the four-mode prepared response; inspect narrow layout and mode switching.
+
+Completed tine return record (stable): owns new src/tine/address.js, tests/tine-address.test.js and owned tine.html/main.js integration. Strict versioned page-grid design, captured from successful preparation; address keep/reopen stays quiet and independent of held/draft state. Unsupported addresses require explicit reset.
