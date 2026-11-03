@@ -508,3 +508,5 @@ Tine replay integration: owns live-capture.js/live-render-worker.js, capture tes
 Tine live quiet return: owns live-address.js/tests, live-capture record loader and play-main/tine-play keep/reopen integration. Explicit address update from completed capture only; strict bounded fragment, silent asynchronous reconstruction, no autoplay or implicit overwrite.
 
 Live tine discovery: owns project.html and src/project-catalog.js copy/catalog update for the completed shape→play→replay→keep route and its history milestone; local preview only.
+
+Live tine phrase/body comparison: owns live-comparison.js, live-comparison-worker.js and tests. Preserve the source record, exact event frames/strengths/rate/ending and relative positions; vary dimensions only, re-admit the entire candidate, fixed pickup gain and no loudness matching. UI follows verified pair rendering.
