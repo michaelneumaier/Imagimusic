@@ -431,3 +431,5 @@ Completed solo continuation checkpoint (stable): docs/ROADMAP.md M18 heading/cur
 Completed joint decay research (stable): tools/study-joint-decay.mjs, tests/joint-decay-study.test.js and own evidence note. Bounded fixed-frequency exponential mixture fit with explicit supplied frequencies, independent residual reconstruction, and known-answer controls; no production estimator or shared physics edits.
 
 Completed joint-fit listening study (stable): tools/render-joint-decay-study.mjs, generated local renders/joint-decay-study, own evidence note and catalog entry. Same-gain source/reconstruction WAVs, actual withheld noisy suffix metrics, explicit supplied-frequency limitations; one player and no automatic target handoff.
+
+Completed estimated-frequency fit study (stable): tools/study-estimated-joint-decay.mjs and focused tests/evidence note. Feed all threshold-passing spectral candidates into the bounded joint fit without ground-truth selection, refuse counts outside its 1..4-mode scope, and score actual withheld observations only afterward. No production promotion.
