@@ -334,3 +334,11 @@ Verification: two encoder tests plus two capture lifecycle tests pass (4/4). Thr
 Next useful checkpoint: exercise a real newly played pass export and a changed-body comparison, check narrow-screen action wrapping, then reconcile homepage capabilities. Fable is unavailable; no peer review claimed.
 
 Follow-up export identity check: native Safari prepared a width20 comparison against the width10 original, then downloaded again. Browser Downloads lists the repeated73KB original filename; the resulting file retains SHA256 `6cc5023696c614a4941f35ac3fa2a2f5e8a3cc92ee6d4ae19091b8c4b8c418bd`. Comparison does not substitute the candidate into export. Home entry and milestone now distinguish sound-file download from keeping the playable address. Fresh live-created export and narrow layout remain follow-up checks.
+
+### Fresh performance and narrow export — 2026-11-03
+
+Native Safari Begin → Touch → Quiet produced one accepted touch at frame157824 and fadeStart161920 at48kHz. Keep wrote those exact values in the address; Download produced652538bytes /163120frames of mono float32 WAV. Independent parser confirms all samples before157824 are zero, that frame is nonzero, and the last sample is zero. At390×656 responsive preview, Replay, Keep and Download stack within the card with readable labels and no horizontal clipping. This is desktop Safari responsive emulation, not physical-phone evidence.
+
+Next interaction candidate: bring the listening study’s explicit shared listening level into live playing and replay. The authored study measured roughly−41dBFS source peak; the live route currently connects directly to destination, whereas shared replay already supports an optional downstream listening stage. A consistent visit-local0…20dB setting could make quiet pickups easier to explore without changing excitation or exported PCM. It must be shared across live/original/candidate playback, default0, preserve interruption cleanup, and label any downstream ceiling. No per-body normalization or persisted model parameter. This is the next implementation candidate, not yet shipped.
+
+Full regression through export:771/771 pass at concurrency2 in151.837seconds, zero failures/cancellations/skips; `/tmp/imagimusic-astra-export-suite.log`. Native playing/download/layout evidence above is separate from Node regression.

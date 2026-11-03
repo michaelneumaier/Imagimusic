@@ -530,3 +530,5 @@ Tine listening-level study: owns study-player.js/study-main.js and tests, plus g
 Completed-pass audio export checkpoint complete: src/tine/wav.js, tests and playing-page download controls released. Original completed pass only; float32 source samples preserved.
 
 Export discovery complete: project.html and src/project-catalog.js wording checked in Safari,39/39 entries; claim released.
+
+Export milestone evidence complete: M18, log and evidence updated; full771/771 and native fresh/narrow export checked. Claim released.
