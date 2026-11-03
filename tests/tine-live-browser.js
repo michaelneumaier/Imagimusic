@@ -1,3 +1,4 @@
+import {createTineLiveResponse} from '../src/tine/live-response.js';
 import {createAudioRenderJob} from '../src/audio-render-job.js';
 import {tineLiveRecordFromFinished,renderTineLiveRecord} from '../src/tine/live-record.js';
 import {createTineLivePass} from '../src/tine/live-pass.js';
@@ -32,6 +33,9 @@ async function run(early){
  const comparison=await createAudioRenderJob(new URL('../src/tine/live-comparison-worker.js',import.meta.url),{source:saved,dimensions:{lengthMm:80,widthMm:20}}).promise;
  let comparisonError=0;for(let i=0;i<rebuilt.frames;i++)comparisonError=Math.max(comparisonError,Math.abs(comparison.original.channels[0][i]-rebuilt.channels[0][i]),Math.abs(comparison.candidate.channels[0][i]-rebuilt.channels[0][i]/2));
  assert(comparisonError===0,`Comparison worker differs: ${comparisonError}`);
- node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError,recordError,workerError,comparisonError};
+ const mechanical=createTineLiveResponse(saved).at(finished.snapshot.frame);let displacementError=0,velocityError=0;
+ for(let i=0;i<4;i++){displacementError=Math.max(displacementError,Math.abs(mechanical.modes[i].displacementM-finished.snapshot.modes[i].displacementM));velocityError=Math.max(velocityError,Math.abs(mechanical.modes[i].velocityMPerS-finished.snapshot.modes[i].velocityMPerS));}
+ assert(displacementError<1e-15&&velocityError<1e-12,'Spatial inspection differs from worklet state');
+ node.disconnect();node.port.close();return {early,secondFrame:second.frame,endFrame:pass.frame,maxError,recordError,workerError,comparisonError,displacementError,velocityError};
 }
 try{const natural=await run(false),early=await run(true);document.getElementById('result').textContent='PASS 2/2\n'+JSON.stringify({natural,early,note:'Actual offline worklet samples and applied frames; no live latency or hardware measurement.'},null,2);}catch(error){document.getElementById('result').textContent='FAIL: '+error.message;}

@@ -514,3 +514,5 @@ Live tine phrase/body comparison: owns live-comparison.js, live-comparison-worke
 Live comparison controls: owns live-comparison-session.js/tests and playing-page optional comparison disclosure. Source-bound pair ownership, staged dimensions, preserved pair on cancel/failure, explicit auditions and original live/kept identity.
 
 Candidate playing continuation: owned play-main/tine-play link from prepared comparison candidate to quiet body-only playing in a new tab. Preserve source page and kept pass; no implied performance transfer or automatic body switch.
+
+Signed live-phrase spatial inspection: owns live-response.js/tests. Pure frame-addressed analytic reconstruction from accepted events, signed bending/velocity and combined modal energy; verify against streaming state and PCM before visual UI. No display-rate oscillation or invented slow-motion claim.
