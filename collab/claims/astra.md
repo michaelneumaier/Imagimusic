@@ -548,3 +548,5 @@ Completed phrase reading complete: optional source-bound table and native kept-r
 First-visit curation complete: home/history/M18 and IDEAS triage reconciled, native route checked and full774/774 passed; claim released.
 
 Finite-force offline foundation complete: force-study.js, tests and tools/study-tine-force.mjs checked;3 tests and duration probe recorded. Claim released; convergence investigation remains next.
+
+Force convergence complete: tool/reference refinement and four-case/four-mode convergence checked;4 physics tests pass. Claim released.

@@ -401,3 +401,20 @@ Reproducible probe: `node tools/study-tine-force.mjs`. Default80×10mm body,48kH
 |4ms|0.605152|0.000425|0.000009|<0.000001|
 
 This measured fixture supports investigating duration as a cause of changed modal balance. It does not establish monotonic attenuation for all frequencies/durations, perceptual softness, hammer mechanics or radiation. Pulse onset/centroid and finite forcing change the energy history; equal total impulse is not equal injected work. No live format or page behavior changed. Next: quantify convergence to the intended continuous pulse, then consider an explicitly authored listening comparison at fixed source gain. Fable review remains pending.
+
+### Continuous-pulse convergence boundary — 2026-11-03
+
+`node tools/study-tine-force-convergence.mjs` independently integrates continuous half-sine forcing against the damped impulse Green function, using composite Simpson quadrature at8192 intervals and a4096-interval refinement comparison. It compares pulse-ending state with held interval-average forces at24/48/96kHz for0.125/0.5/1/4ms pulses on the opening body. The error metric is hypot(omega*deltaq,deltav)/abs(v_from_equal_ideal_impulse), separately for each mode. This avoids dividing by near-zero pulse responses; percentages below are not relative errors in the attenuated response or perceptual errors.
+
+Maximum normalized state error across the four modes:
+
+| Duration |24kHz|48kHz|96kHz|
+|---|---:|---:|---:|
+|0.125ms|7.9293%|2.0299%|0.51059%|
+|0.5ms|0.66700%|0.16645%|0.041595%|
+|1ms|0.18930%|0.047330%|0.011833%|
+|4ms|0.0088318%|0.0021985%|0.00054905%|
+
+Every mode/case converges by a factor between3.5 and4.5 when the step halves, consistent with second-order error for these fixtures. The quadrature refinement difference is at most1.70e-12 in the same normalized metric, far below all measured discretization errors. Force integrals remain1e-7Ns within1e-20Ns. Combined exact-step/RK4/invariant/convergence group4/4 passes.
+
+Consequence: the short48kHz pulse cannot be described as an exact continuous half-sine. The implemented held-average force is an explicit valid prescribed input, but its highest retained mode differs measurably from the intended continuous curve. Any listening study must label that force representation and source rate. This is one body/four durations, not a universal accuracy guarantee, nor a claim that listeners detect the discrepancy. No changes to live playing.
