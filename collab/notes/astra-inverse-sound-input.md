@@ -77,3 +77,11 @@ Evidence:
 - Desktop screenshot inspection showed readable controls, gain disclosure and channel waveform. No phone-device, acoustic-output or human listening-quality claim is made.
 
 The catalog now describes explicit audition and silent opening. Future interpretation must retain this source reference and make any changes to gain, decay, channels or inferred resonances visible.
+
+### Follow the recording while listening
+
+An optional playback marker now crosses each channel's unchanged waveform using the replay owner's audio-clock position. The marker maps the same start/end plot bounds as the waveform (68..1260 of 1280 horizontal units). It hides at Quiet, remains at the end after natural completion, and can be disabled without changing playback. Initial reduced-motion preference disables it; no preference is saved or inferred beyond that browser setting. The marker represents playback position, not a newly inferred resonance or a measured speaker-output timestamp.
+
+The transport stays visible while scrolling within the selected recording. Waveform sample-range and time labels are HTML text, avoiding the tiny stretched canvas labels observed in the narrow check. Existing sample values and scales are unchanged.
+
+Native Safari evidence: desktop screenshot during playback showed aligned markers on both channels at approximately 1.5/8 seconds. At 390×656 responsive size, controls remained visible above both waveforms; disabling Follow playback left playback running at 2.8/8 seconds with no markers, and re-enabling it showed aligned markers during another explicit replay. HTML axis labels were readable in the narrow screenshot. Escape returned to ready/Quiet-disabled; responsive mode was exited. These are desktop-browser responsive checks, not physical-phone or hardware-latency measurements. Syntax and diff checks passed. No new model/renderer test is claimed for this display-only change.

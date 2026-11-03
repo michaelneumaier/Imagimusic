@@ -423,3 +423,5 @@ Completed November 3 independent research maintenance (ownership returned to sta
 Completed sound candidate reliability study (stable): tools/study-sound-candidates.mjs, tests/sound-candidate-study.test.js and own evidence note. Controlled amplitude/spacing/noise sweep using the corrected research estimator, explicit one-to-one threshold-candidate metrics and residuals; no production acceptance rule.
 
 Completed local source audition (stable): inverse-sound.html/css, src/inverse/sound-inspection.js, sound-worker.js, sound-audition.js and tests/inverse-sound-audition.test.js / inverse-sound-browser.js. Explicit playback of decoded source through existing replay lifecycle; declared attenuation, untouched analysis samples, replacement/cancel/visibility quiet.
+
+Completed source listening position (stable): owned inverse-sound page and inspection code. Optional clock-driven marker across the unchanged channel waveforms, reduced-motion default, narrow playback control layout; no analysis or sound change.
