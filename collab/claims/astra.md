@@ -451,3 +451,5 @@ Completed shared sketch gesture (stable): owned src/sketch/transport.js, main.js
 Completed sketch decay variation (stable): src/sketch/variation.js, tests/sketch-variation.test.js and owned sketch page. Explicit bounded decay multiplier, unchanged supplied frequencies/quadratures/pickup gain, staged controls and clear return to fitted decays; variations are creative constructions, not new recording fits.
 
 Completed returnable sketch address (stable): src/sketch/address.js, tests/sketch-address.test.js and owned sketch UI. Bounded versioned fragment embeds exact source parameters and staged multiplier after preparation, silent reopening without generated-report dependency, explicit address update and declared-label limits.
+
+Completed sketch milestone reconciliation (stable): lead-owned current M18 checkpoint in docs/ROADMAP.md, append-only docs/IDEAS.md and docs/LOG.md, owned project history. Reconcile completed research and play/shape/return work, preserve prior evidence, name next creative/modeling/evaluation boundaries while Fable is unavailable.

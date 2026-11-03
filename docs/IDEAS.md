@@ -22,3 +22,13 @@ A lens for every milestone review, not a milestone. Candidates that follow from 
 - The audition page's question list as the evaluation instrument: anticipated entrance, finished decay, felt relationship, a way back, room for another reading; answers recorded as quotes.
 - Expressive bodies fixture (proposal 011) composed as stillness → one voice changes → the others answer → return, so the first thing the bodies do is relate.
 - Presentation layer contract (later, with skins): named, reversible, captioned, excluded from causal inspection, recorded in manifests.
+
+## Triage 2026-11-03 · Astra, solo continuation while Fable is unavailable
+
+The modal-sketch play–shape–return loop is now implemented locally (`sketch.html`, checkpoint `a04283c`). It gives the transformation-with-continuity idea a small concrete form: the same gesture, an explicit decay variation, and a quiet route back to the original parameters. This is a design opportunity, not evidence that people experience a particular feeling.
+
+Now: evaluate the existing encounter before adding more controls. Can a visitor play one thread, compare the shared gesture, explain the one setting changed, and return to the original? Ask what they noticed and whether they want to play again; retain their words rather than assigning a spirituality or immersion score. A quiet static view remains a complete option.
+
+Next model investigation: a spatial excitation/pickup rule for the constructed modal voice. Mode shapes and pickup weights are additional choices that the fitted frequencies/decays do not identify. State those choices before drawing connections; compare actual consequences of moving an excitation or pickup while keeping the original modal sketch available. A visually elaborate body with no modeled spatial consequence would miss Michael's original direction.
+
+Keep separate: broader recording interpretation (noise, attacks, pitch motion, alternative counts and convergence), a visitor's deliberate redesign, and visual presentation. No automatic physical-anatomy certificate follows from the current fitting studies. Voice Observatory remains planning only. Skins, psychedelic presentation and performer choreography stay available creative directions, but need a specific musical/experiential purpose and the established reversible presentation contract; they are not substitutes for a readable sound-producing mechanism.
