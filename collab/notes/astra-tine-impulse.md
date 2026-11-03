@@ -107,3 +107,13 @@ Two tests verify full rendered-sample identity after a non-default 95×7 mm desi
 Native Safari also verifies that keeping during current-body playback leaves the player in Playing with Quiet available; the address updates without a reload.
 
 Full regression after the return integration: 733/733 pass, zero failures/cancellations/skips, concurrency 2, 141.910 seconds (`/tmp/imagimusic-astra-tine-return-suite.log`).
+
+## A repeated-strike phrase foundation
+
+`src/tine/phrase.js` adds linear superposition on one unchanged body. The authored invitation uses impulses at 0, 0.8 and 2.1 seconds, with strengths 0.25, 0.15 and 0.25 of the same 1 micro-N s impulse. The default render ends at 6.1 seconds with one final 25 ms fade. Earlier strikes are not individually faded or replaced by each new strike. No page integration yet.
+
+Each event creates the existing SI response. Modal displacement and velocity are summed first; energy is then calculated from the combined state, retaining interference terms. Opposite simultaneous strikes cancel exactly in the tested state, while conservative admission still adds absolute bounds. Up to eight ordered events within four seconds are accepted, with strengths ±1; aggregate displacement and fixed-gain output are checked before rendering. Every event must precede the final fade and every retained mode must satisfy the existing sample-rate guard. This remains a linear point-impulse model, with no finite hammer collision, feedback from player or air radiation.
+
+Three new tests cover overlap against the original impulse states, cancellation, immutable event snapshots, exact one-strike PCM parity, fixed-gain width scaling over the entire phrase, late tails and one ending, and malformed/over-budget/aliased requests. The affected group passes 13/13. A test initially distinguished negative zero from zero at the ending; it now checks numerical silence, preserving the renderer's signed-zero result.
+
+Numerical exploration at the default positions: 80×10 mm phrase sampled peak 0.0177701 and RMS 0.00624371 digital amplitude; width 20 mm halves both exactly. Length 120 mm gives peak 0.0140518 and RMS 0.00635799. These values describe the fixed-gain signal, not perceived loudness. At 6.1 s the baseline still retains 2.87805e-12 J in the modeled modes, so the ending remains an explicit audition truncation. The previously established worst page-grid single-strike bound 0.679405451 multiplied by summed strength 0.65 gives 0.441613543, below 0.8. The phrase's musical appeal and its eventual visual treatment are untested.
