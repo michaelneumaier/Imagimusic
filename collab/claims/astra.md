@@ -439,3 +439,7 @@ Completed bounded frequency-refinement study (stable): tools/study-refined-modes
 Completed explicit mode alternatives study (stable): tools/study-mode-alternatives.mjs, focused tests and evidence. Fixed hypothesis grid around spectral candidates, train/validation/final-test split, no final-test-guided selection and no automatic physical target declaration.
 
 Completed playable resonance-sketch foundation (stable): src/sketch/model.js and tests/resonance-sketch.test.js. Construct independent unit-mass damped oscillators from explicitly supplied fitted modes; retain quadratures as displacement/velocity initial conditions, declared pickup scaling and bounded audition renders. This does not identify geometry or imply an impulse-only exciter.
+
+Completed sketch playback transport (stable): src/sketch/transport.js and tests/sketch-transport.test.js. Worker-friendly PCM preparation, explicit-running-context activation, conservative per-activation overlap reservations, Quiet fade retaining reservations until stop, and audio-clock model envelopes. No automatic audio resume.
+
+Completed sketch worker/browser boundary (stable): src/sketch/prepare-worker.js and tests/sketch-transport-browser.html/js. Real worker transfer/cancellation and silent OfflineAudioContext graph checks; fixed scheduling clock explicitly scoped, no hardware-output claim.

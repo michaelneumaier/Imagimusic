@@ -29,3 +29,11 @@ All six fitted models in the local joint-decay listening report were admitted an
 ## Next playable slice
 
 Build an explicit-start transport that can activate a selected mode or the whole sketch, retain overlap only within a cumulative bound, and expose audio-clock state to the picture. Then provide a local comparison of selected study interpretations, with the original source accessible, gain differences visible, and mode/whole-sketch controls. Keep the research lineage and uncertainty separate from a person's freedom to play the constructed voice. The existing inverse workshop continues to use its own declared three-resonance/common-decay model.
+
+## Playback transport checkpoint
+
+The transport and disposable preparation worker are now implemented. Preparation is silent; activation requires an already-running context owned by the caller. Whole-sketch and individual-mode buffers use the same pickup gain. Active voices reserve their full conservative peak allowance until completion, with a cumulative bound of 0.8 and a 32-node limit. Quiet ramps output down over 25 ms and stops within 30 ms; it retains reservations until those voices retire. Caller mutation cannot change copied playback buffers. No context is resumed automatically.
+
+The picture can read summed modal state on the audio-context clock. Reported envelopes include the playback ending and Quiet fades; these are output envelopes, not passive energy measurements during forced quieting. Repeated activations may interfere. Actual device output and latency remain unmeasured.
+
+Six focused Node tests pass (three core, three transport). Native Safari at `tests/sketch-transport-browser.html` reports **PASS 4/4**: transferred worker samples exactly match direct preparation; a real OfflineAudioContext mixes three full activations and refuses a fourth, with peak 0.7346951962 and maximum sample error 2.98023224e-8; a single-mode prefix matches and Quiet leaves a silent tail; cancellation rejects and a fresh worker retries. This harness deliberately uses a fixed scheduling-clock facade around the real offline graph, so it does not establish live activation timing or human listening quality. Peer review remains pending while Fable is unavailable.
