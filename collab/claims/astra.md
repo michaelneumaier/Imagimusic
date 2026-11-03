@@ -596,3 +596,7 @@ Flagship artistic proof: owns assets/flagship/opening-body-v1.png, docs/proposal
 Flagship proof discovery: owns project.html direct artistic-proof link and preparation-helper native-audio source check. Six-panel image and prompt also under assets/flagship.
 
 Flagship artistic proof complete as a first sketch: audio/figures/prompts, six-scene proposal and discovery saved; technical/file/native checks recorded. Claims released. No listening-quality or functioning3D-scene claim.
+
+Flagship opening scene: owns living.html, living.css and src/living/scene.js/main.js. Local static3D geometry/material/camera prototype, demand-rendered and explicit prototype limits, before playing integration.
+
+Opening scene construction and home link complete; native narrow/desktop views and limits recorded in collab/notes/astra-living-instrument.md. Claim released.

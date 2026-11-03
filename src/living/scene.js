@@ -1,0 +1,47 @@
+import * as T from '../../vendor/three/build/three.module.js';
+import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
+import {createSurfaceLighting} from '../stage/surface-lighting.js';
+
+/** Static design study. One drawing unit = 10 mm. No physical motion here. */
+export function createLivingScene(canvas){
+ const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;
+ renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+ renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+ const scene=new T.Scene();scene.background=new T.Color(0x0c141a);scene.fog=new T.Fog(0x0c141a,30,65);
+ const studio=createSurfaceLighting(renderer);scene.environment=studio.environment;scene.environmentIntensity=1.8;
+ const ceramic=new T.MeshStandardMaterial({color:0x20292b,roughness:.78,metalness:.08,roughnessMap:studio.grain});
+ const bronze=new T.MeshStandardMaterial({color:0x9e693b,roughness:.31,metalness:.86,roughnessMap:studio.grain});
+ const steel=new T.MeshStandardMaterial({color:0xc4c9c9,roughness:.28,metalness:.93,roughnessMap:studio.grain});
+ const dark=new T.MeshStandardMaterial({color:0x25221e,roughness:.4,metalness:.7});
+ const objects=new T.Group();scene.add(objects);
+ function mesh(geometry,material,position,parent=objects){const m=new T.Mesh(geometry,material);m.position.fromArray(position);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+ const chamferedBox=(w,h,d)=>{const b=.035,s=new T.Shape(),x=w/2-b,y=h/2-b;s.moveTo(-x,-y);s.lineTo(x,-y);s.lineTo(x,y);s.lineTo(-x,y);s.closePath();const g=new T.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelThickness:b,bevelSize:b,bevelSegments:3,steps:1});g.translate(0,0,-(d-2*b)/2);return g;};
+ const shape=new T.Shape();shape.moveTo(-1.7,.08);shape.bezierCurveTo(-2.2,1.8,-2.0,3.5,-.65,4.05);shape.bezierCurveTo(-.2,4.25,.05,4.15,.05,3.8);shape.lineTo(.05,3.15);shape.bezierCurveTo(-1.5,3.1,-1.55,1.0,1.15,.55);shape.lineTo(3.75,.43);shape.bezierCurveTo(4.25,.4,4.3,.1,3.8,.05);shape.closePath();
+ const cradle=new T.ExtrudeGeometry(shape,{depth:1.8,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.1,bevelThickness:.1,curveSegments:128});
+ mesh(cradle,ceramic,[-.75,0,-.9]);
+ // Exposed span x=0…8, width1, thickness.1; another .8 enters the clamp.
+ const blade=mesh(new T.BoxGeometry(8.8,.1,1),steel,[3.6,3.5,0]);blade.name='steel-blade';
+ mesh(chamferedBox(.8,.32,1.45),bronze,[-.4,3.71,0]);
+ mesh(chamferedBox(.8,.25,1.45),bronze,[-.4,3.325,0]);
+ for(const z of [-.46,.46]){
+  mesh(new T.CylinderGeometry(.115,.115,.045,32),bronze,[-.4,3.892,z]);
+  mesh(new T.CylinderGeometry(.058,.058,.008,6),dark,[-.4,3.918,z]);
+ }
+ const floor=mesh(new T.PlaneGeometry(180,180),new T.MeshStandardMaterial({color:0x03070c,roughness:.8,metalness:.12}),[0,-.07,0],scene);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
+ scene.add(new T.HemisphereLight(0xa8c8db,0x1e1710,.9));
+ const key=new T.DirectionalLight(0xffd5a0,3.2);key.position.set(-4,11,5);key.target.position.set(2,2,0);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:35});key.shadow.bias=-.00015;key.shadow.normalBias=.025;scene.add(key,key.target);
+ const rim=new T.DirectionalLight(0xa7d1e7,2.8);rim.position.set(6,5,-7);scene.add(rim);
+ const camera=new T.PerspectiveCamera(34,1,.1,100),controls=new OrbitControls(camera,canvas);
+ controls.enableDamping=false;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.48;
+ let selected='opening',width=0,height=0,disposed=false;
+ const poses={opening:{target:[2.8,2,0],direction:[10,6.5,14],radius:5.8},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
+ function place(){const p=poses[selected],vertical=T.MathUtils.degToRad(camera.fov/2),horizontal=Math.atan(Math.tan(vertical)*camera.aspect),distance=p.radius/Math.sin(Math.min(vertical,horizontal));controls.target.fromArray(p.target);camera.position.copy(controls.target).add(new T.Vector3(...p.direction).normalize().multiplyScalar(distance));controls.update();}
+ function render(){if(!disposed)renderer.render(scene,camera);}
+ function resize(){const r=canvas.getBoundingClientRect();if(r.width===width&&r.height===height)return;width=r.width;height=r.height;renderer.setSize(Math.max(1,width),Math.max(1,height),false);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();place();render();}
+ function view(name){if(!poses[name])throw Error('Unknown instrument view.');selected=name;place();render();}
+ controls.addEventListener('change',render);
+ const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
+ function dispose(){disposed=true;observer.disconnect();controls.dispose();studio.dispose();const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
+ return {view,render,dispose};
+}
