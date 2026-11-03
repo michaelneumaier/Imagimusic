@@ -450,3 +450,9 @@ The existing force listening study now includes a closed optional phrase compari
 Generator assertions verify every opening sample equals its single-touch counterpart until the second excitation, total finite-force impulse equals3e-7Ns within1e-20, headroom/ending, and exact float-WAV round-trip. Independent Python checks confirm295200 frames, mono float32/48kHz, hashes and zero final samples for all four1180858-byte files. Phrase peaks are.00926870/.00805831/.00775040/.00587811. Single-touch WAV hashes remain unchanged.
 
 Safari opens the disclosure, exposes the authored timing and single-touch-only diagram distinction, switches ideal/4ms phrases, and confirms active Pause state plus6s duration. Same shared listening stage, no normalization, new live format or perceptual claim. The catalog description now mentions both ways of listening; entry count remains40.
+
+### Listening controls remain in reach — 2026-11-03
+
+Both tine listening-study generators now wrap native audio controls and selected-example status in a labelled sticky region. At390px responsive width, the player remains visible while the visitor chooses a lower-page phrase; the current label sits directly beneath it. Phrase buttons/download links now wrap as complete flex items instead of splitting link text around buttons. Focus outlines and160px scroll margins help controls remain readable below the dock. No playback or rendering code changed.
+
+Native Safari verifies active Pause→Play transitions using the visible dock immediately after starting the4ms returning phrase and the shorter-body example. A screenshot verifies the force study’s dock at the top while lower-page phrase choices are visible. Physical-phone behavior and detailed keyboard traversal remain unmeasured; existing input/park lifecycle evidence is separate.

@@ -560,3 +560,5 @@ Force input picture complete: actual-input plot/table, visual/native checks and 
 Force energy reading complete: common-time accounting, figures/tables, native accessibility and unchanged-audio checks recorded; claim released.
 
 Returning-force phrase complete: generator/catalog and browser/file evidence recorded; claim released.
+
+Listening controls in reach complete: both generators updated and native force/body pause actions verified; claim released.
