@@ -682,3 +682,7 @@ Living first-screen consolidation: owns living.html/css opening copy and respons
 Flagship polish planning: owns proposal024 continuation priorities and append-only evidence/log. Consolidate existing studies into a reviewable first-minute milestone without changing model or saved arrangement contracts.
 
 Living first-screen consolidation and flagship polish planning complete: native viewport/action evidence recorded and proposal024 continuation criteria saved; claims released.
+
+Living answer composition: owns src/living/answer-study.js, tests/living-answer-study.test.js, tools/render-living-answer-study.mjs and ignored renders/living-answer-study. Compare v1 overlap with complete gesture entrances separated by source span plus350ms (minimum800ms); identical bodies/gains/pans/source/return. Link study through existing model details and preparation helper after verification; production arrangement remains v1.
+
+Living answer composition comparison complete: eight local WAVs/report/manual workshop, six focused tests, file and native lifecycle evidence recorded. Claims released; next: direct the musical entrances visually and evaluate the complete encounter.

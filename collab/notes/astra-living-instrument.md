@@ -170,3 +170,16 @@ Initial still capture wrongly took paused audio.currentTime0 instead of selected
 Shortened the opening invitation, removed the prototype counter from the header, aligned Hear it first alongside the heading on desktop, and sized the scene against viewport height. Existing control IDs and all playback/model JavaScript remain unchanged. Native Safari390×656 inspection showed the invitation, transport, complete body and caption together;1100×656 screenshot also showed the complete body and caption at the viewport bottom. These two checks do not establish every viewport or text-zoom behavior.
 
 Native Begin/Touch produced one accepted event at frame33408 with fadeStart382800/48k; completion left replay available. A subsequent Begin followed immediately by Quiet returned the explicit no-touch-ended status and retained the previous phrase. No model tests added for this CSS/copy-only change; whitespace checks pass. Proposal024 now specifies the next artistic milestone, input cases and review artifact. Fable unavailable; no independent review claimed.
+
+
+## Answer composition comparison
+
+Added experimental answer-study.js and render-living-answer-study.mjs. Current round passes through the existing v1 renderer exactly. Spaced treatment copies its admitted source/bodies/gains/pans, changing only entrance delay to max(800ms, last-minus-first touch span+350ms) and the following return time. Distinct study kind prevents accidental presentation as a saved production arrangement. Independent tails may overlap; no coupling, inference, normalization or added space. All fixture files share previewgain8.
+
+Four4second phrases yield eight WAVs: greeting round/spaced15.1/17.5s; single14.7/15s; crowded14.1/15s; distant15.8/20.1s. Full source/score, peak/RMS andSHA256 saved in ignored renders/living-answer-study/report.json. Independent Python wave checks confirm stereo16/48k frame counts, hashes, and byte-identical opening/return across treatments for every fixture. Peak preview range0.02951–0.04436; these measurements are not perceived loudness or preference evidence.
+
+Six focused answer/arrangement tests pass: separated gesture groups across44.1/48/96k and densities, immutable source/retained events, independent stereo stem reconstruction, exact v1 solo/return and unchanged reference renderer. Initial8000Hz fixture correctly failed the existing retained-mode guard; it is now an explicit refusal test rather than an assumed supported body/rate combination. No model guard changed.
+
+Native Safari390×656: page opens quietly, selected greeting spaced playback exposes Pause, tab-away/return parks at4seconds with Play available (duration17seconds). Narrow screenshot shows stacked comparison choices, collapsed entrance schedules and sticky native transport. Uses unchanged shared study player. Preparation helper reports all16 studies ready. Linked inside Living model details, no new catalog entry. No listening preference, visual direction adoption or peer review claimed; Fable unavailable.
+
+Combined answer/arrangement/shared-player regression:11/11 pass. Last full-suite checkpoint remains799 and predates the subsequent greeting, space and answer studies; no new full-suite claim.
