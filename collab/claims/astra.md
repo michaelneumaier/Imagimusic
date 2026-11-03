@@ -550,3 +550,7 @@ First-visit curation complete: home/history/M18 and IDEAS triage reconciled, nat
 Finite-force offline foundation complete: force-study.js, tests and tools/study-tine-force.mjs checked;3 tests and duration probe recorded. Claim released; convergence investigation remains next.
 
 Force convergence complete: tool/reference refinement and four-case/four-mode convergence checked;4 physics tests pass. Claim released.
+
+Force listening study complete: generator, shared caption and local files verified; claim released.
+
+Force-study discovery complete: catalog40/40 and regeneration ready; claim released.

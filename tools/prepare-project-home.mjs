@@ -5,6 +5,7 @@ import {spawn} from 'node:child_process';
 import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['The time within a touch','renders/tine-force','tools/render-tine-force-study.mjs'],
  ['One phrase, four bodies','renders/tine-bodies','tools/study-tine-bodies.mjs'],
  ['What continues beyond the glimpse?','renders/joint-decay-study','tools/render-joint-decay-study.mjs',['--audio-dir','renders/joint-decay-study']],
  ['Room for an answer','renders/open-phrase-study','tools/render-open-phrase-study.mjs'],
