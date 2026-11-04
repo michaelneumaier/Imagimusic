@@ -7,7 +7,7 @@ const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
  */
 export function validateContinuousReturnFinished(seed,sampleRate,data,touches,originAudioFrame,quietFrame=null){
  const performance=createContinuousReturnPerformance(seed,{sampleRate}),{plan}=performance;
- if(!data||data.type!=='finished'||data.seed!==seed||!Number.isSafeInteger(originAudioFrame)||originAudioFrame<0||!Number.isSafeInteger(originAudioFrame+plan.frames)||data.originAudioFrame!==originAudioFrame)throw Error('Invalid continuous completion identity or audio origin.');
+ if(!data||data.type!=='finished'||data.kind!==undefined||data.version!==undefined||data.seed!==seed||!Number.isSafeInteger(originAudioFrame)||originAudioFrame<0||!Number.isSafeInteger(originAudioFrame+plan.frames)||data.originAudioFrame!==originAudioFrame)throw Error('Invalid continuous completion identity or audio origin.');
  const record=validateContinuousTineRecord(data.record),naturalFade=plan.frames-Math.round(.025*sampleRate);
  if(record.sampleRate!==sampleRate||!equal(record.design,plan.design)||record.fadeStart>naturalFade)throw Error('The continuous capture does not match the prepared study.');
  if(quietFrame!==null&&(!Number.isInteger(quietFrame)||quietFrame<0||quietFrame>naturalFade||record.fadeStart!==quietFrame))throw Error('The ending does not match acknowledged Quiet.');

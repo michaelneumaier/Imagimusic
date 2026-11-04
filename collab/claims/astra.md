@@ -1071,3 +1071,5 @@ Continuous body-view binding complete: optional actual-clock scene at1000x, redu
 
 Responsive return research complete: separate first-three early-touch memory yields two later softened answers; no-input PCM unchanged. Three offline listening examples rendered;65focused tests pass with --no-maglev after documented default-runtime stall. Claims released; variant browser integration/native listening and independent review remain ahead.
 Whole-score capture-capacity fix complete in continuous-return-study.js and memory wrapper: reserve25/26score slots across entire composition. Both finish4096event tiny-guest stress trials. No edit was needed to the existing continuous-return.test.js; regression coverage is in living-memory-return.test.js. Claims released.
+
+Responsive completion contract complete: explicit variant identity, exact remembered contributions/derived answers and physical-history reconstruction, with fixed verifier rejecting variant messages. Sixty-nine focused tests pass under --no-maglev; syntax/diff checked. Claims released; responsive worker/worklet/session/view integration and independent review remain ahead.
