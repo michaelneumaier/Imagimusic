@@ -46,3 +46,22 @@ test('rendered striker head reaches the blade top at85percent span without penet
   for(let i=0;i<=100;i++)assert.ok(livingStrikerPose(length,i/100,lane).head[1]-g.headRadius>=3.55-1e-12);
  }
 });
+
+test('dense rigs have disjoint moving lane envelopes while every head still reaches the blade',async()=>{
+ const {livingStrikerPose}=await import('../src/living/striker-geometry.js');
+ const {createLivingStudyFixtures}=await import('../src/living/study-fixtures.js');
+ for(const fixture of createLivingStudyFixtures()){
+  const c=createLivingChoreography(fixture.source);
+  for(const body of [0,1,2]){
+   const actors=c.actors.filter(a=>a.body===body);
+   for(let i=1;i<actors.length;i++)assert.ok(actors[i].lane-actors[i-1].lane>actors[i].headRadius+actors[i-1].headRadius);
+   for(const actor of actors){
+    // Heads, joint balls and counterweights fit this radius in z; shaft radii are .025 drawing units.
+    assert.ok(actor.headRadius>=.025);
+    const p=livingStrikerPose(c.score.bodies[body].design.lengthMm,1,actor.lane,actor.headRadius);
+    assert.ok(Math.abs(p.head[1]-actor.headRadius-3.55)<1e-12);
+    assert.ok(Math.abs(p.head[2])+actor.headRadius<.5);
+   }
+  }
+ }
+});

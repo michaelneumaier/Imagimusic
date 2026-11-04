@@ -16,7 +16,7 @@ export function createLivingChoreography(source,treatment='round'){
   return planPerformers(events,{family:`living-${bodyIndex}`,slots:1,restSlot:0,maxActors:8});
  });
  if(plans.some(p=>p.unplanned.length))throw Error('Contact study cannot stage every touch.');
- const actors=plans.flatMap((plan,body)=>plan.actors.map((actor,index)=>({id:actor.id,body,lane:plan.actors.length===1?0:(index/(plan.actors.length-1)-.5)*.7})));
+ const actors=plans.flatMap((plan,body)=>plan.actors.map((actor,index)=>({id:actor.id,body,lane:plan.actors.length===1?0:(index/(plan.actors.length-1)-.5)*.7,headRadius:plan.actors.length===1?.1:Math.min(.1,.28/(plan.actors.length-1))})));
  const ease=u=>u*u*(3-2*u);
  return {score,plans,actors,at(seconds){
   if(!Number.isFinite(seconds)||seconds<0||seconds>score.frames/score.sampleRate)throw Error('Contact time is outside the score.');

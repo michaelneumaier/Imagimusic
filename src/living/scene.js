@@ -52,14 +52,12 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function setLength(mm){length=mm/10;blade.scale.x=(length+.8)/8.8;blade.position.x=(length-.8)/2;marker.position.x=.85*length;marker.visible=false;veil.visible=false;}
  // Workshop-only contact rig; created lazily so published appearances stay intact.
  const contactActors=new Map(),contactGroup=new T.Group();objects.add(contactGroup);contactGroup.visible=false;
- const armLength=Math.hypot(SG.reach,SG.drop);
+ let contactSupport=null;
  function performers(poses){
   contactGroup.visible=poses.length>0;
   for(const rig of contactActors.values())rig.root.visible=false;
-  for(const pose of poses){
-   let rig=contactActors.get(pose.id);
-   if(!rig){
-    const root=new T.Group();contactGroup.add(root);
+  if(poses.length&&!contactSupport){
+    const root=new T.Group();contactGroup.add(root);contactSupport=root;
     // A tapered ceramic bow carries the axle outside the blade's width.
     // Its shape and the counterweight are art direction, not simulated mechanics.
     const bow=new T.Shape();bow.moveTo(-.7,.12);
@@ -69,16 +67,23 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
     const support=new T.ExtrudeGeometry(bow,{depth:.14,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.035,bevelThickness:.035,curveSegments:48});
     mesh(support,ceramic,[0,0,SG.postZ-.07],root);
     const foot=mesh(new T.SphereGeometry(1,32,16),ceramic,[-.45,.10,SG.postZ],root);foot.scale.set(.62,.13,.38);
-    const axle=mesh(new T.CylinderGeometry(.065,.065,SG.postZ-pose.lane,16),bronze,[0,SG.pivotY,(SG.postZ+pose.lane)/2],root);axle.rotation.x=Math.PI/2;
+    const axle=mesh(new T.CylinderGeometry(.065,.065,SG.postZ+.35,16),bronze,[0,SG.pivotY,(SG.postZ-.35)/2],root);axle.rotation.x=Math.PI/2;
+  }
+  if(contactSupport)contactSupport.position.x=.85*length-SG.reach;
+  for(const pose of poses){
+   const geometry=livingStrikerPose(length*10,pose.down,pose.lane,pose.headRadius),armLength=geometry.armLength;
+   const actorKey=pose.id+':'+pose.lane+':'+pose.headRadius;
+   let rig=contactActors.get(actorKey);
+   if(!rig){
+    const root=new T.Group();contactGroup.add(root);
     const arm=new T.Group();arm.position.set(0,SG.pivotY,pose.lane);root.add(arm);
     const shaft=mesh(new T.CylinderGeometry(.025,.025,armLength,16),steel,[armLength/2,0,0],arm);shaft.rotation.z=-Math.PI/2;
-    mesh(new T.SphereGeometry(SG.headRadius,24,16),bronze,[armLength,0,0],arm);
-    mesh(new T.SphereGeometry(.1,20,12),dark,[0,0,0],arm);
+    mesh(new T.SphereGeometry(pose.headRadius,24,16),bronze,[armLength,0,0],arm);
+    mesh(new T.SphereGeometry(pose.headRadius,20,12),dark,[0,0,0],arm);
     const tail=mesh(new T.CylinderGeometry(.035,.035,.38,16),steel,[-.19,0,0],arm);tail.rotation.z=-Math.PI/2;
-    const counterweight=mesh(new T.SphereGeometry(1,24,16),bronze,[-.38,0,0],arm);counterweight.scale.set(.20,.09,.12);
-    rig={root,arm};contactActors.set(pose.id,rig);
+    const counterweight=mesh(new T.SphereGeometry(1,24,16),bronze,[-.38,0,0],arm);counterweight.scale.set(.20,.09,Math.min(.12,pose.headRadius));
+    rig={root,arm};contactActors.set(actorKey,rig);
    }
-   const geometry=livingStrikerPose(length*10,pose.down,pose.lane);
    rig.root.visible=true;rig.root.position.x=geometry.pivot[0];
    rig.arm.rotation.z=geometry.angle;
   }

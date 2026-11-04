@@ -1,15 +1,11 @@
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
-import {createLivingGreeting} from '../src/living/greeting.js';
+import {createLivingStudyFixtures} from '../src/living/study-fixtures.js';
 import {renderLivingAnswerStudy} from '../src/living/answer-study.js';
 import {stereoWav} from '../src/loom/model.js';
-const directory=resolve(process.argv[2]??'renders/living-response-study'),greeting=createLivingGreeting(),previewGain=8;
-const fixture=(times,strengths)=>({...greeting,events:times.map((t,i)=>({frame:Math.round(t*48000),strength:strengths[i]}))});
-const fixtures=[{id:'greeting',name:'Three touches',source:greeting},
- {id:'single',name:'One touch',source:fixture([.5],[.1])},
- {id:'crowded',name:'Eight nearby touches',source:fixture([.5,.525,.55,.575,.6,.625,.65,.675],[.05,.025,.025,.025,.025,.025,.025,.05])},
- {id:'spaced',name:'Three distant touches',source:fixture([.3,1.8,3.3],[.1,.025,.05])}];
+const directory=resolve(process.argv[2]??'renders/living-response-study'),previewGain=8;
+const fixtures=createLivingStudyFixtures();
 mkdirSync(directory,{recursive:true});
 const cases=fixtures.map(f=>({...f,treatments:['spaced','fragment'].map(id=>{
  const pcm=renderLivingAnswerStudy(f.source,id),channels=pcm.channels.map(c=>Float32Array.from(c,v=>v*previewGain));let peak=0,sum=0;

@@ -728,3 +728,9 @@ Living contact staging foundation complete: planner adapter, shared rig geometry
 Living performer art refinement: owns scene.js optional rig silhouette and living-look.html staging explanation. Replace straight post with tapered ceramic bow and counterweight; preserve head geometry/contact timeline and production defaults. Native still/motion checks before checkpoint.
 
 Living performer art refinement complete: ceramic bow/counterweight candidate, native contact and held-ending evidence, unchanged geometry tests recorded. Claim released; dense multi-actor staging and narrow motion clarity remain open before any production adoption.
+
+Dense contact staging: owns choreography.js actor dimensions, striker-geometry.js variable head clearance, scene.js shared support and actor sizing, corresponding tests. Eight-actor rest heads currently overlap by0.1sceneunit; remove duplicated supports and size heads/counterweights within distinct transverse lanes. Acoustic model unchanged; inspect dense fixture before release.
+
+Dense visual fixture: also owns study-fixtures.js, both living answer/response render tools for shared fixture import, look-main.js/living-look.html phrase selection. Compare before/after WAV hashes to ensure fixture extraction changes no audio.
+
+Dense contact staging complete: overlap measured and corrected with shared support/lane-sized mallets, shared source fixtures and native burst/switch/narrow evidence. Claims released. Next: contact close-up for small-screen inspection; no production adoption yet.
