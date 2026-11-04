@@ -1032,3 +1032,5 @@ Shared phrase session complete: explicit/cancellable audio lifecycle, acknowledg
 Shared phrase interaction complete: optional Listen and join, guest pad/keyboard, acknowledged history, Quiet ending, combined JSON/replay link, fixed centered level and coordinated playback. Full943tests pass. Claims released; native playback/focus/layout and long-running ensemble participation remain unverified/unimplemented.
 
 Shared contribution to composition complete: verified completed combined phrase can open quietly as a fresh personal journey in another tab, retaining original and keep/replay. Empty endings clear development links.6focused tests and HTTP/IDs/syntax/diff pass. Claims released; native navigation and musical assessment pending.
+
+Shared phrase response model complete: accepted-event single-body response, atomic batch validation, due-score ordering, clock-filtered counts, separate ending opacity and held layout.8focused tests pass including streaming-state agreement and sampled framing. Claims released; visual UI/native rendering remain ahead.
