@@ -1036,3 +1036,5 @@ Shared contribution to composition complete: verified completed combined phrase 
 Shared phrase response model complete: accepted-event single-body response, atomic batch validation, due-score ordering, clock-filtered counts, separate ending opacity and held layout.8focused tests pass including streaming-state agreement and sampled framing. Claims released; visual UI/native rendering remain ahead.
 
 Shared live response binding complete: lazy single-body scene from accepted events and acknowledged ending, audio-clock motion/still choice, visibility/cancellation and optional graphics failure/recovery.19focused tests pass. Claims released; native pixels/synchronization/performance remain unverified.
+
+Generated journey participation complete: every selected journey exposes its actual opening for preview/shared participation, including generated music with two guest slots. Home/catalog/history reconciled.10focused tests and page/resource/syntax/diff checks pass. Claims released; native playback/navigation and aesthetic assessment pending.

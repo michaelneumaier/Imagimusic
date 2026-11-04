@@ -109,8 +109,8 @@ function choose({continueSequence=false}={}){
  $('duration').textContent=clock(plan.frames/plan.sampleRate);
  $('description').textContent=personalChoice?`Your ${personalSource.events.length}-touch phrase opens the journey. Five exchanges turn its rhythm and move its accents, then the exact original returns. All of your touches remain in each variation; the whole opening and homecoming stand alone.`:treatment.description;
  $('personal-capabilities').hidden=!personalChoice;
- $('personal-original').hidden=!personalChoice;
- $('shared-phrase').hidden=!personalChoice;
+ $('personal-original').hidden=false;
+ $('shared-phrase').hidden=false;
  film?.refresh();
  rows=plan.sections.map(s=>{const li=document.createElement('li'),name=document.createElement('span'),time=document.createElement('small');name.textContent=s.name;time.textContent=`${clock(s.startFrame/plan.sampleRate)}–${clock(s.endFrame/plan.sampleRate)}`;li.append(name,time);return li;});
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
@@ -197,10 +197,10 @@ $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();dra
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
 function park(){shared?.stop();original?.park();film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
-original=setupPersonalOriginalListening({getSource:()=>personalSource,beforePlay:()=>{stop({keepOriginal:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{audio:$('original-audio'),listen:$('original-listen'),quiet:$('original-quiet'),status:$('original-status')}});
+original=setupPersonalOriginalListening({getSource:()=>plan.sections[0].source,beforePlay:()=>{stop({keepOriginal:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{audio:$('original-audio'),listen:$('original-listen'),quiet:$('original-quiet'),status:$('original-status')}});
 $('shared-motion').checked=!reducedMotion.matches;
 const sharedVisual=createSharedPhraseVisual({canvas:$('shared-canvas'),motion:$('shared-motion'),details:$('shared-phrase'),status:$('shared-visual-status'),getTime:()=>shared?.time()??0});
-shared=setupSharedPhraseControls({visual:sharedVisual,getSource:()=>personalSource,beforePlay:()=>{stop({keepShared:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{start:$('shared-start'),pad:$('shared-pad'),strength:$('shared-strength'),quiet:$('shared-quiet'),status:$('shared-status'),history:$('shared-history'),download:$('shared-download'),replay:$('shared-replay'),develop:$('shared-develop'),result:$('shared-result')}});
+shared=setupSharedPhraseControls({visual:sharedVisual,getSource:()=>plan.sections[0].source,beforePlay:()=>{stop({keepShared:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{start:$('shared-start'),pad:$('shared-pad'),strength:$('shared-strength'),quiet:$('shared-quiet'),status:$('shared-status'),history:$('shared-history'),download:$('shared-download'),replay:$('shared-replay'),develop:$('shared-develop'),result:$('shared-result')}});
 choose();
 film=setupLivingJourneyMovieControls({getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
 function openPersonalAddress(){
