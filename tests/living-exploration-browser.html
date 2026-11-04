@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Living exploration worker checks</title><style>body{background:#0c141a;color:#e9e4d9;font:16px/1.6 system-ui;max-width:800px;margin:40px auto;padding:24px}pre{white-space:pre-wrap}</style><h1>Living exploration worker checks</h1><p>Silent local fixture. No audio playback, files uploaded or page state restored.</p><pre id="result" role="status">Running…</pre><script type="module">
+import {createLivingGreeting} from '../src/living/greeting.js';
+import {createLivingRecord} from '../src/living/record.js';
+import {createTineLiveComparison} from '../src/tine/live-comparison.js';
+import {createLivingExploration,renderLivingExploration} from '../src/living/exploration-record.js';
+import {createAudioRenderJob} from '../src/audio-render-job.js';
+const out=document.getElementById('result'),messages=[],check=(ok,message)=>{if(!ok)throw Error(message);messages.push('PASS · '+message);out.textContent=messages.join('\n');};
+try{
+ const original=createLivingRecord(createLivingGreeting(),{cameraMotion:false,presentationVersion:1});
+ const candidate=createTineLiveComparison(original.source,{lengthMm:65,widthMm:10}).candidate;
+ const response={...candidate,sampleRate:44100,events:[{frame:2000,strength:.05}],fadeStart:45000};
+ const record=createLivingExploration(original,response),expected=renderLivingExploration(record),url=new URL('../src/living/exploration-worker.js',import.meta.url);
+ const job=createAudioRenderJob(url,record),actual=await job.promise;
+ check(JSON.stringify(actual.record)===JSON.stringify(record),'Both canonical records survive the real worker transfer.');
+ check(['original','response'].every(key=>actual[key].sampleRate===expected[key].sampleRate&&actual[key].frames===expected[key].frames&&actual[key].channels[0] instanceof Float32Array&&actual[key].channels[0].length===expected[key].channels[0].length&&actual[key].channels[0].every((v,i)=>Object.is(v,expected[key].channels[0][i]))),'Both dry PCM buffers match the same-browser direct reconstruction, at independent rates.');
+ let rejected=false;try{await createAudioRenderJob(url,{...record,response:{...response,events:[]}}).promise;}catch{rejected=true;}check(rejected,'Invalid response returns an error instead of a partial pair.');
+ const cancelled=createAudioRenderJob(url,record);cancelled.cancel();let aborted=false;try{await cancelled.promise;}catch(error){aborted=error.name==='AbortError';}check(aborted,'Immediate cancellation rejects with AbortError.');
+ out.textContent+='\nComplete: 4 checks passed. No sound was played.';
+}catch(error){out.textContent=messages.join('\n')+'\nFAIL · '+error.message;}
+</script></html>

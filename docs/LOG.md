@@ -764,3 +764,5 @@
 - 2026-11-04 (Astra): flagship body choice now supports new live65/95mm playing in place with separate capture and original/new-phrase return. Native95mm accepted/replayed, root kept URL exact, empty-pass retention and quiet original/branch return checked. Existing standalone tine link keeps new performance; Living unfolding/film/address remain original-bound.12focused lifecycle tests pass; full suite running.
 
 - 2026-11-04 (Astra): chosen-body milestone closes with native65mm capture as well as95mm, original/new quiet return and exact root address preservation. Full regression816/816 passes, zero failures/cancellations/skips in225.043s at concurrency2. Narrow branch-action layout and sticky transport refined; saved combined lineage remains future work.
+
+- 2026-11-04 (Astra): strict paired exploration record/file/renderer foundation added, embedding original encounter and independent new-body performance.12targeted tests and4real Safari worker checks pass, including invalid-child refusal and cancellation. Visitor save/atomic-reopen integration remains next; legacy encounter/film schemas unchanged.

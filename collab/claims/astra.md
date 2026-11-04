@@ -746,3 +746,9 @@ Chosen-body discovery: also owns src/project-catalog.js Living entry; describe i
 Chosen-body narrow layout: owns living.css for flex-wrapped branch actions and opaque sticky transport; native inspection found inline link wrapping and text showing through the transport.
 
 Living chosen-body playing complete:65/95mm native capture, selected replay, original/new quiet return, unchanged root keep and empty-pass retention verified; full816 suite passes. Catalog/plan/evidence reconciled. Claims released. Combined saved lineage remains next design work.
+
+Living exploration record foundation: owns src/living/exploration-record.js, exploration-worker.js and tests/living-exploration-record.test.js. Strict paired record with immutable original encounter and independent new65/95mm performance, bounded file round-trip, both-source render bundle for later atomic UI restore. Preserve legacy recipes; no premature visitor download control.
+
+Exploration browser transport: also owns tests/living-exploration-browser.html, a silent local fixture for actual worker pair reconstruction, invalid-record error and cancellation. No visitor UI adoption claim.
+
+Living exploration foundation complete: strict record/16KiB reader/paired renderer and worker verified by12targeted tests and4native browser-worker checks. Claims released. Next integrate captured parent context and atomic visitor save/reopen; not yet exposed as a completed keeping feature.
