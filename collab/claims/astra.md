@@ -774,3 +774,9 @@ Automatic entrance layout: also owns living.css for wrapping the added invitatio
 Automatic piece discovery/evidence: owns project.html current-chapter copy, src/project-catalog.js Living entry, and append-only current evidence in astra-living-instrument notes/proposal026. Preserve archive and earlier study routes.
 
 Automatic first piece complete: bounded version1 seeded grammar, one-action performance/replay, explicit quiet adoption, source-preserving preview and kept-address return verified.10targeted checks pass; narrow native flow and layout inspected. Home/catalog/plan/evidence reconciled. Claims released. Next: visible known-score contact staging and artistic evaluation of contrasting generated phrases.
+
+Versioned contact presentation: owns src/living/presentation.js, record.js, performance-view.js, movie-plan.js, scene.js, main.js, living.html and related tests/film fixture. Adopt dusk contact choreography as presentation3 for fresh visits, preserving1/2 state and sound. Share poses between live unfolding and film; hide rigs after stop. Positive-impulse staging only, with old signed records retained under prior appearances.
+
+Contact identity notes/evidence: also owns choreography.js and striker-geometry.js comments marking production3 stability, project-catalog.js Living description, and current evidence/plan appendices. No physics changes.
+
+Versioned contact presentation complete: new3 live/film sampling adopted, old1/2 hashes pinned unchanged, positive-contact boundary explicit, native generated ensemble/Quiet and legacy bare unfolding verified; actual453frame film encoded/downloaded, manifest reconstructed and contact frame inspected. Full831pass; final selector check3pass. Claims released. Next artistic evaluation of generated pieces, their anticipation and framing; no wider composer or real hammer physics claimed.

@@ -3,7 +3,7 @@ import {createTineDesign} from '../src/tine/address.js';
 import {renderLivingArrangement} from '../src/living/arrangement.js';
 import {exportLivingMovie} from '../src/living/export.js';
 const $=id=>document.getElementById(id);let controller,urls=[];
-const record=createLivingRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:24000,strength:.1},{frame:55200,strength:.025},{frame:105600,strength:.05}],fadeStart:190800});
+const record=createLivingRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:24000,strength:.1},{frame:55200,strength:.025},{frame:105600,strength:.05}],fadeStart:190800},{presentationVersion:new URLSearchParams(location.search).get('presentation')==='3'?3:2});
 $('make').onclick=async()=>{
  controller=new AbortController();$('make').disabled=true;$('cancel').disabled=false;
  try{
@@ -13,7 +13,7 @@ $('make').onclick=async()=>{
   for(const [suffix,blob,label] of [['.f32',new Blob([raw]),'Save diagnostic Float32'],['.mp4',result.blob,'Save movie'],['.wav',new Blob([result.wav],{type:'audio/wav'}),'Save source WAV'],['.json',new Blob([JSON.stringify(result.manifest,null,2)],{type:'application/json'}),'Save manifest']]){
    const url=URL.createObjectURL(blob);urls.push(url);const a=document.createElement('a');a.href=url;a.download=result.stem+suffix;a.textContent=label;$('files').append(a);
   }
-  $('preview').src=urls[1];$('report').textContent=JSON.stringify({frames:result.manifest.frames,duration:result.manifest.duration,audioSamples:result.manifest.audioSamples,bytes:result.blob.size},null,2);$('status').textContent='Encoded. Preview remains paused; save files for independent inspection.';
+  $('preview').src=urls[1];$('report').textContent=JSON.stringify({presentationVersion:result.manifest.presentationVersion,frames:result.manifest.frames,duration:result.manifest.duration,audioSamples:result.manifest.audioSamples,bytes:result.blob.size},null,2);$('status').textContent='Encoded. Preview remains paused; save files for independent inspection.';
  }catch(error){$('status').textContent=error.name==='AbortError'?'Cancelled. Previous result retained.':error.message;}
  finally{controller=null;$('make').disabled=false;$('cancel').disabled=true;}
 };

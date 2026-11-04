@@ -2,7 +2,8 @@ import {planPerformers,actorPose} from '../perform/planner.js';
 import {createLivingArrangement} from './arrangement.js';
 import {createLivingSpacedAnswer} from './answer-study.js';
 
-/** Experimental choreography for known, positive-impulse scores only.
+/** Known, positive-impulse choreography. Round timing and poses are now part
+ * of presentation3; incompatible changes require a new presentation identity.
  * Each blade has stationary actors, so slot-distance is never treated as metres.
  * Planner allocation handles dense/simultaneous notes without dropping contacts.
  * Head placement is artistic; the existing ideal impulse remains the sound source.

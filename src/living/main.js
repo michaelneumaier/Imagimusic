@@ -5,7 +5,7 @@ import {createLivingExploration,serializeLivingExploration,validateLivingExplora
 import {createLivingMovieControls} from './movie-controls.js';
 import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
-import {createLivingArrangementView} from './arrangement-view.js';
+import {createLivingPerformanceView} from './performance-view.js';
 import {createLivingResponse} from './response.js';
 import {LIVING_PRESENTATIONS,livingPresentationVersion} from './presentation.js';
 import {createLivingScene} from './scene.js';
@@ -17,7 +17,7 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
-let presentationVersion=2,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
+let presentationVersion=3,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
@@ -57,9 +57,10 @@ function touch(){if(!session||$('touch').disabled)return;session.strike(.1).catc
 function animate(){
  raf=0;const repeat=listening(),t=repeat?replay.time():session.time(),response=repeat?replayResponse:liveResponse;
  if(repeat&&unfolding){
-  const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked,$('camera-motion').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} ${examplePlaying?'example':'remembered'} touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
+  const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked,$('camera-motion').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} ${examplePlaying?(generatedPlaying?'generated':'example'):'remembered'} touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
   const wideVisible=!$('camera-motion').checked||frame.cameraOpen>0,chapterKey=frame.part+':'+wideVisible;
   if(lastPart!==chapterKey){lastPart=chapterKey;const title=(examplePlaying?{opening:exampleName()+': a phrase, alone.',answer:'The phrase opens into three bodies.',return:'The opening phrase returns.'}:{opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'})[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',wideVisible?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':(examplePlaying?'The original 80 mm blade, playing a prepared phrase.':'The original 80 mm blade, playing your phrase alone.'));}
+  if(frame.performers)canvas.setAttribute('aria-label',canvas.getAttribute('aria-label').replace(/ Score-driven strikers.*$/,'')+' Score-driven strikers prepare, touch and recover on the recorded timeline.');
   if(listening())raf=requestAnimationFrame(animate);return;
  }
  if(response&&$('reveal').checked)world?.response(response.at(t).points);
@@ -155,7 +156,7 @@ async function playArrangement(source,example=false,generated=false){
  if(!example)selectPCM(capture.current);world?.view('opening');for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view==='opening'));
  unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'begin'):'unfold';arrangementPCM=null;arrangementView=null;
  let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),source);}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
- const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingArrangementView(pcm.plan);return pcm;});
+ const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingPerformanceView(source,presentationVersion);return pcm;});
  $('touch-note').textContent=example?exampleName()+': a phrase becomes a round, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  const playing=replay.play(prepared);replayFocus=true;controls();
@@ -192,7 +193,7 @@ $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Sp
 $('quiet').addEventListener('click',()=>{
  if(explorationJob){restoreVersion++;cancelExploration();$('recipe-note').textContent='Opening cancelled. Both previous phrases remain available.';controls();return;}
  if(movie?.busy){movie.cancel();return;}
- if(listening()){cancelArrangement();replay.stop();$('playing-status').textContent=examplePlaying?'Example stopped. Choose Begin when you want to play.':'Replay stopped. Your phrase is unchanged.';return;}
+ if(listening()){cancelArrangement();replay.stop();$('playing-status').textContent=examplePlaying?(generatedPlaying?'Piece stopped. Hear it again, explore it, or make another.':'Example stopped. Choose Begin when you want to play.'):'Replay stopped. Your phrase is unchanged.';return;}
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});

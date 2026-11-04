@@ -185,3 +185,9 @@ This expands the Returning Room milestone: a newcomer can receive a compelling c
 Make a piece now generates a bounded seeded motif and related second cell, then performs the existing opening, three-body answer and return. Hear this piece again repeats it. Explore this piece quietly adopts its exact generated touches for comparison, playing and keeping; simply listening preserves the current original. The fixed authored introduction remains available. The home page now describes both automatic and hands-on entrances.
 
 This closes the first automatic source-to-performance-to-playable-encounter loop. It does not yet invent instrument anatomy, provide creative direction controls or establish the musical quality of its variations. The next work should stage the known events with visible performers and evaluate contrasting generated phrases as complete passages before widening the grammar. Generated source is retained in existing encounter recipes; seed and grammar metadata are not part of that saved format.
+
+## Prepared pieces now have visible performers
+
+Presentation3, Porcelain performers, adopts the ceramic contact rig into new flagship encounters. Generated pieces, the fixed introduction and visitor unfoldings share the same known-score pose timeline as film export. Earlier saved appearances remain unchanged. Quiet retires the rig; direct live touch continues to receive immediate acknowledgment. A local15.1second film with453frames has been encoded and its pose hashes reconstructed in Node from the downloaded manifest.
+
+The performer is artistic choreography around an ideal impulse source. It does not yet model collision forces or make the instrument mechanically coupled. The next artistic work is to inspect complete contrasting generated performances for readable anticipation, musical distinction and a satisfying return, including narrow and held views. Broader grammar and creative direction controls should grow from those observations.

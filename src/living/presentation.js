@@ -3,5 +3,6 @@
 export const LIVING_PRESENTATIONS=Object.freeze({
  1:Object.freeze({look:'original',name:'Warm studio'}),
  2:Object.freeze({look:'dusk',name:'Porcelain at dusk'}),
+ 3:Object.freeze({look:'dusk',name:'Porcelain performers',contacts:true}),
 });
 export function livingPresentationVersion(record){return record.version===1?1:record.presentationVersion;}

@@ -4,8 +4,9 @@ export const LIVING_ADDRESS_LIMIT=8192;
 export function validateLivingRecord(value){
  const keys=value?.version===2?[...legacyKeys,'presentationVersion']:legacyKeys;
  if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||!keys.every(k=>Object.hasOwn(value,k))||value.kind!=='imagimusic-living-encounter'||![1,2].includes(value.version)||value.arrangementVersion!==1||typeof value.cameraMotion!=='boolean'||typeof value.reveal!=='boolean')throw Error('Unsupported Living Instrument encounter.');
- if(value.version===2&&![1,2].includes(value.presentationVersion))throw Error('Unsupported Living Instrument presentation.');
+ if(value.version===2&&![1,2,3].includes(value.presentationVersion))throw Error('Unsupported Living Instrument presentation.');
  const plan=createLivingArrangement(value.source);
+ if(value.presentationVersion===3&&plan.source.events.some(e=>e.strength<=0))throw Error('The performer presentation requires positive touches. Earlier presentations retain signed impulses.');
  return Object.freeze({kind:'imagimusic-living-encounter',version:value.version,arrangementVersion:1,source:plan.source,cameraMotion:value.cameraMotion,reveal:value.reveal,...(value.version===2?{presentationVersion:value.presentationVersion}:{})});
 }
 export function createLivingRecord(source,{cameraMotion=true,reveal=true,presentationVersion=2}={}){

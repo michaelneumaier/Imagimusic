@@ -50,7 +50,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   mesh(new T.CylinderGeometry(.058,.058,.008,6),dark,[-.4,3.918,z]);
  }
  function setLength(mm){length=mm/10;blade.scale.x=(length+.8)/8.8;blade.position.x=(length-.8)/2;marker.position.x=.85*length;marker.visible=false;veil.visible=false;}
- // Workshop-only contact rig; created lazily so published appearances stay intact.
+ // Contact rig is lazy; only presentation3 or the explicit workshop enables it.
  const contactActors=new Map(),contactGroup=new T.Group();objects.add(contactGroup);contactGroup.visible=false;
  let contactSupport=null;
  function performers(poses){
@@ -130,6 +130,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   if(cameraOpen===value)return;cameraOpen=value;scene.fog.near=T.MathUtils.lerp(30,80,value);scene.fog.far=T.MathUtils.lerp(65,180,value);bodies[1].objects.visible=bodies[2].objects.visible=value>0;place();
  }
  function arrangementFrame(frame,reveal,cameraMotion=true,contactDetail=false){
+  if(frame.performers)performers(frame.performers);
   const framingChanged=inspectContact!==contactDetail;inspectContact=contactDetail;
   controls.enabled=inspectContact||!cameraMotion;openCamera(inspectContact?0:cameraMotion?frame.cameraOpen:1);if(framingChanged)place();
   for(let i=0;i<3;i++){bodies[i].response(reveal?frame.bodies[i].points:null);bodies[i].acknowledgeTouch(frame.bodies[i].touched);}
@@ -143,7 +144,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
  }
  function performers(poses=[]){for(let i=0;i<3;i++)bodies[i].performers(poses.filter(p=>p.body===i));}
- function clearArrangement(){const wasDetail=inspectContact;inspectContact=false;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
+ function clearArrangement(){performers([]);const wasDetail=inspectContact;inspectContact=false;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
  function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
  return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,performers,dispose};
