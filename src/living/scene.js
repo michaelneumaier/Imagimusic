@@ -90,7 +90,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   }
  }
  setLength(mm);
- return {objects,blade,response,setLength,performers,acknowledgeTouch(value){marker.visible=value;}};
+ return {objects,blade,response,setLength,performers,acknowledgeTouch(value,activation=.85){marker.position.x=activation*length;marker.visible=value;}};
  }
  const bodies=ensemble?ensemble.instances.map(instance=>{const body=makeBody(instance.bodyMm);body.objects.position.fromArray(instance.position);return body;}):[makeBody(80),makeBody(95),makeBody(65)];
  if(!ensemble){bodies[1].objects.position.set(-11,0,-4);bodies[2].objects.position.set(10,0,-4);bodies[1].objects.visible=bodies[2].objects.visible=false;}
@@ -150,7 +150,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function instanceFrame(frame,reveal=true){
   if(!ensemble||frame.instances.length!==bodies.length)throw Error('Frame does not match the journey ensemble.');
   performers(frame.performers);
-  for(let i=0;i<bodies.length;i++){const state=frame.instances[i];bodies[i].response(reveal?state.points:null,state.endingOpacity);bodies[i].acknowledgeTouch(false);}
+  for(let i=0;i<bodies.length;i++){const state=frame.instances[i];bodies[i].response(reveal?state.points:null,state.endingOpacity);bodies[i].acknowledgeTouch(!!state.touchMarker,state.touchMarker?.activation);}
   render();
  }
  function clearArrangement(){performers([]);const wasDetail=inspectContact||!!cameraShot;inspectContact=false;cameraShot=null;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}

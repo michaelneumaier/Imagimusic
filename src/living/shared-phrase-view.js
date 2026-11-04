@@ -37,9 +37,10 @@ export function createLivingSharedPhraseView(value,{guestLimit}={}){
   const raw=seconds*rate,nearest=Math.round(raw),frame=Math.abs(raw-nearest)<1e-7?nearest:raw;
   const visible=events.filter(event=>event.frame<=frame),fadeFrames=Math.round(.025*rate),endFrame=fadeStart+fadeFrames;
   const endingOpacity=frame<fadeStart?1:Math.max(0,(endFrame-1-frame)/(fadeFrames-1));
-  const touched=visible.length>0;
+  const touched=visible.length>0,last=visible.at(-1);
+  const touchMarker=last&&frame-last.frame<Math.round(.12*rate)&&endingOpacity>0?{activation:source.design.activation,frame:last.frame,origin:last.origin}:null;
   return {seconds,frame,touches:visible.length,scoreTouches:visible.filter(e=>e.origin==='score').length,guestTouches:visible.filter(e=>e.origin==='guest').length,
-   instances:[{...layout.instances[0],points:touched?response.at(frame/rate).points:null,touched,endingOpacity,passId:touched?0:null,localSeconds:frame/rate}],performers:[]};
+   instances:[{...layout.instances[0],points:touched?response.at(frame/rate).points:null,touched,touchMarker,endingOpacity,passId:touched?0:null,localSeconds:frame/rate}],performers:[]};
  }
  return Object.freeze({source,layout,accept,end,at,get accepted(){return events.slice();}});
 }

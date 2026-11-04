@@ -47,3 +47,16 @@ test('held single-body framing contains the body and a sampled maximum-strength 
   for(const point of points){const p=new T.Vector3(...point).project(camera);assert.ok(Math.abs(p.x)<.95&&Math.abs(p.y)<.95&&p.z>-1&&p.z<1);}
  }
 });
+
+test('touch marker uses accepted timing and actual activation, expires and does not alter response',()=>{
+ const selected={...source,design:createTineDesign({activation:.25})},view=createLivingSharedPhraseView(selected);
+ view.accept(selected.events.map((e,index)=>({...e,index,origin:'score'})));
+ assert.equal(view.at(.35-1/48000).instances[0].touchMarker,null);
+ assert.deepEqual(view.at(.35).instances[0].touchMarker,{activation:.25,frame:16800,origin:'score'});
+ assert.equal(view.at(.47).instances[0].touchMarker,null);
+ const before=view.at(.6).instances[0].points;
+ view.accept([{index:2,frame:33600,strength:.05,origin:'guest'}]);
+ assert.deepEqual(view.at(.6).instances[0].points,before);
+ assert.deepEqual(view.at(.7).instances[0].touchMarker,{activation:.25,frame:33600,origin:'guest'});
+ view.end(33600);assert.equal(view.at(.725).instances[0].touchMarker,null);
+});
