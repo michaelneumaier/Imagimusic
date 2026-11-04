@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A gesture returns · Imagimusic</title><link rel="stylesheet" href="src/living/continuous-return.css"></head>
+<body><main>
+<nav><a href="project.html">Imagimusic</a><a href="living-journey.html">The listening workshop ↗</a></nav>
+<p class="eyebrow">THE LIVING INSTRUMENT · CONTINUOUS STUDY</p>
+<h1>A gesture<br><em>returns.</em></h1>
+<p class="intro">An instrument remembers its ringing. A small rhythm changes, makes room for silence, and finds its way home. Begin, then simply listen.</p>
+<section class="listening" aria-label="Continuous listening">
+<div class="phase-heading"><p id="phase">A gesture, and its return</p><span id="elapsed">0 / 48 seconds</span></div>
+<ol class="phases" aria-label="Musical passages"><li>Opening</li><li>Echo</li><li>Reflection</li><li>Space</li><li>Gathering</li><li>Thinning</li><li>Recollection</li><li>Return</li></ol>
+<progress id="progress" max="48" value="0" aria-label="Performance progress"></progress>
+<div class="transport"><button id="start" class="primary">Begin listening</button><button id="quiet" disabled>Quiet</button><label class="seed-label">Gesture <select id="seed"><option value="42">01</option><option value="2950288811">02</option><option value="4294967295">03</option></select></label></div>
+<p id="status" role="status">A small idea, waiting.</p>
+<label class="level">Listening level <input id="level" type="range" min="0" max="20" step="1" value="0"><output id="level-value">+0 dB</output></label>
+</section>
+<details class="participate"><summary>Leave a small trace</summary>
+<p>You can add a touch while the same instrument is ringing. The planned music carries on, and you can stop playing at any time.</p>
+<div class="transport"><button id="pad" disabled>Touch the instrument</button><label>Strength <select id="strength"><option value="0.025">Soft</option><option value="0.05" selected>Light</option><option value="0.1">Firm</option></select></label></div>
+<p class="small">With the touch button focused, use 1, 2 or 3. Touches are accepted only when the body has room for them alongside its committed notes.</p><p id="count" class="small">0 notes · 0 from you</p>
+</details>
+<section class="kept" aria-label="Kept performance"><a id="download" hidden download>Keep the performance JSON ↓</a><p id="result" class="small" hidden></p></section>
+<details><summary>About this listening experiment</summary><p>This is a 48-second, seeded rhythmic composition on one continuously ringing steel-tine model. Its eight passages are authored transformations of a small gesture. An added touch changes the ringing sound; it does not rewrite the future composition.</p><p>The sound uses four vibration modes, ideal impulses and a modeled velocity pickup. It does not model acoustic radiation or collisions. The timeline shows score position, not physical motion or emotion. The final fade changes output volume, not the instrument’s physical damping.</p><p>Opening is silent. Leaving or hiding the page stops playback. Quiet completes a short capture; cancellation or interruption does not. A completed capture is checked in a background worker before its JSON download appears. This page does not yet reopen those files or export their audio.</p><p>Experimental browser integration: native playback and listening quality have not yet been verified. The previous kept performance remains available if a new attempt fails.</p></details>
+<footer><a href="living.html">Play the Living Instrument</a><span>Made to be listened to. Participation is optional.</span></footer>
+</main><script type="module" src="src/living/continuous-return-main.js"></script></body></html>
