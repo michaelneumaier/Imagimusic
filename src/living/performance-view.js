@@ -12,6 +12,6 @@ export function createLivingPerformanceView(source,presentationVersion,arrangeme
  if(!Number.isInteger(presentationVersion)||!Object.hasOwn(LIVING_PRESENTATIONS,presentationVersion))throw Error('Unsupported Living Instrument presentation.');
  const presentation=LIVING_PRESENTATIONS[presentationVersion];
  const plan=createLivingArrangement(source,arrangementVersion),view=presentation.attention?createLivingAttentionView(plan):createLivingArrangementView(plan);
- const choreography=presentation.contacts?createLivingChoreography(plan.source,arrangementVersion===1?'round':'spaced'):null;
+ const choreography=presentation.contacts?createLivingChoreography(plan.source,arrangementVersion===1?'round':arrangementVersion===2?'spaced':'released'):null;
  return {plan,at(seconds){const frame=view.at(seconds);return choreography?{...frame,performers:choreography.at(seconds)}:frame;}};
 }

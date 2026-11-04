@@ -37,7 +37,7 @@ test('default round retains its PCM identity and unsupported score versions are 
  assert.equal(pcm.plan.version,1);assert.deepEqual(pcm.channels,renderLivingArrangement(source,1).channels);
  const hash=createHash('sha256');for(const channel of pcm.channels)hash.update(new Uint8Array(channel.buffer,channel.byteOffset,channel.byteLength));
  assert.equal(hash.digest('hex'),'6cbea3417e94d7ac26843f51a08fdcf0c66b8faab0fa228e07a694f262a47390');
- for(const version of [0,3,'2',null,NaN,{},true]){
+ for(const version of [0,4,'2',null,NaN,{},true]){
   assert.throws(()=>createLivingArrangement(source,version),/Unsupported/);
   assert.throws(()=>renderLivingArrangement(source,version),/Unsupported/);
   assert.throws(()=>createLivingPerformanceView(source,3,version),/Unsupported/);

@@ -1,15 +1,19 @@
+import {createLivingReleasedScore} from './released-score.js';
+import {createTineDampedRelease} from '../tine/damped-release.js';
 import {validateTineLiveRecord,renderTineLiveRecord} from '../tine/live-record.js';
 import {createTineLiveComparison} from '../tine/live-comparison.js';
 
 /** Arrangement v2 separates answer touch spans by at least 350ms (tails may
  * overlap), with a minimum 800ms entrance interval. V1 remains the default.
+ * V3 adds a partial first reply, ideal distributed damping and a settling beat.
  * Authored arrangement v1: original, three staggered bodies, original again.
- * Each voice is a separate complete pass with the source's exact local event
+ * In v1/2 each voice is a separate complete pass with the source's exact local event
  * frames and ending. No coupling, time stretch, pitch shift or normalization.
  * Panning and ensemble gains are artistic presentation, not acoustic radiation.
  */
 export function createLivingArrangement(value,version=1){
- if(![1,2].includes(version))throw Error('Unsupported Living Instrument arrangement.');
+ if(![1,2,3].includes(version))throw Error('Unsupported Living Instrument arrangement.');
+ if(version===3)return createLivingReleasedScore(createLivingArrangement(value,2));
  const source=validateTineLiveRecord(value),rate=source.sampleRate;
  if(source.design.lengthMm!==80||source.design.widthMm!==10||source.events.length===0||source.events.some(e=>Math.abs(e.strength)>.1))throw Error('Use a completed opening phrase with touches on the 80 × 10 mm body.');
  const bodies=[source,createTineLiveComparison(source,{lengthMm:95,widthMm:10}).candidate,createTineLiveComparison(source,{lengthMm:65,widthMm:10}).candidate];
@@ -28,8 +32,13 @@ export function createLivingArrangement(value,version=1){
  return Object.freeze({kind:'imagimusic-living-arrangement',version,source,bodies:Object.freeze(bodies),sampleRate:rate,phraseFrames:duration,delayFrames,roundStart,returnStart,frames:returnStart+duration,voices:Object.freeze(voices)});
 }
 
+export function renderLivingArrangementBody(plan,index){
+ const record=plan.bodies[index],release=plan.releases?.[index];
+ return release?createTineDampedRelease(record,release).render():renderTineLiveRecord(record);
+}
+
 export function renderLivingArrangement(value,version=1){
- const plan=createLivingArrangement(value,version),stems=plan.bodies.map(record=>renderTineLiveRecord(record).channels[0]);
+ const plan=createLivingArrangement(value,version),stems=plan.bodies.map((record,i)=>renderLivingArrangementBody(plan,i).channels[0]);
  const sum=[new Float64Array(plan.frames),new Float64Array(plan.frames)];
  for(const voice of plan.voices){
   const angle=(voice.pan+1)*Math.PI/4,gains=[Math.cos(angle)*voice.gain,Math.sin(angle)*voice.gain],stem=stems[voice.body];

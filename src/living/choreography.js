@@ -1,5 +1,5 @@
 import {planPerformers,actorPose} from '../perform/planner.js';
-import {createLivingFragmentAnswer,createLivingReleasedAnswer} from './answer-study.js';
+import {createLivingFragmentAnswer} from './answer-study.js';
 import {createLivingArrangement} from './arrangement.js';
 
 /** Known, positive-impulse choreography. Round timing and poses are now part
@@ -10,7 +10,7 @@ import {createLivingArrangement} from './arrangement.js';
  */
 export function createLivingChoreography(source,treatment='round'){
  if(!['round','spaced','fragment','released'].includes(treatment))throw Error('Unknown choreography score.');
- const score=treatment==='released'?createLivingReleasedAnswer(source):treatment==='fragment'?createLivingFragmentAnswer(source):createLivingArrangement(source,treatment==='round'?1:2);
+ const score=treatment==='released'?createLivingArrangement(source,3):treatment==='fragment'?createLivingFragmentAnswer(source):createLivingArrangement(source,treatment==='round'?1:2);
  if(score.source.events.some(e=>e.strength<=0))throw Error('Contact study requires positive impulses.');
  const plans=score.bodies.map((body,bodyIndex)=>{
   const events=score.voices.flatMap((v,voiceIndex)=>v.body===bodyIndex?body.events.map((e,eventIndex)=>({id:`${voiceIndex}:${eventIndex}`,slot:0,noteOn:(v.startFrame+e.frame)/score.sampleRate,velocity:e.strength})):[]);

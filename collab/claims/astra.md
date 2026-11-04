@@ -862,3 +862,7 @@ Released score pacing complete:67focused tests pass;36WAVs regenerated; all late
 Automatic experience discovery: owns project.html and Living catalog description plus implementation notes. Present listening, small creative direction and playing as complete entrances; reconcile flagship roadmap/history with following-camera and released-reply workshop evidence. No new destination or publication.
 
 Automatic experience discovery complete: home/current chapter/vision/roadmap/history reconciled; native narrow hero and43-entry catalog checked, local links verified. Claims released. No independent review or musical preference claimed.
+
+Released arrangement3 foundation: owns new released-score.js, arrangement.js, answer-study.js, choreography.js, performance-view.js and core contract tests. Extract current candidate as immutable version3 score; freeze pre-extraction PCM identities, preserve1/2 and API defaults. Record/UI/worker adoption remains a subsequent complete path.
+
+Released arrangement3 foundation complete:9 pre-extraction PCM hashes retained;69focused tests pass. Claims released. Record/UI/film end-to-end adoption remains next, default1 unchanged; no independent review claimed.
