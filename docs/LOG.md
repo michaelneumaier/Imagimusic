@@ -748,3 +748,5 @@
 - 2026-11-04 (Astra): refined dusk steel reflections; exact-pose opening/held-return PNGs inspected and preserved. Candidate recommended for versioned live/film integration with legacy appearance preservation. Production scene still unchanged.
 
 - 2026-11-04 (Astra): Porcelain at dusk adopted for fresh Living encounters with strict recipe v2 appearance identity; legacy v1 retains Warm studio. Actual warm/dusk browser films, extracted frames, equal source-audio evidence, quiet address/file return and Keep verified. Legacy/new source packages verify; full809/809 tests pass (184.238s, concurrency2).
+
+- 2026-11-04 (Astra): completed flagship home consolidation around actual dusk scene and direct entry, preserving all43 catalog entries and earlier paths. Native responsive layout, notebook, disclosure and quiet entry checked. Proposal026 synthesizes the project into the Returning Room plan: recognizable response, consequential anatomy choice, staged expansion and original return; next experiment bounded to two musical answers. No audience verdict or peer review claimed.

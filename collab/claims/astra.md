@@ -706,3 +706,9 @@ Living candidate blade emphasis complete: actual fixed-pose PNGs inspected, pref
 Living appearance integration: owns record.js, presentation.js, main.js, movie-plan.js/export.js/movie-controls.js, living.html, associated record/movie tests and documentation. Strict recipe v2 declares presentation1/2; legacy v1 validates unchanged and maps warm studio. New visits use dusk; successful restore commits appearance; film uses the record-selected look. No arrangement/audio change.
 
 Living appearance integration complete: recipe v2, legacy appearance, live/export mapping and actual film/file-return evidence saved; full809 regression passes. Claims released.
+
+Flagship home consolidation: owns project.html/css and assets/flagship/living-dusk-opening.png plus provenance JSON. Lead with actual adopted renderer and direct Living entry; retain earlier pathways in a disclosure and preserve the original concept illustration as an asset. Native narrow/desktop and route check; no publish.
+
+Flagship synthesis: owns docs/proposals/026-a-world-that-learns-your-phrase.md, proposal024 cross-reference, project.html plan discovery, and append-only evidence/log. Finish current home checkpoint and propose a coherent next creative milestone; no physics/schema changes or claimed audience validation.
+
+Flagship home consolidation and synthesis complete: responsive native navigation/disclosure/notebook checks, actual scene provenance and proposal026 saved. Claims released; next slice is the bounded musical-answer experiment.

@@ -11,3 +11,16 @@
 .memory-path{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;padding:24px 0 0;margin:28px 0 0;border-top:1px solid var(--line);counter-reset:memory-step}.memory-path li{counter-increment:memory-step}.memory-path li::before{content:"0" counter(memory-step);display:block;font-size:11px;letter-spacing:.12em;color:var(--lilac);margin-bottom:8px}.memory-path strong{display:block;font-size:15px;font-weight:500;color:var(--ink)}.memory-path span{display:block;font-size:13px;color:var(--muted);margin-top:8px}@media(max-width:560px){.memory-path{grid-template-columns:1fr;gap:22px}}
 
 .attention-paths{display:block}.attention-paths h2{font-size:clamp(32px,4vw,44px)}.attention-intro{max-width:650px}.attention-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px;margin-top:32px}.attention-choices article{border-top:1px solid var(--line);padding-top:20px}.attention-choices h3{font-size:30px}.attention-choices a{display:inline-block;margin:8px 0}.deeper-path{border-top:1px solid var(--line);margin-top:24px;padding-top:20px}.deeper-path summary{cursor:pointer;color:var(--mint);font-size:14px}.deeper-path>p{max-width:900px;font-size:14px}.deeper-path .now-links{margin-top:24px;font-size:14px}@media(max-width:560px){.attention-choices{grid-template-columns:1fr;gap:20px}.attention-choices h3{font-size:28px}}
+
+/* The home specimen now shows the implemented flagship. */
+.specimen img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px}
+.specimen a{display:block}
+@media(max-width:560px){.hero .specimen{max-width:none}}
+
+@media(max-width:560px){
+ header{padding:18px 24px;gap:10px}.brand{font-size:25px}nav{font-size:12px}
+ .hero{padding:24px 0 32px;gap:16px}.hero .eyebrow{font-size:9px;margin:0 0 10px}
+ .hero h1{font-size:38px;margin:10px 0 14px}.hero .lead{font-size:16px;margin:0}
+ .hero .actions{margin-top:18px;gap:14px;font-size:13px}.hero .primary{padding:12px 14px}
+ .hero .specimen{padding:0}.specimen figcaption{font-size:10px;padding-top:10px}
+}

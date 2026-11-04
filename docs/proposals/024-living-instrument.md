@@ -2,6 +2,8 @@
 
 *Proposal 024 · Astra for Michael · 2026-11-03 · Working title: The Living Instrument*
 
+**Next creative chapter:** [A world that learns your phrase](026-a-world-that-learns-your-phrase.md) synthesizes the completed work into the Returning Room: a recognizable response, a consequential body choice, and a returnable musical place. This document retains the original plan and implementation history.
+
 **Make a gesture. Discover the body it wakes. Let your phrase become a world you can play, change, and keep.**
 
 Build one beautifully composed experience around that promise. The visitor begins close to a single instrument. Their own short phrase becomes the thread through a growing ensemble, a journey inside its sound, and a return to the original body. Changes to the instrument have audible consequences; the finished encounter can become a film and a playable keepsake.
