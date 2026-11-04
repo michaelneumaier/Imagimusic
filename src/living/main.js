@@ -26,6 +26,7 @@ let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveRespons
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
 let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original',generatedArrangementVersion=1,generatedKeepURL=null;
+const arrangementNames={1:'Overlapping round',2:'Spacious exchange',3:'A reply, then a breath'};
 const arrangementButtons=[...document.querySelectorAll('[data-arrangement]')];
 const spacingButtons=[...document.querySelectorAll('[data-spacing]')];
 const exampleName=()=>generatedPlaying?'A generated piece':'An authored example';
@@ -163,7 +164,7 @@ async function playArrangement(source,example=false,generated=false,version=arra
  unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'begin'):'unfold';arrangementPCM=null;arrangementView=null;
  let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),createLivingRecord(source,{presentationVersion,arrangementVersion:version}));}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
  const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingPerformanceView(source,presentationVersion,version);return pcm;});
- $('touch-note').textContent=example?exampleName()+': a phrase crosses three bodies, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
+ $('touch-note').textContent=version===3?'An opening, a partial reply that releases its ring, two full answers, then the original returns. Independent bodies; ideal distributed damping on the first reply.':example?exampleName()+': a phrase crosses three bodies, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  const playing=replay.play(prepared);replayFocus=true;controls();
  try{await playing;}catch(error){cancelArrangement();if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
@@ -176,7 +177,7 @@ function previewGenerated(seed,spacing){
  if(generatedKeepURL)$('generated-keep-note').textContent='The download below still holds your last kept piece. Keep this piece saves the current one.';
  for(const b of spacingButtons)b.setAttribute('aria-pressed',String(b.dataset.spacing===spacing));
  $('generated-title').textContent=generatedTitle(generatedPhrase);
- $('generated-note').textContent=`${LIVING_PHRASE_SPACING[spacing].name} · ${generatedArrangementVersion===2?'Spacious exchange':'Overlapping round'}. A small motif crosses three bodies, then comes home.`;
+ $('generated-note').textContent=`${LIVING_PHRASE_SPACING[spacing].name} · ${arrangementNames[generatedArrangementVersion]}. A small motif crosses three bodies, then comes home.`;
  for(const b of arrangementButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.arrangement)===generatedArrangementVersion));
  $('generated-identity').textContent=`Seed ${seed} · phrase grammar 1 · spacing direction 1. Six generated touches, with a ${generatedPhrase.variation==='repeat'?'repeated motif':generatedPhrase.variation==='linger'?'delayed final touch':'softer second cell'}. Kept encounters preserve the exact touches; this seed and direction label are not included in the saved encounter format.`;
  playArrangement(generatedPhrase.source,true,true,generatedArrangementVersion);
@@ -202,7 +203,7 @@ $('keep-generated').addEventListener('click',()=>{
   if(blob.size>LIVING_RECIPE_FILE_LIMIT)throw Error('This recipe exceeds the supported file size.');
   const next=URL.createObjectURL(blob),link=$('generated-download');
   link.href=next;link.download=`imagimusic-piece-${generatedPhrase.seed}-${generatedPhrase.spacing}-arrangement${generatedArrangementVersion}.json`;
-  link.textContent=`Last kept piece — save again: ${generatedTitle(generatedPhrase)} · ${LIVING_PHRASE_SPACING[generatedPhrase.spacing].name.toLowerCase()} · ${generatedArrangementVersion===2?'spacious exchange':'overlapping round'}`;link.hidden=false;
+  link.textContent=`Last kept piece — save again: ${generatedTitle(generatedPhrase)} · ${LIVING_PHRASE_SPACING[generatedPhrase.spacing].name.toLowerCase()} · ${arrangementNames[generatedArrangementVersion].toLowerCase()}`;link.hidden=false;
   if(generatedKeepURL)URL.revokeObjectURL(generatedKeepURL);generatedKeepURL=next;
   $('generated-keep-note').textContent='Your piece is ready to save. Open this recipe here whenever you want to hear or explore it. Your current original and address are unchanged.';
   link.click();
@@ -214,7 +215,7 @@ $('explore-generated').addEventListener('click',async()=>{
  await capture.load(phrase.source);if(own!==restoreVersion)return;
  if(JSON.stringify(capture.current?.record)!==JSON.stringify(phrase.source)){$('generated-note').textContent='This piece could not be prepared for exploration. The previous original remains available.';return;}
  arrangementVersion=version;unfolding=false;examplePlaying=false;generatedPlaying=false;
- $('generated-note').textContent=`${generatedTitle(phrase)} is now your current original, at ${LIVING_PHRASE_SPACING[phrase.spacing].name.toLowerCase()}, with ${version===2?'a spacious exchange':'an overlapping round'}. Compare its bodies, play an answer, or keep the encounter.`;
+ $('generated-note').textContent=`${generatedTitle(phrase)} is now your current original, at ${LIVING_PHRASE_SPACING[phrase.spacing].name.toLowerCase()}, with ${arrangementNames[version].toLowerCase()}. Compare its bodies, play an answer, or keep the encounter.`;
  $('touch-note').textContent='This original phrase was generated. Its timing and accents remain intact when you compare bodies or keep the encounter.';
  $('playing-status').textContent='Generated phrase adopted quietly. Hear again, unfold it, or choose another body to play.';controls();
 });
@@ -286,7 +287,7 @@ async function restoreRecord(record,origin,note=$('keep-note')){
  // Commit presentation only after source reconstruction succeeds.
  applyPresentation(record);
  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
- note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, ${arrangementVersion===2?'spacious exchange':'overlapping round'} and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
+ note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, ${arrangementNames[arrangementVersion].toLowerCase()} and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
 }
 async function restoreAddress(){
  park();if(!location.hash)return;

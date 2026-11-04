@@ -3,7 +3,7 @@ import {createTineDesign} from '../src/tine/address.js';
 import {renderLivingArrangement} from '../src/living/arrangement.js';
 import {exportLivingMovie} from '../src/living/export.js';
 const $=id=>document.getElementById(id);let controller,urls=[];
-const record=createLivingRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:24000,strength:.1},{frame:55200,strength:.025},{frame:105600,strength:.05}],fadeStart:190800},{arrangementVersion:new URLSearchParams(location.search).get('arrangement')==='2'?2:1,presentationVersion:['3','4'].includes(new URLSearchParams(location.search).get('presentation'))?Number(new URLSearchParams(location.search).get('presentation')):2});
+const record=createLivingRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:24000,strength:.1},{frame:55200,strength:.025},{frame:105600,strength:.05}],fadeStart:190800},{arrangementVersion:['2','3'].includes(new URLSearchParams(location.search).get('arrangement'))?Number(new URLSearchParams(location.search).get('arrangement')):1,presentationVersion:['3','4'].includes(new URLSearchParams(location.search).get('presentation'))?Number(new URLSearchParams(location.search).get('presentation')):2});
 $('make').onclick=async()=>{
  controller=new AbortController();$('make').disabled=true;$('cancel').disabled=false;
  try{

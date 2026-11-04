@@ -7,7 +7,7 @@ import {createLivingPerformanceView} from '../src/living/performance-view.js';
 import {traceHash} from '../src/state.js';
 
 test('presentation4 live and film share exact attention poses in both arrangements',()=>{
- for(const source of [createLivingGreeting(),createLivingGeneratedStudyFixtures()[3].source])for(const arrangementVersion of [1,2]){
+ for(const source of [createLivingGreeting(),createLivingGeneratedStudyFixtures()[3].source])for(const arrangementVersion of [1,2,3]){
   const record=createLivingRecord(source,{presentationVersion:4,arrangementVersion}),movie=createLivingMoviePlan(record),view=createLivingPerformanceView(source,4,arrangementVersion),old=createLivingPerformanceView(source,3,arrangementVersion);
   for(const t of movie.times){
    const frame=view.at(t),{cameraShot,...unchanged}=frame;
@@ -20,7 +20,7 @@ test('presentation4 live and film share exact attention poses in both arrangemen
 });
 test('held presentation4 films suppress attention before the renderer consumes the frame',()=>{
  const source=createLivingGreeting();
- for(const arrangementVersion of [1,2])for(const reveal of [true,false]){
+ for(const arrangementVersion of [1,2,3])for(const reveal of [true,false]){
   const movie=createLivingMoviePlan(createLivingRecord(source,{presentationVersion:4,arrangementVersion,cameraMotion:false,reveal}));
   const old=createLivingMoviePlan(createLivingRecord(source,{presentationVersion:3,arrangementVersion,cameraMotion:false,reveal}));
   for(const t of movie.times){const {cameraShot,...frame}=movie.sample(t);assert.equal(cameraShot,null);assert.equal(frame.cameraOpen,1);assert.deepEqual(frame,old.sample(t));}

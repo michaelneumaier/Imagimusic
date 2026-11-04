@@ -866,3 +866,9 @@ Automatic experience discovery complete: home/current chapter/vision/roadmap/his
 Released arrangement3 foundation: owns new released-score.js, arrangement.js, answer-study.js, choreography.js, performance-view.js and core contract tests. Extract current candidate as immutable version3 score; freeze pre-extraction PCM identities, preserve1/2 and API defaults. Record/UI/worker adoption remains a subsequent complete path.
 
 Released arrangement3 foundation complete:9 pre-extraction PCM hashes retained;69focused tests pass. Claims released. Record/UI/film end-to-end adoption remains next, default1 unchanged; no independent review claimed.
+
+Released arrangement3 adoption: owns record.js/main.js/movie-plan.js/living.html, relevant keeping tests and movie browser fixture. Carry identity through generated controls, names, adoption, address/recipe/paired origin/worker and films; preserve legacy schema1/default1. Verify actual export and native quiet restore before completing milestone.
+
+Released adoption discovery: also owns project.html, src/project-catalog.js, living-look.html, comparison-tool identity copy and existing proposal/evidence appendices. Reconcile once complete adoption evidence is collected; no new destination.
+
+Released arrangement3 adoption complete:69focused/855full tests pass; actual521-frame film reconstructed, downloaded source hashes verified with explicit Safari/Node precision limits, native generated recipe/adoption/address quiet restore checked. Home/workshop/catalog/plan evidence reconciled. Claims released; default1 and earlier identities preserved. No independent review or subjective listening verdict claimed.

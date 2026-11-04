@@ -3,7 +3,7 @@ const legacyKeys=['kind','version','arrangementVersion','source','cameraMotion',
 export const LIVING_ADDRESS_LIMIT=8192;
 export function validateLivingRecord(value){
  const keys=value?.version===2?[...legacyKeys,'presentationVersion']:legacyKeys;
- if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||!keys.every(k=>Object.hasOwn(value,k))||value.kind!=='imagimusic-living-encounter'||![1,2].includes(value.version)||!(value.version===1?[1]:[1,2]).includes(value.arrangementVersion)||typeof value.cameraMotion!=='boolean'||typeof value.reveal!=='boolean')throw Error('Unsupported Living Instrument encounter.');
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||!keys.every(k=>Object.hasOwn(value,k))||value.kind!=='imagimusic-living-encounter'||![1,2].includes(value.version)||!(value.version===1?[1]:[1,2,3]).includes(value.arrangementVersion)||typeof value.cameraMotion!=='boolean'||typeof value.reveal!=='boolean')throw Error('Unsupported Living Instrument encounter.');
  if(value.version===2&&![1,2,3,4].includes(value.presentationVersion))throw Error('Unsupported Living Instrument presentation.');
  const plan=createLivingArrangement(value.source,value.arrangementVersion);
  if([3,4].includes(value.presentationVersion)&&plan.source.events.some(e=>e.strength<=0))throw Error('The performer presentation requires positive touches. Earlier presentations retain signed impulses.');
