@@ -812,3 +812,9 @@ Spacious encounter integration: owns living record/worker/movie-plan/movie-contr
 Spacious integration discovery/evidence: also owns Living catalog description, project.html current entrance copy, and current plan/evidence appendices. No new catalog destination.
 
 Spacious encounter integration complete: generated choice, worker/record/live/film propagation, quiet restore and retained paired origin verified; actual573frame film and source recipe downloaded and reconstructed.52targeted and full838tests pass; native narrow flow checked. Home/catalog/plan/evidence reconciled. Claims released; no independent review claimed.
+
+Listening-only keeping: owns main.js/living.html for direct generated-recipe download with exact source/arrangement/appearance, separate from current original and address. Native download/reopen/retention validation; reuse existing strict record and file reader.
+
+Listening-only keeping evidence: also owns current catalog description and appendices in proposal026 and implementation notes.
+
+Listening-only keeping complete: one-action download, independent original/address retention and native quiet recipe reopen verified;9targeted tests pass; exact downloaded source matches generator. Claims released. Artistic whole-piece refinement remains next.

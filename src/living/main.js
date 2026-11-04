@@ -1,6 +1,6 @@
 import {createLivingDirectedPhrase,LIVING_PHRASE_SPACING} from './generative-phrase.js';
 import {createLivingGreeting} from './greeting.js';
-import {readLivingKeptFile} from './recipe-file.js';
+import {readLivingKeptFile,LIVING_RECIPE_FILE_LIMIT} from './recipe-file.js';
 import {createLivingExploration,serializeLivingExploration,validateLivingExploration} from './exploration-record.js';
 import {createLivingMovieControls} from './movie-controls.js';
 import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
@@ -25,7 +25,7 @@ motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
-let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original',generatedArrangementVersion=1;
+let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original',generatedArrangementVersion=1,generatedKeepURL=null;
 const arrangementButtons=[...document.querySelectorAll('[data-arrangement]')];
 const spacingButtons=[...document.querySelectorAll('[data-spacing]')];
 const exampleName=()=>generatedPlaying?'A generated piece':'An authored example';
@@ -42,6 +42,7 @@ function controls(){
  $('another-piece').disabled=$('generate-piece').disabled;
  $('replay-generated').disabled=$('hear-first').disabled||!generatedPhrase;
  $('explore-generated').disabled=$('replay-generated').disabled;
+ $('keep-generated').disabled=$('replay-generated').disabled;
  for(const b of [...spacingButtons,...arrangementButtons])b.disabled=$('replay-generated').disabled;
  $('open-recipe').disabled=!world||busy||repeat;
  $('return-branch').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!branchCapture?.current;
@@ -118,7 +119,7 @@ const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  if(state==='preparing')$('playing-status').textContent=examplePlaying?'Preparing '+exampleName().toLowerCase()+'…':'Preparing your phrase…';
  if(state==='playing'){if(unfolding)world?.setLength(80);$('playing-status').textContent=unfolding?(examplePlaying?exampleName()+' is unfolding…':'Your phrase is unfolding…'):`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
  if(state==='suspended'){$('playing-status').textContent='Replay was interrupted. Choose Quiet, then hear it again.';stopView();}
- if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?(generatedPlaying?'The piece has settled. Hear it again, explore it, or make another.':'The example has settled. Choose Begin to make a phrase of your own.'):'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:!generatedPlaying});replayFocus=false;}
+ if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?(generatedPlaying?'The piece has settled. Hear it again, keep it, or make another.':'The example has settled. Choose Begin to make a phrase of your own.'):'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:!generatedPlaying});replayFocus=false;}
 }});
 session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const touchFocused=document.activeElement===$('touch'),quietFocused=document.activeElement===$('quiet');
@@ -172,6 +173,7 @@ $('hear-first').addEventListener('click',()=>{if(!$('hear-first').disabled)playA
 function previewGenerated(seed,spacing){
  generatedPhrase=createLivingDirectedPhrase(seed,spacing);generatedSpacing=spacing;
  $('generated-actions').hidden=false;
+ if(generatedKeepURL)$('generated-keep-note').textContent='The download below still holds your last kept piece. Keep this piece saves the current one.';
  for(const b of spacingButtons)b.setAttribute('aria-pressed',String(b.dataset.spacing===spacing));
  $('generated-title').textContent=generatedTitle(generatedPhrase);
  $('generated-note').textContent=`${LIVING_PHRASE_SPACING[spacing].name} · ${generatedArrangementVersion===2?'Spacious exchange':'Overlapping round'}. A small motif crosses three bodies, then comes home.`;
@@ -192,6 +194,20 @@ for(const button of arrangementButtons)button.addEventListener('click',()=>{
  generatedArrangementVersion=Number(button.dataset.arrangement);previewGenerated(generatedPhrase.seed,generatedSpacing);
 });
 $('replay-generated').addEventListener('click',()=>{if(!$('replay-generated').disabled)playArrangement(generatedPhrase.source,true,true,generatedArrangementVersion);});
+$('keep-generated').addEventListener('click',()=>{
+ if($('keep-generated').disabled||!generatedPhrase)return;
+ try{
+  const record=createLivingRecord(generatedPhrase.source,{arrangementVersion:generatedArrangementVersion,presentationVersion,cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked});
+  const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});
+  if(blob.size>LIVING_RECIPE_FILE_LIMIT)throw Error('This recipe exceeds the supported file size.');
+  const next=URL.createObjectURL(blob),link=$('generated-download');
+  link.href=next;link.download=`imagimusic-piece-${generatedPhrase.seed}-${generatedPhrase.spacing}-arrangement${generatedArrangementVersion}.json`;
+  link.textContent=`Last kept piece — save again: ${generatedTitle(generatedPhrase)} · ${LIVING_PHRASE_SPACING[generatedPhrase.spacing].name.toLowerCase()} · ${generatedArrangementVersion===2?'spacious exchange':'overlapping round'}`;link.hidden=false;
+  if(generatedKeepURL)URL.revokeObjectURL(generatedKeepURL);generatedKeepURL=next;
+  $('generated-keep-note').textContent='Your piece is ready to save. Open this recipe here whenever you want to hear or explore it. Your current original and address are unchanged.';
+  link.click();
+ }catch(error){$('generated-keep-note').textContent='Could not keep this piece. '+error.message;}
+});
 $('explore-generated').addEventListener('click',async()=>{
  if($('explore-generated').disabled)return;
  const phrase=generatedPhrase,version=generatedArrangementVersion;park();const own=restoreVersion;
