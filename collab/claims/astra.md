@@ -698,3 +698,7 @@ Living workshop still-camera route complete: native retained choice, wide return
 Living consolidated light candidate: owns looks.js and living-look.html. Add porcelain-at-dusk candidate combining pale support readability with dark veil contrast; retain references and production defaults. Native opening/held-return inspection before recording art-direction judgment.
 
 Living consolidated light candidate complete: narrow opening/wide-return and actual PNG evidence recorded; candidate recommended for blade-emphasis refinement, production unchanged. Claim released.
+
+Living candidate blade emphasis: owns looks.js, scene.js presentation setter, living-look.html explanation. Tune only dusk steel roughness/reflection strength, restore defaults for reference choices, inspect actual fixed-pose stills before recommending adoption.
+
+Living candidate blade emphasis complete: actual fixed-pose PNGs inspected, preferred candidate and versioned integration requirement documented. Claim released.

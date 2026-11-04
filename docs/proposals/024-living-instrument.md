@@ -177,3 +177,6 @@ The first composition comparison is now locally playable: [A phrase with room to
 
 
 The visual synthesis candidate is now **Porcelain at dusk**, available in the existing workshop. It changes only the warm-studio support color to the pale ceramic used in the morning reference. Native390px opening and held-return inspection, plus two actual1280×720 PNG captures, show the arch separating more clearly from the dark field while the veil remains visible. Astra's art-direction recommendation is to carry this candidate forward, with blade-versus-support emphasis as the next refinement. This is a visual judgment, not audience evidence; production still uses its original presentation. Before adoption, keep live and exported presentation aligned and explicitly describe any presentation-version change.
+
+
+The dusk candidate now includes broader steel reflections (render roughness0.48, environment multiplier2.4). Opening and held-return captures show improved blade presence alongside the pale support. It is the preferred visual candidate for integration. The next implementation step is a declared appearance identity shared by live viewing and film export, with legacy warm-studio recipes continuing to reopen coherently. This changes presentation only; the spaced musical answer remains a separate experiment.

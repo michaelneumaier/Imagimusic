@@ -98,7 +98,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function setLook(name){
   const look=LIVING_LOOKS[name];if(!look)throw Error('Unknown visual treatment.');
   scene.background.setHex(look.background);scene.fog.color.setHex(look.background);floor.material.color.setHex(look.floor);
-  ceramic.color.setHex(look.ceramic);bronze.color.setHex(look.bronze);steel.color.setHex(look.steel);
+  ceramic.color.setHex(look.ceramic);bronze.color.setHex(look.bronze);steel.color.setHex(look.steel);steel.roughness=look.steelRoughness??.28;steel.envMapIntensity=look.steelEnvironment??1;
   renderer.toneMappingExposure=look.exposure;scene.environmentIntensity=look.environment;
   key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
  }

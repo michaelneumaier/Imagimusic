@@ -208,3 +208,12 @@ Added one controlled candidate to looks.js and the existing workshop: original w
 Native390×656 opening1s and held-camera original-return12.1s inspected. The arch and its inner negative space read more clearly; pale support gives the small ensemble stronger separation from the ground, while the unchanged veil remains visible. The ceramic now visually outweighs the quieter steel blade, an unresolved balance issue. Recommendation: carry this candidate forward and refine blade emphasis before adoption; no listener/user preference claim.
 
 Actual downloaded PNGs copied to ignored renders/living-look/living-round-dusk-follow-1.0s.png and living-round-dusk-held-12.1s.png; both1280×720, decoded and viewed. SHA256 recorded in dusk-stills.json (opening373eccb9…, heldd842254c…). Syntax/whitespace checks pass. No tests for the color constant; no model changes. Fable review pending.
+
+
+## Blade emphasis in the dusk candidate
+
+Dusk now sets steel roughness0.48 and material environment multiplier2.4; other looks restore0.28/1. The sound-producing geometry, metalness, source material parameters and veil are unchanged. This is a rendering treatment, not a changed alloy or acoustic response. The scene's initial material defaults remain original; only setLook(dusk) applies the experiment.
+
+Native exact-pose PNGs captured and viewed at opening1s and held original-return12.1s. Broad reflected light makes the blade top more visible and the three lengths easier to separate in the ensemble. Ceramic remains the strongest shape but the blade now has a clearer continuous surface. Preferred candidate for integration based on this art-direction inspection; no user preference claim. Actual1280×720 files kept under ignored renders/living-look/dusk-refined-opening.png and dusk-refined-held-return.png, hashes in dusk-refined-stills.json; previous captures retained. Syntax/whitespace checks pass. No model tests required for presentation-only material tuning.
+
+Next integration must give appearance an explicit saved identity, select it consistently in live/film, preserve legacy warm-studio reopening, and keep experimental spaced arrangement outside production until chosen. Current recipe v1 stores source/camera/reveal but no appearance; movie manifest separately declares presentationVersion1. Do not silently turn all old recipes into the new look or let live and film diverge. Fable review pending.
