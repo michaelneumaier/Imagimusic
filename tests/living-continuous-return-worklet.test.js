@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {renderContinuousTineRecord} from '../src/living/continuous-tine-record.js';
+import {validateContinuousReturnFinished} from '../src/living/continuous-return-result.js';
 test('continuous return worklet host contract',async t=>{
  let Processor;globalThis.sampleRate=48000;globalThis.currentFrame=8192;
  globalThis.AudioWorkletProcessor=class{constructor(){this.port={messages:[],postMessage:value=>this.port.messages.push(structuredClone(value))};}};
@@ -16,6 +17,7 @@ test('continuous return worklet host contract',async t=>{
    while(active){const b=block(p);all.set(b.left,offset);offset+=128;active=b.active;}
    const finished=p.port.messages.find(m=>m.type==='finished'),expected=renderContinuousTineRecord(finished.record);
    assert.deepEqual(all,expected.channels[0]);assert.equal(touches(p).length,25);
+   assert.deepEqual(validateContinuousReturnFinished(42,sampleRate,finished,touches(p),origin).record,finished.record);
    assert.ok(touches(p).every((e,i)=>e.index===i&&e.audioFrame===origin+e.frame&&e.origin==='score'));
    assert.equal(finished.originAudioFrame,origin);block(p);assert.equal(p.port.messages.filter(m=>m.type==='finished').length,1);
   });
@@ -28,6 +30,7 @@ test('continuous return worklet host contract',async t=>{
    assert.deepEqual(Float32Array.from(all.slice(0,expected.frames)),expected.channels[0]);assert.ok(all.slice(expected.frames).every(x=>x===0));
    assert.deepEqual(touches(p).map(e=>[e.frame,e.origin,e.audioFrame]),[[0,'guest',origin]]);assert.equal(finished.record.fadeStart,128);
    assert.equal(p.port.messages.filter(m=>m.type==='refused').length,2);
+   assert.deepEqual(validateContinuousReturnFinished(42,sampleRate,finished,touches(p),origin,128).record,finished.record);
   });
   await t.test('cancellation discards the pending capture without publishing a finished record',()=>{
    const p=make();send(p,{id:0,type:'start'});send(p,{id:1,type:'strike',strength:.1});send(p,{id:2,type:'cancel'});
