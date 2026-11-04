@@ -30,5 +30,5 @@ export function setupContinuousReturnReplay({elements,getSource,beforePlay,forma
  audio.addEventListener('play',()=>{beforePlay();update();const own=version;player.resume().catch(()=>{if(own===version){stop();status.textContent='Replay was interrupted.';}});});
  for(const event of ['pause','ended'])audio.addEventListener(event,update);
  audio.addEventListener('error',()=>{stop();status.textContent='This browser could not play the float WAV. The download remains available.';});
- update();return {stop,setDb:value=>player.setDb(value),dispose(){stop();current?.urls.forEach(revokeURL);current=null;}};
+ update();return {stop,get prepared(){return current?{identity:current.urls[0],record:structuredClone(current.artifact.record)}:null;},setDb:value=>player.setDb(value),dispose(){stop();current?.urls.forEach(revokeURL);current=null;}};
 }

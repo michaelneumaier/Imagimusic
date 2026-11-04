@@ -1121,3 +1121,5 @@ Ensemble resonance-family research complete: same-score current/near-octave/open
 Saved ensemble response foundation complete: immutable structural copy after worker admission, arbitrary-time modal sampler from actual saved geometry/history, range/framing/physical-state coverage. 179 focused tests pass under --no-maglev. Claims released; scene width support, media-clock binding, native assessment and independent review remain ahead.
 
 Saved-width scene support complete: extracted real body geometry, admitted width/edge/clamp support, exact default geometry fingerprints and actual widest-body framing. Full1,138tests pass under --no-maglev; HTTP/syntax/diff pass. Claims released; saved replay media-clock binding, native rendering and independent review remain ahead.
+
+Saved ensemble visual replay integrated: separate optional scene from worker-admitted record, identity/copy boundary, media seeking/pause/end, disclosure/reduced-motion/visibility guards and local graphics failure. 185 focused tests pass; HTTP/43IDs/syntax/diff pass. Claims released; native playback/pixels/timing, appeal and independent review remain open.

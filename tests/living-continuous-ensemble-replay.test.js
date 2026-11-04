@@ -14,10 +14,10 @@ function fixture(){
  return {elements,artifact,replay,blobs,revoked,player,setNext:fn=>next=fn,get prepares(){return prepares;},get plays(){return plays;},get cancels(){return cancels;},get coordinations(){return coordinations;}};
 }
 test('preparing stays silent; explicit replay coordinates audio, while failed replacement retains both downloads',async()=>{
- const f=fixture();await f.elements.prepare.fire('click');assert.equal(f.prepares,0);assert.equal(f.plays,0);assert.equal(f.elements.listen.disabled,false);assert.equal(f.elements.wav.href,'blob:1');
+ const f=fixture();assert.equal(f.replay.prepared,null);await f.elements.prepare.fire('click');const copy=f.replay.prepared;assert.equal(copy.identity,'blob:1');copy.record.records.length=0;assert.equal(f.replay.prepared.record.records.length,3);assert.equal(f.prepares,0);assert.equal(f.plays,0);assert.equal(f.elements.listen.disabled,false);assert.equal(f.elements.wav.href,'blob:1');
  await f.elements.listen.fire('click');assert.equal(f.prepares,1);assert.equal(f.plays,1);assert.equal(f.elements.audio.hidden,false);assert.equal(f.coordinations,2);
- f.setNext(()=>Promise.reject(Error('Invalid saved body')));await f.elements.prepare.fire('click');assert.equal(f.elements.wav.href,'blob:1');assert.deepEqual(f.revoked,[]);assert.equal(f.elements.listen.disabled,false);
- f.setNext(()=>Promise.resolve(f.artifact));await f.elements.prepare.fire('click');assert.deepEqual(f.revoked,['blob:1','blob:2']);f.replay.dispose();assert.deepEqual(f.revoked,['blob:1','blob:2','blob:3','blob:4']);
+ f.setNext(()=>Promise.reject(Error('Invalid saved body')));await f.elements.prepare.fire('click');assert.equal(f.elements.wav.href,'blob:1');assert.equal(f.replay.prepared.identity,'blob:1');assert.deepEqual(f.revoked,[]);assert.equal(f.elements.listen.disabled,false);
+ f.setNext(()=>Promise.resolve(f.artifact));await f.elements.prepare.fire('click');assert.deepEqual(f.revoked,['blob:1','blob:2']);f.replay.dispose();assert.equal(f.replay.prepared,null);assert.deepEqual(f.revoked,['blob:1','blob:2','blob:3','blob:4']);
 });
 test('cancellation suppresses late preparation and file size is checked before reading',async()=>{
  const f=fixture();let resolve;f.setNext(()=>new Promise(r=>resolve=r));const pending=f.elements.prepare.fire('click');await Promise.resolve();f.elements.cancel.fire('click');resolve(f.artifact);await pending;

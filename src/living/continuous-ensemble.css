@@ -8,3 +8,6 @@
 .listening-only .transport{margin-bottom:18px}
 .listening-only #status{min-height:0;margin:18px 0}
 .listening-only #body-view{padding-top:18px}
+
+#replay-body-canvas{display:block;width:100%;aspect-ratio:16/10;height:auto;border-radius:12px;margin:20px 0;background:#0c141a}
+#replay-body-canvas[hidden]{display:none}

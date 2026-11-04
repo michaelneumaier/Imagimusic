@@ -1,3 +1,4 @@
+import {createContinuousEnsembleReplayVisual} from './continuous-ensemble-replay-visual.js';
 import {setupContinuousEnsembleReplay} from './continuous-ensemble-replay.js';
 import {setupContinuousEnsembleControls} from './continuous-ensemble-controls.js';
 import {createContinuousEnsembleVisual} from './continuous-ensemble-visual.js';
@@ -9,10 +10,11 @@ function setListeningView(value){
 }
 attention.hidden=false;attention.addEventListener('click',()=>setListeningView(!listeningView));
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&listeningView){setListeningView(false);attention.focus();}});
-$('body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('body-motion').checked=$('replay-body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
 const visual=createContinuousEnsembleVisual({canvas:$('body-canvas'),motion:$('body-motion'),details:$('body-view'),status:$('body-status'),getTime:()=>controls.time()});
 const controls=setupContinuousEnsembleControls({visual,beforePlay:()=>replay?.stop(),elements:{...Object.fromEntries(['start','quiet','seed','status','count','result','whole','strength','mode'].map(name=>[name,$(name)])),continueListening:$('continue-listening'),pads:[0,1,2].map(i=>$(`pad-${i}`)),downloads:[1,2,3].map(i=>$(`voice-${i}`))}});
 replay=setupContinuousEnsembleReplay({elements:Object.fromEntries(['file','prepare','cancel','listen','quiet','audio','status','wav','json'].map(name=>[name,$(`replay-${name}`)])),getSource:()=>{const finished=controls.finished;return finished?{kind:'imagimusic-continuous-ensemble-record',version:1,mixGain:1/3,records:finished.records}:null;},beforePlay:()=>controls.stop()});
+const replayVisual=createContinuousEnsembleReplayVisual({audio:$('replay-audio'),canvas:$('replay-body-canvas'),motion:$('replay-body-motion'),disclosures:[$('kept-piece'),$('replay-body-view')],status:$('replay-body-status'),getPrepared:()=>replay.prepared});
 const phases=['Opening','Echo','Reflection','Space','Gathering','Thinning','Recollection','Return'],marks=[...document.querySelectorAll('.phases li')];
 function draw(){
  const showing=['playing','ending','verifying','ended'].includes(controls.state),seconds=showing?controls.time():0,index=Math.min(7,Math.floor(seconds/6));
@@ -23,5 +25,5 @@ function draw(){
 let timer=setInterval(draw,200);draw();
 $('level').addEventListener('input',()=>{const db=Number($('level').value);controls.setDb(db);replay.setDb(db);$('level-value').textContent=`+${db} dB`;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){controls.stop();replay.stop();}});
-window.addEventListener('pagehide',()=>{controls.stop();replay.stop();clearInterval(timer);});
+window.addEventListener('pagehide',()=>{controls.stop();replay.stop();replayVisual.clear();clearInterval(timer);});
 window.addEventListener('pageshow',event=>{if(event.persisted){clearInterval(timer);timer=setInterval(draw,200);draw();}});
