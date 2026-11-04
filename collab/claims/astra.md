@@ -756,3 +756,9 @@ Living exploration foundation complete: strict record/16KiB reader/paired render
 Synthesis checkpoint: Astra takes the proposal026 planning update while Fable is unavailable, limited to docs/proposals/026-a-world-that-learns-your-phrase.md. Reconcile completed studies and add a concrete flagship milestone; no changes to Fable's physics or shared vision. Current exploration foundation is committed and its12targeted checks pass; UI integration remains explicitly next.
 
 Synthesis checkpoint complete: proposal026 reconciles contact progress, defines one directed encounter and orders paired keeping, composition, interaction, polish and first-visit evaluation. Existing homepage notebook link verified;12targeted record/recipe tests pass. Planning claim released; paired UI integration remains next, not claimed complete.
+
+Paired visitor keeping: owns src/tine/live-capture.js and its tests for staged adoption; src/living/main.js, recipe-file.js, living.html and associated tests for original provenance, paired download and atomic quiet reopen. No edits to Fable-owned physics; existing recipe meanings preserved.
+
+Paired keeping evidence: also owns append-only collab/notes/astra-living-instrument.md and proposal026 current checkpoint reconciliation, limited to this completed integration.
+
+Paired visitor keeping complete: actual local download retains correct parent after a fresh original, quiet file reopen restores both, original/response return and malformed-file retention verified in Safari390px. Full825/825 regression passes; evidence and proposal updated. Claims released. Next: versioned contact choreography and one directed passage, retaining the production score pending listening judgment.

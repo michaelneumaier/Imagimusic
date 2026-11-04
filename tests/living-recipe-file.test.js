@@ -13,3 +13,17 @@ test('bounded reader refuses oversized files before reading and refuses manifest
  await assert.rejects(readLivingRecipeFile(new Blob(['{'])));await assert.rejects(readLivingRecipeFile(new Blob([JSON.stringify({kind:'imagimusic-living-movie'})])),/film manifest/);
  await assert.rejects(readLivingRecipeFile({size:2,text:async()=>{throw Error('read failed');}}),/read failed/);
 });
+
+test('shared opener accepts paired files while retaining the original recipe size boundary',async()=>{
+ const {readLivingKeptFile}=await import('../src/living/recipe-file.js');
+ const {createLivingExploration}=await import('../src/living/exploration-record.js');
+ const response={...record.source,design:{...record.source.design,lengthMm:95}};
+ const pair=createLivingExploration(record,response);
+ assert.deepEqual(await readLivingKeptFile(new Blob([JSON.stringify(pair)])),pair);
+ assert.deepEqual(await readLivingKeptFile(new Blob([JSON.stringify(record)])),record);
+ assert.deepEqual(await readLivingKeptFile(new Blob([JSON.stringify(pair)+' '.repeat(8500)])),pair);
+ await assert.rejects(readLivingKeptFile(new Blob([JSON.stringify(record)+' '.repeat(8500)])),/8 KiB/);
+ await assert.rejects(readLivingKeptFile({size:2,text:async()=>'é'.repeat(9000)}),/too large/);
+ await assert.rejects(readLivingKeptFile(new Blob([JSON.stringify({kind:'imagimusic-living-movie'})])),/film manifest/);
+ await assert.rejects(readLivingKeptFile(new Blob([JSON.stringify({...pair,response:null})])));
+});

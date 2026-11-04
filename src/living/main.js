@@ -1,5 +1,6 @@
 import {createLivingGreeting} from './greeting.js';
-import {readLivingRecipeFile} from './recipe-file.js';
+import {readLivingKeptFile} from './recipe-file.js';
+import {createLivingExploration,serializeLivingExploration,validateLivingExploration} from './exploration-record.js';
 import {createLivingMovieControls} from './movie-controls.js';
 import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
@@ -22,14 +23,14 @@ $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
 motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-motion').checked=!motionPreference.matches;});
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
-let restoreVersion=0,movie=null;
+let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
 let examplePlaying=false;
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
  const branchPending=!!branchCapture?.pending;
- const state=session?.state??'idle',busy=active(state)||!!movie?.busy,repeat=listening();
+ const state=session?.state??'idle',busy=active(state)||!!movie?.busy||!!explorationJob,repeat=listening();
  $('begin').disabled=!world||busy||repeat;
  $('hear-first').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending;
  $('open-recipe').disabled=!world||busy||repeat;
@@ -39,6 +40,7 @@ function controls(){
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
  $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM;
  for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
+ $('keep-exploration').disabled=!world||busy||repeat||branchPending||!branchCapture?.current||!branchOrigin;
  $('keep-encounter').disabled=!world||busy||repeat||capture.pending||!capture.current;
  $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
  for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
@@ -96,7 +98,7 @@ const capture=createTineLiveCapture({onChange:({current,pending,message})=>{
  controls();
 }});
 branchCapture=createTineLiveCapture({onChange:({current,pending,message})=>{
- if(current&&current!==seenBranch){seenBranch=current;selectPCM(current);$('return-branch').hidden=false;$('branch-path').hidden=false;$('branch-path').href='tine-play.html'+tineLiveFragment(current.record);$('branch-path').textContent=`Open the new ${current.record.design.lengthMm} mm phrase ↗`;}
+ if(current&&current!==seenBranch){branchOrigin=pendingBranchOrigin;pendingBranchOrigin=null;seenBranch=current;selectPCM(current);$('return-branch').hidden=false;$('branch-path').hidden=false;$('branch-path').href='tine-play.html'+tineLiveFragment(current.record);$('branch-path').textContent=`Open the new ${current.record.design.lengthMm} mm phrase ↗`;}
  $('branch-note').textContent=message?`The new phrase could not be prepared. Your original remains available. ${message}`:pending?'Remembering the new phrase separately…':current?`New ${current.record.design.lengthMm} mm phrase · ${current.record.events.length} ${current.record.events.length===1?'touch':'touches'}. Return to either phrase here. Unfolding and encounter keeping use the original.`:'Choose a longer or shorter body to make a new phrase here. Your original stays available.';
  controls();if(branchReturnFocus&&!pending){branchReturnFocus=false;if(!$('play-body').disabled)$('play-body').focus({preventScroll:true});}
 }});
@@ -122,7 +124,8 @@ session=createTineLiveSession({listeningDb:0,onChange:event=>{
  else if(event.state==='playing')runView();
 }});
 async function startPlaying(nextDesign){
- branchReturnFocus=false;restoreVersion++;
+ const origin=nextDesign.lengthMm===80?null:selectedPCM===branchCapture.current?branchOrigin:createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion});
+ branchReturnFocus=false;restoreVersion++;cancelExploration();pendingBranchOrigin=origin;
  cancelArrangement();unfolding=false;examplePlaying=false;comparison.cancel();capture.cancel();branchCapture.cancel();replay.park();playingDesign=nextDesign;selectPCM(nextDesign.lengthMm===80?capture.current:selectedPCM);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
  $('touch-note').textContent='Touches join the vibration already ringing. The gold spot appears only after a touch is accepted.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
@@ -164,15 +167,16 @@ $('reveal').addEventListener('change',()=>{if(!$('reveal').checked){if(unfolding
 $('touch').addEventListener('click',touch);
 $('touch').addEventListener('keydown',event=>{if(event.repeat&&(event.code==='Space'||event.code==='Enter'))event.preventDefault();});
 $('quiet').addEventListener('click',()=>{
+ if(explorationJob){restoreVersion++;cancelExploration();$('recipe-note').textContent='Opening cancelled. Both previous phrases remain available.';controls();return;}
  if(movie?.busy){movie.cancel();return;}
  if(listening()){cancelArrangement();replay.stop();$('playing-status').textContent=examplePlaying?'Example stopped. Choose Begin when you want to play.':'Replay stopped. Your phrase is unchanged.';return;}
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});
-function park(){branchReturnFocus=false;movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();branchCapture?.cancel();replay.park();session.park();}
+function park(){pendingBranchOrigin=null;cancelExploration();branchReturnFocus=false;movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();branchCapture?.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
-movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!branchCapture?.pending&&!!capture.current,onChange:controls});
+movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!explorationJob&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!branchCapture?.pending&&!!capture.current,onChange:controls});
 controls();
 
 $('keep-encounter').addEventListener('click',()=>{
@@ -180,14 +184,47 @@ $('keep-encounter').addEventListener('click',()=>{
  try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
  catch(error){$('keep-note').textContent=error.message;}
 });
+function cancelExploration(){explorationJob?.cancel();explorationJob=null;}
+$('keep-exploration').addEventListener('click',()=>{
+ if($('keep-exploration').disabled)return;
+ try{
+  const record=createLivingExploration(branchOrigin,branchCapture.current.record);
+  const next=URL.createObjectURL(new Blob([serializeLivingExploration(record)],{type:'application/json'}));
+  const link=$('exploration-download');link.href=next;link.download=`imagimusic-exploration-${record.response.design.lengthMm}mm.json`;link.hidden=false;
+  if(explorationURL)URL.revokeObjectURL(explorationURL);explorationURL=next;
+  $('exploration-note').textContent=`Both phrases are ready to save: the original this performance began with, and your new ${record.response.design.lengthMm} mm phrase. This file stays with that pair until you prepare another.`;
+ }catch(error){$('exploration-note').textContent='Could not prepare this pair. '+error.message;}
+});
+async function restoreExploration(value){
+ const record=validateLivingExploration(value);park();const own=restoreVersion;
+ $('recipe-note').textContent='Preparing both kept phrases quietly…';
+ try{
+  const job=createAudioRenderJob(new URL('./exploration-worker.js',import.meta.url),record);explorationJob=job;controls();
+  const pcm=await job.promise;if(own!==restoreVersion||explorationJob!==job)return;
+  if(JSON.stringify(pcm.record)!==JSON.stringify(record)||JSON.stringify(pcm.original.record)!==JSON.stringify(record.original.source)||JSON.stringify(pcm.response.record)!==JSON.stringify(record.response))throw Error('The prepared phrases do not match this exploration.');
+  const commitOriginal=capture.stage(pcm.original),commitResponse=branchCapture.stage(pcm.response);
+  // Both validations and copies succeeded. No observer sees a partial pair.
+  commitOriginal();commitResponse();pendingBranchOrigin=record.original;explorationJob=null;
+  unfolding=false;world?.clearArrangement();applyPresentation(record.original);
+  capture.publish();branchCapture.publish();
+  $('playing-status').textContent='Both kept phrases are ready. Your new phrase is selected; hear it when you choose.';
+  $('recipe-note').textContent='Both phrases reopened quietly. Original returns to the first phrase; Return to the new phrase restores your response. The address and previous downloads are unchanged. Unfolding and films use the original.';
+ }catch(error){
+  if(own!==restoreVersion)return;
+  $('recipe-note').textContent='Could not open this exploration. Both previous phrases remain available. '+error.message;
+ }finally{if(own===restoreVersion){explorationJob=null;controls();}}
+}
+function applyPresentation(record){
+ presentationVersion=livingPresentationVersion(record);world?.setLook(LIVING_PRESENTATIONS[presentationVersion].look);
+ $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
+}
 async function restoreRecord(record,origin,note=$('keep-note')){
  park();const own=restoreVersion;
  unfolding=false;world?.clearArrangement();note.textContent='Opening your kept encounter quietly…';
  await capture.load(record.source);if(own!==restoreVersion)return;
  if(!capture.current||JSON.stringify(capture.current.record)!==JSON.stringify(record.source)){note.textContent='This encounter could not be prepared. Your previous phrase and address remain available.';return;}
  // Commit presentation only after source reconstruction succeeds.
- presentationVersion=livingPresentationVersion(record);world?.setLook(LIVING_PRESENTATIONS[presentationVersion].look);
- $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
+ applyPresentation(record);
  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
  note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, arrangement version and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
 }
@@ -198,8 +235,8 @@ async function restoreAddress(){
 }
 $('open-recipe').addEventListener('change',async()=>{
  const file=$('open-recipe').files?.[0];$('open-recipe').value='';if(!file)return;
- park();const own=restoreVersion;$('recipe-note').textContent='Reading the selected recipe locally…';
- try{const record=await readLivingRecipeFile(file);if(own!==restoreVersion)return;await restoreRecord(record,'a recipe file',$('recipe-note'));}
- catch(error){if(own===restoreVersion)$('recipe-note').textContent='Could not open this recipe. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
+ park();const own=restoreVersion;$('recipe-note').textContent='Reading the selected kept file locally…';
+ try{const record=await readLivingKeptFile(file);if(own!==restoreVersion)return;if(record.kind==='imagimusic-living-exploration')await restoreExploration(record);else await restoreRecord(record,'a recipe file',$('recipe-note'));}
+ catch(error){if(own===restoreVersion)$('recipe-note').textContent='Could not open this kept file. '+error.message+(capture.current?' Your previous phrase remains available.':'');}
 });
 window.addEventListener('hashchange',restoreAddress);if(location.hash)restoreAddress();

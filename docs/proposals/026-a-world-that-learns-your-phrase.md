@@ -155,3 +155,9 @@ Keep the existing source of sound explicit: four-mode tines with ideal impulses 
 Continue first with paired save and reopen in src/living/main.js and living.html, supported by the exploration record and worker already committed. Preserve original provenance independently from whichever phrase is currently selected. Add a way to stage both reconstructed captures before publishing either UI update. Verify replacement failure and cancellation before treating the feature as finished.
 
 Then work toward the single directed encounter above. Do not create another permanent catalog destination for each experiment. Keep the existing home page as the public-facing local overview and this proposal as its linked working plan. Fable's eventual return should begin with this checkpoint and a concrete reviewable change; their absence is not an approval. Nothing in this plan authorizes pushing or publishing.
+
+## Paired keeping now available
+
+The first implementation item from the synthesis checkpoint is now available in the flagship: Keep both phrases prepares a local file containing the retained original encounter and the new body performance. The shared opener restores them together quietly and selects the new phrase. A native save after starting a newer original verified that the older response still keeps its correct parent. Invalid replacement retained the existing pair. Existing encounter addresses and films continue to use the original only.
+
+The next creative slice is the directed passage: adopt contact choreography under a new presentation identity, preserve earlier keepsakes, and assess the whole passage as music and visible action. Full-versus-abbreviated response preference remains an open listening judgment; retain the current score as the working baseline.
