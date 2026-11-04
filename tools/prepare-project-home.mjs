@@ -6,6 +6,7 @@ import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
  ['A phrase with room to breathe','renders/living-answer-study','tools/render-living-answer-study.mjs'],
+ ['An answer that leaves room','renders/living-response-study','tools/render-living-response-study.mjs'],
  ['A little air around a phrase','renders/living-space-study','tools/render-living-space-study.mjs'],
  ['A phrase unfolds','renders/living-arrangement','tools/render-living-arrangement.mjs'],
  ['The first encounter artistic proof','renders/flagship-sketch','tools/render-flagship-sketch.mjs'],

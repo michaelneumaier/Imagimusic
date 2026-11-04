@@ -17,10 +17,23 @@ export function createLivingSpacedAnswer(value){
  return Object.freeze({...base,kind:'imagimusic-living-answer-study',version:1,delayFrames,returnStart,frames:returnStart+base.phraseFrames,voices:Object.freeze(voices)});
 }
 
+/** A controlled composition alternative: only the first answer is abbreviated.
+ * Keep the first ceil(N/2) distinct onset groups, including simultaneous touches.
+ * Retained frames/strengths, ending, later answers and return stay unchanged.
+ * A one-onset phrase deliberately produces an identical control.
+ */
+export function createLivingFragmentAnswer(value){
+ const base=createLivingSpacedAnswer(value),events=base.source.events;
+ const groups=[...new Set(events.map(e=>e.frame))],last=groups[Math.ceil(groups.length/2)-1];
+ const bodies=base.bodies.map((body,i)=>i===1?Object.freeze({...body,events:Object.freeze(body.events.filter(e=>e.frame<=last))}):body);
+ return Object.freeze({...base,kind:'imagimusic-living-fragment-study',bodies:Object.freeze(bodies),
+  derivation:Object.freeze({rule:'first-half-onset-groups',retainedSourceIndices:Object.freeze(events.flatMap((e,i)=>e.frame<=last?[i]:[])),omittedSourceIndices:Object.freeze(events.flatMap((e,i)=>e.frame>last?[i]:[]))})});
+}
+
 export function renderLivingAnswerStudy(value,treatment='spaced'){
  if(treatment==='round')return renderLivingArrangement(value);
- if(treatment!=='spaced')throw Error('Unknown answer treatment.');
- const plan=createLivingSpacedAnswer(value),stems=plan.bodies.map(b=>renderTineLiveRecord(b).channels[0]);
+ if(!['spaced','fragment'].includes(treatment))throw Error('Unknown answer treatment.');
+ const plan=treatment==='fragment'?createLivingFragmentAnswer(value):createLivingSpacedAnswer(value),stems=plan.bodies.map(b=>renderTineLiveRecord(b).channels[0]);
  const sum=[new Float64Array(plan.frames),new Float64Array(plan.frames)];
  for(const v of plan.voices){
   const angle=(v.pan+1)*Math.PI/4,gains=[Math.cos(angle)*v.gain,Math.sin(angle)*v.gain];

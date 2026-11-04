@@ -49,3 +49,34 @@ test('spaced score drives independent visual clocks and returns the original res
  assert.equal(view.at(p.returnStart/r).cameraOpen,0);
  assert.equal(view.at(p.frames/r).touches,15);
 });
+
+test('fragment answer retains complete onset groups and explicit source lineage without mutation',async()=>{
+ const {createLivingFragmentAnswer}=await import('../src/living/answer-study.js');
+ for(const times of [[.5],[.5,.5,.7,.9],[.3,1.8,3.3],[.5,.525,.55,.575,.6,.625,.65,.675]]){
+  const s={...createLivingGreeting(),events:times.map((t,i)=>({frame:Math.round(t*48000),strength:i%2?-.025:.05}))},before=structuredClone(s);
+  const full=createLivingSpacedAnswer(s),p=createLivingFragmentAnswer(s),groups=[...new Set(times)],cut=groups[Math.ceil(groups.length/2)-1];
+  assert.deepEqual(s,before);assert.deepEqual(p.source,full.source);assert.deepEqual(p.voices,full.voices);assert.equal(p.frames,full.frames);
+  assert.deepEqual(p.bodies[1].events,s.events.filter(e=>e.frame<=Math.round(cut*48000)));
+  assert.deepEqual(p.bodies[0],full.bodies[0]);assert.deepEqual(p.bodies[2],full.bodies[2]);
+  assert.deepEqual([...p.derivation.retainedSourceIndices,...p.derivation.omittedSourceIndices],s.events.map((_,i)=>i));
+  for(const index of p.derivation.retainedSourceIndices)assert.deepEqual(p.bodies[1].events[index],s.events[index]);
+ }
+});
+
+test('fragment PCM changes only the first answer and leaves exact opening, completion and return',()=>{
+ const source=createLivingGreeting(),full=renderLivingAnswerStudy(source,'spaced'),partial=renderLivingAnswerStudy(source,'fragment'),p=partial.plan;
+ const first=p.voices[1],omitted=p.source.events[p.derivation.omittedSourceIndices[0]].frame;
+ for(let ch=0;ch<2;ch++){
+  assert.deepEqual(partial.channels[ch].subarray(0,first.startFrame+omitted),full.channels[ch].subarray(0,first.startFrame+omitted));
+  assert.notDeepEqual(partial.channels[ch].subarray(first.startFrame+omitted,first.endFrame),full.channels[ch].subarray(first.startFrame+omitted,first.endFrame));
+  assert.deepEqual(partial.channels[ch].subarray(first.endFrame),full.channels[ch].subarray(first.endFrame));
+ }
+ const expected=[new Float64Array(p.frames),new Float64Array(p.frames)];
+ for(const v of p.voices){const stem=renderTineLiveRecord(p.bodies[v.body]).channels[0];for(let ch=0;ch<2;ch++){
+  const gain=(ch?Math.sin:Math.cos)((v.pan+1)*Math.PI/4)*v.gain;
+  for(let i=0;i<stem.length;i++)expected[ch][v.startFrame+i]+=stem[i]*gain;
+ }}
+ assert.deepEqual(partial.channels,expected.map(c=>Float32Array.from(c)));
+ const single={...source,events:[source.events[0]]};
+ assert.deepEqual(renderLivingAnswerStudy(single,'spaced').channels,renderLivingAnswerStudy(single,'fragment').channels);
+});

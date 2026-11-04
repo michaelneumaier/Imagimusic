@@ -712,3 +712,9 @@ Flagship home consolidation: owns project.html/css and assets/flagship/living-du
 Flagship synthesis: owns docs/proposals/026-a-world-that-learns-your-phrase.md, proposal024 cross-reference, project.html plan discovery, and append-only evidence/log. Finish current home checkpoint and propose a coherent next creative milestone; no physics/schema changes or claimed audience validation.
 
 Flagship home consolidation and synthesis complete: responsive native navigation/disclosure/notebook checks, actual scene provenance and proposal026 saved. Claims released; next slice is the bounded musical-answer experiment.
+
+Living response experiment: owns src/living/answer-study.js, tests/living-answer-study.test.js, tools/render-living-response-study.mjs and proposal026/evidence links. Compare unchanged spaced score with first-answer prefix, preserving all onset clocks, bodies, gains, tails and original return; simultaneous touches remain grouped. Experimental only.
+
+Response study reproduction: owns tools/prepare-project-home.mjs registration; no added catalog entry or flagship control.
+
+Living response experiment complete: controlled prefix derivation,8 local WAV/report artifacts, reproduction helper,6 focused tests, independent file checks and native listening controls verified. Claims released. Musical preference remains explicitly open; continue contact staging on current production score.

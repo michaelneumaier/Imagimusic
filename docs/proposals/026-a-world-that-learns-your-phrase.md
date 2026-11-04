@@ -84,3 +84,10 @@ We do not yet have those audience results. The ceramic support remains artistic,
 Continue from [the current flagship implementation plan](024-living-instrument.md), [the artistic sketch](025-first-encounter-storyboard.md), and [the implementation evidence](../../collab/notes/astra-living-instrument.md). Preserve production arrangement v1 and appearance identities while experimenting. Keep work local; no push or publication. Fable is unavailable, so this is Astra's proposal and not a jointly reviewed decision.
 
 The immediate outcome we are pursuing is precise: **someone makes a small phrase, hears a surprising possibility that still feels like theirs, changes its body, and wants another turn.** That is the experience the larger procedural world should grow from.
+
+
+## First response experiment available
+
+[An answer that leaves room](../../renders/living-response-study/index.html) compares the full spaced answer with a controlled abbreviated first reply on all four fixtures. Only the first95mm voice changes: retain the first half of distinct touch groups, rounded up, then let it ring without further touches. The next two voices play the complete phrase. Timing, gains, bodies, ending and total duration stay fixed. Simultaneous touches stay together; the one-touch pair is identical. Exact retained/omitted indices are in the report. Regenerate with `node tools/render-living-response-study.mjs` or the project preparation helper.
+
+This deliberately isolates one compositional choice before changing camera or contact choreography. Checks establish source retention, unchanged completion/return and native playback, not musical preference. The bounded unresolved observation is whether the abbreviated first reply feels inviting or incomplete across the four fixtures. Until that listening judgment is available, retain the existing production score and use it to develop contact staging; do not add more answer variants.
