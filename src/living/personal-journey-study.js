@@ -13,7 +13,7 @@ const chapters=[
  ['home',1,0,false,1,1],
 ];
 
-function original(value){
+export function validateLivingPersonalSource(value){
  const source=validateTineLiveRecord(value);
  if(source.design.lengthMm!==80||source.design.widthMm!==10||!source.events.length||source.events.some(e=>e.strength<=0||e.strength>.1))throw Error('Use a completed80×10mm phrase with one to eight positive touches no stronger than0.1.');
  return source;
@@ -24,7 +24,7 @@ function original(value){
  * Timing derives afresh from the input. The original post-touch tail is retained.
  */
 export function createLivingPersonalVariation(value,{spacing=1,rotation=0,reflected=false,strengthScale=1}={}){
- const basis=original(value),n=basis.events.length,rate=basis.sampleRate;
+ const basis=validateLivingPersonalSource(value),n=basis.events.length,rate=basis.sampleRate;
  if(![.8,1,1.15].includes(spacing)||!Number.isInteger(rotation)||rotation<0||rotation>=n||typeof reflected!=='boolean'||!Number.isFinite(strengthScale)||strengthScale<=0||strengthScale>1)throw Error('Unsupported personal phrase variation.');
  const first=basis.events[0].frame,last=basis.events.at(-1).frame,span=last-first,tail=basis.fadeStart-last;
  const available=Math.min(4*rate-first,8*rate-Math.round(.025*rate)-tail-first);
@@ -39,7 +39,7 @@ export function createLivingPersonalVariation(value,{spacing=1,rotation=0,reflec
 }
 
 export function createLivingPersonalJourneyStudy(value){
- const source=original(value),rate=source.sampleRate,sections=[],voices=[];let lastTouch=0,end=0;
+ const source=validateLivingPersonalSource(value),rate=source.sampleRate,sections=[],voices=[];let lastTouch=0,end=0;
  chapters.forEach(([name,spacing,rotation,reflected,strengthScale,version],index)=>{
   const variation=createLivingPersonalVariation(source,{spacing,rotation:rotation%source.events.length,reflected,strengthScale});
   const arrangement=createLivingArrangement(variation.source,version),part=index===0?'opening':index===chapters.length-1?'return':'answer';

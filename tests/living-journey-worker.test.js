@@ -5,6 +5,8 @@ import {createHash} from 'node:crypto';
 import {createAudioRenderJob} from '../src/audio-render-job.js';
 import {validateLivingJourneyRequest} from '../src/living/journey-artifact.js';
 import {createLivingEvolvingJourneyStudy} from '../src/living/evolving-journey-study.js';
+import {createLivingPersonalJourneyStudy} from '../src/living/personal-journey-study.js';
+import {createTineDesign} from '../src/tine/address.js';
 
 class BrowserWorkerBridge{
  static instances=[];
@@ -14,6 +16,15 @@ class BrowserWorkerBridge{
 }
 const request={kind:'imagimusic-living-journey-request',version:1,seed:42,treatment:'evolving'};
 const make=input=>createAudioRenderJob(new URL('../src/living/journey-worker.js',import.meta.url),input,{WorkerClass:BrowserWorkerBridge});
+
+test('actual background worker renders the original supplied personal phrase with its own artifact identity',async()=>{
+ const source={kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:16800,strength:.025},{frame:29280,strength:.1},{frame:83520,strength:.05},{frame:103200,strength:.025}],fadeStart:175200};
+ const input={kind:'imagimusic-living-personal-journey-request',version:1,source},job=make(input),worker=BrowserWorkerBridge.instances.at(-1),artifact=await job.promise;await worker.stopped;
+ assert.equal(artifact.kind,'imagimusic-living-personal-journey-artifact');assert.deepEqual(artifact.source,source);
+ assert.deepEqual(artifact.plan,createLivingPersonalJourneyStudy(source));assert.equal(artifact.seconds,38.775);
+ assert.equal(createHash('sha256').update(new Uint8Array(artifact.wav)).digest('hex'),artifact.sha256);
+ assert.equal(worker.terminations,1);
+});
 
 test('strict transient requests refuse unknown identities and seed/treatment coercion',()=>{
  assert.deepEqual(validateLivingJourneyRequest(request),request);

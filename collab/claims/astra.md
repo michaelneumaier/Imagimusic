@@ -1002,3 +1002,7 @@ Journey film package verifier complete: two targeted tests and actual file-based
 Personal-phrase journey study: owns new personal-journey-study.js/tests and offline renderer plus own notes. Derive a finite arc from an admitted real live-tine record, retain all touches and exact opening/home, rotate accents/reflect timing without substituting generated notes. Separate experimental identity; no saved seed grammar/default changes.
 
 Personal-phrase journey study complete: actual source transforms,17voices, isolated exact opening/home, offline renderer and two authored WAV/reports. Seven focused journey tests pass; claims released. UI handoff/personal report/film integration and listening assessment remain ahead; no changed defaults or native proof.
+
+Personal journey render/return foundation: owns personal-journey-artifact.js/report.js/tests, personal source validator export, journey-worker.js/generation.js and worker tests. Separate strict personal request/artifact identities, actual background transfer, exact source/plan/hash checks and silent report reader; existing seeded bytes retained.
+
+Personal journey render/return foundation complete: distinct strict identities, realworker transfer, exact-source/plan/hash-verified download session and silent report reader;17focused tests pass, seededfixture unchanged. Claims released. UI input/handoff/report wiring and personal film support remain ahead.
