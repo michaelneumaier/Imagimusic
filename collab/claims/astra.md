@@ -1079,3 +1079,5 @@ Responsive live routing complete: memory worklet/verification worker and session
 Responsive view and listening choice complete: atomic remembered-score validation, mode-aware scene/control routing and optional pre-start selection.84focused tests pass under --no-maglev; HTTP/IDs/syntax/diff checked. Claims released. Native assessment and independent review remain pending.
 
 Remembered-answer discovery complete: invitation/catalog/roadmap/history reflect current experience;45catalog entries and83local resources checked. Next continuous-ensemble artifact and evaluation boundaries documented in own notes. Claims released; native assessment and independent review pending.
+
+Continuous ensemble study complete: three independent48second bodies with shared clock, exact component replay, fixed mix and rendered source/ensemble pair.88focused tests pass under --no-maglev. Claims released; live participation, scene/UI integration, native assessment and independent review ahead.
