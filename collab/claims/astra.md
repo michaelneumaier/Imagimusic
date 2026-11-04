@@ -998,3 +998,7 @@ Journey film visitor controls implemented: silent generation/export and four dow
 Journey film package verification: owns tools/verify-living-journey-film.mjs, tests/verify-living-journey-film.test.js, local verification instructions in living-journey.html and own notes. Rebuild model/frame/recording evidence and compare supplied report/WAV; bounded CLI input, explicit exclusion of MP4 pixels/codec/audio-sync verification.
 
 Journey film package verifier complete: two targeted tests and actual file-based CLI pass after signed-zero JSON roundtrip correction; source/WAV checks only, scope explicit. Claims released. Actual MP4/native playback and independent review remain pending.
+
+Personal-phrase journey study: owns new personal-journey-study.js/tests and offline renderer plus own notes. Derive a finite arc from an admitted real live-tine record, retain all touches and exact opening/home, rotate accents/reflect timing without substituting generated notes. Separate experimental identity; no saved seed grammar/default changes.
+
+Personal-phrase journey study complete: actual source transforms,17voices, isolated exact opening/home, offline renderer and two authored WAV/reports. Seven focused journey tests pass; claims released. UI handoff/personal report/film integration and listening assessment remain ahead; no changed defaults or native proof.
