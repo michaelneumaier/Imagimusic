@@ -1006,3 +1006,7 @@ Personal-phrase journey study complete: actual source transforms,17voices, isola
 Personal journey render/return foundation: owns personal-journey-artifact.js/report.js/tests, personal source validator export, journey-worker.js/generation.js and worker tests. Separate strict personal request/artifact identities, actual background transfer, exact source/plan/hash checks and silent report reader; existing seeded bytes retained.
 
 Personal journey render/return foundation complete: distinct strict identities, realworker transfer, exact-source/plan/hash-verified download session and silent report reader;17focused tests pass, seededfixture unchanged. Claims released. UI input/handoff/report wiring and personal film support remain ahead.
+
+Personal journey page handoff: owns personal-journey-input.js/tests, journey-main.js/HTML/CSS, movie-controls capability gate, optional personal ensemble fit in journey-layout.js and framing tests plus own notes. Quiet bounded source import, personal selection/listen/keep/report return, explicit unsupported seed-continuation/film gates and full independent-instance framing.
+
+Personal journey page handoff implemented: quiet bounded input/selection, explicit listen/keeping/report return, personal capability gates and optional12instance framing. Source admission error text clarified. Full914tests pass; resources/IDs/syntax/diff and oldseededfilmfixture checked. Claims released. Native UI/playback and independent review remain pending.

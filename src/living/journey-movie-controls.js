@@ -1,12 +1,12 @@
 import {createLivingJourneyMovieSession} from './journey-movie-session.js';
 
-export function setupLivingJourneyMovieControls({getSelection,beforePrepare,onChange=()=>{}}){
+export function setupLivingJourneyMovieControls({getSelection,beforePrepare,canMake=()=>true,onChange=()=>{}}){
  const $=id=>document.getElementById(id);
  const session=createLivingJourneyMovieSession({onChange:()=>{refresh();onChange();}});
- function refresh(){$('journey-make-film').disabled=session.busy;$('journey-cancel-film').disabled=!session.busy;}
+ function refresh(){$('journey-make-film').disabled=session.busy||!canMake();$('journey-cancel-film').disabled=!session.busy;}
  $('journey-cancel-film').addEventListener('click',()=>session.cancel());
  $('journey-make-film').addEventListener('click',async()=>{
-  if(session.busy)return;
+  if(session.busy||!canMake())return;
   const selection=getSelection();beforePrepare();
   try{
    const pending=session.prepare(selection,text=>$('journey-film-status').textContent=text);
@@ -19,5 +19,5 @@ export function setupLivingJourneyMovieControls({getSelection,beforePrepare,onCh
   }catch(error){$('journey-film-status').textContent=(error.name==='AbortError'?'Film preparation cancelled.':`Film preparation failed: ${error.message}`)+' Any previous film remains available.';}
   finally{refresh();if(document.activeElement===$('journey-cancel-film'))$('journey-make-film').focus({preventScroll:true});}
  });
- refresh();return session;
+ refresh();return {cancel:session.cancel,refresh,get busy(){return session.busy;}};
 }

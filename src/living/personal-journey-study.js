@@ -15,7 +15,7 @@ const chapters=[
 
 export function validateLivingPersonalSource(value){
  const source=validateTineLiveRecord(value);
- if(source.design.lengthMm!==80||source.design.widthMm!==10||!source.events.length||source.events.some(e=>e.strength<=0||e.strength>.1))throw Error('Use a completed80×10mm phrase with one to eight positive touches no stronger than0.1.');
+ if(source.design.lengthMm!==80||source.design.widthMm!==10||!source.events.length||source.events.some(e=>e.strength<=0||e.strength>.1))throw Error('Use a completed phrase on the 80 × 10 mm body, with one to eight positive touches no stronger than 0.1.');
  return source;
 }
 
