@@ -838,3 +838,7 @@ Presentation4 adoption: owns presentation.js, record.js, performance-view.js, mo
 Presentation4 discovery/evidence: also owns living-look.html published-treatment copy, catalog description and current plan/evidence appendices.
 
 Presentation4 adoption complete:59 targeted and845 full tests pass; actual525-frame film reconstructed, native generated recipe/address identity checked. Evidence and next low-input composition experiment documented. Claims released; no independent review claimed.
+
+Fragment journey comparison: owns tools/render-living-answer-study.mjs, src/living/{choreography,arrangement-view,look-main}.js, living-look.html and a focused fragment staging test. Connect existing fragment score to generated audio and visual workshop, count actual touches, preserve published scores and default paths. Evidence appendices follow.
+
+Fragment journey comparison complete:27 WAVs rendered,13 focused tests pass, native generated selection/audio metadata/first-answer control checked. Claims released. Full-passage aesthetic evaluation remains next; no independent review claimed.

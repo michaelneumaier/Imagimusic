@@ -15,6 +15,6 @@ export function createLivingArrangementView(plan){
   const ease=x=>{const u=Math.max(0,Math.min(1,x));return u*u*(3-2*u);};
   const openingEnd=plan.voices[0].endFrame,answerEnd=plan.voices[3].endFrame;
   const cameraOpen=frame<plan.roundStart?ease((frame-openingEnd)/(plan.roundStart-openingEnd)):frame<answerEnd?1:1-ease((frame-answerEnd)/(plan.returnStart-answerEnd));
-  return {cameraOpen,bodies,touches,totalTouches:plan.source.events.length*plan.voices.length,part:frame<plan.roundStart?'opening':frame<plan.returnStart?'answer':'return'};
+  return {cameraOpen,bodies,touches,totalTouches:plan.voices.reduce((sum,voice)=>sum+plan.bodies[voice.body].events.length,0),part:frame<plan.roundStart?'opening':frame<plan.returnStart?'answer':'return'};
  }};
 }

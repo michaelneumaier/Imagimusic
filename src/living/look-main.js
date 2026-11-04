@@ -2,7 +2,7 @@ import {createLivingStudyFixtures,createLivingGeneratedStudyFixtures} from './st
 import {createLivingChoreography} from './choreography.js';
 import {LIVING_LOOKS} from './looks.js';
 import {createLivingArrangement} from './arrangement.js';
-import {createLivingSpacedAnswer} from './answer-study.js';
+import {createLivingSpacedAnswer,createLivingFragmentAnswer} from './answer-study.js';
 import {createLivingAttentionView} from './attention-view.js';
 import {createLivingArrangementView} from './arrangement-view.js';
 import {createLivingScene} from './scene.js';
@@ -12,7 +12,7 @@ const source=()=>fixtures.find(f=>f.id===fixtureId).source;
 let composition='round',plan=createLivingArrangement(source()),view=createLivingArrangementView(plan);
 let choreography=createLivingChoreography(source()),attention=createLivingAttentionView(plan);
 const duration=()=>plan.frames/plan.sampleRate;
-const names={round:'Overlapping round',spaced:'Spaced answer'};
+const names={round:'Overlapping round',spaced:'Spaced answer',fragment:'A partial reply'};
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 let contactDetail=false;
@@ -34,7 +34,7 @@ for(const b of document.querySelectorAll('[data-chapter]'))b.addEventListener('c
  seek(index?(plan.voices[index].startFrame+plan.bodies[plan.voices[index].body].events[0].frame)/plan.sampleRate+.1:chapter==='opening'?1:plan.returnStart/plan.sampleRate+1);
 });
 function chooseScore(){
- pause();contactDetail=false;plan=composition==='round'?createLivingArrangement(source()):createLivingSpacedAnswer(source());view=createLivingArrangementView(plan);choreography=createLivingChoreography(source(),composition);attention=createLivingAttentionView(plan);seconds=1;lastPaint=-Infinity;
+ pause();contactDetail=false;plan=composition==='round'?createLivingArrangement(source()):composition==='fragment'?createLivingFragmentAnswer(source()):createLivingSpacedAnswer(source());view=createLivingArrangementView(plan);choreography=createLivingChoreography(source(),composition);attention=createLivingAttentionView(plan);seconds=1;lastPaint=-Infinity;
  $('moment').max=duration();audio.src=`renders/${fixtures.find(f=>f.id===fixtureId).audioDirectory}/${fixtureId}-${composition}.wav`;audio.load();audio.pause();
  $('audio-note').textContent=`${fixtures.find(f=>f.id===fixtureId).name} · ${names[composition]} · ${duration().toFixed(1)} seconds · dry bodies · preview gain ×8. Choose Play when ready.`;
  for(const c of document.querySelectorAll('[data-composition]'))c.setAttribute('aria-pressed',String(c.dataset.composition===composition));
