@@ -752,3 +752,7 @@ Living exploration record foundation: owns src/living/exploration-record.js, exp
 Exploration browser transport: also owns tests/living-exploration-browser.html, a silent local fixture for actual worker pair reconstruction, invalid-record error and cancellation. No visitor UI adoption claim.
 
 Living exploration foundation complete: strict record/16KiB reader/paired renderer and worker verified by12targeted tests and4native browser-worker checks. Claims released. Next integrate captured parent context and atomic visitor save/reopen; not yet exposed as a completed keeping feature.
+
+Synthesis checkpoint: Astra takes the proposal026 planning update while Fable is unavailable, limited to docs/proposals/026-a-world-that-learns-your-phrase.md. Reconcile completed studies and add a concrete flagship milestone; no changes to Fable's physics or shared vision. Current exploration foundation is committed and its12targeted checks pass; UI integration remains explicitly next.
+
+Synthesis checkpoint complete: proposal026 reconciles contact progress, defines one directed encounter and orders paired keeping, composition, interaction, polish and first-visit evaluation. Existing homepage notebook link verified;12targeted record/recipe tests pass. Planning claim released; paired UI integration remains next, not claimed complete.

@@ -55,7 +55,7 @@ Let joy, uncanniness, tenderness and awe emerge as possibilities. Do not prescri
 | D. Let a choice change the instrument | Original plus two curated body candidates inside the existing flagship; choose, play, compare, return | A newcomer can explain the audible consequence, play their choice, and recover the untouched original. No new physics family is required. |
 | E. Finish the Returning Room | One coherent entrance, response, choice, expansion and ending, with a local film and saved branch | A few newcomers complete the journey without coaching, recognize their contribution, and identify something they want to hear or do again. Revise from observed behavior. |
 
-The **next implementation slice is B**, before extending the interface. Compare the existing full-phrase spaced answer with one economical response that repeats a recognizable fragment, leaves a deliberate rest, then completes the phrase. Reuse the four existing source fixtures. Keep originals exact at either end. Write down which gestures were retained, delayed or omitted, and keep the source immutable. Do not introduce pitch correction, random generation, automatic emotional labeling or a new saved schema in this experiment.
+At the opening of this proposal, the next implementation slice was B. The experiment is now available below; the current build order is in the synthesis checkpoint at the end. Compare the existing full-phrase spaced answer with one economical response that repeats a recognizable fragment, leaves a deliberate rest, then completes the phrase. Reuse the four existing source fixtures. Keep originals exact at either end. Write down which gestures were retained, delayed or omitted, and keep the source immutable. Do not introduce pitch correction, random generation, automatic emotional labeling or a new saved schema in this experiment.
 
 A useful outcome may be that the full phrase is already the better answer. Then stage it exceptionally well and move on. This experiment must end with a decision or a clearly bounded missing listening observation, rather than spawning more permanently exposed variants.
 
@@ -94,10 +94,64 @@ This deliberately isolates one compositional choice before changing camera or co
 
 ## Contact staging foundation
 
-The existing [visual workshop](../../living-look.html) now has an optional known-score striker rig and exact approach/contact/recovery inspection points. It uses the established planner without treating abstract slot distances as physical travel. Contact geometry reaches85percent of each blade; source sound stays unchanged. The current rig establishes timing and clearance of the head against the blade, but its post-and-arm silhouette is utilitarian and dense multi-actor clearance remains unassessed. Next refine a distinctive performer around this contact foundation, then inspect its motion in a complete held-camera passage. Production presentation and film recipes do not yet include strikers.
+The existing [visual workshop](../../living-look.html) now has an optional known-score striker rig and exact approach/contact/recovery inspection points. It uses the established planner without treating abstract slot distances as physical travel. Contact geometry reaches85percent of each blade; source sound stays unchanged. The rig now uses a shared ceramic bow and bronze axle, with smaller separated heads for dense phrases. A paused close-up preserves the selected instant and camera preference. Head contact and lane spacing are checked; general mechanism collision and physical actuator dynamics remain outside this study. A complete held-camera passage has been exercised, but its artistic effectiveness still needs listening and viewing judgment. Production presentation and film recipes do not yet include strikers.
 
 ## A body choice now becomes playable in place
 
 The flagship now offers Play this body after choosing the65mm or95mm candidate. A new phrase sounds and is captured on that body in the same scene. Original restores the first80mm phrase; Return to the new phrase restores the separate performance quietly. Hear again follows the selected phrase. The new performance has its own existing tine-record link; encounter addresses, unfolding and films still use the original80mm source. Begin remains a fresh80mm pass. This closes the first choose/play/return loop without redefining old keepsakes. A saved lineage joining both performances remains later work.
 
 The combined keeping foundation now exists as a separate strict exploration record: original Living encounter plus independent new65/95mm performance. File round-trip and real-browser worker reconstruction preserve both. Visitor controls are still pending: provenance must be captured at branch creation and both performances must restore together after successful preparation. Existing encounter recipes and films retain their current meaning.
+
+
+## Synthesis checkpoint and the next complete milestone
+
+Michael asked us to step back, bring the discoveries together, and plan something exceptional while continuing the work. The existing exploration foundation is a clean stopping point for that reflection: committed at f3a9f6c, with all 12 targeted exploration, recipe and encounter checks passing again. Its visitor save and reopen controls are the next unfinished implementation slice. The latest full implementation regression remains the 816-test chosen-body checkpoint; this reflection does not claim a newer full run or independent review.
+
+The creative priority is one finished encounter that earns a second visit. The catalog remains our laboratory and history. The Living Instrument becomes the place a newcomer can enter without understanding that history.
+
+### The moment to build around
+
+Imagine tapping a hesitant little rhythm. A small ceramic mechanism prepares itself and plays that exact rhythm back. A second, longer blade answers in a lower voice. Its entrance is visible before it is audible. You recognize the uneven pause you left. The camera opens just enough to reveal that this answer belongs to another playable body. You touch it and make a new phrase. For the ending, the room gives your first phrase back to you, alone.
+
+The intended surprise is that a thing you just watched perform can become your own instrument, and that your contribution remains recognizable throughout. A beautiful rendered passage and a satisfying playable object meet in the same place. That is the product hypothesis to prove before expanding the world.
+
+The longer ambition is an instrument that can help invent its own next anatomy: retain a gesture, propose meaningfully different sounding structures, let a person choose through listening, and compose a visible performance from the resulting relationship. The current curated alternatives are the first bounded step. Procedural invention will need admitted models, audible objectives and reasons to prefer one candidate; visual variety alone will not establish it.
+
+### What the experiments have taught us
+
+| Discovery | Consequence for the flagship |
+| --- | --- |
+| Exact gestures can survive replay, comparison and export | Treat a person's contribution as the enduring center of the experience. |
+| Geometry can determine a modeled voice | Give structural choices an audible consequence and an immediate chance to play. |
+| Known events permit convincing preparation | Let anticipation carry visual interest; distinguish it from spontaneous live acknowledgment. |
+| Coupling and damping can make relationships audible in earlier studies | Reserve genuinely shared energy for a later integrated physical model, rather than depicting independent tines as coupled. |
+| A held view and a close view reveal different things | Compose one readable default, with voluntary inspection and a stable alternative. |
+| Many working studies do not establish a moving experience | Judge the next milestone as a complete passage, including the first sound and the final silence. |
+
+### Spirituality and psychedelia as form
+
+The experience can make attention consequential. A pause the visitor leaves can become the space in which another voice enters. A pattern can remain itself across different bodies. The return can make a familiar sound feel newly situated. These are concrete compositional relationships through which intimacy, awe or play might emerge without telling a visitor what to feel.
+
+For a later optional perceptual passage, imagine stepping outward and seeing the phrase's successive entrances arranged as places around the room. Each place corresponds to an actual retained event or derived voice; revisiting it plays its contribution. The scene changes the perceived scale of musical time while keeping a way back to the instrument. This would be an artistic representation of a score, with no claim to depict consciousness or physical sound propagation. First earn that expansion through the music.
+
+### Build order from this checkpoint
+
+1. Finish paired keeping. Capture the original encounter when a new body performance begins. Prepare and validate both saved performances before replacing either current one. Cancellation, malformed files and a later fresh original must preserve the correct previous pair. Reopen quietly. Keep existing film and encounter identities intact.
+2. Resolve one directed passage. Use the existing production score as the working baseline, the adopted dusk materials and the ceramic performer. Compare the existing full and abbreviated answers by listening; select a departure only when the whole passage benefits. Introduce a new presentation identity for any adopted contact choreography so old keepsakes retain their appearance.
+3. Compose the interaction around that passage. Invitation, recognition, answer, body choice, new playing and original return should be legible in one scene. Stage controls according to the moment, retain clear replay and Quiet, and expose the workshop through a secondary route. Keep one touch a complete contribution and never require a visitor to perform well.
+4. Polish the complete loop. Review contact, silence, tonal balance, lighting, camera, typography, narrow layout, keyboard focus, reduced motion and preparation failures together. Measure actual device responsiveness. Verify that the film and playable keepsake preserve the same chosen encounter; extending film beyond the original source requires its own explicit versioned contract.
+5. Observe first visits. A proposed small formative round is five people with mixed musical familiarity, including phone and keyboard use. Ask what they believe happened before explaining. Look for recognition of their phrase, understanding of a body choice, an unaided return and a voluntary second turn. Record confusion and indifference as design evidence. This sample guides revision; it does not establish broad appeal.
+
+The milestone is complete when one local encounter carries a visitor from a first gesture to a meaningful alternative and back, with coherent sound and visible action, reliable keeping, and observed reasons to play again. Engineering completion and audience response are separate evidence. A test count cannot substitute for listening.
+
+### The next physical frontier
+
+After this encounter works, pursue one connected anatomy: two sounding parts and one controllable bridge or damper. Let a single touch reveal how a connection changes both voices. This could make the relationship itself playable, extending the original dream beyond a staged ensemble. Reuse the earlier coupling and Rest work as reference implementations, but establish the actual spatial model, energy accounting, stability and acoustic limitations before integrating it with the tine flagship.
+
+Keep the existing source of sound explicit: four-mode tines with ideal impulses and a velocity pickup; independent bodies in the current ensemble; artistic support and performer geometry; a magnified response bound. Contact choreography does not yet simulate a hammer, and a rendered room does not supply acoustic radiation. Those are precise future research boundaries, not reasons to postpone the present artistic milestone.
+
+### Resuming the work
+
+Continue first with paired save and reopen in src/living/main.js and living.html, supported by the exploration record and worker already committed. Preserve original provenance independently from whichever phrase is currently selected. Add a way to stage both reconstructed captures before publishing either UI update. Verify replacement failure and cancellation before treating the feature as finished.
+
+Then work toward the single directed encounter above. Do not create another permanent catalog destination for each experiment. Keep the existing home page as the public-facing local overview and this proposal as its linked working plan. Fable's eventual return should begin with this checkpoint and a concrete reviewable change; their absence is not an approval. Nothing in this plan authorizes pushing or publishing.
