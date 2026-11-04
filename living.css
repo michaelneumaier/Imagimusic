@@ -38,3 +38,5 @@ header{padding-top:18px;padding-bottom:14px}
 .intro-listen{flex-wrap:wrap;flex-shrink:1;max-width:480px}#generated-actions{margin-top:20px;max-width:760px}#generated-note{font-size:14px;line-height:1.7;color:#b6c0bd}#generate-piece{background:#24332f;border-color:#9cae9f}
 
 .phrase-spacing{border:0;padding:0;margin:18px 0}.phrase-spacing legend{font-size:14px;color:#d1d9d5;margin-bottom:10px}.phrase-spacing .quiet{margin-top:10px}
+
+.generated-piece{padding:26px 28px;border:1px solid #344047;border-radius:18px;background:#101d22}.generated-piece h2{font:32px/1.15 Georgia;margin:10px 0}.generated-piece .eyebrow{margin:0}.generated-piece .generated-invitation{margin-top:16px;max-width:640px}.generated-piece details{margin-top:20px}.generated-piece .generated-identity{margin-top:12px}.generated-piece .branch-actions{margin-top:16px}.generated-piece #replay-generated{background:#24332f;border-color:#9cae9f}.generated-piece .phrase-spacing{margin-bottom:0}@media(max-width:700px){.generated-piece{padding:22px 18px}.generated-piece h2{font-size:28px}}

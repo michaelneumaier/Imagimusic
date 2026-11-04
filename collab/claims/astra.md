@@ -786,3 +786,9 @@ Creative phrase spacing: owns src/living/generative-phrase.js and tests plus mai
 Spacing discovery/evidence: also owns Living catalog entry and append-only proposal026/implementation notes for this creative-input milestone.
 
 Creative phrase spacing complete: deterministic same-seed three-way direction, explicit original return and selected-version adoption verified;11targeted tests plus final4generator tests pass, native source frames/accents checked. Catalog, plan and evidence updated. Claims released; listener assessment and next compositional direction remain open.
+
+Automatic listening polish: owns living.html/living.css/main.js for an aftermath card below the scene, musical titles, optional spacing/details and a nearby Another piece action. Preserve sources, pace semantics, model and recorded identities. Native narrow-screen and playback/focus checks; no new audio tests for layout-only changes.
+
+Listening polish evidence: also owns append-only astra-living-instrument notes and proposal026 checkpoint. No source/score/film identity changes.
+
+Automatic listening polish complete: scene-first layout, named piece card, optional disclosures and nearby Another piece verified in native390pxSafari; natural completion focus visible, new identity generated, Quiet and pace discovery checked. Static checks pass. Claims released; musical evaluation remains the next substantive creative decision.

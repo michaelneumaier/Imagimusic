@@ -197,3 +197,7 @@ The performer is artistic choreography around an ideal impulse source. It does n
 After generating a piece, Closer, Original pace and More space let the visitor direct that same motif without playing it. The choice changes event spacing while preserving its accents and musical cell; it prepares a complete new performance and leaves the current original untouched until Explore is chosen. Original pace restores the grammar's exact source. The bounded control supplies one audible compositional decision, rather than a vague mood promise.
 
 Next, assess whether these choices are clearly audible and whether the current automatic round gives the motif enough room to be recognized. The existing spaced-answer and fragment studies remain candidate musical directions; their listening judgment should inform any new saved arrangement version. More parameters are not yet the priority.
+
+## Listening comes before the controls
+
+The generated piece now introduces itself below the scene with a musical name and three clear next actions: hear it again, make another, or explore it. Pace and technical identity remain optional disclosures. The scene leads during playback, and completion brings the replay action into view. This keeps low-input listening at the center while preserving the invitation to shape or play the result.
