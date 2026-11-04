@@ -890,3 +890,7 @@ Continued listening complete:76focused tests pass; native automatic seed transit
 Autonomous journey composition study: owns new src/living/journey-study.js, tests/living-journey-study.test.js, tools/render-living-journey-study.mjs and own evidence notes. Compose a finite seven-chapter development of one seed with exact return; render local listening artifact and structural evidence. No production format/default changes; no Fable review claimed.
 
 Autonomous journey study complete: two local WAV/report artifacts (118.88s and134.27s),72Living tests pass with exact opening/return and all chapter PCM verified. Claims released. Study only; continuity and listening preference unresolved; no independent review claimed.
+
+Connected journey comparison: owns new src/living/connected-journey-study.js, new connected journey tests, tools/render-living-journey-study.mjs and own evidence notes. Retain baseline; one opening/return with five connected exchanges, preserve each voice's full render and explicit independent-pass limitation.
+
+Connected journey comparison complete: two connected WAV/reports40.21s/47.48s preserve baseline artifacts;74Living tests pass and PCM16 artifact probed. Claims released. One exact isolated opening/return; independent tails overlap internally. No preference, continuous-body or independent-review claim.
