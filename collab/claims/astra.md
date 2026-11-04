@@ -928,3 +928,9 @@ Journey per-instance response complete: actual source/release/fade clocks and si
 Journey scene integration: owns optional ensemble branch in scene.js, new journey-layout.js/tests and journey-main.js/CSS/HTML. Reuse established geometry with explicit instance placement/response opacity, fixed wide camera and media-clock rendering; leave default scene branch/saved inputs unchanged. Native QA pending bridge recovery.
 
 Journey ensemble integrated locally: optional scene branch, fixed framing, per-instance response/performers and audio-clock controls.84Living tests pass and sampled projection guard passes sixscores×threeaspects. Claims released. Native render/layout/sync/performance verification blocked by tool startup, not claimed complete; no publication or independent review.
+
+Journey media identity: owns new journey-media.js/tests, journey-main.js and own notes. Before playing, verify selected report matches exact current plan and WAV SHA256 matches report; cancel obsolete preparation, retain bounded local resources and quiet failure. No audio/score changes.
+
+Media identity integration also owns src/tine/study-player.js and its focused tests to expose silent user-gesture audio preparation before asynchronous file verification. Preserve existing play/resume behavior for other studies.
+
+Journey media identity complete: all six real WAV/report/current-plan pairs verified; nine targeted tests pass. Quiet/selection/leaving cancel preparation; silent gesture-time audio stage preparation added. Claims released. Native playback activation/visual sync still unverified; Node model timings are not browser performance evidence. No independent review.

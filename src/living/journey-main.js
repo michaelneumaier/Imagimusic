@@ -6,8 +6,10 @@ import {createLivingJourneyScore} from './journey-score.js';
 import {createLivingJourneyView} from './journey-view.js';
 import {createLivingJourneyLayout} from './journey-layout.js';
 import {createLivingScene} from './scene.js';
+import {createLivingJourneyMedia} from './journey-media.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
+const media=createLivingJourneyMedia();
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
 let scene=null,journeyView=null,raf=0,lastDraw=-Infinity;
@@ -59,9 +61,9 @@ function update(){
  $('quiet').disabled=audio.paused&&!starting;
  if(!starting)$('status').textContent=audio.error?'Audio unavailable. See the local rendering instructions below.':audio.ended?'The journey has settled.':`${audio.paused?'Paused':'Playing'} · ${clock(audio.currentTime)} · ${active.map(s=>s.name).join(' / ')||'a moment of space'}`;
 }
-function stop(){generation++;starting=false;player.stop();update();}
+function stop(){generation++;starting=false;media.cancel();player.stop();update();}
 function choose(){
- generation++;starting=false;player.stop();audio.hidden=true;audio.removeAttribute('src');audio.load();
+ generation++;starting=false;player.stop();media.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
  const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
  const treatment={connected:{make:createLivingConnectedJourneyStudy,suffix:'-connected',description:'One opening, five connected exchanges, one return. Each middle exchange begins while the previous sound is still ringing.'},chapters:{make:createLivingJourneyStudy,suffix:'',description:'Seven self-contained chapters. Each presents the phrase, develops it across the bodies, and returns to its own opening.'},evolving:{make:createLivingEvolvingJourneyStudy,suffix:'-evolving',description:'One opening, twelve developing exchanges, one return. The rhythm turns and the accents move, then the familiar rhythm and accents come back before home.'}}[shape];
  plan=treatment.make(seed);
@@ -75,9 +77,9 @@ function choose(){
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
 $('listen').addEventListener('click',async()=>{
- const own=++generation;starting=true;$('quiet').disabled=false;$('status').textContent='Preparing the journey…';
- try{const playing=await player.play(url);if(own!==generation||!playing)return;starting=false;audio.hidden=false;update();}
- catch(error){if(own!==generation)return;starting=false;player.stop();$('quiet').disabled=true;$('status').textContent='Playback could not start. Check the local rendering instructions below, then try Listen again.';}
+ const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent='Checking the journey audio and score…';
+ try{await player.prepare();if(own!==generation)return;const verified=await media.prepare(url,plan);if(own!==generation)return;const playing=await player.play(verified);if(own!==generation||!playing)return;starting=false;audio.hidden=false;update();}
+ catch(error){if(own!==generation)return;starting=false;player.stop();$('quiet').disabled=true;$('status').textContent=`Playback could not start: ${error.message} See the local rendering instructions below.`;}
 });
 $('quiet').addEventListener('click',stop);
 $('seed').addEventListener('change',choose);
@@ -91,6 +93,6 @@ $('ensemble-veils').addEventListener('change',drawEnsemble);
 $('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
 $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){generation++;starting=false;stopAnimation();player.park();if(plan)update();}
+function park(){generation++;starting=false;media.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();

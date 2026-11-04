@@ -27,3 +27,8 @@ test('failed stage connection is disposed and retried without replacing the medi
  player.setDb(8);await assert.rejects(player.play('opening.wav'),/output unavailable/);assert.equal(disposals,1);assert.equal(disconnects,1);assert.equal(plays,0);assert.equal(audio.src,'');
  player.setDb(16);assert.equal(await player.play('phrase.wav'),true);assert.equal(sources,1);assert.deepEqual(levels,[8,16]);assert.equal(plays,1);assert.equal(audio.src,'phrase.wav');
 });
+test('explicit preparation unlocks one audio stage without assigning or playing media',async()=>{
+ const f=fixture();f.player.setDb(8);await f.player.prepare();await f.player.prepare();
+ assert.deepEqual(f.counts(),{contexts:1,sources:1});assert.equal(f.audio.src,'');assert.equal(f.audio.plays,0);assert.deepEqual(f.levels,[8]);
+ await f.player.play('verified.wav');assert.equal(f.audio.plays,1);assert.deepEqual(f.counts(),{contexts:1,sources:1});
+});
