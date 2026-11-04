@@ -60,13 +60,22 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
    let rig=contactActors.get(pose.id);
    if(!rig){
     const root=new T.Group();contactGroup.add(root);
-    mesh(new T.CylinderGeometry(.055,.075,SG.pivotY,16),bronze,[0,SG.pivotY/2,SG.postZ],root);
-    mesh(new T.CylinderGeometry(.25,.3,.12,24),dark,[0,.06,SG.postZ],root);
+    // A tapered ceramic bow carries the axle outside the blade's width.
+    // Its shape and the counterweight are art direction, not simulated mechanics.
+    const bow=new T.Shape();bow.moveTo(-.7,.12);
+    bow.bezierCurveTo(-1.05,1.2,-.7,3.7,-.1,SG.pivotY-.1);
+    bow.quadraticCurveTo(0,SG.pivotY+.06,.08,SG.pivotY);
+    bow.bezierCurveTo(-.4,3.1,-.6,1.4,-.2,.12);bow.closePath();
+    const support=new T.ExtrudeGeometry(bow,{depth:.14,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.035,bevelThickness:.035,curveSegments:48});
+    mesh(support,ceramic,[0,0,SG.postZ-.07],root);
+    const foot=mesh(new T.SphereGeometry(1,32,16),ceramic,[-.45,.10,SG.postZ],root);foot.scale.set(.62,.13,.38);
     const axle=mesh(new T.CylinderGeometry(.065,.065,SG.postZ-pose.lane,16),bronze,[0,SG.pivotY,(SG.postZ+pose.lane)/2],root);axle.rotation.x=Math.PI/2;
     const arm=new T.Group();arm.position.set(0,SG.pivotY,pose.lane);root.add(arm);
     const shaft=mesh(new T.CylinderGeometry(.025,.025,armLength,16),steel,[armLength/2,0,0],arm);shaft.rotation.z=-Math.PI/2;
     mesh(new T.SphereGeometry(SG.headRadius,24,16),bronze,[armLength,0,0],arm);
     mesh(new T.SphereGeometry(.1,20,12),dark,[0,0,0],arm);
+    const tail=mesh(new T.CylinderGeometry(.035,.035,.38,16),steel,[-.19,0,0],arm);tail.rotation.z=-Math.PI/2;
+    const counterweight=mesh(new T.SphereGeometry(1,24,16),bronze,[-.38,0,0],arm);counterweight.scale.set(.20,.09,.12);
     rig={root,arm};contactActors.set(pose.id,rig);
    }
    const geometry=livingStrikerPose(length*10,pose.down,pose.lane);

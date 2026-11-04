@@ -724,3 +724,7 @@ Living contact staging: owns src/living/choreography.js, tests/living-choreograp
 Contact staging geometry: also owns src/living/striker-geometry.js, shared by renderer and clearance checks. Workshop precision is now10ms with explicit approach/contact/recovery checkpoints; saved production appearance unchanged.
 
 Living contact staging foundation complete: planner adapter, shared rig geometry, optional workshop rendering and exact inspection controls checked. Claims released. Next refine performer silhouette and inspect a complete staged passage; no production adoption yet.
+
+Living performer art refinement: owns scene.js optional rig silhouette and living-look.html staging explanation. Replace straight post with tapered ceramic bow and counterweight; preserve head geometry/contact timeline and production defaults. Native still/motion checks before checkpoint.
+
+Living performer art refinement complete: ceramic bow/counterweight candidate, native contact and held-ending evidence, unchanged geometry tests recorded. Claim released; dense multi-actor staging and narrow motion clarity remain open before any production adoption.
