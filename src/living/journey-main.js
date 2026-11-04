@@ -102,7 +102,7 @@ $('listen').addEventListener('click',listen);
 $('new-journey').addEventListener('click',()=>{
  let seed;do{seed=crypto.getRandomValues(new Uint32Array(1))[0];}while([...$('seed').options].some(o=>Number(o.value)===seed));
  let option=$('fresh-seed');if(!option){option=document.createElement('option');option.id='fresh-seed';option.dataset.generated='true';$('seed').append(option);}
- option.value=String(seed);option.textContent=`Your new idea · ${seed}`;$('seed').value=String(seed);choose();listen();
+ option.value=String(seed);option.textContent=`Your journey · ${seed}`;$('seed').value=String(seed);choose();listen();
 });
 $('open-journey').addEventListener('change',async()=>{
  const file=$('open-journey').files?.[0];$('open-journey').value='';if(!file)return;

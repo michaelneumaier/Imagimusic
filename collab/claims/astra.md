@@ -950,3 +950,7 @@ Visitor fresh generation implemented: new seed -> worker -> exact-plan/hash-veri
 Generated score return: owns new journey-report.js/tests, generation session/tests, journey-main.js/HTML/CSS and own notes. Bounded strict report import prepares selected seed/structure quietly; explicit Listen must reproduce kept WAV digest. Invalid/stale reads preserve current selection; no flagship recipe or cross-engine byte-equivalence promise.
 
 Generated score return implemented: bounded strict silent report import, exact retained audio-hash guard on regeneration and preserved prior selection on refusal. Seven focused tests pass plus resources200/IDs/syntax/diff. Claims released. Native chooser/restore/playback unverified; no cross-engine exactness or flagship recipe claim.
+
+Generator coverage audit: owns tools/audit-living-journey-grammar.mjs, bounded-family copy in journey page and own notes. Enumerate all grammar1 parameter combinations through actual seeds, then audit all three journey plans and performer allocations; distinguish mathematical source diversity from perceived novelty.
+
+Generator coverage audit complete:324reachable/distinct source tuples,972plans and161676exact touch assignments audited; size/instance/return checks pass. Bounded-family copy corrected. Claims released. No exhaustive audio/perceptual/GPU claim; new-seed novelty is explicitly limited and richer musical relationships remain next.
