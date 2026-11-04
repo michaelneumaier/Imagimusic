@@ -225,3 +225,7 @@ Keep this piece now downloads a generated encounter recipe directly from its lis
 ## Let the camera attend to a phrase
 
 The existing visual workshop now has a phrase-level attention candidate: anticipate an answering body, stay with its phrase, and release toward the next voice. Overlaps share a frame. It offers a way for the automatic performance to direct attention without asking the visitor to operate the camera. A same-moment comparison shows larger instruments while retaining context; held-camera output remains unchanged. This is still a workshop experiment, not a saved presentation. Full-passage motion, framing of dense generated sources and eventual versioned adoption remain to assess.
+
+## Camera handoffs refined
+
+Measured a zoom-velocity corner in the first attention candidate and replaced the maximum-based radius with a smooth weighted-spread curve. The handoff regression now converges toward zero velocity discontinuity. First, middle and last answer shortcuts make the existing workshop useful for inspecting an entire passage’s framing. The longest generated source has been inspected at its first and last entries: closer attention can crop silent neighbours, and a new answer initially shares the frame with the previous release. These are explicit artistic tradeoffs to assess, not a reason to silently change saved appearances.

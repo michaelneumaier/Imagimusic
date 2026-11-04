@@ -405,3 +405,11 @@ Five tests pass: across nine authored/generated fixtures and both arrangements, 
 Next evaluate first/last answers and generated dense/long fixtures across the full moving passage. Adopt only with an explicit new presentation identity and film integration if the motion improves the encounter. Current3 remains published.
 
 Native attention playback follow-up: matching spaced WAV advanced from7.65s through its17.50s ending; status returned to Paused/return and original-only framing. This confirms timeline completion, not a continuous-motion comfort or listening verdict.
+
+## Smooth camera handoff refinement
+
+The first attention candidate’s max-distance/max-weight radius had a real velocity corner at equal answer weights. For generated return seed3828877473 spaced score at7.86s, left/right radius velocities approached+1.252695/-1.252695 scene units/s as finite-difference step shrank from1e-3 to1e-5s: a persistent2.50539 jump. This is a numerical motion defect, not a subjective listening finding.
+
+Replaced that maximum with weighted squared distance from the attention centroid, mapped smoothly to radius9+7V/(V+16); influence uses smoothstep of total weight instead of a linear hard cap. Same measured handoff now has velocity difference0.0001642 at1e-3s,0.00001642 at1e-4s,0.000001642 at1e-5s, converging toward zero. Added regression at both equal-weight spaced handoffs for all five generated fixtures; six attention/presentation tests pass. No change to published appearances or sound.
+
+Workshop chapter buttons now reach First/Middle/Last answer100ms after that voice’s first source touch. Native390pxSafari longest generated source(open-limit), spaced/dusk/performers/attention: first6.325s and last14.325s reached quietly with matching source audio; downloaded PNGs visually inspected and retained under renders/living-attention. First shot enlarges the active95mm blade, deliberately cropping silent neighbours; last opening still shares attention with the previous body’s release and retains context. These observations do not prove all-body visibility, motion comfort or preference. Full passage and dense overlaps remain useful evaluation before any saved presentation adoption.

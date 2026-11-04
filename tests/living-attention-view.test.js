@@ -30,3 +30,17 @@ test('spacious answer anticipates and holds a complete phrase then returns to th
   }
  }
 });
+
+test('radius velocity is continuous when equally weighted answers exchange attention',()=>{
+ for(const {source} of createLivingGeneratedStudyFixtures()){
+  const plan=createLivingArrangement(source,2),view=createLivingAttentionView(plan);
+  for(const i of [1,2]){
+   const last=(plan.voices[i].startFrame+source.events.at(-1).frame)/plan.sampleRate;
+   const next=(plan.voices[i+1].startFrame+source.events[0].frame)/plan.sampleRate;
+   const t=(last+.3+next)/2;
+   const jump=h=>{const a=view.at(t-h).cameraShot.radius,b=view.at(t).cameraShot.radius,c=view.at(t+h).cameraShot.radius;return Math.abs((c-b)/h-(b-a)/h);};
+   // A genuine corner has a nonzero limiting velocity jump as h shrinks.
+   assert.ok(jump(1e-5)<.001);assert.ok(jump(1e-5)<jump(1e-3)/50);
+  }
+ }
+});

@@ -28,8 +28,10 @@ export function createLivingAttentionView(plan){
   const target=[0,1,2].map(axis=>answers.reduce((sum,a,i)=>sum+a.target[axis]*weights[i],0)/total);
   // Widen as contributing phrase centres separate, capped at the established
   // wide radius. A framing heuristic, not an occlusion or frustum proof.
-  const spread=Math.max(...answers.map((a,i)=>Math.hypot(...a.target.map((v,k)=>v-target[k]))*weights[i]/Math.max(...weights)));
-  const radius=Math.min(16,9+spread),amount=Math.min(1,total)*opening;
+  const variance=answers.reduce((sum,a,i)=>sum+a.target.reduce((distance,v,k)=>distance+(v-target[k])**2,0)*weights[i],0)/total;
+  // Smooth saturation avoids switching the winning body or hitting a hard
+  // radius cap. Smooth influence also has zero slope at full attention.
+  const radius=9+7*variance/(variance+16),amount=ease(total)*opening;
   return {...frame,cameraShot:{target:mix(baseline.target,target,amount),direction:baseline.direction,radius:baseline.radius+(radius-baseline.radius)*amount}};
  }};
 }

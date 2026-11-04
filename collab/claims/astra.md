@@ -822,3 +822,9 @@ Listening-only keeping complete: one-action download, independent original/addre
 Answer attention workshop: owns new src/living/attention-view.js and tests, optional scene cameraShot plumbing, look-main.js/living-look.html diagnostic toggle. Smooth phrase-level anticipatory framing; published presentation1/2/3 paths remain unchanged. Inspect existing exported wide shot and candidate native workshop before any adoption.
 
 Answer attention evidence: also owns current plan/evidence appendices. Candidate implemented, five tests pass, native same-moment comparison and byte-identical held-view check complete. Claims released for this workshop slice. Current saved appearances unchanged; wider moving-passage evaluation remains next.
+
+Attention handoff refinement: owns attention-view.js and tests plus current evidence/plan appendices. Measured non-vanishing radius-velocity jump at equal answer weights; replace max-based framing and linear capped influence with smooth weighted spread/influence. Keep candidate workshop-only.
+
+Attention inspection shortcuts: also owns look-main.js/living-look.html chapter buttons to inspect each answer at its first contact+100ms, replacing the single middle-answer shortcut.
+
+Attention handoff refinement complete: persistent zoom-velocity corner measured and removed with smooth variance/influence; six targeted tests pass; native longest-source first/last-answer captures inspected. Claims released. Still workshop-only; no general visibility or comfort verdict.
