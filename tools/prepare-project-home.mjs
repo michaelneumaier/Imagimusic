@@ -3,8 +3,10 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
 import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
+import {checkLivingJourneyArtifacts} from './prepare-living-journeys.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['A phrase remembered','renders/living-journey-study','tools/prepare-living-journeys.mjs',[],false,'journey'],
  ['How should a generated piece answer?','renders/living-generated-answer-study','tools/render-living-answer-study.mjs',['--generated']],
  ['A phrase with room to breathe','renders/living-answer-study','tools/render-living-answer-study.mjs'],
  ['An answer that leaves room','renders/living-response-study','tools/render-living-response-study.mjs'],
@@ -25,7 +27,8 @@ const studies=[
 ];
 const args=process.argv.slice(2);
 if(args.some(arg=>arg!=='--check'))throw new Error('Usage: node tools/prepare-project-home.mjs [--check]');
-async function available(directory,visual=false){
+async function available(directory,visual=false,kind=null){
+ if(kind==='journey')return (await checkLivingJourneyArtifacts(path.join(root,directory))).every(s=>s.ready);
  try{
   const html=await fs.readFile(path.join(root,directory,'index.html'),'utf8');
   const files=[...html.matchAll(/data-file="([^"]+\.wav)"/g)].map(m=>m[1]);
@@ -38,13 +41,13 @@ async function available(directory,visual=false){
  }catch{return false;}
 }
 let missing=0;
-for(const [title,directory,script,scriptArgs=[],visual=false] of studies){
- if(await available(directory,visual)){console.log('Ready: '+title);continue;}
+for(const [title,directory,script,scriptArgs=[],visual=false,kind=null] of studies){
+ if(await available(directory,visual,kind)){console.log('Ready: '+title);continue;}
  missing++;
  if(args.includes('--check')){console.log('Missing: '+title);continue;}
  console.log('Preparing: '+title+' (physical rendering may take a few minutes)');
  await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script,...scriptArgs],{cwd:root,stdio:['ignore','ignore','inherit']});child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(title+' preparation failed: '+(signal??code))));});
- if(!await available(directory,visual))throw new Error(title+' renderer did not produce a complete study page');
+ if(!await available(directory,visual,kind))throw new Error(title+' renderer did not produce complete study artifacts');
  missing--;
  console.log('Ready: '+title);
 }
