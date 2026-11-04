@@ -1066,3 +1066,5 @@ Continuous kept-performance return complete: bounded silent JSON opening/last-re
 Continuous experience discovery complete: home invitation, roadmap/history and45entry catalog cover continuous listening/keeping/return with explicit limits and next creative milestones. All45destinations200;18home IDs/92local refs/syntax/diff checked. Claims released; native assessment and independent review remain pending.
 
 Continuous response view model complete: bounded modal checkpoints, accepted-score/guest ordering, clock-filtered displacement bounds and separate ending opacity. Fifty-five focused tests pass including streaming-state agreement and declared1000x bound framing. Claims released; scene binding/native pixels and independent review remain ahead.
+
+Continuous body-view binding complete: optional actual-clock scene at1000x, reduced-motion/still choice, lazy loading/context recovery and audio-independent failure. Full1015tests pass; prior film source fixture unchanged, IDs/HTTP/syntax/diff checked. Claims released; native pixels/sync/aesthetic assessment and independent review remain ahead.

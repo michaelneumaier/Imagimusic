@@ -1,5 +1,5 @@
 import {createContinuousReturnSession} from './continuous-return-session.js';
-export function setupContinuousReturnControls({elements,createSession=createContinuousReturnSession,makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url),onChange=()=>{},beforePlay=()=>{}}){
+export function setupContinuousReturnControls({elements,createSession=createContinuousReturnSession,makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url),onChange=()=>{},beforePlay=()=>{},visual=null}){
  const {start,quiet,pad,strength,seed,status,count,download,result}=elements;let session,pending=false,url=null,notes=0,guests=0,version=0;
  const active=()=>['preparing','playing','ending','verifying'].includes(session.state);
  function update(){
@@ -13,6 +13,7 @@ export function setupContinuousReturnControls({elements,createSession=createCont
   result.textContent=`Kept performance · ${(finished.snapshot.endFrame/finished.record.sampleRate).toFixed(2)} seconds · ${finished.record.events.length} touches. This JSON contains the instrument and accepted notes.`;result.hidden=false;if(old)revokeURL(old);
  }
  session=createSession({listeningDb:0,onChange:event=>{
+  visual?.update(event);
   if(event.events)for(const touch of event.events){if(touch.origin==='guest')guests++;else notes++;}
   const messages={idle:'A small idea, waiting.',preparing:'Preparing your instrument…',playing:'The music continues on its own. Join only if you feel like it.',ending:'Letting the last sound settle…',verifying:'Keeping the performance…',ended:'The last sound has settled.',interrupted:'Listening stopped. Start again when you are ready.',cancelled:'Preparation cancelled.',error:event.message||'Listening could not continue.'};
   status.textContent=messages[event.state]??event.state;
@@ -21,7 +22,7 @@ export function setupContinuousReturnControls({elements,createSession=createCont
  }});
  start.addEventListener('click',async()=>{
   if(active())return;beforePlay();const current=++version;notes=0;guests=0;pending=false;
-  try{await session.start(Number(seed.value));}catch(error){if(current===version&&error.name!=='AbortError')status.textContent=error.message;}finally{if(current===version)update();}
+  try{visual?.begin(Number(seed.value));await session.start(Number(seed.value));}catch(error){if(current===version&&error.name!=='AbortError')status.textContent=error.message;}finally{if(current===version)update();}
  });
  async function strike(value){
   if(pad.disabled)return;pending=true;update();const current=version;
@@ -31,6 +32,6 @@ export function setupContinuousReturnControls({elements,createSession=createCont
  pad.addEventListener('keydown',event=>{if(event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;const value={'1':.025,'2':.05,'3':.1}[event.key];if(value){event.preventDefault();return strike(value);}});
  async function hush(){if(session.state==='verifying'){stop();return;}try{await session.quiet();}catch(error){if(error.name!=='AbortError')status.textContent=error.message;}update();}
  quiet.addEventListener('click',hush);
- function stop(){version++;pending=false;if(active())session.park();update();}
+ function stop(){visual?.stop();version++;pending=false;if(active())session.park();update();}
  update();return {stop,quiet:hush,setDb:db=>session.setListeningDb(db),time:()=>session.time(),get state(){return session.state;},get finished(){return session.finished;},dispose(){stop();session.dispose();if(url)revokeURL(url);url=null;}};
 }

@@ -1,8 +1,11 @@
 import {setupContinuousReturnControls} from './continuous-return-controls.js';
+import {createContinuousReturnVisual} from './continuous-return-visual.js';
 import {setupContinuousReturnReplay} from './continuous-return-replay.js';
 const $=id=>document.getElementById(id),names=['start','quiet','pad','strength','seed','status','count','download','result'];
 let replay=null;
-const controls=setupContinuousReturnControls({elements:Object.fromEntries(names.map(name=>[name,$(name)])),beforePlay:()=>replay?.stop()});
+$('body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const visual=createContinuousReturnVisual({canvas:$('body-canvas'),motion:$('body-motion'),details:$('body-view'),status:$('body-status'),getTime:()=>controls.time()});
+const controls=setupContinuousReturnControls({elements:Object.fromEntries(names.map(name=>[name,$(name)])),beforePlay:()=>replay?.stop(),visual});
 replay=setupContinuousReturnReplay({elements:Object.fromEntries(['file','prepare','cancel','listen','quiet','audio','status','wav','json'].map(name=>[name,$(`replay-${name}`)])),getSource:()=>controls.finished?.record,beforePlay:()=>controls.stop()});
 const phases=['Opening','Echo','Reflection','Space','Gathering','Thinning','Recollection','Return'];
 const marks=[...document.querySelectorAll('.phases li')];

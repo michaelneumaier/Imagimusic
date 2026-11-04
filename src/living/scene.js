@@ -5,8 +5,9 @@ import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitContr
 import {createSurfaceLighting} from '../stage/surface-lighting.js';
 
 /** One drawing unit = 10 mm. The solid body stays still; the optional veil
- * shows a conservative displacement envelope at 100,000× magnification. */
-export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height:fixedHeight,ensemble=null}={}){
+ * shows a conservative displacement envelope, defaulting to 100,000× magnification. */
+export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height:fixedHeight,ensemble=null,responseMagnification=100000}={}){
+ if(!Number.isFinite(responseMagnification)||responseMagnification<=0||responseMagnification>100000)throw Error('Invalid response magnification.');
  const fixed=fixedWidth!==undefined||fixedHeight!==undefined;
  if(fixed&&(!Number.isInteger(fixedWidth)||fixedWidth<1||!Number.isInteger(fixedHeight)||fixedHeight<1))throw Error('Fixed scene dimensions must be positive integers.');
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:fixed});
@@ -41,7 +42,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function response(points,opacity=1){
   veil.visible=!!points;
   veilMaterial.opacity=.16*opacity;for(const {line} of edges)line.material.opacity=.65*opacity;
-  if(points){for(let i=0;i<81;i++){const x=points[i].u*length,h=points[i].boundM*1e7;veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
+  if(points){for(let i=0;i<81;i++){const x=points[i].u*length,h=points[i].boundM*(100*responseMagnification);veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
    veilGeometry.attributes.position.needsUpdate=true;veilGeometry.computeBoundingSphere();for(const {line} of edges){line.geometry.attributes.position.needsUpdate=true;line.geometry.computeBoundingSphere();}}
  }
  mesh(chamferedBox(.8,.32,1.45),bronze,[-.4,3.71,0]);

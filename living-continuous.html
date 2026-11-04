@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A gesture returns · Imagimusic</title><link rel="stylesheet" href="src/living/continuous-return.css"></head>
+<title>A gesture returns · Imagimusic</title><link rel="stylesheet" href="src/living/continuous-return.css"><script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script></head>
 <body><main>
 <nav><a href="project.html">Imagimusic</a><a href="living-journey.html">The listening workshop ↗</a></nav>
 <p class="eyebrow">THE LIVING INSTRUMENT · CONTINUOUS STUDY</p>
@@ -14,6 +14,7 @@
 <p id="status" role="status">A small idea, waiting.</p>
 <label class="level">Listening level <input id="level" type="range" min="0" max="20" step="1" value="0"><output id="level-value">+0 dB</output></label>
 </section>
+<details id="body-view"><summary>See the ringing body</summary><canvas id="body-canvas" width="960" height="600" role="img" aria-label="Single steel tine with an optional modeled response envelope"></canvas><label><input id="body-motion" type="checkbox" checked> Follow the live response</label><p id="body-status" class="small" role="status">Begin listening to prepare the optional body view.</p><p class="small">The solid instrument stays still. The translucent veil shows a displacement bound magnified 1,000×; it is not slow-motion vibration. A gold marker briefly acknowledges an accepted touch at its activation point, not a simulated collision. The held view allows room for stronger responses. Turn following off to hold a picture. This view follows live playing, not kept-file replay.</p></details>
 <details class="participate"><summary>Leave a small trace</summary>
 <p>You can add a touch while the same instrument is ringing. The planned music carries on, and you can stop playing at any time.</p>
 <div class="transport"><button id="pad" disabled>Touch the instrument</button><label>Strength <select id="strength"><option value="0.025">Soft</option><option value="0.05" selected>Light</option><option value="0.1">Firm</option></select></label></div>
