@@ -1,8 +1,12 @@
-import {readTineLiveAddress} from '../tine/live-address.js';
+import {readTineLiveAddress,tineLiveFragment} from '../tine/live-address.js';
 import {readLivingAddress,validateLivingRecord} from './record.js';
 import {validateLivingPersonalSource,createLivingPersonalJourneyStudy} from './personal-journey-study.js';
 
 export const PERSONAL_PHRASE_INPUT_LIMIT=16*1024;
+export function livingPersonalJourneyHref(value){
+ const source=validateLivingPersonalSource(value);createLivingPersonalJourneyStudy(source);
+ return 'living-journey.html'+tineLiveFragment(source);
+}
 /** Parse locally only. A pasted address contributes its kept fragment; no URL
  * is fetched or navigated. The encounter's original source is the creative seed.
  */

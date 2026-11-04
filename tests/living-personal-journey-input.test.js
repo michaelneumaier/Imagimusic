@@ -1,12 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readLivingPersonalPhrase} from '../src/living/personal-journey-input.js';
+import {readLivingPersonalPhrase,livingPersonalJourneyHref} from '../src/living/personal-journey-input.js';
 import {createTineDesign} from '../src/tine/address.js';
 import {tineLiveFragment} from '../src/tine/live-address.js';
 import {createLivingRecord,livingFragment} from '../src/living/record.js';
 const source={kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:16800,strength:.025},{frame:29280,strength:.1}],fadeStart:100000};
 test('kept live and Living addresses/files quietly recover the exact original source',()=>{
  const record=createLivingRecord(source,{presentationVersion:4,arrangementVersion:3});
+ const link=livingPersonalJourneyHref(source);assert.ok(link.startsWith('living-journey.html#tine-live='));
+ assert.deepEqual(readLivingPersonalPhrase(new URL(link,'http://localhost:8081/').href),source);
+ assert.throws(()=>livingPersonalJourneyHref({...source,events:[{frame:100,strength:-.025}]}));
  for(const text of [JSON.stringify(source),JSON.stringify(record),tineLiveFragment(source),livingFragment(record),'http://localhost:8081/tine-play.html'+tineLiveFragment(source),'https://example.invalid/living.html'+livingFragment(record)])assert.deepEqual(readLivingPersonalPhrase(text),source);
  assert.throws(()=>readLivingPersonalPhrase('javascript:alert(1)'+tineLiveFragment(source)));
  assert.throws(()=>readLivingPersonalPhrase('https://example.invalid/no-phrase'));

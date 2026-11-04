@@ -844,3 +844,12 @@ A long-tail admission probe revealed up to12independent instances rather than th
 Seventeen targeted tests pass across import, personal artifact/report, realworker, shared generation, both layout paths and seeded movie source. Syntax/diff and nine served resources pass; page IDs are unique. Native CUA inventory again returned no apps/browsers with pipe startup failure. Actual textarea/filechooser/selection/playback/report-return layout and device interaction remain unverified. Full regression result follows below. No independent review or audience judgment claimed.
 
 Full regression checkpoint: `npm test`914/914passing,0failures,105.32s. Output `/tmp/imagimusic-personal-handoff-full-suite.log`. Native page acceptance remains separate and outstanding.
+
+
+### A direct path from playing to a personal journey
+
+A completed admitted original in living.html now exposes Let this phrase unfold beside Open your original phrase. The helper validates the personal source/comparison admission, then carries the exact existing #tine-live record into living-journey.html; no new address schema, clipboard step or server-side transfer. Unsupported originals (including signed legacy impulses) retain existing flagship behavior and do not show a misleading handoff link. The link updates only when the retained capture changes, not on every playback tick.
+
+The journey page recognizes incoming #tine-live and #living fragments on arrival/hashchange, pauses/cancels current work, admits the original and opens its personal score quietly. Invalid incoming fragments leave the current selection available. Unrelated anchors are ignored. Explicit Listen is still required; the incoming address carries an original phrase rather than every workshop choice, and score reports remain the way to keep a selected journey.
+
+Four focused input/composition tests pass, including an actual built link parsed through a complete URL back to the exact original and refusal of unsupported signed input. Both pages have uniqueIDs; five page/module resourcesHTTP200; syntax/diff clean. Full regression remains914atfffdbfa. Actual browser navigation, back/return behavior and playback remain pending native tool recovery; no audience or independent-review claim.

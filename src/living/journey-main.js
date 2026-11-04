@@ -195,3 +195,12 @@ function park(){film?.cancel();continuation.stop();generation++;starting=false;m
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();
 film=setupLivingJourneyMovieControls({canMake:()=>!personalChoice,getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
+function openPersonalAddress(){
+ const hash=location.hash;
+ if(!hash.startsWith('#tine-live=')&&!hash.startsWith('#living='))return;
+ stop();tuning.stop();
+ try{selectPersonalSource(readLivingPersonalPhrase(hash));$('status').textContent='Your original phrase arrived quietly. Choose Listen to hear its longer journey.';}
+ catch(error){$('status').textContent=`The incoming phrase could not open: ${error.message} Your current selection is still available.`;}
+}
+window.addEventListener('hashchange',openPersonalAddress);
+openPersonalAddress();

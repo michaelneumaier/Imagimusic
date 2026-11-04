@@ -1010,3 +1010,7 @@ Personal journey render/return foundation complete: distinct strict identities, 
 Personal journey page handoff: owns personal-journey-input.js/tests, journey-main.js/HTML/CSS, movie-controls capability gate, optional personal ensemble fit in journey-layout.js and framing tests plus own notes. Quiet bounded source import, personal selection/listen/keep/report return, explicit unsupported seed-continuation/film gates and full independent-instance framing.
 
 Personal journey page handoff implemented: quiet bounded input/selection, explicit listen/keeping/report return, personal capability gates and optional12instance framing. Source admission error text clarified. Full914tests pass; resources/IDs/syntax/diff and oldseededfilmfixture checked. Claims released. Native UI/playback and independent review remain pending.
+
+Direct personal journey handoff: owns living.html/main.js, journey-main.js/HTML and personal-journey-input.js/test plus own notes. Link an admitted completed original directly to a quiet personal-journey address; preserve existing source identity and avoid clipboard/file steps.
+
+Direct personal journey handoff complete: admitted retained originals link through existingtine-livefragment to quiet journey arrival/hashchange; four focused tests and pages/IDs/resources/syntax/diff pass. Claims released. Native navigation/back/playback and independent review pending.

@@ -1,4 +1,5 @@
 import {createListeningContinuation} from './listening-continuation.js';
+import {livingPersonalJourneyHref} from './personal-journey-input.js';
 import {createLivingDirectedPhrase,LIVING_PHRASE_SPACING} from './generative-phrase.js';
 import {createLivingGreeting} from './greeting.js';
 import {readLivingKeptFile,LIVING_RECIPE_FILE_LIMIT} from './recipe-file.js';
@@ -121,7 +122,10 @@ const comparison=createTineComparisonSession({onChange:({current,pending,message
  controls();
 }});
 const capture=createTineLiveCapture({onChange:({current,pending,message})=>{
- if(current&&current!==seenCapture){seenCapture=current;selectPCM(current);seenComparison=null;comparison.setSource(current.record);}
+ if(current&&current!==seenCapture){seenCapture=current;selectPCM(current);seenComparison=null;comparison.setSource(current.record);
+  try{$('develop-phrase').href=livingPersonalJourneyHref(current.record);$('develop-phrase').hidden=false;}
+  catch{$('develop-phrase').hidden=true;$('develop-phrase').removeAttribute('href');}
+ }
  if(current){$('open-phrase').href='tine-play.html'+tineLiveFragment(current.record);$('phrase-path').hidden=false;}
  $('phrase-note').textContent=message?`The latest replay could not be prepared. ${current?'Your previous phrase is still available. ':''}${message}`:pending?'Remembering this phrase…':current?`${current.record.events.length} ${current.record.events.length===1?'touch':'touches'} · ${current.seconds.toFixed(2)} seconds. Hear it here, or open it to compare bodies and keep its address.`:'A completed phrase will appear here.';
  controls();
