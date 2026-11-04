@@ -2,6 +2,13 @@ import {setupContinuousEnsembleReplay} from './continuous-ensemble-replay.js';
 import {setupContinuousEnsembleControls} from './continuous-ensemble-controls.js';
 import {createContinuousEnsembleVisual} from './continuous-ensemble-visual.js';
 const $=id=>document.getElementById(id);let replay=null;
+// Presentation only: keep all transport, replay and body-view state intact.
+const attention=$('attention'),page=$('ensemble-page');let listeningView=false;
+function setListeningView(value){
+ listeningView=value;page.classList.toggle('listening-only',value);attention.setAttribute('aria-pressed',String(value));attention.textContent=value?'Show the full page':'Settle into listening';
+}
+attention.hidden=false;attention.addEventListener('click',()=>setListeningView(!listeningView));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&listeningView){setListeningView(false);attention.focus();}});
 $('body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
 const visual=createContinuousEnsembleVisual({canvas:$('body-canvas'),motion:$('body-motion'),details:$('body-view'),status:$('body-status'),getTime:()=>controls.time()});
 const controls=setupContinuousEnsembleControls({visual,beforePlay:()=>replay?.stop(),elements:{...Object.fromEntries(['start','quiet','seed','status','count','result','whole','strength','mode'].map(name=>[name,$(name)])),continueListening:$('continue-listening'),pads:[0,1,2].map(i=>$(`pad-${i}`)),downloads:[1,2,3].map(i=>$(`voice-${i}`))}});
