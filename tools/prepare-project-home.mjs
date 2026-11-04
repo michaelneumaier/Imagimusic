@@ -6,6 +6,7 @@ import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 import {checkLivingJourneyArtifacts} from './prepare-living-journeys.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['Room between voices','renders/living-ensemble-spatial-study','tools/render-ensemble-spatial-study.mjs'],
  ['Room to finish','renders/living-ensemble-ending-study','tools/render-ensemble-ending-study.mjs'],
  ['A way home','renders/living-ensemble-journey-study','tools/render-ensemble-journey-study.mjs'],
  ['The space between voices','renders/living-ensemble-resonance-study','tools/render-ensemble-resonance-study.mjs'],

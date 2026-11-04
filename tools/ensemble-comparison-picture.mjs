@@ -1,0 +1,9 @@
+/** Add the shared optional picture and protected playback controls to a generated comparison. */
+export function ensembleComparisonPicture(html,{records,checkpoints=null,entries}){
+const picture='<details id="journey-picture" open><summary>Watch the instruments</summary><canvas id="journey-canvas" width="960" height="600" hidden role="img" aria-label="Three bodies following the selected comparison" style="width:100%;aspect-ratio:16/10;border-radius:12px"></canvas><label><input id="journey-motion" type="checkbox" checked> Follow the music</label><label><input id="journey-cues" type="checkbox"> Show artistic touch cues</label><p id="journey-picture-status" role="status">Choose an example to show its instruments.</p><p id="ending-reading" role="status">Choose an example to see its matching response.</p><p>Same camera and1,000× response-bound magnification across examples. Touch cues are artistic; veils show bounds, not slow-motion vibration.</p></details>';
+const transportEnd='<p id="status" role="status">Choose an example to listen.</p>';
+html=html.replace('<div aria-label="Choose a listening example">','<section id="journey-transport" aria-label="Ending comparison playback"><div aria-label="Choose a listening example">').replace(transportEnd,transportEnd+'</section>'+picture);
+html=html.replace('</h1>','</h1><div id="journey-toolbar"><button id="journey-settle" type="button" aria-pressed="false" hidden>Settle into listening</button><button id="journey-pause" type="button" disabled hidden>Pause</button></div>').replace('<body>','<body class="journey-page">').replace('</head>','<link rel="stylesheet" href="../../src/living/ensemble-journey.css"></head>');
+html=html.replace('</body>','<script id="ending-view-source" type="application/json">'+JSON.stringify({records,checkpoints,entries}).replace(/</g,'\\u003c')+'</script><script type="module" src="../../src/living/ensemble-ending-main.js"></script></body>');
+return html;
+}
