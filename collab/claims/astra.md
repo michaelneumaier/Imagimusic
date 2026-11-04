@@ -982,3 +982,7 @@ Journey film source complete: canonical30fps frame source, immutable identity an
 Journey film soundtrack: owns new journey-movie-audio.js/tests and own notes. Snapshot generated artifact, validate full score/film identity and canonical PCM16 WAV header/hash, decode actual kept samples for future AAC encoding and preserve exact WAV; cancellation across hashing.
 
 Journey film soundtrack complete: three focused tests pass; six regenerated soundtracks match existing prepared WAV hashes and exact movie-plan samples. Canonical PCM16 decode retains original bytes, snapshots callers and checks cancellation. Claims released. Encoder/visitor/native verification remain ahead.
+
+Journey movie encoding: owns new journey-movie-render.js, journey-movie-backend.js, journey-export.js and tests/living-journey-movie-render.test.js plus own notes. Connect fixed verified frames/decoded kept WAV to local H264/AAC encoder, cancellation and resource cleanup; injected backend tests separate from pending native codec verification.
+
+Journey movie encoding connected: browser H264/AAC adapter plus frame/hash/cancellation orchestration; eight focused film tests pass and full connected-score test-double pipeline checked. Claims released. Native MP4/pixel/audio/codec performance and visitor controls remain unfinished; no encoded-film claim.
