@@ -1115,3 +1115,5 @@ Optional continued ensemble listening complete: explicit opt-in, three-gesture c
 Optional quieter ensemble presentation complete: reversible listening-only view, protected transport/replay/status/participation access, Escape restoration and home/catalog discovery. HTML ancestry/IDs, HTTP and syntax/diff checks pass. Claims released; native layout, keyboard feel, appeal and independent review remain open.
 
 Offered ensemble variety refined: three distinct first gaps and accent shapes, reproducible 27-combination score probe, unchanged generator/old-seed semantics. 15 fixed/control and six memory tests pass; served menu matches measurement; syntax/diff pass. Claims released; perceptual variety, long-session appeal and independent review remain open.
+
+Ensemble resonance-family research complete: same-score current/near-octave/open-triad comparison, strict record admission, unchanged baseline PCM/WAV, explicit shared player and catalog/preparer discovery. Independent WAV/hash/HTTP/home-readiness/syntax/diff checks pass. Claims released; live family unchanged and native preference/recognition/independent assessment remain open.
