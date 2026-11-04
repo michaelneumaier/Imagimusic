@@ -708,3 +708,14 @@ Added a closed optional disclosure to living-journey.html with two phrase choice
 Nine targeted tests pass (comparison lifecycle, physical tuning study and existing study player), plus module syntax/diff and unique-ID checks. Fourteen served resources return200, including all six WAV/report pairs. Native CUA inventory was retried and returned no apps/browsers with `Sky Computer Use native pipe startup failed`; no visual/actual browser playback claim. Fable still has no new response; independent review pending.
 
 The listening prompts ask whether answers extend or transform the opening and what the homecoming does to its meaning. They do not imply measured emotional effects or a preferred temperament. Mass/decay/loudness covary with geometry; first-mode ratios are not perceived-pitch evidence. Continue evaluating the musical experience before incorporating a versioned body palette in generated journeys.
+
+
+### Optional continuation for full journeys
+
+The existing journey workshop now offers Keep listening after this journey. It reuses the flagship's tested epoch-guarded continuation scheduler. A natural media ending queues a three-second pause, then creates a fresh seed in the selected structure through the existing worker/hash-checked playback path. Preparation adds quiet time; no gapless or adaptive-composer claim. The selected structure and listening level persist. New journey action preserves the opt-in; manual seed/structure selection stops it.
+
+Quiet, native pause, keeping WAV/report, opening a kept report, starting the tuning comparison, playback failure, hidden/pagehide and graphics interruption stop continuation. Replay cancels a pending timer. The pending pause keeps Quiet available. Current generated downloads are replaced on the next selection; this is explicit beside the control. Only the latest generated artifact is retained, preventing unbounded recording retention. The bounded motif family can repeat ideas despite different seeds.
+
+Syntax/diff checks and served page/modules pass; unique IDs checked. Existing continuation tests cover duplicate endings, epoch cancellation, owner cancellation and manual-next behavior. The full regression result follows below. Native browser automatic playback/transport timing and graphical continuity remain unverified because the native-control startup failure persists; this is implemented local behavior, not a browser acceptance claim. A browser refusing playback stops the sequence and offers the existing retry path.
+
+Regression checkpoint: `npm test` completed891/891 passing,0failures,93.69s. Full output: `/tmp/imagimusic-journey-continuation-suite.log`. This includes core scheduler, worker/generation/report, body comparison and media-stage tests; it does not simulate the new page wiring in a real browser.

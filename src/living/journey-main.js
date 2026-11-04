@@ -10,6 +10,7 @@ import {createLivingJourneyMedia} from './journey-media.js';
 import {createLivingJourneyGeneration} from './journey-generation.js';
 import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from './journey-report.js';
 import {setupLivingTuningListening} from './tuning-listening.js';
+import {createListeningContinuation} from './listening-continuation.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 const media=createLivingJourneyMedia();
@@ -20,6 +21,14 @@ let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
 let scene=null,journeyView=null,raf=0,lastDraw=-Infinity;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const continuation=createListeningContinuation({next:()=>{
+ if(document.hidden||starting||!audio.ended){continuation.stop();return;}
+ makeFreshJourney(true);
+},onChange:()=>{
+ $('journey-continue').checked=continuation.enabled;
+ $('journey-continue-note').textContent=continuation.pending?'A moment of quiet. Preparing the next journey starts in three seconds.':continuation.enabled?'Another journey will follow this ending. Quiet stops the sequence.':'Optional. New journeys follow at the selected structure; ideas can repeat. Each new journey replaces the previous downloads. Keeping a file stops the sequence.';
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending;
+}});
 $('ensemble-motion').checked=!reducedMotion.matches;
 function drawEnsemble(){
  if(!scene||!journeyView)return;
@@ -64,11 +73,12 @@ function update(){
  drawScore(frame);
  const active=plan.sections.filter(s=>frame>=s.startFrame&&frame<s.endFrame);
  rows.forEach((row,i)=>row.classList.toggle('active',frame>=plan.sections[i].startFrame&&frame<plan.sections[i].endFrame));
- $('quiet').disabled=audio.paused&&!starting;
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending;
  if(!starting)$('status').textContent=audio.error?'Audio unavailable. See the local rendering instructions below.':audio.ended?'The journey has settled.':`${audio.paused?'Paused':'Playing'} · ${clock(audio.currentTime)} · ${active.map(s=>s.name).join(' / ')||'a moment of space'}`;
 }
-function stop(){generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
-function choose(){
+function stop(){continuation.stop();generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
+function choose({continueSequence=false}={}){
+ if(!continueSequence)continuation.stop();
  expectedSha256=null;
  generation++;starting=false;player.stop();media.clear();generated.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
  const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
@@ -88,6 +98,7 @@ function choose(){
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
 async function listen(){
+ continuation.cancelPending();
  tuning.stop();
  const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent=generatedChoice?'Making your journey locally… Quiet cancels preparation.':'Checking the journey audio and score…';
  try{
@@ -99,14 +110,15 @@ async function listen(){
    $('download').href=artifact.audioURL;$('download').download=stem+'.wav';$('report').href=artifact.reportURL;$('report').download=stem+'.json';$('report').textContent='Keep the score report';$('download').hidden=$('report').hidden=false;
   }else verified=await media.prepare(url,plan);
   if(own!==generation)return;const playing=await player.play(verified);if(own!==generation||!playing)return;starting=false;audio.hidden=false;update();
- }catch(error){if(own!==generation)return;starting=false;player.stop();$('quiet').disabled=true;$('status').textContent=`Playback could not start: ${error.message} ${generatedChoice?'Try Listen again, or choose a prepared seed.':'See the local rendering instructions below.'}`;}
+ }catch(error){if(own!==generation)return;continuation.stop();starting=false;player.stop();$('quiet').disabled=true;$('status').textContent=`Playback could not start: ${error.message} ${generatedChoice?'Try Listen again, or choose a prepared seed.':'See the local rendering instructions below.'}`;}
 }
 $('listen').addEventListener('click',listen);
-$('new-journey').addEventListener('click',()=>{
+function makeFreshJourney(continueSequence=false){
  let seed;do{seed=crypto.getRandomValues(new Uint32Array(1))[0];}while([...$('seed').options].some(o=>Number(o.value)===seed));
  let option=$('fresh-seed');if(!option){option=document.createElement('option');option.id='fresh-seed';option.dataset.generated='true';$('seed').append(option);}
- option.value=String(seed);option.textContent=`Your journey · ${seed}`;$('seed').value=String(seed);choose();listen();
-});
+ option.value=String(seed);option.textContent=`Your journey · ${seed}`;$('seed').value=String(seed);choose({continueSequence});listen();
+}
+$('new-journey').addEventListener('click',()=>makeFreshJourney(continuation.enabled));
 $('open-journey').addEventListener('change',async()=>{
  const file=$('open-journey').files?.[0];$('open-journey').value='';if(!file)return;
  stop();const own=++generation;starting=true;$('quiet').disabled=false;$('status').textContent='Reading the kept score…';
@@ -120,10 +132,18 @@ $('open-journey').addEventListener('change',async()=>{
  }catch(error){if(own!==generation)return;starting=false;$('quiet').disabled=true;$('status').textContent=`The score could not open: ${error.message} Your previous selection is still available.`;}
 });
 $('quiet').addEventListener('click',stop);
+$('journey-continue').addEventListener('change',()=>{
+ if($('journey-continue').checked){continuation.enable();if(audio.ended&&!starting)continuation.queue();}
+ else continuation.stop();
+});
+for(const id of ['download','report'])$(id).addEventListener('click',stop);
+audio.addEventListener('ended',()=>continuation.queue());
+audio.addEventListener('pause',()=>{if(!audio.ended&&!starting)continuation.stop();});
+audio.addEventListener('error',()=>continuation.stop());
 $('seed').addEventListener('change',choose);
 for(const input of document.querySelectorAll('[name=shape]'))input.addEventListener('change',choose);
 $('level').addEventListener('input',()=>{player.setDb(Number($('level').value));tuning.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
-audio.addEventListener('play',()=>{tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
+audio.addEventListener('play',()=>{continuation.cancelPending();tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
 audio.addEventListener('playing',startAnimation);
 for(const event of ['pause','ended','seeked'])audio.addEventListener(event,()=>{stopAnimation();drawEnsemble();if(event==='seeked')startAnimation();});
 $('ensemble-motion').addEventListener('change',()=>{drawEnsemble();startAnimation();});
@@ -131,6 +151,6 @@ $('ensemble-veils').addEventListener('change',drawEnsemble);
 $('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
 $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
+function park(){continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();

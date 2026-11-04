@@ -962,3 +962,7 @@ Body relationship study complete: six WAV/report pairs across two seeds; baselin
 Tuning listening access: owns living-journey.html, journey-main.js, new tuning-listening.js and own notes. Add optional same-score body comparison within existing workshop, one shared-level player, mutually exclusive playback and quiet page lifecycle. No new flagship default.
 
 Tuning listening access complete, including tests/living-tuning-listening.test.js: optional existing-page comparison, exclusive playback/shared level/quiet lifecycle; nine focused tests and14served resources pass. Claims released. Native browser QA unavailable after verified pipe startup failure; no preference or independent review claimed.
+
+Long-journey continuation: owns living-journey.html, journey-main.js and own notes. Reuse established opt-in continuation scheduler for fresh worker-generated journeys after natural ending; cancel on Quiet/manual selection/keeping/page-away/error and retain finite-family limits.
+
+Long-journey continuation implemented: opt-in natural-end sequence, three-second pause plus local worker preparation, bounded latest-artifact retention and explicit stops. Full891tests pass; syntax/resources/IDs/diff checked. Claims released. Native automatic playback/transport/scene verification and independent review remain open.
