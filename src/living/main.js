@@ -1,3 +1,4 @@
+import {createLivingGeneratedPhrase} from './generative-phrase.js';
 import {createLivingGreeting} from './greeting.js';
 import {readLivingKeptFile} from './recipe-file.js';
 import {createLivingExploration,serializeLivingExploration,validateLivingExploration} from './exploration-record.js';
@@ -24,7 +25,8 @@ motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
-let examplePlaying=false;
+let examplePlaying=false,generatedPlaying=false,generatedPhrase=null;
+const exampleName=()=>generatedPlaying?'A generated piece':'An authored example';
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
@@ -33,6 +35,9 @@ function controls(){
  const state=session?.state??'idle',busy=active(state)||!!movie?.busy||!!explorationJob,repeat=listening();
  $('begin').disabled=!world||busy||repeat;
  $('hear-first').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending;
+ $('generate-piece').disabled=$('hear-first').disabled;
+ $('replay-generated').disabled=$('hear-first').disabled||!generatedPhrase;
+ $('explore-generated').disabled=$('replay-generated').disabled;
  $('open-recipe').disabled=!world||busy||repeat;
  $('return-branch').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!branchCapture?.current;
  $('play-body').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM||selectedPCM.record.design.lengthMm===80;
@@ -45,7 +50,7 @@ function controls(){
  $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
  for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
  movie?.refresh();
- if(repeat&&unfolding){$('touch-count').textContent=examplePlaying?'An authored example':'Your phrase unfolding';return;}
+ if(repeat&&unfolding){$('touch-count').textContent=examplePlaying?exampleName():'Your phrase unfolding';return;}
  $('touch-count').textContent=repeat?`${replayCount} / ${selectedPCM.record.events.length} remembered ${selectedPCM.record.events.length===1?'touch':'touches'}`:`${session?.touches??0} / 8 touches`;
 }
 function touch(){if(!session||$('touch').disabled)return;session.strike(.1).catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});}
@@ -54,7 +59,7 @@ function animate(){
  if(repeat&&unfolding){
   const frame=arrangementView.at(t);world?.arrangementFrame(frame,$('reveal').checked,$('camera-motion').checked);$('touch-count').textContent=`${frame.touches} / ${frame.totalTouches} ${examplePlaying?'example':'remembered'} touches`;$('remaining').textContent=`${t.toFixed(1)} / ${arrangementPCM.seconds.toFixed(1)} seconds`;
   const wideVisible=!$('camera-motion').checked||frame.cameraOpen>0,chapterKey=frame.part+':'+wideVisible;
-  if(lastPart!==chapterKey){lastPart=chapterKey;const title=(examplePlaying?{opening:'An example: three touches, alone.',answer:'The example opens into three bodies.',return:'The first three touches return.'}:{opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'})[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',wideVisible?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':(examplePlaying?'The original 80 mm blade, playing an authored example.':'The original 80 mm blade, playing your phrase alone.'));}
+  if(lastPart!==chapterKey){lastPart=chapterKey;const title=(examplePlaying?{opening:exampleName()+': a phrase, alone.',answer:'The phrase opens into three bodies.',return:'The opening phrase returns.'}:{opening:'Your phrase, alone.',answer:'Three bodies answering.',return:'The original phrase returns.'})[frame.part];$('playing-status').textContent=title;status.textContent=title;canvas.setAttribute('aria-label',wideVisible?'Three independent steel blades: 95 mm left, 80 mm centre, 65 mm right. Each veil follows that body’s recorded touches.':(examplePlaying?'The original 80 mm blade, playing a prepared phrase.':'The original 80 mm blade, playing your phrase alone.'));}
   if(listening())raf=requestAnimationFrame(animate);return;
  }
  if(response&&$('reveal').checked)world?.response(response.at(t).points);
@@ -104,10 +109,10 @@ branchCapture=createTineLiveCapture({onChange:({current,pending,message})=>{
 }});
 const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  const quietFocused=document.activeElement===$('quiet');controls();
- if(state==='preparing')$('playing-status').textContent=examplePlaying?'Preparing an authored example…':'Preparing your phrase…';
- if(state==='playing'){if(unfolding)world?.setLength(80);$('playing-status').textContent=unfolding?(examplePlaying?'An authored example is unfolding…':'Your phrase is unfolding…'):`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
+ if(state==='preparing')$('playing-status').textContent=examplePlaying?'Preparing '+exampleName().toLowerCase()+'…':'Preparing your phrase…';
+ if(state==='playing'){if(unfolding)world?.setLength(80);$('playing-status').textContent=unfolding?(examplePlaying?exampleName()+' is unfolding…':'Your phrase is unfolding…'):`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
  if(state==='suspended'){$('playing-status').textContent='Replay was interrupted. Choose Quiet, then hear it again.';stopView();}
- if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?'The example has settled. Choose Begin to make a phrase of your own.':'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:true});replayFocus=false;}
+ if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?(generatedPlaying?'The piece has settled. Hear it again, explore it, or make another.':'The example has settled. Choose Begin to make a phrase of your own.'):'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:true});replayFocus=false;}
 }});
 session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const touchFocused=document.activeElement===$('touch'),quietFocused=document.activeElement===$('quiet');
@@ -145,19 +150,37 @@ $('again').addEventListener('click',async()=>{
  try{await playing;}catch(error){$('playing-status').textContent=error.message;}
 });
 function cancelArrangement(){arrangementJob?.cancel();arrangementJob=null;}
-async function playArrangement(source,example=false){
- examplePlaying=example;restoreVersion++;
+async function playArrangement(source,example=false,generated=false){
+ examplePlaying=example;generatedPlaying=generated;restoreVersion++;
  if(!example)selectPCM(capture.current);world?.view('opening');for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view==='opening'));
- unfolding=true;lastPart=null;replayReturnButton=example?'begin':'unfold';arrangementPCM=null;arrangementView=null;
+ unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'begin'):'unfold';arrangementPCM=null;arrangementView=null;
  let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),source);}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
  const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingArrangementView(pcm.plan);return pcm;});
- $('touch-note').textContent=example?'Authored example: three touches become a round, then return. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
+ $('touch-note').textContent=example?exampleName()+': a phrase becomes a round, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  const playing=replay.play(prepared);replayFocus=true;controls();
  try{await playing;}catch(error){cancelArrangement();if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
 }
 $('unfold').addEventListener('click',()=>{if(!$('unfold').disabled)playArrangement(capture.current.record);});
 $('hear-first').addEventListener('click',()=>{if(!$('hear-first').disabled)playArrangement(createLivingGreeting(),true);});
+$('generate-piece').addEventListener('click',()=>{
+ if($('generate-piece').disabled)return;
+ const seed=crypto.getRandomValues(new Uint32Array(1))[0];generatedPhrase=createLivingGeneratedPhrase(seed);
+ $('generated-actions').hidden=false;
+ $('generated-note').textContent=`Piece ${seed}. A three-touch motif, a breath, and a ${generatedPhrase.variation==='repeat'?'return of the motif':generatedPhrase.variation==='linger'?'later final touch':'softer return'}. Six generated touches unfold across three bodies. Your played phrase stays separate.`;
+ playArrangement(generatedPhrase.source,true,true);
+});
+$('replay-generated').addEventListener('click',()=>{if(!$('replay-generated').disabled)playArrangement(generatedPhrase.source,true,true);});
+$('explore-generated').addEventListener('click',async()=>{
+ if($('explore-generated').disabled)return;
+ const phrase=generatedPhrase;park();const own=restoreVersion;
+ await capture.load(phrase.source);if(own!==restoreVersion)return;
+ if(JSON.stringify(capture.current?.record)!==JSON.stringify(phrase.source)){$('generated-note').textContent='This piece could not be prepared for exploration. The previous original remains available.';return;}
+ unfolding=false;examplePlaying=false;generatedPlaying=false;
+ $('generated-note').textContent=`Piece ${phrase.seed} is ready to explore. Compare its bodies, play an answer, or keep this encounter as an address or film.`;
+ $('touch-note').textContent='This original phrase was generated. Its timing and accents remain intact when you compare bodies or keep the encounter.';
+ $('playing-status').textContent='Generated phrase adopted quietly. Hear again, unfold it, or choose another body to play.';controls();
+});
 for(const button of bodyButtons)button.addEventListener('click',async()=>{
  if(button.disabled)return;unfolding=false;const lengthMm=Number(button.dataset.length);
  if(lengthMm===80){comparison.cancel();selectPCM(capture.current);controls();return;}

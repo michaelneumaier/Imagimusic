@@ -766,3 +766,11 @@ Paired visitor keeping complete: actual local download retains correct parent af
 Creative steering: owns proposal026 update for Michael's low-input procedural-performance question. Make autonomous watching/listening a first-class entry, with optional creative direction and playable takeover. Existing contact integration remains unstarted; no runtime claims.
 
 Creative steering recorded in proposal026: automatic, lightly directed and hands-on entrances share one compositional world. Fixed greeting distinguished from future seeded composition. Claim released. Next procedural work should produce a bounded complete piece before endless generation or a large prompt surface.
+
+Automatic first piece: owns src/living/generative-phrase.js, its tests, main.js and living.html for one-action seeded composition and an explicit quiet adoption route. Keep automatic preview separate from visitor captures; original-only films remain exact. No new physics or arbitrary prompt interpretation.
+
+Automatic entrance layout: also owns living.css for wrapping the added invitation and bounded generated-note width on narrow screens.
+
+Automatic piece discovery/evidence: owns project.html current-chapter copy, src/project-catalog.js Living entry, and append-only current evidence in astra-living-instrument notes/proposal026. Preserve archive and earlier study routes.
+
+Automatic first piece complete: bounded version1 seeded grammar, one-action performance/replay, explicit quiet adoption, source-preserving preview and kept-address return verified.10targeted checks pass; narrow native flow and layout inspected. Home/catalog/plan/evidence reconciled. Claims released. Next: visible known-score contact staging and artistic evaluation of contrasting generated phrases.
