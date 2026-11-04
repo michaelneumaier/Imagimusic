@@ -95,3 +95,7 @@ This deliberately isolates one compositional choice before changing camera or co
 ## Contact staging foundation
 
 The existing [visual workshop](../../living-look.html) now has an optional known-score striker rig and exact approach/contact/recovery inspection points. It uses the established planner without treating abstract slot distances as physical travel. Contact geometry reaches85percent of each blade; source sound stays unchanged. The current rig establishes timing and clearance of the head against the blade, but its post-and-arm silhouette is utilitarian and dense multi-actor clearance remains unassessed. Next refine a distinctive performer around this contact foundation, then inspect its motion in a complete held-camera passage. Production presentation and film recipes do not yet include strikers.
+
+## A body choice now becomes playable in place
+
+The flagship now offers Play this body after choosing the65mm or95mm candidate. A new phrase sounds and is captured on that body in the same scene. Original restores the first80mm phrase; Return to the new phrase restores the separate performance quietly. Hear again follows the selected phrase. The new performance has its own existing tine-record link; encounter addresses, unfolding and films still use the original80mm source. Begin remains a fresh80mm pass. This closes the first choose/play/return loop without redefining old keepsakes. A saved lineage joining both performances remains later work.

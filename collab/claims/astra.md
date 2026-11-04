@@ -738,3 +738,11 @@ Dense contact staging complete: overlap measured and corrected with shared suppo
 Living contact close-up: owns scene.js optional paused inspection framing, look-main.js and living-look.html controls. Preserve time and camera preference; whole-scene return, playback/source/chapter exits detail, named PNG capture. Production defaults unaffected.
 
 Living contact close-up complete: narrow native inspection and return/play/preference/capture-link behavior checked; claims released. Current contact staging remains a workshop layer pending a versioned adoption decision and visitor-facing evaluation.
+
+Living chosen-body playing: owns main.js/living.html integration. Add explicit in-place playing on selected65/95mm candidate with separate capture, retaining original80mm source for comparisons/unfold/film/keepsake; original button restores root. Native completed/empty/return/replay verification; no saved schema change.
+
+Chosen-body discovery: also owns src/project-catalog.js Living entry; describe in-place new phrase and original keeping boundary.
+
+Chosen-body narrow layout: owns living.css for flex-wrapped branch actions and opaque sticky transport; native inspection found inline link wrapping and text showing through the transport.
+
+Living chosen-body playing complete:65/95mm native capture, selected replay, original/new quiet return, unchanged root keep and empty-pass retention verified; full816 suite passes. Catalog/plan/evidence reconciled. Claims released. Combined saved lineage remains next design work.

@@ -15,7 +15,7 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
-let presentationVersion=2;
+let presentationVersion=2,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
@@ -28,16 +28,19 @@ let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
 const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
+ const branchPending=!!branchCapture?.pending;
  const state=session?.state??'idle',busy=active(state)||!!movie?.busy,repeat=listening();
  $('begin').disabled=!world||busy||repeat;
- $('hear-first').disabled=!world||busy||repeat||capture.pending||comparison.pending;
+ $('hear-first').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending;
  $('open-recipe').disabled=!world||busy||repeat;
+ $('return-branch').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!branchCapture?.current;
+ $('play-body').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM||selectedPCM.record.design.lengthMm===80;
  $('touch').disabled=repeat||state!=='playing'||session.touches>=8;
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
- $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||!selectedPCM;
- for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
+ $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM;
+ for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
  $('keep-encounter').disabled=!world||busy||repeat||capture.pending||!capture.current;
- $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||!capture.current;
+ $('unfold').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
  for(const b of buttons)b.disabled=!world||(repeat&&unfolding);
  movie?.refresh();
  if(repeat&&unfolding){$('touch-count').textContent=examplePlaying?'An authored example':'Your phrase unfolding';return;}
@@ -66,14 +69,19 @@ try{
  world=createLivingScene(canvas,{onTouch:touch});world.setLook(LIVING_PRESENTATIONS[presentationVersion].look);status.textContent='80 × 10 × 1 mm · drag to look around';
  for(const button of buttons)button.addEventListener('click',()=>{world.view(button.dataset.view);for(const b of buttons)b.setAttribute('aria-pressed',String(b===button));status.textContent=button.textContent;});
 }catch(error){status.textContent='The 3D view could not open. The sound sketch and scene boards are available below.';for(const b of buttons)b.disabled=true;console.error(error);}
-function describeBody(){const mm=selectedPCM?.record.design.lengthMm??80;return selectedPCM?`${mm===80?'Original':mm===95?'Longer':'Shorter'} body · ${mm} mm. Choose Hear again. Your touches and their timing stay the same; Begin returns to the original body.`:'First make a phrase. Then discover how it sounds in another body.';}
+function describeBody(){
+ if(!selectedPCM)return 'First make a phrase. Then discover how it sounds in another body.';
+ const mm=selectedPCM.record.design.lengthMm,fresh=selectedPCM===branchCapture?.current;
+ return `${mm===80?'Original':mm===95?'Longer':'Shorter'} body · ${mm} mm. ${fresh?'Your new phrase is selected. Hear again replays it.':mm===80?'Hear again replays your original phrase.':'Hear again plays your original touches on this body.'}`;
+}
+
 function selectPCM(pcm){
  selectedPCM=pcm;const mm=pcm?.record.design.lengthMm??80;world?.setLength(mm);
  status.textContent=`${mm} × 10 × 1 mm · drag to look around`;
  canvas.setAttribute('aria-label',`Three-dimensional ${mm} mm steel blade clamped at one end on a ceramic arch. Use the view buttons below to inspect it.`);
  for(const b of bodyButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.length)===mm));
  $('body-path').hidden=!pcm||mm===80;if(pcm)$('body-path').href='tine-play.html'+tineLiveFragment(pcm.record);
- $('body-note').textContent=describeBody();
+ $('body-note').textContent=describeBody();$('play-body').textContent=mm===80?'Play this body':`Play the ${mm} mm body`;
 }
 const comparison=createTineComparisonSession({onChange:({current,pending,message})=>{
  if(current&&current!==seenComparison){seenComparison=current;selectPCM(current.candidate);}
@@ -87,6 +95,11 @@ const capture=createTineLiveCapture({onChange:({current,pending,message})=>{
  $('phrase-note').textContent=message?`The latest replay could not be prepared. ${current?'Your previous phrase is still available. ':''}${message}`:pending?'Remembering this phrase…':current?`${current.record.events.length} ${current.record.events.length===1?'touch':'touches'} · ${current.seconds.toFixed(2)} seconds. Hear it here, or open it to compare bodies and keep its address.`:'A completed phrase will appear here.';
  controls();
 }});
+branchCapture=createTineLiveCapture({onChange:({current,pending,message})=>{
+ if(current&&current!==seenBranch){seenBranch=current;selectPCM(current);$('return-branch').hidden=false;$('branch-path').hidden=false;$('branch-path').href='tine-play.html'+tineLiveFragment(current.record);$('branch-path').textContent=`Open the new ${current.record.design.lengthMm} mm phrase ↗`;}
+ $('branch-note').textContent=message?`The new phrase could not be prepared. Your original remains available. ${message}`:pending?'Remembering the new phrase separately…':current?`New ${current.record.design.lengthMm} mm phrase · ${current.record.events.length} ${current.record.events.length===1?'touch':'touches'}. Return to either phrase here. Unfolding and encounter keeping use the original.`:'Choose a longer or shorter body to make a new phrase here. Your original stays available.';
+ controls();if(branchReturnFocus&&!pending){branchReturnFocus=false;if(!$('play-body').disabled)$('play-body').focus({preventScroll:true});}
+}});
 const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  const quietFocused=document.activeElement===$('quiet');controls();
  if(state==='preparing')$('playing-status').textContent=examplePlaying?'Preparing an authored example…':'Preparing your phrase…';
@@ -97,29 +110,32 @@ const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
 session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const touchFocused=document.activeElement===$('touch'),quietFocused=document.activeElement===$('quiet');
  if(event.state==='ending'&&(touchFocused||quietFocused))returnFocus=true;
- controls();if(event.sampleRate)liveResponse=createLivingResponse(design,event.sampleRate);
- const messages={preparing:'Preparing the instrument…',playing:'Touch the blade, or use the Touch button.',ringing:'The touch window has closed. Let it ring, or choose Quiet.',ending:'Ending gently…',ended:'The phrase has settled. Hear it again, or begin something new.',interrupted:'Playing stopped while the page or audio was away. Begin again when ready.',cancelled:'Preparation cancelled.',error:event.message};
+ controls();if(event.sampleRate)liveResponse=createLivingResponse(playingDesign,event.sampleRate);
+ const messages={preparing:'Preparing the instrument…',playing:`${playingDesign.lengthMm} mm body. Touch the blade, or use the Touch button.`,ringing:'The touch window has closed. Let it ring, or choose Quiet.',ending:'Ending gently…',ended:'The phrase has settled. Hear it again, or begin something new.',interrupted:'Playing stopped while the page or audio was away. Begin again when ready.',cancelled:'Preparation cancelled.',error:event.message};
  $('playing-status').textContent=messages[event.state]??'Opening is quiet. Begin when you choose.';
  if(event.event){liveResponse?.accept(event.event);world?.acknowledgeTouch();$('touch-note').textContent=`Touch ${event.touches} accepted at sample ${event.event.frame}. The gold spot marks the fixed touch position; it is not a vibration display.`;}
- if(event.finished?.snapshot.events.length)capture.accept(event.finished).catch(error=>{$('phrase-note').textContent=error.message;});
+ if(event.finished?.snapshot.events.length)(playingDesign.lengthMm===80?capture:branchCapture).accept(event.finished).catch(error=>{$(playingDesign.lengthMm===80?'phrase-note':'branch-note').textContent=error.message;});
  if(event.finished&&!event.finished.snapshot.events.length)$('playing-status').textContent='This pass ended without touches.'+(capture.current?' Your previous phrase remains available.':'');
  if(event.state==='playing'&&wantsFocus){wantsFocus=false;$('touch').focus({preventScroll:true});}
  if(touchFocused&&$('touch').disabled&&!$('quiet').disabled)$('quiet').focus({preventScroll:true});
- if(!active(event.state)){stopView();if(touchFocused||quietFocused||returnFocus)$('begin').focus({preventScroll:true});returnFocus=false;}
+ if(!active(event.state)){stopView();if(touchFocused||quietFocused||returnFocus){if(playingDesign.lengthMm!==80&&branchCapture.pending)branchReturnFocus=true;else $(playingDesign.lengthMm===80?'begin':'play-body').focus({preventScroll:true});}returnFocus=false;}
  else if(event.state==='playing')runView();
 }});
-$('begin').addEventListener('click',async()=>{
- restoreVersion++;
- cancelArrangement();unfolding=false;examplePlaying=false;comparison.cancel();capture.cancel();replay.park();selectPCM(capture.current);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
+async function startPlaying(nextDesign){
+ branchReturnFocus=false;restoreVersion++;
+ cancelArrangement();unfolding=false;examplePlaying=false;comparison.cancel();capture.cancel();branchCapture.cancel();replay.park();playingDesign=nextDesign;selectPCM(nextDesign.lengthMm===80?capture.current:selectedPCM);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
  $('touch-note').textContent='Touches join the vibration already ringing. The gold spot appears only after a touch is accepted.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
- try{await session.start(design);}catch(error){if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
-});
+ try{await session.start(nextDesign);}catch(error){if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
+}
+$('begin').addEventListener('click',()=>startPlaying(design));
+$('play-body').addEventListener('click',()=>{if(!$('play-body').disabled)startPlaying(selectedPCM.record.design);});
+$('return-branch').addEventListener('click',()=>{if($('return-branch').disabled)return;comparison.cancel();unfolding=false;selectPCM(branchCapture.current);controls();});
 $('again').addEventListener('click',async()=>{
  const pcm=selectedPCM;if(!pcm||$('again').disabled)return;
  cancelArrangement();unfolding=false;examplePlaying=false;replayReturnButton='again';
  replayResponse=createLivingResponse(pcm.record.design,pcm.sampleRate);pcm.record.events.forEach(event=>replayResponse.accept(event));replayCount=0;
- world?.acknowledgeTouch(false);$('touch-note').textContent='Returning to your original touches, including their timing and ending.';
+ world?.acknowledgeTouch(false);$('touch-note').textContent='Returning to the selected phrase, including its timing and ending.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  // play() first emits idle while stopping any old source; set focus intent after that synchronous step.
  const playing=replay.play(pcm);replayFocus=true;
@@ -153,10 +169,10 @@ $('quiet').addEventListener('click',()=>{
  session.quiet().catch(error=>{if(error.name!=='AbortError')$('playing-status').textContent=error.message;});
 });
 $('level').addEventListener('input',()=>{const db=Number($('level').value);session.setListeningDb(db);replay.setListeningDb(db);$('level-value').textContent=`+${db} dB`;});
-function park(){movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
+function park(){branchReturnFocus=false;movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();branchCapture?.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
-movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!!capture.current,onChange:controls});
+movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!branchCapture?.pending&&!!capture.current,onChange:controls});
 controls();
 
 $('keep-encounter').addEventListener('click',()=>{

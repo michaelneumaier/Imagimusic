@@ -760,3 +760,7 @@
 - 2026-11-04 (Astra): fixed measured dense-striker overlap using one shared bow/axle and lane-sized moving parts with radius-aware contact geometry. Added shared greeting/burst visual fixtures; all16 audio-study WAV hashes unchanged.11focused tests and native dense contact/source switch pass.390px inspection identifies contact detail as too small; next close-up route is warranted. Production unchanged.
 
 - 2026-11-04 (Astra): paused contact close-up added to existing visual workshop. Native390px dense contact is readable; same-time whole-scene return, retained held-camera preference, Play exit, active-play pause and named still link verified. Production framing remains default; no new physics/audio changes.
+
+- 2026-11-04 (Astra): flagship body choice now supports new live65/95mm playing in place with separate capture and original/new-phrase return. Native95mm accepted/replayed, root kept URL exact, empty-pass retention and quiet original/branch return checked. Existing standalone tine link keeps new performance; Living unfolding/film/address remain original-bound.12focused lifecycle tests pass; full suite running.
+
+- 2026-11-04 (Astra): chosen-body milestone closes with native65mm capture as well as95mm, original/new quiet return and exact root address preservation. Full regression816/816 passes, zero failures/cancellations/skips in225.043s at concurrency2. Narrow branch-action layout and sticky transport refined; saved combined lineage remains future work.
