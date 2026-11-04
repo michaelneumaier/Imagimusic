@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {createContinuousEnsemblePerformance} from '../src/living/continuous-ensemble-study.js';
 import {createContinuousReturnPerformance} from '../src/living/continuous-return-study.js';
 import {renderContinuousTineRecord} from '../src/living/continuous-tine-record.js';
+import {prepareContinuousEnsembleAudio} from '../src/living/continuous-ensemble-audio.js';
 import {stereoWav} from '../src/loom/model.js';
 const directory=resolve(process.argv[2]??'renders/living-continuous-ensemble-study'),outputs=[];
 mkdirSync(directory,{recursive:true});
@@ -13,6 +14,11 @@ for(const name of ['source','ensemble']){
  const records=name==='source'?[p.record()]:p.records(),components=records.map(record=>renderContinuousTineRecord(record).channels[0]);
  const gain=1/3,reconstructed=Float32Array.from(mono,(_,i)=>name==='source'?components[0][i]:(components[0][i]+components[1][i]+components[2][i])*gain);
  if(!Buffer.from(mono.buffer).equals(Buffer.from(reconstructed.buffer)))throw Error('Component records failed to reconstruct the performance.');
+ if(name==='ensemble'){
+  const artifact=prepareContinuousEnsembleAudio(JSON.stringify({kind:'imagimusic-continuous-ensemble-record',version:1,mixGain:gain,records})),view=new DataView(artifact.wav);
+  for(let i=0;i<mono.length;i++)if(!Object.is(view.getFloat32(58+4*i,true),mono[i]))throw Error('The saved ensemble WAV changed a mixed sample.');
+  writeFileSync(resolve(directory,'ensemble.json'),JSON.stringify(artifact.record,null,2)+'\n');writeFileSync(resolve(directory,'ensemble-raw.wav'),new Uint8Array(artifact.wav));
+ }
  // Same gain per body in both examples, not equal perceived loudness.
  if(name==='source')for(let i=0;i<mono.length;i++)mono[i]*=gain;
  let peak=0;const channels=[Math.cos(Math.PI/4),Math.sin(Math.PI/4)].map(pan=>Float32Array.from(mono,value=>{
