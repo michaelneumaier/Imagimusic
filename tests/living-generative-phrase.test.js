@@ -39,3 +39,23 @@ test('grammar version1 pins the source for seed42',()=>{
  assert.deepEqual(p.source.events,[{frame:16800,strength:.05},{frame:28800,strength:.025},{frame:52800,strength:.1},{frame:76800,strength:.05},{frame:88800,strength:.025},{frame:124800,strength:.1}]);
  assert.equal(p.source.fadeStart,184800);
 });
+
+test('creative spacing preserves the same idea and source level without cumulative transforms',async()=>{
+ const {createLivingDirectedPhrase}=await import('../src/living/generative-phrase.js');
+ for(const seed of [0,42,2026,188545454,2950288811,0xffffffff]){
+  const basis=createLivingGeneratedPhrase(seed),directions=['close','original','open'].map(d=>createLivingDirectedPhrase(seed,d));
+  assert.deepEqual(directions[1].source,basis.source);
+  assert.ok(directions[0].pulseFrames<directions[1].pulseFrames&&directions[1].pulseFrames<directions[2].pulseFrames);
+  for(const p of directions){
+   assert.deepEqual(p.source.events.map(e=>e.strength),basis.source.events.map(e=>e.strength));
+   assert.deepEqual(p.source.design,basis.source.design);assert.equal(p.variation,basis.variation);
+   assert.equal(p.source.events[0].frame,16800);assert.ok(p.source.events.at(-1).frame<=192000);
+   assert.equal(p.source.fadeStart-p.source.events.at(-1).frame,60000);
+   assert.deepEqual(p.source.events.map(e=>(e.frame-16800)/p.pulseFrames),basis.source.events.map(e=>(e.frame-16800)/basis.pulseFrames));
+   assert.deepEqual(createLivingDirectedPhrase(seed,p.spacing),p);
+   const pcm=renderLivingArrangement(p.source);assert.ok(Number.isFinite(pcm.peak)&&pcm.peak<=1);
+  }
+ }
+ const bounded=createLivingDirectedPhrase(2950288811,'open');assert.equal(bounded.source.events.at(-1).frame,192000);assert.equal(bounded.pulseFrames,17520);
+ for(const value of [null,{},'__proto__','slow'])assert.throws(()=>createLivingDirectedPhrase(42,value));
+});

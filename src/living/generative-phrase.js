@@ -20,3 +20,22 @@ export function createLivingGeneratedPhrase(seed){
  const source=validateTineLiveRecord({kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate,events,fadeStart:events.at(-1).frame+Math.round(1.25*sampleRate)});
  return Object.freeze({kind:'imagimusic-living-generated-phrase',version:1,seed,pulseFrames,motif:Object.freeze([...motif]),accents:Object.freeze([...accents]),repeatOffsetTicks,variation,source});
 }
+
+export const LIVING_PHRASE_SPACING=Object.freeze({
+ close:Object.freeze({name:'Closer',scale:.7}),
+ original:Object.freeze({name:'Original pace',scale:1}),
+ open:Object.freeze({name:'More space',scale:1.25}),
+});
+/** Direction v1 retains the seeded musical cell, accents and final decay.
+ * Adjust the shared pulse, with a ceiling at the four-second touch boundary.
+ * Always derive from grammar1, so changing direction never accumulates rounding.
+ */
+export function createLivingDirectedPhrase(seed,spacing='original'){
+ if(typeof spacing!=='string'||!Object.hasOwn(LIVING_PHRASE_SPACING,spacing))throw Error('Choose a supported phrase spacing.');
+ const basis=createLivingGeneratedPhrase(seed),first=basis.source.events[0].frame;
+ const lastTick=(basis.source.events.at(-1).frame-first)/basis.pulseFrames;
+ const pulseFrames=Math.min(Math.round(basis.pulseFrames*LIVING_PHRASE_SPACING[spacing].scale),Math.floor((4*basis.source.sampleRate-first)/lastTick));
+ const events=basis.source.events.map(e=>({frame:first+(e.frame-first)/basis.pulseFrames*pulseFrames,strength:e.strength}));
+ const source=validateTineLiveRecord({...basis.source,events,fadeStart:events.at(-1).frame+60000});
+ return Object.freeze({...basis,kind:'imagimusic-living-directed-phrase',version:1,spacing,pulseFrames,source});
+}

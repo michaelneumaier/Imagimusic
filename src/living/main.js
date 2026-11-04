@@ -1,4 +1,4 @@
-import {createLivingGeneratedPhrase} from './generative-phrase.js';
+import {createLivingDirectedPhrase,LIVING_PHRASE_SPACING} from './generative-phrase.js';
 import {createLivingGreeting} from './greeting.js';
 import {readLivingKeptFile} from './recipe-file.js';
 import {createLivingExploration,serializeLivingExploration,validateLivingExploration} from './exploration-record.js';
@@ -25,7 +25,8 @@ motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
-let examplePlaying=false,generatedPlaying=false,generatedPhrase=null;
+let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original';
+const spacingButtons=[...document.querySelectorAll('[data-spacing]')];
 const exampleName=()=>generatedPlaying?'A generated piece':'An authored example';
 let unfolding=false,arrangementJob=null,arrangementPCM=null,arrangementView=null,lastPart=null,replayReturnButton='again';
 const active=state=>['preparing','playing','ringing','ending'].includes(state);
@@ -38,6 +39,7 @@ function controls(){
  $('generate-piece').disabled=$('hear-first').disabled;
  $('replay-generated').disabled=$('hear-first').disabled||!generatedPhrase;
  $('explore-generated').disabled=$('replay-generated').disabled;
+ for(const b of spacingButtons)b.disabled=$('replay-generated').disabled;
  $('open-recipe').disabled=!world||busy||repeat;
  $('return-branch').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!branchCapture?.current;
  $('play-body').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM||selectedPCM.record.design.lengthMm===80;
@@ -164,12 +166,20 @@ async function playArrangement(source,example=false,generated=false){
 }
 $('unfold').addEventListener('click',()=>{if(!$('unfold').disabled)playArrangement(capture.current.record);});
 $('hear-first').addEventListener('click',()=>{if(!$('hear-first').disabled)playArrangement(createLivingGreeting(),true);});
+function previewGenerated(seed,spacing){
+ generatedPhrase=createLivingDirectedPhrase(seed,spacing);generatedSpacing=spacing;
+ $('generated-actions').hidden=false;
+ for(const b of spacingButtons)b.setAttribute('aria-pressed',String(b.dataset.spacing===spacing));
+ $('generated-note').textContent=`Piece ${seed} · ${LIVING_PHRASE_SPACING[spacing].name.toLowerCase()}. A three-touch motif, a breath, and a ${generatedPhrase.variation==='repeat'?'return of the motif':generatedPhrase.variation==='linger'?'later final touch':'softer return'}. Six generated touches unfold across three bodies. Your current encounter stays separate.`;
+ playArrangement(generatedPhrase.source,true,true);
+}
 $('generate-piece').addEventListener('click',()=>{
  if($('generate-piece').disabled)return;
- const seed=crypto.getRandomValues(new Uint32Array(1))[0];generatedPhrase=createLivingGeneratedPhrase(seed);
- $('generated-actions').hidden=false;
- $('generated-note').textContent=`Piece ${seed}. A three-touch motif, a breath, and a ${generatedPhrase.variation==='repeat'?'return of the motif':generatedPhrase.variation==='linger'?'later final touch':'softer return'}. Six generated touches unfold across three bodies. Your played phrase stays separate.`;
- playArrangement(generatedPhrase.source,true,true);
+ previewGenerated(crypto.getRandomValues(new Uint32Array(1))[0],generatedSpacing);
+});
+for(const button of spacingButtons)button.addEventListener('click',()=>{
+ if(button.disabled||!generatedPhrase)return;
+ previewGenerated(generatedPhrase.seed,button.dataset.spacing);
 });
 $('replay-generated').addEventListener('click',()=>{if(!$('replay-generated').disabled)playArrangement(generatedPhrase.source,true,true);});
 $('explore-generated').addEventListener('click',async()=>{
@@ -178,7 +188,7 @@ $('explore-generated').addEventListener('click',async()=>{
  await capture.load(phrase.source);if(own!==restoreVersion)return;
  if(JSON.stringify(capture.current?.record)!==JSON.stringify(phrase.source)){$('generated-note').textContent='This piece could not be prepared for exploration. The previous original remains available.';return;}
  unfolding=false;examplePlaying=false;generatedPlaying=false;
- $('generated-note').textContent=`Piece ${phrase.seed} is ready to explore. Compare its bodies, play an answer, or keep this encounter as an address or film.`;
+ $('generated-note').textContent=`Piece ${phrase.seed}, ${LIVING_PHRASE_SPACING[phrase.spacing].name.toLowerCase()}, is ready to explore. Compare its bodies, play an answer, or keep this encounter as an address or film.`;
  $('touch-note').textContent='This original phrase was generated. Its timing and accents remain intact when you compare bodies or keep the encounter.';
  $('playing-status').textContent='Generated phrase adopted quietly. Hear again, unfold it, or choose another body to play.';controls();
 });

@@ -780,3 +780,9 @@ Versioned contact presentation: owns src/living/presentation.js, record.js, perf
 Contact identity notes/evidence: also owns choreography.js and striker-geometry.js comments marking production3 stability, project-catalog.js Living description, and current evidence/plan appendices. No physics changes.
 
 Versioned contact presentation complete: new3 live/film sampling adopted, old1/2 hashes pinned unchanged, positive-contact boundary explicit, native generated ensemble/Quiet and legacy bare unfolding verified; actual453frame film encoded/downloaded, manifest reconstructed and contact frame inspected. Full831pass; final selector check3pass. Claims released. Next artistic evaluation of generated pieces, their anticipation and framing; no wider composer or real hammer physics claimed.
+
+Creative phrase spacing: owns src/living/generative-phrase.js and tests plus main.js/living.html/living.css for same-seed Closer/Original pace/More space choices. Preserve grammar1 output and original capture; choices rebuild source timings, never stretch recorded audio or stack transforms.
+
+Spacing discovery/evidence: also owns Living catalog entry and append-only proposal026/implementation notes for this creative-input milestone.
+
+Creative phrase spacing complete: deterministic same-seed three-way direction, explicit original return and selected-version adoption verified;11targeted tests plus final4generator tests pass, native source frames/accents checked. Catalog, plan and evidence updated. Claims released; listener assessment and next compositional direction remain open.

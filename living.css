@@ -36,3 +36,5 @@ header{padding-top:18px;padding-bottom:14px}
 .branch-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}.branch-actions a{display:inline-block}
 
 .intro-listen{flex-wrap:wrap;flex-shrink:1;max-width:480px}#generated-actions{margin-top:20px;max-width:760px}#generated-note{font-size:14px;line-height:1.7;color:#b6c0bd}#generate-piece{background:#24332f;border-color:#9cae9f}
+
+.phrase-spacing{border:0;padding:0;margin:18px 0}.phrase-spacing legend{font-size:14px;color:#d1d9d5;margin-bottom:10px}.phrase-spacing .quiet{margin-top:10px}

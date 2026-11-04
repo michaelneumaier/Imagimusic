@@ -191,3 +191,9 @@ This closes the first automatic source-to-performance-to-playable-encounter loop
 Presentation3, Porcelain performers, adopts the ceramic contact rig into new flagship encounters. Generated pieces, the fixed introduction and visitor unfoldings share the same known-score pose timeline as film export. Earlier saved appearances remain unchanged. Quiet retires the rig; direct live touch continues to receive immediate acknowledgment. A local15.1second film with453frames has been encoded and its pose hashes reconstructed in Node from the downloaded manifest.
 
 The performer is artistic choreography around an ideal impulse source. It does not yet model collision forces or make the instrument mechanically coupled. The next artistic work is to inspect complete contrasting generated performances for readable anticipation, musical distinction and a satisfying return, including narrow and held views. Broader grammar and creative direction controls should grow from those observations.
+
+## First creative direction control
+
+After generating a piece, Closer, Original pace and More space let the visitor direct that same motif without playing it. The choice changes event spacing while preserving its accents and musical cell; it prepares a complete new performance and leaves the current original untouched until Explore is chosen. Original pace restores the grammar's exact source. The bounded control supplies one audible compositional decision, rather than a vague mood promise.
+
+Next, assess whether these choices are clearly audible and whether the current automatic round gives the motif enough room to be recognized. The existing spaced-answer and fragment studies remain candidate musical directions; their listening judgment should inform any new saved arrangement version. More parameters are not yet the priority.
