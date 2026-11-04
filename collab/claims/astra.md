@@ -1133,3 +1133,5 @@ Longer unattended listening study complete: A way home, three related 48-second 
 Longer journey picture complete: renderer-admitted embedded chapters, exact media-clock boundary/seek sampling, shared scene lifecycle, reduced-motion/still choice and optional cues. Twenty focused tests pass; embedded records/WAV identity/HTTP/syntax/diff checked. Claims released; native appearance/sync and independent review remain open.
 
 Homepage invitation/current milestones complete: unattended journey first, optional participation and exploration routes, preserved earlier paths under disclosure, current roadmap corrections and appended history. Balanced HTML/19 IDs/62 local resources/retained destinations/home readiness/diff checked. Claims released; native layout and independent review remain pending.
+
+Personal three-touch journey foundation complete: bounded copied gesture, exact opening/home timing and accents, unchanged default WAV, strict chapter preparation and cancellable worker. Five composition tests and 14 audio/view/lifecycle tests pass; syntax/diff clean. Claims released; page controls, native listening and independent review remain ahead.

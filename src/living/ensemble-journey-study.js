@@ -3,9 +3,16 @@ import {createContinuousEnsembleStudy} from './continuous-ensemble-study.js';
 /** A three-chapter authored grammar. Each chapter starts from rest and has its
  * own captured ending; the long presentation joins those complete recordings.
  * A seed varies the opening rhythm/accent, not the form or instrument family. */
-export function createEnsembleJourneyStudy(seed=42,{sampleRate=48000}={}){
+export function createEnsembleJourneyStudy(seed=42,{sampleRate=48000,gesture=null}={}){
  const source=createContinuousEnsembleStudy(seed,{sampleRate}),opening=source.sections[0].events;
- const motif=opening.map(e=>({time:(e.frame-opening[0].frame)/sampleRate,strength:e.strength}));
+ if(gesture!==null){
+  if(!Array.isArray(gesture)||gesture.length!==3)throw Error('Offer exactly three touches.');
+  gesture=gesture.map((e,i)=>{
+   if(!e||Object.keys(e).length!==2||!Object.hasOwn(e,'frame')||!Object.hasOwn(e,'strength')||!Number.isInteger(e.frame)||e.frame<0||e.frame>3*sampleRate||(i===0?e.frame!==0:e.frame<=gesture[i-1].frame)||!Number.isFinite(e.strength)||e.strength<=0||e.strength>.1)throw Error('Use three ordered positive touches within three seconds, starting at frame zero.');
+   return {frame:e.frame,strength:e.strength};
+  });
+ }
+ const motif=gesture?gesture.map(e=>({time:e.frame/sampleRate,strength:e.strength})):opening.map(e=>({time:(e.frame-opening[0].frame)/sampleRate,strength:e.strength}));
  const chapters=[];
  function chapter(name,compose){
   const events=[];
@@ -38,5 +45,5 @@ export function createEnsembleJourneyStudy(seed=42,{sampleRate=48000}={}){
   p(22,{voices:[0,1,0],stretch:1.25,gain:.75});
   p(32);p(40);
  });
- return {kind:'imagimusic-ensemble-journey-study',version:1,seed,sampleRate,seconds:144,motif,chapters};
+ return {kind:'imagimusic-ensemble-journey-study',version:1,seed,sampleRate,seconds:144,motifSource:gesture?'personal':'offered',motif,chapters};
 }
