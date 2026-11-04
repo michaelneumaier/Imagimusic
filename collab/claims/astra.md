@@ -1048,3 +1048,5 @@ Continuous score reservation complete: read-only conservative forecast and64note
 Continuous performance capture complete: separate strict sixty-second/from-rest record, accepted provenance, bounded reader, admission reconstruction and output-only ending. Twelve focused tests and full967tests pass. Claims released; browser transport, ensemble integration, native listening and independent review remain pending.
 
 Continuous finite transport complete: explicit start/Quiet/cancel/end, bounded capture with score-slot reservation, exact saved reconstruction, scheduler cancellation/accessors. Sixteen focused tests pass. Claims released; composer/worklet/native listening and independent review remain ahead.
+
+Autonomous continuous return study complete: seeded48second/eight-passage rhythmic form, automatic look-ahead, optional guest with unchanged score, unattended/one-touch exact-capture WAV comparison. Twenty-one focused tests pass; local artifacts200. Claims released; native listening/worklet/browser and independent review remain ahead.
