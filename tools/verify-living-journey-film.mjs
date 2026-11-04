@@ -4,6 +4,8 @@ import {pathToFileURL} from 'node:url';
 import {isDeepStrictEqual} from 'node:util';
 import {createHash} from 'node:crypto';
 import {createLivingJourneyMoviePlan} from '../src/living/journey-movie-plan.js';
+import {renderLivingPersonalJourneyArtifact} from '../src/living/personal-journey-artifact.js';
+import {readLivingPersonalJourneyReport} from '../src/living/personal-journey-report.js';
 import {renderLivingJourneyArtifact} from '../src/living/journey-artifact.js';
 import {prepareLivingJourneyMovieAudio} from '../src/living/journey-movie-audio.js';
 import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from '../src/living/journey-report.js';
@@ -16,20 +18,22 @@ export async function verifyLivingJourneyFilm(manifest,scoreText,wav){
  try{
   if(!(wav instanceof ArrayBuffer)||wav.byteLength<44||wav.byteLength>64*1024*1024)throw Error('Use a WAV no larger than64MiB.');
   if(JSON.stringify(manifest).length>2*1024*1024)throw Error('Film details exceed2MiB.');
-  const kept=readLivingJourneyReport(scoreText),plan=createLivingJourneyMoviePlan(kept.request,{reveal:manifest?.reveal});
+  if(typeof scoreText!=='string'||Buffer.byteLength(scoreText)>LIVING_JOURNEY_REPORT_LIMIT)throw Error('Score report exceeds its input limit.');
+  const personal=JSON.parse(scoreText)?.kind==='imagimusic-living-personal-journey-artifact';
+  const kept=(personal?readLivingPersonalJourneyReport:readLivingJourneyReport)(scoreText),plan=createLivingJourneyMoviePlan(kept.request,{reveal:manifest?.reveal});
   const {audio,codecs,encoding,...storedPlan}=manifest;
   // Downloads are JSON: e.g. the first instance's -0 depth returns as 0.
   // Compare the exact serialized contract rather than in-memory signed zero.
   check('Full score, layout, timing, reveal choice and every frame-state hash rebuild',isDeepStrictEqual(JSON.parse(JSON.stringify(storedPlan)),JSON.parse(JSON.stringify(plan.manifest))));
   check('Declared codec choices are H.264/AAC',isDeepStrictEqual(codecs,{video:'avc',audio:'aac'}));
   check('Encoding scope is retained as text',typeof encoding==='string'&&encoding.length>0);
-  const rebuilt=await renderLivingJourneyArtifact(kept.request);
+  const rebuilt=await (personal?renderLivingPersonalJourneyArtifact:renderLivingJourneyArtifact)(kept.request);
   const {wav:rebuiltWav,...rebuiltReport}=rebuilt;
   check('Complete generated score report matches this runtime',isDeepStrictEqual(JSON.parse(scoreText),rebuiltReport));
   const expected=await prepareLivingJourneyMovieAudio(rebuilt,plan.manifest);
   check('Saved soundtrack evidence matches regenerated recording',isDeepStrictEqual(audio,expected.evidence));
   check('Provided WAV bytes equal the regenerated recording',wav.byteLength===rebuiltWav.byteLength&&hash(wav)===rebuilt.sha256);
-  return {ok:checks.every(c=>c.ok),checks,seed:kept.request.seed,treatment:kept.request.treatment,modelFrames:plan.times.length,audioSamples:rebuilt.frames,scope};
+  return {ok:checks.every(c=>c.ok),checks,...(personal?{personal:true,touches:kept.request.source.events.length}:{seed:kept.request.seed,treatment:kept.request.treatment}),modelFrames:plan.times.length,audioSamples:rebuilt.frames,scope};
  }catch(error){checks.push({name:error.message,ok:false});return {ok:false,checks,scope};}
 }
 

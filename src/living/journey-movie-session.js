@@ -1,3 +1,4 @@
+import {validateLivingPersonalJourneyRequest} from './personal-journey-artifact.js';
 import {validateLivingJourneyRequest} from './journey-artifact.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
 
@@ -12,7 +13,8 @@ export function createLivingJourneyMovieSession({
  function cancel(){controller?.abort();job?.cancel();}
  async function prepare({request:value,reveal=true,expectedSha256=null},onProgress=()=>{}){
   if(controller)throw Error('A journey film is already being prepared.');
-  const request=validateLivingJourneyRequest(value);
+  const personal=value?.kind==='imagimusic-living-personal-journey-request';
+  const request=(personal?validateLivingPersonalJourneyRequest:validateLivingJourneyRequest)(value);
   if(typeof reveal!=='boolean'||(expectedSha256!==null&&(typeof expectedSha256!=='string'||!/^[a-f0-9]{64}$/.test(expectedSha256))))throw Error('Unsupported journey film options.');
   controller=new AbortController();const signal=controller.signal;
   const check=()=>{if(signal.aborted)throw new DOMException('Journey film cancelled.','AbortError');};
@@ -26,7 +28,8 @@ export function createLivingJourneyMovieSession({
    const links=[];
    try{for(const [suffix,blob,label] of files)links.push({href:makeURL(blob),download:result.stem+suffix,label});check();}
    catch(error){links.forEach(link=>revokeURL(link.href));throw error;}
-   const next={links,seed:request.seed,treatment:request.treatment,reveal,seconds:result.manifest.duration};
+   const identity=personal?{personal:true,touches:request.source.events.length}:{seed:request.seed,treatment:request.treatment};
+   const next={links,...identity,reveal,seconds:result.manifest.duration};
    release(current);current=next;return next;
   }finally{job=null;controller=null;onChange();}
  }

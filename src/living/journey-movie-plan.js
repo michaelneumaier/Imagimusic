@@ -1,3 +1,5 @@
+import {validateLivingPersonalJourneyRequest} from './personal-journey-artifact.js';
+import {createLivingPersonalJourneyStudy} from './personal-journey-study.js';
 import {validateLivingJourneyRequest} from './journey-artifact.js';
 import {createLivingJourneyStudy} from './journey-study.js';
 import {createLivingConnectedJourneyStudy} from './connected-journey-study.js';
@@ -19,15 +21,17 @@ function freeze(value){
  */
 export function createLivingJourneyMovieSource(value,{reveal=true}={}){
  if(typeof reveal!=='boolean')throw Error('Choose whether the journey film reveals response veils.');
- const request=validateLivingJourneyRequest(value),journey=makers[request.treatment](request.seed);
- const view=createLivingJourneyView(journey),layout=freeze(createLivingJourneyLayout(view.allocation));
+ const personal=value?.kind==='imagimusic-living-personal-journey-request';
+ const request=personal?validateLivingPersonalJourneyRequest(value):validateLivingJourneyRequest(value);
+ const journey=personal?createLivingPersonalJourneyStudy(request.source):makers[request.treatment](request.seed);
+ const view=createLivingJourneyView(journey),layout=freeze(createLivingJourneyLayout(view.allocation,{fitAllInstances:personal}));
  const fps=30,duration=journey.frames/journey.sampleRate,times=Object.freeze(new FrameClock({fps}).times(duration));
  function sample(seconds){
   const frame=view.at(seconds);
   return {...frame,cameraShot:layout.camera,instances:frame.instances.map(instance=>({...instance,points:reveal?instance.points:null}))};
  }
  const manifest=freeze({
-  kind:'imagimusic-living-journey-movie-plan',version:1,request,journey,layout,reveal,look:'dusk',
+  kind:personal?'imagimusic-living-personal-journey-movie-plan':'imagimusic-living-journey-movie-plan',version:1,request,journey,layout,reveal,look:'dusk',
   width:1280,height:720,fps,sampleRate:journey.sampleRate,audioSamples:journey.frames,
   duration,frames:times.length,videoDuration:times.length/fps,
   hashDigits:JOURNEY_MOVIE_HASH_DIGITS,frameHashes:[],

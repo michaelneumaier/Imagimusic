@@ -1,3 +1,4 @@
+import {readLivingPersonalJourneyReport} from './personal-journey-report.js';
 import {readLivingJourneyReport} from './journey-report.js';
 
 /** Decode only the canonical stereo PCM16 container produced by this study.
@@ -9,8 +10,10 @@ export async function prepareLivingJourneyMovieAudio(artifact,manifest,{signal,d
  if(!(artifact?.wav instanceof ArrayBuffer)||artifact.wav.byteLength<44||artifact.wav.byteLength>64*1024*1024)throw Error('Use a bounded generated journey WAV.');
  // Snapshot before hashing yields: caller edits cannot change this soundtrack.
  const wav=artifact.wav.slice(0),{wav:ignored,...fields}=artifact;
- const reportText=JSON.stringify(fields),kept=readLivingJourneyReport(reportText),report=JSON.parse(reportText);
- if(manifest?.kind!=='imagimusic-living-journey-movie-plan'||manifest.version!==1||JSON.stringify(kept.request)!==JSON.stringify(manifest.request)||JSON.stringify(kept.plan)!==JSON.stringify(manifest.journey)||manifest.sampleRate!==report.sampleRate||manifest.audioSamples!==report.frames||manifest.duration!==report.seconds)throw Error('The soundtrack belongs to a different journey film.');
+ const personal=fields.kind==='imagimusic-living-personal-journey-artifact';
+ const reportText=JSON.stringify(fields),kept=(personal?readLivingPersonalJourneyReport:readLivingJourneyReport)(reportText),report=JSON.parse(reportText);
+ const kind=personal?'imagimusic-living-personal-journey-movie-plan':'imagimusic-living-journey-movie-plan';
+ if(manifest?.kind!==kind||manifest.version!==1||JSON.stringify(kept.request)!==JSON.stringify(manifest.request)||JSON.stringify(kept.plan)!==JSON.stringify(manifest.journey)||manifest.sampleRate!==report.sampleRate||manifest.audioSamples!==report.frames||manifest.duration!==report.seconds)throw Error('The soundtrack belongs to a different journey film.');
  const sampleRate=report.sampleRate,frames=report.frames;
  const view=new DataView(wav),tag=offset=>String.fromCharCode(...new Uint8Array(wav,offset,4));
  if(wav.byteLength!==44+frames*4||tag(0)!=='RIFF'||view.getUint32(4,true)!==wav.byteLength-8||tag(8)!=='WAVE'||tag(12)!=='fmt '||view.getUint32(16,true)!==16||view.getUint16(20,true)!==1||view.getUint16(22,true)!==2||view.getUint32(24,true)!==sampleRate||view.getUint32(28,true)!==sampleRate*4||view.getUint16(32,true)!==4||view.getUint16(34,true)!==16||tag(36)!=='data'||view.getUint32(40,true)!==frames*4)throw Error('The journey soundtrack is not its canonical stereo PCM16 WAV.');

@@ -194,7 +194,7 @@ for(const event of ['timeupdate','pause','playing','ended','seeked','error'])aud
 function park(){film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();
-film=setupLivingJourneyMovieControls({canMake:()=>!personalChoice,getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
+film=setupLivingJourneyMovieControls({getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
 function openPersonalAddress(){
  const hash=location.hash;
  if(!hash.startsWith('#tine-live=')&&!hash.startsWith('#living='))return;
