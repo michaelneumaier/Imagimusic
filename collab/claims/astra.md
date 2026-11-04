@@ -1026,3 +1026,5 @@ Original phrase audition complete: personal journey offers sound-only original t
 Shared ringing-body prototype complete: scheduled and guest touches use one continuous existing tine pass with reserved quota, deterministic ties and exact retained source ending.10focused tests pass; authored original/joined WAV pair rendered. Claims released. Worklet/live UI, native timing, visualization and long-running composition remain ahead.
 
 Shared phrase worklet complete: bounded acknowledged commands, actual accepted source/guest frame provenance, origin clock and complete record. Explicit source/context rate agreement and terminal error silence.13focused tests pass. Claims released; main-thread lifecycle, live controls and native timing remain ahead.
+
+Shared phrase session complete: explicit/cancellable audio lifecycle, acknowledged guest quota, guarded clock/touch events and reconstructed complete result; prior successful result survives failed replacement.23focused tests passed, then6session tests passed after added failure-retention/message coverage. Claims released; live UI/native device verification pending.
