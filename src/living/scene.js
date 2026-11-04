@@ -100,11 +100,11 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  const rim=new T.DirectionalLight(0xa7d1e7,2.8);rim.position.set(6,5,-7);scene.add(rim);
  const camera=new T.PerspectiveCamera(34,1,.1,220),controls=new OrbitControls(camera,canvas);
  controls.enableDamping=false;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.48;
- let cameraOpen=0;
+ let cameraOpen=0,inspectContact=false;
  let selected='opening',width=0,height=0,disposed=false;
  const poses={opening:{target:[3.5,2,0],direction:[10,6.5,14],radius:6.6},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
  function place(){
-  const solo=poses[selected],wide={target:[3,2,-2],direction:[5,9,19],radius:16};
+  const solo=inspectContact?{target:[6.3,4.2,0],direction:[3,2,8],radius:1.3}:poses[selected],wide={target:[3,2,-2],direction:[5,9,19],radius:16};
   const target=new T.Vector3(...solo.target).lerp(new T.Vector3(...wide.target),cameraOpen);
   const direction=new T.Vector3(...solo.direction).normalize().lerp(new T.Vector3(...wide.direction).normalize(),cameraOpen).normalize();
   const radius=T.MathUtils.lerp(solo.radius,wide.radius,cameraOpen),vertical=T.MathUtils.degToRad(camera.fov/2),horizontal=Math.atan(Math.tan(vertical)*camera.aspect),distance=radius/Math.sin(Math.min(vertical,horizontal));
@@ -129,8 +129,9 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function openCamera(value){
   if(cameraOpen===value)return;cameraOpen=value;scene.fog.near=T.MathUtils.lerp(30,80,value);scene.fog.far=T.MathUtils.lerp(65,180,value);bodies[1].objects.visible=bodies[2].objects.visible=value>0;place();
  }
- function arrangementFrame(frame,reveal,cameraMotion=true){
-  controls.enabled=!cameraMotion;openCamera(cameraMotion?frame.cameraOpen:1);
+ function arrangementFrame(frame,reveal,cameraMotion=true,contactDetail=false){
+  const framingChanged=inspectContact!==contactDetail;inspectContact=contactDetail;
+  controls.enabled=inspectContact||!cameraMotion;openCamera(inspectContact?0:cameraMotion?frame.cameraOpen:1);if(framingChanged)place();
   for(let i=0;i<3;i++){bodies[i].response(reveal?frame.bodies[i].points:null);bodies[i].acknowledgeTouch(frame.bodies[i].touched);}
   render();
  }
@@ -142,7 +143,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
  }
  function performers(poses=[]){for(let i=0;i<3;i++)bodies[i].performers(poses.filter(p=>p.body===i));}
- function clearArrangement(){controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);render();}
+ function clearArrangement(){const wasDetail=inspectContact;inspectContact=false;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
  function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
  return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,performers,dispose};

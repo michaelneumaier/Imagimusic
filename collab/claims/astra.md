@@ -734,3 +734,7 @@ Dense contact staging: owns choreography.js actor dimensions, striker-geometry.j
 Dense visual fixture: also owns study-fixtures.js, both living answer/response render tools for shared fixture import, look-main.js/living-look.html phrase selection. Compare before/after WAV hashes to ensure fixture extraction changes no audio.
 
 Dense contact staging complete: overlap measured and corrected with shared support/lane-sized mallets, shared source fixtures and native burst/switch/narrow evidence. Claims released. Next: contact close-up for small-screen inspection; no production adoption yet.
+
+Living contact close-up: owns scene.js optional paused inspection framing, look-main.js and living-look.html controls. Preserve time and camera preference; whole-scene return, playback/source/chapter exits detail, named PNG capture. Production defaults unaffected.
+
+Living contact close-up complete: narrow native inspection and return/play/preference/capture-link behavior checked; claims released. Current contact staging remains a workshop layer pending a versioned adoption decision and visitor-facing evaluation.

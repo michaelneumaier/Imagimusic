@@ -758,3 +758,5 @@
 - 2026-11-04 (Astra): refined workshop strikers with tapered ceramic bows, oval feet and bronze counterweights while retaining exact head path and score. Native dusk contact and held-camera ending inspected; playback reaches15.10s paused.4focused checks pass. Production unchanged; dense and small-screen motion inspection remains next.
 
 - 2026-11-04 (Astra): fixed measured dense-striker overlap using one shared bow/axle and lane-sized moving parts with radius-aware contact geometry. Added shared greeting/burst visual fixtures; all16 audio-study WAV hashes unchanged.11focused tests and native dense contact/source switch pass.390px inspection identifies contact detail as too small; next close-up route is warranted. Production unchanged.
+
+- 2026-11-04 (Astra): paused contact close-up added to existing visual workshop. Native390px dense contact is readable; same-time whole-scene return, retained held-camera preference, Play exit, active-play pause and named still link verified. Production framing remains default; no new physics/audio changes.
