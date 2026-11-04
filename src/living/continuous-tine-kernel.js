@@ -51,6 +51,26 @@ export function createContinuousTineKernel(geometry,{sampleRate=48000,count=4,ac
   }
   frame+=output.length;return output;
  }
+ /** Conservative committed-window forecast, with an extra planning margin.
+  * Decay the larger current analytic/state bound, then add absolute impulses.
+  * Validates all input first; never advances or changes the ringing body.
+  */
+ function forecast(events){
+  if(!Array.isArray(events)||events.length>65)throw Error('Forecast at most65touches.');
+  let previous=frame;
+  const planned=events.map(event=>{
+   if(!event||!Number.isSafeInteger(event.frame)||event.frame<previous||event.frame-frame>8*sampleRate||!Number.isFinite(event.strength)||event.strength===0||Math.abs(event.strength)>.1)throw Error('Invalid ordered continuous forecast within8seconds.');
+   previous=event.frame;return {frame:event.frame,strength:event.strength};
+  });
+  let {displacementBoundM,outputBound}=bounds(),at=frame;
+  for(const event of planned){
+   const decay=Math.exp(-slowestDecay*(event.frame-at)/sampleRate);at=event.frame;
+   displacementBoundM=displacementBoundM*decay+Math.abs(event.strength)*unit.displacementBoundM;
+   outputBound=outputBound*decay+Math.abs(event.strength)*unitOutputBound;
+   if(displacementBoundM>.98*model.geometry.thicknessM*.1||outputBound>.98*TINE_OUTPUT_BOUND)return {admitted:false,frame:at,displacementBoundM,outputBound};
+  }
+  return {admitted:true,frame:at,displacementBoundM,outputBound};
+ }
  function snapshot(){return {frame,accepted,weightedStrength:decayedStrength(),slowestDecay,...bounds(),modes:model.modes.map((m,i)=>({displacementM:q[i],velocityMPerS:v[i],energyJ:.5*m.massKg*v[i]*v[i]+.5*m.stiffnessNPerM*q[i]*q[i]}))};}
- return Object.freeze({sampleRate,count,geometry:model.geometry,strike,process,snapshot});
+ return Object.freeze({sampleRate,count,geometry:model.geometry,strike,process,snapshot,forecast,get frame(){return frame;}});
 }

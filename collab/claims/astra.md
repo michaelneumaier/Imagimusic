@@ -1042,3 +1042,5 @@ Generated journey participation complete: every selected journey exposes its act
 Shared touch feedback complete:120ms accepted-touch marker at actual activation, separate from physical response/ending.9focused tests and existing saved film source verifier pass. Claims released; native marker appearance/sync pending.
 
 Continuous tine research complete: separate constant-memory streaming kernel, conservative decay-recovering admission with1percent margin and block-independent budget clock.7focused tests pass;60second authored continuous WAV/report rendered. Claims released; scheduler reservation, long-form record, worklet/native and musical evaluation remain ahead.
+
+Continuous score reservation complete: read-only conservative forecast and64note/8second committed queue protect planned notes from guest admission.8focused tests pass, including saturated reservation and60second rolling schedule. Claims released; native scheduling, recording and composition adoption remain ahead.
