@@ -1040,3 +1040,5 @@ Shared live response binding complete: lazy single-body scene from accepted even
 Generated journey participation complete: every selected journey exposes its actual opening for preview/shared participation, including generated music with two guest slots. Home/catalog/history reconciled.10focused tests and page/resource/syntax/diff checks pass. Claims released; native playback/navigation and aesthetic assessment pending.
 
 Shared touch feedback complete:120ms accepted-touch marker at actual activation, separate from physical response/ending.9focused tests and existing saved film source verifier pass. Claims released; native marker appearance/sync pending.
+
+Continuous tine research complete: separate constant-memory streaming kernel, conservative decay-recovering admission with1percent margin and block-independent budget clock.7focused tests pass;60second authored continuous WAV/report rendered. Claims released; scheduler reservation, long-form record, worklet/native and musical evaluation remain ahead.
