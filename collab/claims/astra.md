@@ -858,3 +858,7 @@ Released-reply workshop integration complete:36WAVs regenerated with matched res
 Released score pacing: owns answer-study.js, released-study tests, existing workshop/tool copy and evidence appendices. Bring later answers forward after a source-derived settling interval; retain full local motifs/return and preserve old published arrangements. Existing released experiment is not a saved identity.
 
 Released score pacing complete:67focused tests pass;36WAVs regenerated; all later motifs and exact original return retained at earlier times. Claims released. Workshop-only artistic rule; independent review and subjective preference unclaimed.
+
+Automatic experience discovery: owns project.html and Living catalog description plus implementation notes. Present listening, small creative direction and playing as complete entrances; reconcile flagship roadmap/history with following-camera and released-reply workshop evidence. No new destination or publication.
+
+Automatic experience discovery complete: home/current chapter/vision/roadmap/history reconciled; native narrow hero and43-entry catalog checked, local links verified. Claims released. No independent review or musical preference claimed.
