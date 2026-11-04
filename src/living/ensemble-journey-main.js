@@ -1,8 +1,9 @@
+import {setupJourneyPresentation} from './ensemble-journey-presentation.js';
 import {setupEnsembleJourneyControls} from './ensemble-journey-controls.js';
 import {createEnsembleJourneyView} from './ensemble-journey-view.js';
 import {createContinuousEnsembleReplayVisual} from './continuous-ensemble-replay-visual.js';
-// This page and its embedded records are generated together after full offline
-// admission. No arbitrary uploads or remote chapter JSON are accepted here.
+// Offered records are embedded after offline physical admission. Personal
+// records arrive from the local render worker; kept recipes also verify the WAV.
 const audio=document.querySelector('audio'),details=document.getElementById('journey-picture'),motion=document.getElementById('journey-motion'),status=document.getElementById('journey-picture-status');
 const $=id=>document.getElementById(id);let personal=null,visual=null;
 motion.checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -18,3 +19,5 @@ try{
 
 window.addEventListener('pagehide',()=>{personal?.stop();visual?.clear();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)personal?.stop();});
+
+setupJourneyPresentation({root:document.body,audio,toggle:$('journey-settle'),pause:$('journey-pause'),secondaryDetails:[...document.querySelectorAll('main>details:not(#journey-picture)')]});

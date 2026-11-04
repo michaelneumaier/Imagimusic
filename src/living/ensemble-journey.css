@@ -1,0 +1,29 @@
+/* Keep the piece and its controls together as the picture expands. */
+body.journey-page{background:radial-gradient(ellipse at 75% 0%,#263036 0,transparent 55%),#11191f}
+.journey-page main{max-width:1000px;padding:36px clamp(20px,4vw,44px) 72px}
+.journey-page h1{font-size:clamp(42px,7vw,72px);letter-spacing:-.035em;margin:24px 0}
+.journey-page main>p,.journey-page main>small{max-width:700px}
+#journey-toolbar{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;gap:12px;padding:12px 0;background:#11191ff5;border-bottom:1px solid #454d52}
+#journey-toolbar button{width:auto;margin:0;padding:10px 16px;font-size:14px;text-align:center}
+#journey-toolbar button[hidden]{display:none}
+#journey-pause{min-width:90px}
+#journey-transport{max-width:700px;margin-top:24px}
+#journey-transport>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#journey-transport>div button{margin:0;min-height:74px}
+#journey-transport label{font-size:14px}
+#journey-transport #listening-help{font-size:13px}
+#journey-transport audio{margin:16px 0 0}
+#journey-transport #status{font-size:14px;min-height:1.6em}
+#journey-picture{margin-top:22px;border-color:#58626a}
+#journey-picture canvas{display:block;margin:18px 0;background:#131c22}
+#journey-picture canvas[hidden]{display:none}
+#journey-picture label{display:inline-block;margin-right:24px;font-size:14px}
+#journey-picture p{font-size:13px;max-width:700px}
+#personal-panel [role=group]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#personal-panel [role=group] button{text-align:center;margin:0;padding:18px 10px}
+#personal-panel input[type=file]{max-width:100%;font:inherit}
+#personal-panel p{max-width:700px}
+.journey-page.settled main>p:not([role=status]),.journey-page.settled main>small{display:none}
+.journey-page.settled #journey-picture>p:not([role=status]){display:none}
+.journey-page.settled main>details:not(#journey-picture){margin-top:16px;padding-top:16px}
+@media(max-width:600px){.journey-page main{padding-top:22px}#journey-transport>div{grid-template-columns:1fr}#journey-transport>div button{min-height:0}#journey-toolbar button{padding:10px 12px}#journey-picture label{display:block}#personal-panel [role=group]{gap:6px}#personal-panel [role=group] button{font-size:14px}}

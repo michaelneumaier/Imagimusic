@@ -1139,3 +1139,5 @@ Personal three-touch journey foundation complete: bounded copied gesture, exact 
 Personal journey page controls complete: three silent taps, explicit worker preparation/cancellation, retained previous personal version, shared-player listening, matching optional picture and WAV/chapter keeping.25 focused tests pass; generated28 IDs/HTTP/syntax/WAV identity/diff checked. Claims released; native interaction/listening and independent review remain open.
 
 Whole personal journey return complete: bounded strict recipe, silent worker regeneration, exact WAV fingerprint before publication, retained failures/cancelled reads and atomic five-URL lifecycle.30 focused and full1,175 tests pass; served31 IDs/HTTP/syntax/home readiness/diff checked. Claims released; native file/audio/visual interaction and independent review remain open.
+
+Journey listening presentation complete: transport before expanding picture, sticky explicit Pause, reversible quiet view/Escape and responsive personal accent layout. Balanced HTML/35 IDs/HTTP/syntax/home readiness/diff and unchanged WAV checked. Claims released; native layout/keyboard/appeal and independent review remain open.
