@@ -32,7 +32,7 @@ export function createContinuousReturnStudy(seed=42,{sampleRate=48000}={}){
  * guest. A guest affects the ringing state, not this fixed composition's future.
  */
 export function createContinuousReturnPerformance(seed=42,options={}){
- const plan=createContinuousReturnStudy(seed,options),pass=createContinuousTinePass(plan.design,{sampleRate:plan.sampleRate,endFrame:plan.frames});let next=0;
+ const plan=createContinuousReturnStudy(seed,options),pass=createContinuousTinePass(plan.design,{sampleRate:plan.sampleRate,endFrame:plan.frames});let next=0,guestCount=0;
  function replenish(){
   if(pass.state!=='playing')return;
   let end=next;while(end<plan.events.length&&plan.events[end].frame<=pass.frame+8*plan.sampleRate)end++;
@@ -45,7 +45,9 @@ export function createContinuousReturnPerformance(seed=42,options={}){
  }
  function tryGuest(strength=.1){
   if(!Number.isFinite(strength)||strength===0||Math.abs(strength)>.1)throw Error('Guest strength must be nonzero and within ±0.1.');
-  replenish();return pass.tryGuest(strength);
+  replenish();
+  if(guestCount>=4096-plan.events.length)return {admitted:false,events:[],reason:'Recording space is reserved for the remaining composition.'};
+  const result=pass.tryGuest(strength);if(result.admitted)guestCount++;return result;
  }
  return Object.freeze({plan,start,process,tryGuest,quiet:pass.quiet,cancel:pass.cancel,record:pass.record,snapshot:pass.snapshot,get state(){return pass.state;},get frame(){return pass.frame;}});
 }
