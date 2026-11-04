@@ -28,7 +28,12 @@ export function createLivingConnectedJourneyStudy(seed){
 }
 
 export function renderLivingConnectedJourneyStudy(seed){
- const plan=createLivingConnectedJourneyStudy(seed),sum=[new Float64Array(plan.frames),new Float64Array(plan.frames)];
+ return renderLivingConnectedPlan(createLivingConnectedJourneyStudy(seed));
+}
+
+/** Internal study renderer for section-indexed independent voice plans. */
+export function renderLivingConnectedPlan(plan){
+ const sum=[new Float64Array(plan.frames),new Float64Array(plan.frames)];
  for(let i=0;i<plan.sections.length;i++){
   const section=plan.sections[i],stems=section.arrangement.bodies.map((_,body)=>renderLivingArrangementBody(section.arrangement,body).channels[0]);
   for(const voice of plan.voices.filter(v=>v.section===i)){

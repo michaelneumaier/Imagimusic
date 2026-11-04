@@ -902,3 +902,9 @@ Journey listening comparison implemented: page/14resources200,11targeted tests p
 Journey score view: owns new src/living/journey-score.js/tests, journey-main.js/journey.css/living-journey.html and own notes. Project both actual plans onto three instrument lanes with complete voice spans/touches and audio-clock cursor. Explicit score diagram, not physical motion; retain listening accessibility and no added input requirement.
 
 Journey score view implemented: exact35/17voice clock mapping verified across both seeds;75Living tests pass, resources200 and syntax/diff clean. Claims released. Native layout/playback-sync verification remains outstanding because native control cannot start. No physical-motion or audibility claim.
+
+Motif development study: owns new evolving-journey-study.js/tests, small shared-render extraction from connected-journey-study.js, render-living-journey-study.mjs and own notes. Derive rhythmic reflection/accent rotations from one seed, retain cell boundaries and exact opening/home; render a longer connected arc without production changes.
+
+Evolving study discovery: also owns the existing journey comparison HTML/main for an optional third treatment and exact local rendering instructions. Keep connected default and earlier artifacts unchanged; browser QA limitation persists.
+
+Motif development study complete: two new WAV/reports98.79s/122.61s, optional existing-page treatment,77Living tests pass; both earlier connected WAV hashes preserved and PCM16 duration probed. Claims released. Preference and native UI QA remain open; no production/schema/physics changes or independent review claim.

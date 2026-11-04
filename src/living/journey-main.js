@@ -1,5 +1,6 @@
 import {createLivingJourneyStudy} from './journey-study.js';
 import {createLivingConnectedJourneyStudy} from './connected-journey-study.js';
+import {createLivingEvolvingJourneyStudy} from './evolving-journey-study.js';
 import {createTineStudyPlayer} from '../tine/study-player.js';
 import {createLivingJourneyScore} from './journey-score.js';
 
@@ -42,13 +43,14 @@ function update(){
 function stop(){generation++;starting=false;player.stop();update();}
 function choose(){
  generation++;starting=false;player.stop();audio.hidden=true;audio.removeAttribute('src');audio.load();
- const connected=document.querySelector('[name=shape]:checked').value==='connected',seed=Number($('seed').value);
- plan=(connected?createLivingConnectedJourneyStudy:createLivingJourneyStudy)(seed);
+ const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
+ const treatment={connected:{make:createLivingConnectedJourneyStudy,suffix:'-connected',description:'One opening, five connected exchanges, one return. Each middle exchange begins while the previous sound is still ringing.'},chapters:{make:createLivingJourneyStudy,suffix:'',description:'Seven self-contained chapters. Each presents the phrase, develops it across the bodies, and returns to its own opening.'},evolving:{make:createLivingEvolvingJourneyStudy,suffix:'-evolving',description:'One opening, twelve developing exchanges, one return. The rhythm turns and the accents move, then the familiar rhythm and accents come back before home.'}}[shape];
+ plan=treatment.make(seed);
  buildScore();drawScore(0);
- url=`renders/living-journey-study/journey-${seed}${connected?'-connected':''}.wav`;
+ url=`renders/living-journey-study/journey-${seed}${treatment.suffix}.wav`;
  $('download').href=url;$('report').href=url.replace(/\.wav$/,'.json');
  $('duration').textContent=clock(plan.frames/plan.sampleRate);
- $('description').textContent=connected?'One opening, five connected exchanges, one return. Each middle exchange begins while the previous sound is still ringing.':'Seven self-contained chapters. Each presents the phrase, develops it across the bodies, and returns to its own opening.';
+ $('description').textContent=treatment.description;
  rows=plan.sections.map(s=>{const li=document.createElement('li'),name=document.createElement('span'),time=document.createElement('small');name.textContent=s.name;time.textContent=`${clock(s.startFrame/plan.sampleRate)}–${clock(s.endFrame/plan.sampleRate)}`;li.append(name,time);return li;});
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }

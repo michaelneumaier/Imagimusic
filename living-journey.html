@@ -5,10 +5,10 @@
 <a href="living-look.html">Back to the workshop</a>
 <p class="eyebrow">THE LIVING INSTRUMENT · COMPOSITION STUDY</p>
 <h1>A phrase<br>remembered.</h1>
-<p class="intro">One small idea travels through different bodies, gathers momentum, and comes home. Listen without doing anything else—or compare two ways of telling its story.</p>
+<p class="intro">One small idea travels through different bodies, gathers momentum, and comes home. Listen without doing anything else—or compare three ways of telling its story.</p>
 <div class="choices">
 <label>Musical seed <select id="seed"><option value="42">The last touch waits · 42</option><option value="2950288811">A wider gesture · 2950288811</option></select></label>
-<fieldset><legend>Shape of the journey</legend><label><input type="radio" name="shape" value="connected" checked> One unfolding arc</label><label><input type="radio" name="shape" value="chapters">Seven separate chapters</label></fieldset>
+<fieldset><legend>Shape of the journey</legend><label><input type="radio" name="shape" value="connected" checked> One unfolding arc</label><label><input type="radio" name="shape" value="chapters">Seven separate chapters</label><label><input type="radio" name="shape" value="evolving">A developing motif</label></fieldset>
 </div>
 <p id="description"></p>
 <div class="dock">
@@ -17,13 +17,14 @@
 <p id="status" role="status">Ready when you are.</p>
 </div>
 <label class="level">Optional listening level <input id="level" type="range" min="0" max="20" step="1" value="0"><output id="level-value">+0 dB</output></label>
-<p class="small">The same level applies to both versions. Changing the seed or structure stops playback.</p>
+<p class="small">The same level applies to every version. Changing the seed or structure stops playback.</p>
 <section aria-labelledby="score-title"><h2 id="score-title">A visible conversation</h2><p class="small">Three instrument lanes follow the same clock as the sound. Dots mark touches; bars show complete rendered passes, including their fading tails.</p><div id="score" role="img" aria-label="Score timeline for three independent tine instruments"></div><p id="score-reading" class="small">The opening is waiting.</p></section>
 <section aria-labelledby="chapters-title"><h2 id="chapters-title">Follow the idea</h2><p class="small">These are score chapters, not a measure of emotion. Overlapping rows mean that the preceding sound is still finishing.</p><ol id="chapters"></ol></section>
 <p><a id="download" download>Keep the selected WAV</a> · <a id="report">Inspect the score</a></p>
-<details><summary>What to listen for</summary><p>Can you recognize the opening after its rhythm becomes closer and its accents soften? Do the connected exchanges feel purposeful? Do the separate chapters give you useful breathing room, or repeatedly interrupt the larger journey? Let the ending arrive before deciding.</p><p>The connected version retains the five exchanges but removes their repeated solo openings and endings. It is substantially shorter. Duration and repeated exposure to the motif both change, so this is a structural comparison, not a controlled preference test.</p></details>
-<details><summary>How this sound is made</summary><p>Independent four-mode steel-tine passes produce the sound through a modeled velocity pickup. Ideal impulses excite them; some replies use ideal distributed damping. This is not acoustic radiation, contact-pad physics, or continuous shared-body vibration. Overlapping tails are mixed in full. Both files use the same preview gain ×8 without normalization. The optional listening stage has a sample ceiling.</p><p>The study is finite and authored around a seed. It does not yet adapt or invent new instruments. Opening the page is silent; leaving pauses playback. No preference verdict is implied.</p></details>
-<details><summary>If the local audio has not been rendered</summary><p>From the project directory, render each selected seed with both commands, replacing 42 for the second seed if needed:</p><pre>node tools/render-living-journey-study.mjs 42
-node tools/render-living-journey-study.mjs 42 --connected</pre></details>
+<details><summary>What to listen for</summary><p>Can you recognize the opening after its rhythm becomes closer and its accents soften? Do the connected exchanges feel purposeful? Do the separate chapters give you useful breathing room, or repeatedly interrupt the larger journey? Let the ending arrive before deciding.</p><p>The connected version retains the five exchanges but removes their repeated solo openings and endings. It is substantially shorter. A developing motif introduces twelve exchanges: within each three-touch cell, the two rhythmic intervals can trade places and the accents move cyclically. The cell's beginning and end stay recognizable. The familiar rhythm returns before the familiar accents, then home restores the exact opening.</p><p>Duration, exposure to the motif, rhythm and accents differ between these versions. This is a composition comparison, not a controlled preference test or an established improvement.</p></details>
+<details><summary>How this sound is made</summary><p>Independent four-mode steel-tine passes produce the sound through a modeled velocity pickup. Ideal impulses excite them; some replies use ideal distributed damping. This is not acoustic radiation, contact-pad physics, or continuous shared-body vibration. Overlapping tails are mixed in full. All files use the same preview gain ×8 without normalization. The optional listening stage has a sample ceiling.</p><p>The study is finite and authored around a seed. It does not yet adapt or invent new instruments. Opening the page is silent; leaving pauses playback. No preference verdict is implied.</p></details>
+<details><summary>If the local audio has not been rendered</summary><p>From the project directory, render each selected seed with these commands, replacing 42 for the second seed if needed:</p><pre>node tools/render-living-journey-study.mjs 42
+node tools/render-living-journey-study.mjs 42 --connected
+node tools/render-living-journey-study.mjs 42 --evolving</pre></details>
 <p class="footer"><a href="living.html">Play the Living Instrument</a> · <a href="project.html">Project home</a></p>
 </main><script type="module" src="src/living/journey-main.js"></script></html>
