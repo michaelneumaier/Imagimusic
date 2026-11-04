@@ -990,3 +990,7 @@ Journey movie encoding connected: browser H264/AAC adapter plus frame/hash/cance
 Responsive journey film preparation: owns journey-movie-plan.js, journey-export.js and new async-plan tests plus own notes. Split immutable source snapshot from batched frame hashing; retain exact synchronous manifest identity, snapshot audio before yielding and check cancellation before encoder allocation.
 
 Responsive journey film preparation complete: exact manifest preserved with32frame batches/cancellation; ten focused film tests pass. Node initialsetup167ms/maxbatch24ms is scoped CPU evidence only. Claims released. Visitor controls and native encoding/interaction verification remain ahead.
+
+Journey film visitor controls: owns new journey-movie-session.js/controls.js/session tests, journey-main.js, living-journey.html and own notes. Silent worker generation/export, abort/late-result guard, atomic four-download replacement and previous-film retention; cancel on page/play/selection changes.
+
+Journey film visitor controls implemented: silent generation/export and four downloads with atomic replacement/late-result guards; full904tests pass, resources/IDs/syntax/diff checked. Claims released. Native CUA retry still fails startup; actual movie/page interaction verification and independent review remain outstanding.

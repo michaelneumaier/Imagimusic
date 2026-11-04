@@ -12,12 +12,14 @@ import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from './journey-rep
 import {setupLivingTuningListening} from './tuning-listening.js';
 import {createListeningContinuation} from './listening-continuation.js';
 import {setupJourneyListeningView} from './journey-listening-view.js';
+import {setupLivingJourneyMovieControls} from './journey-movie-controls.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
+let film=null;
 const media=createLivingJourneyMedia();
 const generated=createLivingJourneyGeneration();
 const tuning=setupLivingTuningListening({beforePlay:()=>stop()});
-setupJourneyListeningView({beforeEnter:()=>tuning.stop()});
+setupJourneyListeningView({beforeEnter:()=>{tuning.stop();film?.cancel();}});
 let generatedChoice=false,selectedRequest=null,expectedSha256=null;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
@@ -29,7 +31,7 @@ const continuation=createListeningContinuation({next:()=>{
 },onChange:()=>{
  $('journey-continue').checked=continuation.enabled;
  $('journey-continue-note').textContent=continuation.pending?'A moment of quiet. Preparing the next journey starts in three seconds.':continuation.enabled?'Another journey will follow this ending. Quiet stops the sequence.':'Optional. New journeys follow at the selected structure; ideas can repeat. Each new journey replaces the previous downloads. Keeping a file stops the sequence.';
- $('quiet').disabled=audio.paused&&!starting&&!continuation.pending;
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy;
 }});
 $('ensemble-motion').checked=!reducedMotion.matches;
 function drawEnsemble(){
@@ -75,11 +77,12 @@ function update(){
  drawScore(frame);
  const active=plan.sections.filter(s=>frame>=s.startFrame&&frame<s.endFrame);
  rows.forEach((row,i)=>row.classList.toggle('active',frame>=plan.sections[i].startFrame&&frame<plan.sections[i].endFrame));
- $('quiet').disabled=audio.paused&&!starting&&!continuation.pending;
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy;
  if(!starting)$('status').textContent=audio.error?'Audio unavailable. See the local rendering instructions below.':audio.ended?'The journey has settled.':`${audio.paused?'Paused':'Playing'} · ${clock(audio.currentTime)} · ${active.map(s=>s.name).join(' / ')||'a moment of space'}`;
 }
-function stop(){continuation.stop();generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
+function stop(){film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
 function choose({continueSequence=false}={}){
+ film?.cancel();
  if(!continueSequence)continuation.stop();
  expectedSha256=null;
  generation++;starting=false;player.stop();media.clear();generated.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
@@ -100,6 +103,7 @@ function choose({continueSequence=false}={}){
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
 async function listen(){
+ film?.cancel();
  continuation.cancelPending();
  tuning.stop();
  const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent=generatedChoice?'Making your journey locally… Quiet cancels preparation.':'Checking the journey audio and score…';
@@ -135,6 +139,7 @@ $('open-journey').addEventListener('change',async()=>{
 });
 $('quiet').addEventListener('click',stop);
 $('journey-continue').addEventListener('change',()=>{
+ film?.cancel();
  if($('journey-continue').checked){continuation.enable();if(audio.ended&&!starting)continuation.queue();}
  else continuation.stop();
 });
@@ -145,7 +150,7 @@ audio.addEventListener('error',()=>continuation.stop());
 $('seed').addEventListener('change',choose);
 for(const input of document.querySelectorAll('[name=shape]'))input.addEventListener('change',choose);
 $('level').addEventListener('input',()=>{player.setDb(Number($('level').value));tuning.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
-audio.addEventListener('play',()=>{continuation.cancelPending();tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
+audio.addEventListener('play',()=>{film?.cancel();continuation.cancelPending();tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
 audio.addEventListener('playing',startAnimation);
 for(const event of ['pause','ended','seeked'])audio.addEventListener(event,()=>{stopAnimation();drawEnsemble();if(event==='seeked')startAnimation();});
 $('ensemble-motion').addEventListener('change',()=>{drawEnsemble();startAnimation();});
@@ -153,6 +158,7 @@ $('ensemble-veils').addEventListener('change',drawEnsemble);
 $('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
 $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
+function park(){film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();
+film=setupLivingJourneyMovieControls({getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
