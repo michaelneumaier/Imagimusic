@@ -50,6 +50,7 @@ function controls(){
  $('play-body').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM||selectedPCM.record.design.lengthMm===80;
  $('touch').disabled=repeat||state!=='playing'||session.touches>=8;
  $('quiet').disabled=(!busy&&!repeat)||(busy&&state==='ending');
+ $('again').hidden=!selectedPCM;
  $('again').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM;
  for(const b of bodyButtons)b.disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!capture.current;
  $('keep-exploration').disabled=!world||busy||repeat||branchPending||!branchCapture?.current||!branchOrigin;
@@ -120,23 +121,24 @@ const replay=createGroveReplay({listeningDb:0,onChange:({state})=>{
  if(state==='preparing')$('playing-status').textContent=examplePlaying?'Preparing '+exampleName().toLowerCase()+'…':'Preparing your phrase…';
  if(state==='playing'){if(unfolding)world?.setLength(80);$('playing-status').textContent=unfolding?(examplePlaying?exampleName()+' is unfolding…':'Your phrase is unfolding…'):`Your phrase, returning on the ${selectedPCM.record.design.lengthMm} mm body.`;if(replayFocus)$('quiet').focus({preventScroll:true});runView();}
  if(state==='suspended'){$('playing-status').textContent='Replay was interrupted. Choose Quiet, then hear it again.';stopView();}
- if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?(generatedPlaying?'The piece has settled. Hear it again, keep it, or make another.':'The example has settled. Choose Begin to make a phrase of your own.'):'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:!generatedPlaying});replayFocus=false;}
+ if(!listening()){stopView();if(state==='ended')$('playing-status').textContent=examplePlaying?(generatedPlaying?'The piece has settled. Hear it again, keep it, or make another.':'The example has settled. Open Play a phrase to make one of your own.'):'Your phrase has settled. Hear it again, or begin something new.';if(quietFocused&&replayFocus)$(replayReturnButton).focus({preventScroll:!generatedPlaying});replayFocus=false;}
 }});
 session=createTineLiveSession({listeningDb:0,onChange:event=>{
  const touchFocused=document.activeElement===$('touch'),quietFocused=document.activeElement===$('quiet');
  if(event.state==='ending'&&(touchFocused||quietFocused))returnFocus=true;
  controls();if(event.sampleRate)liveResponse=createLivingResponse(playingDesign,event.sampleRate);
  const messages={preparing:'Preparing the instrument…',playing:`${playingDesign.lengthMm} mm body. Touch the blade, or use the Touch button.`,ringing:'The touch window has closed. Let it ring, or choose Quiet.',ending:'Ending gently…',ended:'The phrase has settled. Hear it again, or begin something new.',interrupted:'Playing stopped while the page or audio was away. Begin again when ready.',cancelled:'Preparation cancelled.',error:event.message};
- $('playing-status').textContent=messages[event.state]??'Opening is quiet. Begin when you choose.';
+ $('playing-status').textContent=messages[event.state]??'Choose Make a piece to listen, or open Play a phrase.';
  if(event.event){liveResponse?.accept(event.event);world?.acknowledgeTouch();$('touch-note').textContent=`Touch ${event.touches} accepted at sample ${event.event.frame}. The gold spot marks the fixed touch position; it is not a vibration display.`;}
  if(event.finished?.snapshot.events.length)(playingDesign.lengthMm===80?capture:branchCapture).accept(event.finished).catch(error=>{$(playingDesign.lengthMm===80?'phrase-note':'branch-note').textContent=error.message;});
  if(event.finished&&!event.finished.snapshot.events.length)$('playing-status').textContent='This pass ended without touches.'+(capture.current?' Your previous phrase remains available.':'');
  if(event.state==='playing'&&wantsFocus){wantsFocus=false;$('touch').focus({preventScroll:true});}
  if(touchFocused&&$('touch').disabled&&!$('quiet').disabled)$('quiet').focus({preventScroll:true});
- if(!active(event.state)){stopView();if(touchFocused||quietFocused||returnFocus){if(playingDesign.lengthMm!==80&&branchCapture.pending)branchReturnFocus=true;else $(playingDesign.lengthMm===80?'begin':'play-body').focus({preventScroll:true});}returnFocus=false;}
+ if(!active(event.state)){stopView();if(touchFocused||quietFocused||returnFocus){if(playingDesign.lengthMm!==80&&branchCapture.pending)branchReturnFocus=true;else $(playingDesign.lengthMm===80?($('playing-tools').open?'begin':'playing-invitation'):'play-body').focus({preventScroll:true});}returnFocus=false;}
  else if(event.state==='playing')runView();
 }});
 async function startPlaying(nextDesign){
+ $('playing-tools').open=true;
  const origin=nextDesign.lengthMm===80?null:selectedPCM===branchCapture.current?branchOrigin:createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion,arrangementVersion});
  branchReturnFocus=false;restoreVersion++;cancelExploration();pendingBranchOrigin=origin;
  cancelArrangement();unfolding=false;examplePlaying=false;comparison.cancel();capture.cancel();branchCapture.cancel();replay.park();playingDesign=nextDesign;selectPCM(nextDesign.lengthMm===80?capture.current:selectedPCM);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
@@ -161,7 +163,7 @@ function cancelArrangement(){arrangementJob?.cancel();arrangementJob=null;}
 async function playArrangement(source,example=false,generated=false,version=arrangementVersion){
  examplePlaying=example;generatedPlaying=generated;restoreVersion++;
  if(!example)selectPCM(capture.current);world?.view('opening');for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view==='opening'));
- unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'begin'):'unfold';arrangementPCM=null;arrangementView=null;
+ unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'playing-invitation'):'unfold';arrangementPCM=null;arrangementView=null;
  let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),createLivingRecord(source,{presentationVersion,arrangementVersion:version}));}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
  const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingPerformanceView(source,presentationVersion,version);return pcm;});
  $('touch-note').textContent=version===3?'An opening, a partial reply that releases its ring, two full answers, then the original returns. Independent bodies; ideal distributed damping on the first reply.':example?exampleName()+': a phrase crosses three bodies, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';

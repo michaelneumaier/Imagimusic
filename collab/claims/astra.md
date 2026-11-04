@@ -872,3 +872,7 @@ Released arrangement3 adoption: owns record.js/main.js/movie-plan.js/living.html
 Released adoption discovery: also owns project.html, src/project-catalog.js, living-look.html, comparison-tool identity copy and existing proposal/evidence appendices. Reconcile once complete adoption evidence is collected; no new destination.
 
 Released arrangement3 adoption complete:69focused/855full tests pass; actual521-frame film reconstructed, downloaded source hashes verified with explicit Safari/Node precision limits, native generated recipe/adoption/address quiet restore checked. Home/workshop/catalog/plan evidence reconciled. Claims released; default1 and earlier identities preserved. No independent review or subjective listening verdict claimed.
+
+Listening-first transport: owns living.html/living.css and main.js for native playing disclosure, always-accessible Quiet, and explicit focus routing. No sound/record changes; verify fresh listening, disclosure keyboard/play and quiet restore in native browser.
+
+Listening-first transport complete: fresh narrow screenshot, native Space disclosure, actual one-touch capture/Quiet, generated playback with closed controls and quiet kept-address restore verified. Claims released. No sound/record changes or independent review claim.
