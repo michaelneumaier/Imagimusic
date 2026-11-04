@@ -743,3 +743,14 @@ Next development gates, in order of evidence needed:
 4. Complete journey visual keeping and versioned flagship adoption once one candidate earns its place. Existing journey reports do not preserve camera, film or an interactive encounter. Keep independent passes visually explicit rather than imply shared resonator state.
 
 Verification for this copy checkpoint:43catalog entries unchanged, unique page IDs, syntax/diff clean and four changed/reference resources200. No new browser or preference evidence; latest full suite891passing at db5c1f5, subsequent presentation/copy checks are narrower.
+
+
+### Long-journey film source: actual independent-instance clocks
+
+Added createLivingJourneyMoviePlan in src/living/journey-movie-plan.js. It validates and snapshots the transient journey request, rebuilds the exact selected score, allocates actual independent instances, fixes the canonical held ensemble layout/dusk look and samples the existing journey response/performer model at i/30. Manifest includes exact soundtrack sample count, frame count, full score/layout, reveal choice and12decimal non-cryptographic frame-state hashes. Manual orbit, visit listening gain and live follow checkbox are excluded explicitly. This is an experimental film source, not an encoded movie or flagship saved recipe.
+
+Two focused tests pass in7.69s. All30fps frames for all three seed42structures match independently constructed live view states, sampled in reverse order; frame hashes rebuild. Film coverage extends less than1/30second beyond exact sound duration. Final exact-time sample has all touches counted and no active response instances. Reveals-off changes only point visibility, not score/performers. Caller/request/layout/source mutation is isolated or refused; invalid time/request/reveal is refused.
+
+Prepared six full manifests under ignored renders/living-journey-movie-plans: seed42 chapter/connected/evolving3567/1207/2964frames; seed2950288811 respectively4028/1425/3679frames.16870planned frames total. Each current reconstructed score equals its existing prepared report plan, actual WAV SHA256 equals that report and stereo PCM16 size matches exact sample duration. No audio regeneration or production rendering change.
+
+Remaining: cancellable movie preparation, validated soundtrack handoff, browser encoding, artifact verification, visitor controls and real native visual/sound inspection. A state hash cannot prove pixels, codec bytes, audible synchronization, physical collisions or appeal. Current native bridge is unavailable; no exported-video or independent-review claim. Fixed preview gain8 should match journey listening files in a future export, with source WAV retained separately from lossy film audio. Full regression checkpoint remains891at db5c1f5; this new foundation has its two targeted tests.

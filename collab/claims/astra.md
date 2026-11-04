@@ -974,3 +974,7 @@ Journey listening view implemented: optional reversible view, essential controls
 Homepage journey checkpoint: owns project.html, existing Living catalog entry and own notes. Reconcile current access, roadmap/adoption gaps and history with generated long journeys, independent-body staging, report return, continuation and listening view. Preserve catalog count and original brief; no shared Fable docs edits.
 
 Homepage journey checkpoint complete: current access, roadmap, history and existing catalog text reconciled;43entries retained, IDs/syntax/diff/resources checked. Claims released. Native QA, listening judgment, richer composition and journey films/flagship adoption remain open.
+
+Journey film source: owns new src/living/journey-movie-plan.js and tests/living-journey-movie-plan.test.js plus own notes. Snapshot canonical selected journey, held layout/reveal and fixed30fps frame state with explicit hash scope; no browser encoder or saved flagship identity changes yet.
+
+Journey film source complete: canonical30fps frame source, immutable identity and applied reveal; two focused tests pass, six manifests16870frames match existing report/WAV identities and durations. Claims released. Encoder/controls/native artifact verification remain ahead; no film-ready claim.
