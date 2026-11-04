@@ -1,15 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {setupContinuousEnsembleControls} from '../src/living/continuous-ensemble-controls.js';
-function fixture({whole=false,mode=false}={}){
+function fixture({whole=false,mode=false,continued=false}={}){
  const make=()=>({disabled:false,hidden:true,value:'42',handlers:{},addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){return this.handlers[type]?.(event);}});
  const elements={...Object.fromEntries(['start','quiet','seed','status','count','result','strength'].map(name=>[name,make()])),downloads:[make(),make(),make()],pads:[make(),make(),make()]};elements.strength.value='.05';
+ elements.seed.options=['42','2950288811','4294967295'].map(value=>({value}));if(continued){elements.continueListening=make();elements.continueListening.checked=true;}
  if(whole)elements.whole=make();if(mode){elements.mode=make();elements.mode.value='memory';}
- const calls=[],blobs=[],revoked=[],options=[];let notify,failAt=-1,gate=null;
- const session={state:'idle',touches:0,async start(seed,settings){options.push(['audio',settings]);calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
+ const calls=[],blobs=[],revoked=[],options=[],tasks=new Map();let taskId=0,visible=true,startFailure=false;let notify,failAt=-1,gate=null;
+ const session={state:'idle',touches:0,async start(seed,settings){if(startFailure)throw Error('Audio resume refused');options.push(['audio',settings]);calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
  const visual={begin:(seed,settings)=>{options.push(['visual',settings]);calls.push(['visual',seed]);},update(){},stop:()=>calls.push(['visual-stop'])};
- const controls=setupContinuousEnsembleControls({elements,visual,createSession:options=>{notify=options.onChange;return session;},makeURL:blob=>{if(blobs.length===failAt)throw Error('URL failed');blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
- return {elements,calls,blobs,revoked,controls,options,emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;},setGate(value){gate=value;}};
+ const controls=setupContinuousEnsembleControls({elements,visual,schedule:(fn,ms)=>{const id=++taskId;tasks.set(id,{fn,ms});return id;},cancel:id=>tasks.delete(id),isVisible:()=>visible,createSession:options=>{notify=options.onChange;return session;},makeURL:blob=>{if(blobs.length===failAt)throw Error('URL failed');blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
+ return {elements,calls,blobs,revoked,controls,options,tasks,setStartFailure(value){startFailure=value;},setVisible(value){visible=value;},async next(){const [id,task]=tasks.entries().next().value;tasks.delete(id);task.fn();await Promise.resolve();},emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;},setGate(value){gate=value;}};
 }
 const finished={seed:42,records:[80,95,65].map(lengthMm=>({kind:'imagimusic-continuous-tine-record',sampleRate:48000,design:{lengthMm},events:[]})),snapshot:[{endFrame:1200}]};
 test('one Begin starts the picture and piece; Quiet is optional and seed stays fixed',async()=>{
@@ -59,4 +60,38 @@ test('optional remembered choice locks with playback and names answers only afte
  f.emit({state:'playing',events:[{origin:'guest',frame:0}]});assert.equal(f.controls.remembers,true);
  f.emit({state:'ended',finished});assert.equal(f.controls.remembers,true);assert.equal(f.elements.mode.disabled,false);
  f.elements.mode.value='fixed';await f.elements.start.fire('click');assert.equal(f.controls.remembers,false);f.emit({state:'playing',events:[{origin:'guest',frame:0}]});assert.equal(f.controls.remembers,false);
+});
+
+
+test('continued listening is opt-in and cycles the three gestures only after completed keeping',async()=>{
+ const once=fixture();await once.elements.start.fire('click');once.emit({state:'ended',finished});assert.equal(once.tasks.size,0);
+ const f=fixture({continued:true,mode:true});assert.equal(f.calls.length,0);await f.elements.start.fire('click');assert.equal(f.tasks.size,0);
+ for(const [current,next] of [[42,'2950288811'],[2950288811,'4294967295'],[4294967295,'42']]){
+  f.emit({state:'verifying'});assert.equal(f.tasks.size,0);f.emit({state:'ended',finished:{...finished,seed:current}});
+  assert.equal(f.tasks.size,1);assert.equal([...f.tasks.values()][0].ms,3000);assert.equal(f.elements.quiet.textContent,'Stop listening');assert.equal(f.elements.quiet.disabled,false);assert.equal(f.elements.mode.disabled,true);
+  await f.next();assert.equal(f.elements.seed.value,next);assert.deepEqual(f.calls.at(-1),['start',Number(next)]);assert.deepEqual(f.options.at(-1),['audio',{mode:'memory'}]);assert.equal(f.controls.remembers,false);
+ }
+ f.controls.dispose();assert.equal(f.elements.continueListening.checked,false);
+});
+test('unchecking lets current music finish; Quiet disarms both active and paused continuation',async()=>{
+ const f=fixture({continued:true});await f.elements.start.fire('click');f.elements.continueListening.checked=false;f.elements.continueListening.fire('change');assert.equal(f.controls.state,'playing');f.emit({state:'ended',finished});assert.equal(f.tasks.size,0);
+ f.elements.continueListening.checked=true;await f.elements.start.fire('click');await f.elements.quiet.fire('click');f.emit({state:'ended',finished});assert.equal(f.tasks.size,0);assert.equal(f.elements.continueListening.checked,false);
+ f.elements.continueListening.checked=true;await f.elements.start.fire('click');f.emit({state:'ended',finished});const stale=[...f.tasks.values()][0].fn;await f.elements.quiet.fire('click');const count=f.calls.length;stale();assert.equal(f.calls.length,count);assert.equal(f.tasks.size,0);assert.equal(f.elements.start.disabled,false);
+});
+test('leaving, replay stop, disposal, failure and stale timers cannot restart listening',async()=>{
+ for(const action of ['hidden','stop','dispose','error','unchecked']){
+  const f=fixture({continued:true});await f.elements.start.fire('click');f.emit({state:'ended',finished});const stale=[...f.tasks.values()][0].fn;
+  if(action==='hidden'){f.setVisible(false);await f.next();}
+  if(action==='stop'){f.controls.stop();assert.match(f.elements.status.textContent,/Listening stopped/);}
+  if(action==='dispose')f.controls.dispose();
+  if(action==='error')f.emit({state:'error',message:'failed'});
+  if(action==='unchecked'){f.elements.continueListening.checked=false;f.elements.continueListening.fire('change');}
+  const before=f.calls.length;stale();assert.equal(f.calls.length,before);assert.equal(f.tasks.size,0);assert.equal(f.elements.continueListening.checked,false);
+ }
+ const failed=fixture({continued:true});await failed.elements.start.fire('click');failed.failNextAt(0);failed.emit({state:'ended',finished});assert.equal(failed.tasks.size,0);assert.equal(failed.elements.continueListening.checked,false);
+});
+
+test('a browser refusal on the next start disarms the sequence and preserves the kept piece',async()=>{
+ const f=fixture({continued:true,whole:true});await f.elements.start.fire('click');f.emit({state:'ended',finished});const kept=f.elements.whole.href;f.setStartFailure(true);await f.next();
+ assert.equal(f.tasks.size,0);assert.equal(f.elements.continueListening.checked,false);assert.match(f.elements.status.textContent,/resume refused/);assert.equal(f.elements.whole.href,kept);assert.equal(f.elements.start.disabled,false);
 });

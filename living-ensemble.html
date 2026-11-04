@@ -13,6 +13,8 @@
 <div class="transport"><button id="start" class="primary">Begin listening</button><button id="quiet" disabled>Quiet</button><label class="seed-label">Gesture <select id="seed"><option value="42">01</option><option value="2950288811">02</option><option value="4294967295">03</option></select></label></div>
 <label>Listening style <select id="mode" aria-describedby="mode-note"><option value="fixed">Let it unfold</option><option value="memory">Let my opening return</option></select></label>
 <p id="mode-note" class="small">Either way, the piece is complete without playing. To leave an opening gesture, choose the remembered style and open “Join the three voices” before you begin.</p>
+<label><input id="continue-listening" type="checkbox" aria-describedby="continue-note"> Keep listening</label>
+<p id="continue-note" class="small">Let the three offered gestures cycle, with a quiet pause between pieces. Quiet or leaving this page stops the sequence. Each piece begins afresh; opening touches belong to that piece. Keep a favorite before the next completed piece replaces its download.</p>
 <p id="status" role="status">Three voices, waiting.</p>
 <label class="level">Listening level <input id="level" type="range" min="0" max="20" step="1" value="0"><output id="level-value">+0 dB</output></label>
 </section>
