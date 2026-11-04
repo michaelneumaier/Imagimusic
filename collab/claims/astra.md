@@ -994,3 +994,7 @@ Responsive journey film preparation complete: exact manifest preserved with32fra
 Journey film visitor controls: owns new journey-movie-session.js/controls.js/session tests, journey-main.js, living-journey.html and own notes. Silent worker generation/export, abort/late-result guard, atomic four-download replacement and previous-film retention; cancel on page/play/selection changes.
 
 Journey film visitor controls implemented: silent generation/export and four downloads with atomic replacement/late-result guards; full904tests pass, resources/IDs/syntax/diff checked. Claims released. Native CUA retry still fails startup; actual movie/page interaction verification and independent review remain outstanding.
+
+Journey film package verification: owns tools/verify-living-journey-film.mjs, tests/verify-living-journey-film.test.js, local verification instructions in living-journey.html and own notes. Rebuild model/frame/recording evidence and compare supplied report/WAV; bounded CLI input, explicit exclusion of MP4 pixels/codec/audio-sync verification.
+
+Journey film package verifier complete: two targeted tests and actual file-based CLI pass after signed-zero JSON roundtrip correction; source/WAV checks only, scope explicit. Claims released. Actual MP4/native playback and independent review remain pending.

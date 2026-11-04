@@ -796,3 +796,12 @@ Thirteen focused film tests pass, including three new session tests for atomic r
 Native CUA inventory was retried: no apps/browsers, with Sky Computer Use native pipe startup failed. The page labels browser export experimental and explicitly says native picture/sound verification is pending. No actual MP4, codec-support, rendered-pixel, audible-sync or independent-review claim. Session/encoder tests use doubles for codecs; source/audio tests use actual generated models and recordings. Full regression result follows below.
 
 Full regression checkpoint: `npm test`904/904passing,0failures,96.62s. Output `/tmp/imagimusic-journey-film-full-suite.log`. This is source/model/session coverage, not native page wiring or movie acceptance.
+
+
+### Verifying a saved journey film source package
+
+Added tools/verify-living-journey-film.mjs and two tests, plus a nested local-check disclosure within film controls. CLI takes film-detailsJSON, generated-scoreJSON and soundtrackWAV with2MiB/512KiB/64MiB file bounds. It rebuilds the current score/layout/reveal/frame hashes and generated audio, compares the full score report and declared soundtrack evidence, then checks the provided WAV bytes against actual regeneration. Codec declarations are checked as metadata only; the encoding explanatory text is required but not treated as codec evidence. Every result states that MP4 pixels/bytes, decodedAAC, audiovisual sync and musical quality are outside scope. Shared model factories are reused; no independent-peer-review claim.
+
+Two targeted tests pass with a genuinely serialized/deserialized manifest and mutations to frame hashes, camera, gain, codec declarations, report sourcePeak, WAV bytes and truncation. An actual three-file CLI fixture under ignored renders/living-journey-movie-plans/verification-fixture first exposed signed-zero comparison: the layout's -0 depth becomes0 inJSON. Canonical serialized-contract comparison fixed that issue, and the test now exercises the JSON roundtrip rather than only the in-memory object. CLI rerun passes all six checks for1207frames/1929900samples. Fixture metadata explicitly says no MP4 was encoded.
+
+Syntax/diff and served instructions checked. Latest full suite remains904at16013e0; two verifier tests are subsequent focused evidence. Actual movie encoding/native acceptance remains pending; the verifier supplies a source-package check for that next stage, not a substitute for it.
