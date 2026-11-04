@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {setupContinuousEnsembleControls} from '../src/living/continuous-ensemble-controls.js';
-function fixture({whole=false}={}){
+function fixture({whole=false,mode=false}={}){
  const make=()=>({disabled:false,hidden:true,value:'42',handlers:{},addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){return this.handlers[type]?.(event);}});
  const elements={...Object.fromEntries(['start','quiet','seed','status','count','result','strength'].map(name=>[name,make()])),downloads:[make(),make(),make()],pads:[make(),make(),make()]};elements.strength.value='.05';
- if(whole)elements.whole=make();
- const calls=[],blobs=[],revoked=[];let notify,failAt=-1,gate=null;
- const session={state:'idle',touches:0,async start(seed){calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
- const visual={begin:seed=>calls.push(['visual',seed]),update(){},stop:()=>calls.push(['visual-stop'])};
+ if(whole)elements.whole=make();if(mode){elements.mode=make();elements.mode.value='memory';}
+ const calls=[],blobs=[],revoked=[],options=[];let notify,failAt=-1,gate=null;
+ const session={state:'idle',touches:0,async start(seed,settings){options.push(['audio',settings]);calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
+ const visual={begin:(seed,settings)=>{options.push(['visual',settings]);calls.push(['visual',seed]);},update(){},stop:()=>calls.push(['visual-stop'])};
  const controls=setupContinuousEnsembleControls({elements,visual,createSession:options=>{notify=options.onChange;return session;},makeURL:blob=>{if(blobs.length===failAt)throw Error('URL failed');blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
- return {elements,calls,blobs,revoked,controls,emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;},setGate(value){gate=value;}};
+ return {elements,calls,blobs,revoked,controls,options,emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;},setGate(value){gate=value;}};
 }
 const finished={seed:42,records:[80,95,65].map(lengthMm=>({kind:'imagimusic-continuous-tine-record',sampleRate:48000,design:{lengthMm},events:[]})),snapshot:[{endFrame:1200}]};
 test('one Begin starts the picture and piece; Quiet is optional and seed stays fixed',async()=>{
@@ -49,4 +49,14 @@ test('body buttons share a pending guard and keyboard strength applies only to t
 test('stopping during a pending guest cannot re-enable controls from its late completion',async()=>{
  const f=fixture();await f.elements.start.fire('click');let release;f.setGate(new Promise(resolve=>release=resolve));const pending=f.elements.pads[1].fire('click');f.controls.stop();release();await pending;
  assert.ok(f.elements.pads.every(p=>p.disabled));assert.equal(f.controls.state,'interrupted');
+});
+
+
+test('optional remembered choice locks with playback and names answers only after early accepted input',async()=>{
+ const f=fixture({mode:true});await f.elements.start.fire('click');assert.deepEqual(f.options,[['visual',{mode:'memory'}],['audio',{mode:'memory'}]]);assert.equal(f.elements.mode.disabled,true);assert.equal(f.controls.remembers,false);
+ f.emit({state:'playing',events:[{origin:'guest',frame:288000}]});assert.equal(f.controls.remembers,false);
+ f.controls.stop();assert.equal(f.elements.mode.disabled,false);await f.elements.start.fire('click');
+ f.emit({state:'playing',events:[{origin:'guest',frame:0}]});assert.equal(f.controls.remembers,true);
+ f.emit({state:'ended',finished});assert.equal(f.controls.remembers,true);assert.equal(f.elements.mode.disabled,false);
+ f.elements.mode.value='fixed';await f.elements.start.fire('click');assert.equal(f.controls.remembers,false);f.emit({state:'playing',events:[{origin:'guest',frame:0}]});assert.equal(f.controls.remembers,false);
 });
