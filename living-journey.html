@@ -29,5 +29,17 @@
 <details><summary>If the local audio has not been rendered</summary><p>From the project directory, prepare or repair all six audio/report pairs with one command. Existing matching files are left alone:</p><pre>node tools/prepare-living-journeys.mjs</pre><p>Add <code>--check</code> to verify without rendering. The project-home preparation command includes this study too. To render just one seed and structure:</p><pre>node tools/render-living-journey-study.mjs 42
 node tools/render-living-journey-study.mjs 42 --connected
 node tools/render-living-journey-study.mjs 42 --evolving</pre></details>
+<details><summary>Explore the relationships between bodies</summary>
+<p>The same short performance, heard through three families of instruments. Each begins and ends with the identical 80 mm body. Only the lengths of the answering bodies change. This is a sound-only comparison; the journey picture above stays paused.</p>
+<div class="choices"><label>Comparison phrase <select id="tuning-seed"><option value="42">The last touch waits · 18 seconds</option><option value="2950288811">A wider gesture · 22 seconds</option></select></label><label>Body family <select id="tuning-family"><option value="existing">Existing · 80 / 95 / 65 mm</option><option value="adjacent">A shorter low body · 80 / 90 / 65 mm</option><option value="fifths">Fifth-related modes · 80 / 97.98 / 65.32 mm</option></select></label></div>
+<div class="transport"><button id="tuning-listen">Listen to this body family</button><button id="tuning-quiet">Quiet comparison</button></div>
+<audio id="tuning-audio" controls hidden preload="none" aria-label="Selected body-family comparison"></audio><p id="tuning-status" role="status"></p>
+<p><a id="tuning-download" download>Keep this comparison WAV</a> · <a id="tuning-report">Inspect its geometry and score</a></p>
+<p>Does the answer feel like an extension of the opening, or a turn into another world? Does hearing the original again change your sense of it? None of these families is a chosen improvement yet.</p>
+<p class="small">Timing, touches, pan and gain stay fixed. Length also changes mass, decay and loudness; these recordings are not loudness-matched. “Fifth-related” describes corresponding modeled resonances in a 3:2 ratio, not established perceived pitch or consonance. Each body remains internally inharmonic. The optional listening level above applies here too. Starting either player pauses the other; switching comparison choices stays quiet.</p>
+<p class="small">Independent four-mode bodies and ideal impulses produce a velocity-pickup signal, without acoustic radiation or coupling. Precise lengths are study-only geometry, not saved instrument designs. To prepare these six local recordings:</p>
+<pre>node tools/render-living-tuning-study.mjs 42
+node tools/render-living-tuning-study.mjs 2950288811</pre>
+</details>
 <p class="footer"><a href="living.html">Play the Living Instrument</a> · <a href="project.html">Project home</a></p>
 </main><script type="module" src="src/living/journey-main.js"></script></html>

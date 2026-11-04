@@ -9,10 +9,12 @@ import {createLivingScene} from './scene.js';
 import {createLivingJourneyMedia} from './journey-media.js';
 import {createLivingJourneyGeneration} from './journey-generation.js';
 import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from './journey-report.js';
+import {setupLivingTuningListening} from './tuning-listening.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 const media=createLivingJourneyMedia();
 const generated=createLivingJourneyGeneration();
+const tuning=setupLivingTuningListening({beforePlay:()=>stop()});
 let generatedChoice=false,selectedRequest=null,expectedSha256=null;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
@@ -86,6 +88,7 @@ function choose(){
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
 async function listen(){
+ tuning.stop();
  const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent=generatedChoice?'Making your journey locally… Quiet cancels preparation.':'Checking the journey audio and score…';
  try{
   await player.prepare();if(own!==generation)return;
@@ -119,8 +122,8 @@ $('open-journey').addEventListener('change',async()=>{
 $('quiet').addEventListener('click',stop);
 $('seed').addEventListener('change',choose);
 for(const input of document.querySelectorAll('[name=shape]'))input.addEventListener('change',choose);
-$('level').addEventListener('input',()=>{player.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
-audio.addEventListener('play',()=>player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';}));
+$('level').addEventListener('input',()=>{player.setDb(Number($('level').value));tuning.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
+audio.addEventListener('play',()=>{tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
 audio.addEventListener('playing',startAnimation);
 for(const event of ['pause','ended','seeked'])audio.addEventListener(event,()=>{stopAnimation();drawEnsemble();if(event==='seeked')startAnimation();});
 $('ensemble-motion').addEventListener('change',()=>{drawEnsemble();startAnimation();});

@@ -958,3 +958,7 @@ Generator coverage audit complete:324reachable/distinct source tuples,972plans a
 Body relationship study: owns tools/render-living-tuning-study.mjs, tests/living-tuning-study.test.js and own evidence notes. Compare existing, adjacent admitted and precise fifth-related body lengths on the identical arrangement2 score; retain physical changes in mass/decay/output, no normalization or production/schema changes.
 
 Body relationship study complete: six WAV/report pairs across two seeds; baseline PCM identity, preserved score/opening/home and exact intended modal ratios verified by two passing tests. Claims released. Study-only geometry; listening preference, native presentation and independent review remain open.
+
+Tuning listening access: owns living-journey.html, journey-main.js, new tuning-listening.js and own notes. Add optional same-score body comparison within existing workshop, one shared-level player, mutually exclusive playback and quiet page lifecycle. No new flagship default.
+
+Tuning listening access complete, including tests/living-tuning-listening.test.js: optional existing-page comparison, exclusive playback/shared level/quiet lifecycle; nine focused tests and14served resources pass. Claims released. Native browser QA unavailable after verified pipe startup failure; no preference or independent review claimed.
