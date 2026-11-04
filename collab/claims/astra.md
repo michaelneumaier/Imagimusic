@@ -1125,3 +1125,5 @@ Saved-width scene support complete: extracted real body geometry, admitted width
 Saved ensemble visual replay integrated: separate optional scene from worker-admitted record, identity/copy boundary, media seeking/pause/end, disclosure/reduced-motion/visibility guards and local graphics failure. 185 focused tests pass; HTTP/43IDs/syntax/diff pass. Claims released; native playback/pixels/timing, appeal and independent review remain open.
 
 Saved-touch choreography research complete: separate staging identity, actual activation/length poses, grouped simultaneous histories, at most three anticipatory cues and bounded fade. Four isolated tests pass; syntax/diff pass. Claims released. Not connected to scene; rendering/legibility/distraction/native and independent assessment remain ahead.
+
+Optional saved-touch cues integrated: lazy bounded geometry, default-off replay option, saved-position contact and media-clock behavior. Full 1,152 tests pass under --no-maglev; served resources, IDs, syntax and diff checks pass. Claims released; native appeal/sync and independent review remain open.

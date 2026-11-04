@@ -40,6 +40,8 @@
 <details id="replay-body-view"><summary>See the saved instruments</summary>
 <canvas id="replay-body-canvas" width="960" height="600" hidden role="img" aria-label="Saved ensemble bodies with optional modeled response bounds"></canvas>
 <label><input id="replay-body-motion" type="checkbox" checked> Follow saved playback</label>
+<label><input id="replay-touch-cues" type="checkbox" aria-describedby="replay-cue-note"> Show approaching touch cues · experimental</label>
+<p id="replay-cue-note" class="small">Optional movements anticipate recorded touches at their saved positions. Nearby touches share one cue per body. These are artistic cues, not simulated impacts or force directions.</p>
 <p id="replay-body-status" class="small" role="status">Choose Listen to show the saved instruments. Preparing stays silent.</p>
 <p class="small">These bodies come from the saved file, including their lengths, widths and touch positions. The response follows the saved audio’s playback position, including seeking. Close this section or turn following off whenever you prefer.</p>
 </details>

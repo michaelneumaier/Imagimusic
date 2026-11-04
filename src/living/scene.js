@@ -1,3 +1,4 @@
+import {createSavedTouchCues} from './saved-touch-scene.js';
 import {createLivingBody} from './body-scene.js';
 import {LIVING_LOOKS} from './looks.js';
 import * as T from '../../vendor/three/build/three.module.js';
@@ -31,7 +32,7 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  controls.enableDamping=false;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.48;
  let cameraOpen=0,inspectContact=false,cameraShot=ensemble?ensemble.camera:null;
  if(ensemble){scene.fog.near=100;scene.fog.far=220;key.shadow.camera.left=-25;key.shadow.camera.right=25;key.shadow.camera.top=25;key.shadow.camera.bottom=-25;key.shadow.camera.far=65;key.shadow.camera.updateProjectionMatrix();}
- let selected='opening',width=0,height=0,disposed=false;
+ let selected='opening',width=0,height=0,disposed=false,savedCues=null;
  const poses={opening:{target:[3.5,2,0],direction:[10,6.5,14],radius:6.6},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
  function place(){
   const solo=inspectContact?{target:[6.3,4.2,0],direction:[3,2,8],radius:1.3}:poses[selected],wide={target:[3,2,-2],direction:[5,9,19],radius:16};
@@ -79,11 +80,13 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  function instanceFrame(frame,reveal=true){
   if(!ensemble||frame.instances.length!==bodies.length)throw Error('Frame does not match the journey ensemble.');
   performers(frame.performers);
+  if(frame.savedTouches?.length&&!savedCues){savedCues=createSavedTouchCues(ensemble);scene.add(savedCues.objects);}
+  savedCues?.update(frame.savedTouches??[]);
   for(let i=0;i<bodies.length;i++){const state=frame.instances[i];bodies[i].response(reveal?state.points:null,state.endingOpacity);bodies[i].acknowledgeTouch(!!state.touchMarker,state.touchMarker?.activation);}
   render();
  }
- function clearArrangement(){performers([]);const wasDetail=inspectContact||!!cameraShot;inspectContact=false;cameraShot=null;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
+ function clearArrangement(){savedCues?.update([]);performers([]);const wasDetail=inspectContact||!!cameraShot;inspectContact=false;cameraShot=null;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
- function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
+ function dispose(){disposed=true;savedCues?.dispose();savedCues=null;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
  return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,instanceFrame,clearArrangement,performers,dispose};
 }

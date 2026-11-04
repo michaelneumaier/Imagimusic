@@ -6,11 +6,11 @@ import {createTineDesign} from '../src/tine/address.js';
 function element(){const listeners=new Map();return {checked:true,open:true,addEventListener(type,fn){if(!listeners.has(type))listeners.set(type,new Set());listeners.get(type).add(fn);},removeEventListener(type,fn){listeners.get(type)?.delete(fn);},fire(type,event={}){for(const fn of listeners.get(type)??[])fn(event);}};}
 const flush=async()=>{await Promise.resolve();await Promise.resolve();};
 function fixture(options={}){
- const audio={...element(),src:'blob:one',paused:true,ended:false,currentTime:0},canvas=element(),motion=element(),outer=element(),inner=element(),visibility=element(),status={},tasks=new Map(),frames=[],layouts=[];let counter=0,disposed=0,hidden=false;
+ const audio={...element(),src:'blob:one',paused:true,ended:false,currentTime:0},canvas=element(),motion=element(),cues={...element(),checked:false},outer=element(),inner=element(),visibility=element(),status={},tasks=new Map(),frames=[],layouts=[];let counter=0,disposed=0,hidden=false;
  let prepared={identity:'blob:one',record:validateContinuousEnsembleRecord({kind:'imagimusic-continuous-ensemble-record',version:1,mixGain:1/3,records:[85,120,60].map((lengthMm,i)=>({kind:'imagimusic-continuous-tine-record',version:1,design:createTineDesign({lengthMm,widthMm:[5,13,20][i]}),sampleRate:48000,events:[{frame:24000,strength:.01,origin:'guest'}],fadeStart:96000}))})};
  const makeScene=(canvas,options)=>{layouts.push(options.ensemble);return {instanceFrame:frame=>frames.push(frame),setLook(){},dispose(){disposed++;}};};
- const view=createContinuousEnsembleReplayVisual({audio,canvas,motion,disclosures:[outer,inner],status,getPrepared:()=>prepared,visibilityTarget:visibility,isVisible:()=>!hidden&&outer.open&&inner.open,loadScene:async()=>makeScene,schedule:fn=>{tasks.set(++counter,fn);return counter;},cancel:id=>tasks.delete(id),...options});
- return {audio,canvas,motion,outer,inner,status,view,frames,tasks,layouts,makeScene,get disposed(){return disposed;},get prepared(){return prepared;},set prepared(value){prepared=value;},set hidden(value){hidden=value;visibility.fire('visibilitychange');},play(){audio.paused=false;audio.ended=false;audio.fire('play');},tick(stamp){const [id,fn]=tasks.entries().next().value;tasks.delete(id);fn(stamp);}};
+ const view=createContinuousEnsembleReplayVisual({audio,canvas,motion,cues,disclosures:[outer,inner],status,getPrepared:()=>prepared,visibilityTarget:visibility,isVisible:()=>!hidden&&outer.open&&inner.open,loadScene:async()=>makeScene,schedule:fn=>{tasks.set(++counter,fn);return counter;},cancel:id=>tasks.delete(id),...options});
+ return {audio,canvas,motion,cues,outer,inner,status,view,frames,tasks,layouts,makeScene,get disposed(){return disposed;},get prepared(){return prepared;},set prepared(value){prepared=value;},set hidden(value){hidden=value;visibility.fire('visibilitychange');},play(){audio.paused=false;audio.ended=false;audio.fire('play');},tick(stamp){const [id,fn]=tasks.entries().next().value;tasks.delete(id);fn(stamp);}};
 }
 test('explicit saved playback creates actual bodies, follows media time and seeks backwards without replaying audio',async()=>{
  const f=fixture();assert.equal(f.layouts.length,0);assert.equal(f.canvas.hidden,true);f.play();await flush();assert.deepEqual(f.layouts[0].instances.map(x=>[x.bodyMm,x.bodyWidthMm]),[[85,5],[120,13],[60,20]]);
@@ -42,4 +42,13 @@ test('a newer saved source wins over an earlier pending scene creation',async()=
  let release;const gate=new Promise(resolve=>release=resolve),f=fixture({loadScene:()=>gate});f.play();
  f.prepared={identity:'blob:two',record:structuredClone(f.prepared.record)};f.prepared.record.records[0].design=createTineDesign({lengthMm:100,widthMm:20});f.audio.src='blob:two';f.play();release(f.makeScene);await flush();
  assert.equal(f.layouts.length,1);assert.equal(f.layouts[0].instances[0].bodyMm,100);assert.equal(f.layouts[0].instances[0].bodyWidthMm,20);assert.equal(f.canvas.hidden,false);f.view.dispose();
+});
+
+test('optional cues anticipate a saved touch without changing sound or defeating held motion',async()=>{
+ const f=fixture();f.play();await flush();f.audio.currentTime=.4;f.tick(0);
+ assert.deepEqual(f.frames.at(-1).savedTouches,[]);assert.equal(f.frames.at(-1).touches,0);
+ f.cues.checked=true;f.cues.fire('change');assert.equal(f.frames.at(-1).savedTouches.length,3);assert.equal(f.frames.at(-1).touches,0);assert.equal(f.audio.currentTime,.4);assert.equal(f.audio.paused,false);
+ f.motion.checked=false;f.motion.fire('change');assert.equal(f.tasks.size,0);const held=f.frames.length;
+ f.audio.currentTime=.5;f.audio.fire('timeupdate');assert.equal(f.frames.length,held);
+ f.cues.checked=false;f.cues.fire('change');assert.deepEqual(f.frames.at(-1).savedTouches,[]);assert.equal(f.tasks.size,0);assert.equal(f.audio.paused,false);f.view.dispose();
 });
