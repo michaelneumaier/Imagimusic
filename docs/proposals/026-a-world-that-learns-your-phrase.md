@@ -221,3 +221,7 @@ This supplies a meaningful creative input while keeping one-action listening com
 ## Listening alone can leave a keepsake
 
 Keep this piece now downloads a generated encounter recipe directly from its listening card. Visitors can keep a complete piece without playing or adopting it as their current original. The exact source, arrangement and appearance reopen quietly; an existing original and its address remain intact. A real downloaded recipe has been checked against its generated source and reopened through the visitor controls. This removes a participation requirement from the automatic path while leaving Explore available when someone wants to join the music.
+
+## Let the camera attend to a phrase
+
+The existing visual workshop now has a phrase-level attention candidate: anticipate an answering body, stay with its phrase, and release toward the next voice. Overlaps share a frame. It offers a way for the automatic performance to direct attention without asking the visitor to operate the camera. A same-moment comparison shows larger instruments while retaining context; held-camera output remains unchanged. This is still a workshop experiment, not a saved presentation. Full-passage motion, framing of dense generated sources and eventual versioned adoption remain to assess.

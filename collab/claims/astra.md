@@ -818,3 +818,7 @@ Listening-only keeping: owns main.js/living.html for direct generated-recipe dow
 Listening-only keeping evidence: also owns current catalog description and appendices in proposal026 and implementation notes.
 
 Listening-only keeping complete: one-action download, independent original/address retention and native quiet recipe reopen verified;9targeted tests pass; exact downloaded source matches generator. Claims released. Artistic whole-piece refinement remains next.
+
+Answer attention workshop: owns new src/living/attention-view.js and tests, optional scene cameraShot plumbing, look-main.js/living-look.html diagnostic toggle. Smooth phrase-level anticipatory framing; published presentation1/2/3 paths remain unchanged. Inspect existing exported wide shot and candidate native workshop before any adoption.
+
+Answer attention evidence: also owns current plan/evidence appendices. Candidate implemented, five tests pass, native same-moment comparison and byte-identical held-view check complete. Claims released for this workshop slice. Current saved appearances unchanged; wider moving-passage evaluation remains next.
