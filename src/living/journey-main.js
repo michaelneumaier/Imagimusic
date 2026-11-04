@@ -3,10 +3,29 @@ import {createLivingConnectedJourneyStudy} from './connected-journey-study.js';
 import {createLivingEvolvingJourneyStudy} from './evolving-journey-study.js';
 import {createTineStudyPlayer} from '../tine/study-player.js';
 import {createLivingJourneyScore} from './journey-score.js';
+import {createLivingJourneyView} from './journey-view.js';
+import {createLivingJourneyLayout} from './journey-layout.js';
+import {createLivingScene} from './scene.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
+let scene=null,journeyView=null,raf=0,lastDraw=-Infinity;
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+$('ensemble-motion').checked=!reducedMotion.matches;
+function drawEnsemble(){
+ if(!scene||!journeyView)return;
+ const seconds=Math.min(plan.frames/plan.sampleRate,Math.max(0,audio.currentTime||0));
+ scene.instanceFrame(journeyView.at(seconds),$('ensemble-veils').checked);
+}
+function tick(stamp){raf=0;if(audio.paused||document.hidden||!$('ensemble-motion').checked)return;if(stamp-lastDraw>=1000/30){drawEnsemble();lastDraw=stamp;}raf=requestAnimationFrame(tick);}
+function stopAnimation(){cancelAnimationFrame(raf);raf=0;}
+function startAnimation(){stopAnimation();lastDraw=-Infinity;if(scene&&!audio.paused&&$('ensemble-motion').checked)raf=requestAnimationFrame(tick);}
+function prepareEnsemble(){
+ stopAnimation();scene?.dispose();scene=null;journeyView=null;
+ try{journeyView=createLivingJourneyView(plan);scene=createLivingScene($('ensemble'),{ensemble:createLivingJourneyLayout(journeyView.allocation)});scene.setLook('dusk');scene.instanceFrame(journeyView.at(0),$('ensemble-veils').checked);$('ensemble-status').textContent=`${journeyView.allocation.instances.length} independent instruments · held camera · sound follows the selected score.`;}
+ catch(error){scene?.dispose();scene=null;$('ensemble-status').textContent='The ensemble could not open. Audio and the score diagram remain available.';}
+}
 const clock=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 function buildScore(){
  score=createLivingJourneyScore(plan);marks=[];cursors=[];
@@ -46,6 +65,7 @@ function choose(){
  const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
  const treatment={connected:{make:createLivingConnectedJourneyStudy,suffix:'-connected',description:'One opening, five connected exchanges, one return. Each middle exchange begins while the previous sound is still ringing.'},chapters:{make:createLivingJourneyStudy,suffix:'',description:'Seven self-contained chapters. Each presents the phrase, develops it across the bodies, and returns to its own opening.'},evolving:{make:createLivingEvolvingJourneyStudy,suffix:'-evolving',description:'One opening, twelve developing exchanges, one return. The rhythm turns and the accents move, then the familiar rhythm and accents come back before home.'}}[shape];
  plan=treatment.make(seed);
+ prepareEnsemble();
  buildScore();drawScore(0);
  url=`renders/living-journey-study/journey-${seed}${treatment.suffix}.wav`;
  $('download').href=url;$('report').href=url.replace(/\.wav$/,'.json');
@@ -64,7 +84,13 @@ $('seed').addEventListener('change',choose);
 for(const input of document.querySelectorAll('[name=shape]'))input.addEventListener('change',choose);
 $('level').addEventListener('input',()=>{player.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
 audio.addEventListener('play',()=>player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';}));
+audio.addEventListener('playing',startAnimation);
+for(const event of ['pause','ended','seeked'])audio.addEventListener(event,()=>{stopAnimation();drawEnsemble();if(event==='seeked')startAnimation();});
+$('ensemble-motion').addEventListener('change',()=>{drawEnsemble();startAnimation();});
+$('ensemble-veils').addEventListener('change',drawEnsemble);
+$('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
+$('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){generation++;starting=false;player.park();if(plan)update();}
+function park(){generation++;starting=false;stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();

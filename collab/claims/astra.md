@@ -924,3 +924,7 @@ Journey instance allocation complete:3/5/6instances across three structures;1996
 Journey per-instance response: owns new journey-view.js/tests and own notes. Sample exact assigned independent source/release clocks, retain simultaneous tails on distinct instances, and expose recorded-ending opacity separately from modeled displacement bounds. No existing scene or audio changes.
 
 Journey per-instance response complete: actual source/release/fade clocks and simultaneous responses verified; six focused tests pass, expanded two-seed view rerun passes. Claims released. Pure frame model; instance-aware scene/native inspection remains ahead. Audio/old appearances unchanged, no independent review.
+
+Journey scene integration: owns optional ensemble branch in scene.js, new journey-layout.js/tests and journey-main.js/CSS/HTML. Reuse established geometry with explicit instance placement/response opacity, fixed wide camera and media-clock rendering; leave default scene branch/saved inputs unchanged. Native QA pending bridge recovery.
+
+Journey ensemble integrated locally: optional scene branch, fixed framing, per-instance response/performers and audio-clock controls.84Living tests pass and sampled projection guard passes sixscores×threeaspects. Claims released. Native render/layout/sync/performance verification blocked by tool startup, not claimed complete; no publication or independent review.

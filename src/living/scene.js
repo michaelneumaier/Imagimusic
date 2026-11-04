@@ -6,7 +6,7 @@ import {createSurfaceLighting} from '../stage/surface-lighting.js';
 
 /** One drawing unit = 10 mm. The solid body stays still; the optional veil
  * shows a conservative displacement envelope at 100,000× magnification. */
-export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height:fixedHeight}={}){
+export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height:fixedHeight,ensemble=null}={}){
  const fixed=fixedWidth!==undefined||fixedHeight!==undefined;
  if(fixed&&(!Number.isInteger(fixedWidth)||fixedWidth<1||!Number.isInteger(fixedHeight)||fixedHeight<1))throw Error('Fixed scene dimensions must be positive integers.');
  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:fixed});
@@ -38,8 +38,9 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  for(const z of [-.51,.51]){const m=new T.Mesh(veilGeometry,veilMaterial);m.position.z=z;veil.add(m);}
  const edges=[];
  for(const sign of [-1,1])for(const z of [-.51,.51]){const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(81*3),3));const line=new T.Line(g,new T.LineBasicMaterial({color:sign>0?0xc1dfdf:0x73aeb9,transparent:true,opacity:.65,depthWrite:false}));line.position.z=z;veil.add(line);edges.push({line,sign});}
- function response(points){
+ function response(points,opacity=1){
   veil.visible=!!points;
+  veilMaterial.opacity=.16*opacity;for(const {line} of edges)line.material.opacity=.65*opacity;
   if(points){for(let i=0;i<81;i++){const x=points[i].u*length,h=points[i].boundM*1e7;veilPositions.set([x,3.5-h,0,x,3.5+h,0],i*6);for(const {line,sign} of edges)line.geometry.attributes.position.array.set([x,3.5+sign*h,0],i*3);}
    veilGeometry.attributes.position.needsUpdate=true;veilGeometry.computeBoundingSphere();for(const {line} of edges){line.geometry.attributes.position.needsUpdate=true;line.geometry.computeBoundingSphere();}}
  }
@@ -91,16 +92,16 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
  setLength(mm);
  return {objects,blade,response,setLength,performers,acknowledgeTouch(value){marker.visible=value;}};
  }
- const bodies=[makeBody(80),makeBody(95),makeBody(65)];
- bodies[1].objects.position.set(-11,0,-4);bodies[2].objects.position.set(10,0,-4);
- bodies[1].objects.visible=bodies[2].objects.visible=false;
+ const bodies=ensemble?ensemble.instances.map(instance=>{const body=makeBody(instance.bodyMm);body.objects.position.fromArray(instance.position);return body;}):[makeBody(80),makeBody(95),makeBody(65)];
+ if(!ensemble){bodies[1].objects.position.set(-11,0,-4);bodies[2].objects.position.set(10,0,-4);bodies[1].objects.visible=bodies[2].objects.visible=false;}
  const floor=new T.Mesh(new T.PlaneGeometry(2000,2000),new T.MeshStandardMaterial({color:0x03070c,roughness:.8,metalness:.12}));floor.position.y=-.07;floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
  scene.add(new T.HemisphereLight(0xa8c8db,0x1e1710,.9));
  const key=new T.DirectionalLight(0xffd5a0,3.2);key.position.set(-4,11,5);key.target.position.set(2,2,0);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:35});key.shadow.bias=-.00015;key.shadow.normalBias=.025;scene.add(key,key.target);
  const rim=new T.DirectionalLight(0xa7d1e7,2.8);rim.position.set(6,5,-7);scene.add(rim);
  const camera=new T.PerspectiveCamera(34,1,.1,220),controls=new OrbitControls(camera,canvas);
  controls.enableDamping=false;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.48;
- let cameraOpen=0,inspectContact=false,cameraShot=null;
+ let cameraOpen=0,inspectContact=false,cameraShot=ensemble?ensemble.camera:null;
+ if(ensemble){scene.fog.near=100;scene.fog.far=220;key.shadow.camera.left=-25;key.shadow.camera.right=25;key.shadow.camera.top=25;key.shadow.camera.bottom=-25;key.shadow.camera.far=65;key.shadow.camera.updateProjectionMatrix();}
  let selected='opening',width=0,height=0,disposed=false;
  const poses={opening:{target:[3.5,2,0],direction:[10,6.5,14],radius:6.6},root:{target:[-.45,3.4,0],direction:[4,3,7],radius:2.1},end:{target:[5.8,3.2,0],direction:[7,4,10],radius:3.2}};
  function place(){
@@ -145,9 +146,15 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   renderer.toneMappingExposure=look.exposure;scene.environmentIntensity=look.environment;
   key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
  }
- function performers(poses=[]){for(let i=0;i<3;i++)bodies[i].performers(poses.filter(p=>p.body===i));}
+ function performers(poses=[]){for(let i=0;i<bodies.length;i++)bodies[i].performers(poses.filter(p=>p.body===i));}
+ function instanceFrame(frame,reveal=true){
+  if(!ensemble||frame.instances.length!==bodies.length)throw Error('Frame does not match the journey ensemble.');
+  performers(frame.performers);
+  for(let i=0;i<bodies.length;i++){const state=frame.instances[i];bodies[i].response(reveal?state.points:null,state.endingOpacity);bodies[i].acknowledgeTouch(false);}
+  render();
+ }
  function clearArrangement(){performers([]);const wasDetail=inspectContact||!!cameraShot;inspectContact=false;cameraShot=null;controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);if(wasDetail)place();render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
  function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,performers,dispose};
+ return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,instanceFrame,clearArrangement,performers,dispose};
 }

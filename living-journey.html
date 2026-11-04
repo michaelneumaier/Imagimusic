@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A phrase remembered · Imagimusic</title><link rel="stylesheet" href="src/living/journey.css">
+<title>A phrase remembered · Imagimusic</title><link rel="stylesheet" href="src/living/journey.css"><script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
 <main>
 <a href="living-look.html">Back to the workshop</a>
 <p class="eyebrow">THE LIVING INSTRUMENT · COMPOSITION STUDY</p>
@@ -18,6 +18,7 @@
 </div>
 <label class="level">Optional listening level <input id="level" type="range" min="0" max="20" step="1" value="0"><output id="level-value">+0 dB</output></label>
 <p class="small">The same level applies to every version. Changing the seed or structure stops playback.</p>
+<section aria-labelledby="ensemble-title"><h2 id="ensemble-title">The instruments answer</h2><canvas id="ensemble" role="img" aria-label="Independent steel-tine instruments in a held ensemble view"></canvas><p id="ensemble-status" class="small" role="status">Preparing the ensemble…</p><label><input id="ensemble-motion" type="checkbox" checked> Follow the performance</label><label><input id="ensemble-veils" type="checkbox" checked> Show magnified response veils</label><p class="small">The camera stays wide; drag to look around. Turning performance following off holds the picture until you pause or seek. Reduced-motion preferences start with following off. Separate instances keep overlapping independent passes visible. Strikers are score-driven, not simulated collisions; veils are displacement bounds magnified 100,000×, with a separate fade at each recorded ending.</p></section>
 <section aria-labelledby="score-title"><h2 id="score-title">A visible conversation</h2><p class="small">Three instrument lanes follow the same clock as the sound. Dots mark touches; bars show complete rendered passes, including their fading tails.</p><div id="score" role="img" aria-label="Score timeline for three independent tine instruments"></div><p id="score-reading" class="small">The opening is waiting.</p></section>
 <section aria-labelledby="chapters-title"><h2 id="chapters-title">Follow the idea</h2><p class="small">These are score chapters, not a measure of emotion. Overlapping rows mean that the preceding sound is still finishing.</p><ol id="chapters"></ol></section>
 <p><a id="download" download>Keep the selected WAV</a> · <a id="report">Inspect the score</a></p>
