@@ -1054,3 +1054,5 @@ Autonomous continuous return study complete: seeded48second/eight-passage rhythm
 Autonomous continuous worklet complete: one-start score, acknowledged guest/Quiet/cancel, origin-clock accepted events and completed capture, bounded command identities and terminal failure silence. Twenty-seven focused tests pass; module200. Claims released; main-thread lifecycle/native device and independent review remain ahead.
 
 Continuous completion verification complete: reconstruct known composition and accepted guests, require matching acknowledged ending, source/history and physical state. Nine focused and full985tests pass. Claims released; cancellable worker/session/native playback and independent review remain ahead.
+
+Cancellable continuous verification worker complete: strict request, actual background reconstruction, bounded timeout and exactly-once release/cancellation. Thirty-four focused tests pass; modules200. Claims released; browser session/native playback and independent review remain ahead.
