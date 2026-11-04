@@ -37,6 +37,7 @@ const listening=()=>['preparing','playing','suspended'].includes(replay.state);
 function controls(){
  const branchPending=!!branchCapture?.pending;
  const state=session?.state??'idle',busy=active(state)||!!movie?.busy||!!explorationJob,repeat=listening();
+ $('phrase-exploration').hidden=!capture.current;
  $('begin').disabled=!world||busy||repeat;
  $('hear-first').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending;
  $('generate-piece').disabled=$('hear-first').disabled;

@@ -876,3 +876,7 @@ Released arrangement3 adoption complete:69focused/855full tests pass; actual521-
 Listening-first transport: owns living.html/living.css and main.js for native playing disclosure, always-accessible Quiet, and explicit focus routing. No sound/record changes; verify fresh listening, disclosure keyboard/play and quiet restore in native browser.
 
 Listening-first transport complete: fresh narrow screenshot, native Space disclosure, actual one-touch capture/Quiet, generated playback with closed controls and quiet kept-address restore verified. Claims released. No sound/record changes or independent review claim.
+
+Phrase-aware exploration disclosure: owns living.html/living.css/main.js and evidence notes. Hide empty body/encounter panel until an original exists; move camera choice next to scene so passive listeners retain it. Native fresh/generated/adopted/kept paths; no music or format changes.
+
+Phrase-aware exploration disclosure complete: fresh/generated listening keeps camera visible and empty body controls hidden; native Explore adopts quietly and reveals meaningful controls. Unique IDs/syntax/diff checks pass. Claims released; no sound/record changes or independent review claim.

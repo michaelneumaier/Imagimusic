@@ -51,3 +51,5 @@ header{padding-top:18px;padding-bottom:14px}
 .transport-actions #quiet{margin-left:auto}
 #again[hidden]{display:none}
 @media(max-width:700px){.transport-actions{gap:8px}#playing-tools{font-size:12px;min-width:130px}#playing-tools summary{padding:10px 13px}#playing-tools .actions button{flex:0 1 auto;min-width:65px}}
+
+.listening-camera{max-width:650px;margin:8px auto 24px;color:#b7c3bf;font-size:14px;line-height:1.6}.listening-camera small{display:block;margin-top:4px;color:#aab8b5}.bodies[hidden]{display:none}
