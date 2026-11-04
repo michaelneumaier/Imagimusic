@@ -946,3 +946,7 @@ Fresh journey worker foundation complete: four real-thread tests pass; fresh bou
 Visitor fresh journey integration: owns journey-generation.js/tests, journey-main.js/living-journey.html and own notes. One-action fresh seed uses worker, quiet cancellation and exact-plan/hash validation; retain current generated WAV/report URLs for replay/download until selection changes. No saved encounter identity or default score change.
 
 Visitor fresh generation implemented: new seed -> worker -> exact-plan/hash-verified playback/downloads, cached replay and cancellation.14focused tests plus fresh89.175sartifact/download check pass; resources200/IDs/syntax/diff checked. Claims released. Native one-action playback/controls/downloads remain unverified; no saved recipe or independent review claim.
+
+Generated score return: owns new journey-report.js/tests, generation session/tests, journey-main.js/HTML/CSS and own notes. Bounded strict report import prepares selected seed/structure quietly; explicit Listen must reproduce kept WAV digest. Invalid/stale reads preserve current selection; no flagship recipe or cross-engine byte-equivalence promise.
+
+Generated score return implemented: bounded strict silent report import, exact retained audio-hash guard on regeneration and preserved prior selection on refusal. Seven focused tests pass plus resources200/IDs/syntax/diff. Claims released. Native chooser/restore/playback unverified; no cross-engine exactness or flagship recipe claim.

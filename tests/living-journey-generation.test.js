@@ -32,3 +32,10 @@ test('Quiet during digest prevents publishing an already rendered result',async(
  const session=createLivingJourneyGeneration({createJob:()=>({promise:Promise.resolve(artifact()),cancel(){}}),digest:()=>{enter();return new Promise(r=>finish=r);},makeURL:()=>{made++;return 'blob:late';}});
  const pending=session.prepare(request,plan),rejected=assert.rejects(pending,{name:'AbortError'});await ready;session.cancel();finish(createHash('sha256').update(new Uint8Array(48)).digest());await rejected;assert.equal(made,0);
 });
+
+test('a kept digest is enforced even when the same unconstrained generation was cached',async()=>{
+ const f=setup(),first=f.session.prepare(request,plan);f.jobs[0].resolve(artifact());await first;
+ const restored=f.session.prepare(request,plan,'f'.repeat(64));f.jobs[1].resolve(artifact());
+ await assert.rejects(restored,/kept audio exactly/);assert.equal(f.blobs.length,2);assert.deepEqual(f.revoked,[]);
+ await assert.rejects(f.session.prepare(request,plan,'invalid'),/Invalid kept/);f.session.clear();
+});

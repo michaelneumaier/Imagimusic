@@ -8,11 +8,12 @@ import {createLivingJourneyLayout} from './journey-layout.js';
 import {createLivingScene} from './scene.js';
 import {createLivingJourneyMedia} from './journey-media.js';
 import {createLivingJourneyGeneration} from './journey-generation.js';
+import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from './journey-report.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 const media=createLivingJourneyMedia();
 const generated=createLivingJourneyGeneration();
-let generatedChoice=false,selectedRequest=null;
+let generatedChoice=false,selectedRequest=null,expectedSha256=null;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
 let scene=null,journeyView=null,raf=0,lastDraw=-Infinity;
@@ -66,6 +67,7 @@ function update(){
 }
 function stop(){generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
 function choose(){
+ expectedSha256=null;
  generation++;starting=false;player.stop();media.clear();generated.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
  const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
  generatedChoice=$('seed').selectedOptions[0]?.dataset.generated==='true';
@@ -89,7 +91,7 @@ async function listen(){
   await player.prepare();if(own!==generation)return;
   let verified;
   if(generatedChoice){
-   const artifact=await generated.prepare(selectedRequest,plan);if(own!==generation)return;verified=artifact.audioURL;
+   const artifact=await generated.prepare(selectedRequest,plan,expectedSha256);if(own!==generation)return;verified=artifact.audioURL;
    const stem=`imagimusic-journey-${artifact.seed}-${artifact.treatment}`;
    $('download').href=artifact.audioURL;$('download').download=stem+'.wav';$('report').href=artifact.reportURL;$('report').download=stem+'.json';$('report').textContent='Keep the score report';$('download').hidden=$('report').hidden=false;
   }else verified=await media.prepare(url,plan);
@@ -101,6 +103,18 @@ $('new-journey').addEventListener('click',()=>{
  let seed;do{seed=crypto.getRandomValues(new Uint32Array(1))[0];}while([...$('seed').options].some(o=>Number(o.value)===seed));
  let option=$('fresh-seed');if(!option){option=document.createElement('option');option.id='fresh-seed';option.dataset.generated='true';$('seed').append(option);}
  option.value=String(seed);option.textContent=`Your new idea · ${seed}`;$('seed').value=String(seed);choose();listen();
+});
+$('open-journey').addEventListener('change',async()=>{
+ const file=$('open-journey').files?.[0];$('open-journey').value='';if(!file)return;
+ stop();const own=++generation;starting=true;$('quiet').disabled=false;$('status').textContent='Reading the kept score…';
+ try{
+  if(file.size>LIVING_JOURNEY_REPORT_LIMIT)throw Error('The score report exceeds512KiB.');
+  const text=await file.text();if(own!==generation)return;const kept=readLivingJourneyReport(text);
+  let option=$('fresh-seed');if(!option){option=document.createElement('option');option.id='fresh-seed';option.dataset.generated='true';$('seed').append(option);}
+  option.value=String(kept.request.seed);option.textContent=`Your kept idea · ${kept.request.seed}`;option.selected=true;
+  document.querySelector(`[name=shape][value=${kept.request.treatment}]`).checked=true;
+  choose();expectedSha256=kept.expectedSha256;$('status').textContent='Kept score reopened quietly. Listen will regenerate it and verify the original audio identity.';
+ }catch(error){if(own!==generation)return;starting=false;$('quiet').disabled=true;$('status').textContent=`The score could not open: ${error.message} Your previous selection is still available.`;}
 });
 $('quiet').addEventListener('click',stop);
 $('seed').addEventListener('change',choose);

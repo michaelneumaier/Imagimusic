@@ -6,8 +6,9 @@ export function createLivingJourneyGeneration({createJob=request=>createAudioRen
  function cancel(){version++;job?.cancel();job=null;}
  function release(value){if(value){revokeURL(value.audioURL);revokeURL(value.reportURL);}}
  function clear(){cancel();release(current);current=null;}
- async function prepare(request,plan){
-  cancel();const own=version,key=JSON.stringify({request,plan});
+ async function prepare(request,plan,expectedSha256=null){
+  cancel();const own=version,key=JSON.stringify({request,plan,expectedSha256});
+  if(expectedSha256!==null&&(typeof expectedSha256!=='string'||!/^[a-f0-9]{64}$/.test(expectedSha256)))throw Error('Invalid kept journey audio identity.');
   if(current?.key===key)return current;
   const fresh=()=>{if(own!==version)throw new DOMException('Journey generation cancelled.','AbortError');};
   try{
@@ -15,6 +16,7 @@ export function createLivingJourneyGeneration({createJob=request=>createAudioRen
    if(artifact?.kind!=='imagimusic-living-journey-artifact'||artifact.version!==1||artifact.seed!==request.seed||artifact.treatment!==request.treatment||artifact.previewGain!==8||artifact.sampleRate!==plan.sampleRate||artifact.frames!==plan.frames||JSON.stringify(artifact.plan)!==JSON.stringify(plan)||!(artifact.wav instanceof ArrayBuffer)||artifact.wav.byteLength!==44+plan.frames*4||artifact.wav.byteLength>64*1024*1024)throw Error('Generated audio does not match the selected journey.');
    const hash=Array.from(new Uint8Array(await digest(artifact.wav)),v=>v.toString(16).padStart(2,'0')).join('');fresh();
    if(hash!==artifact.sha256)throw Error('Generated audio failed its identity check.');
+   if(expectedSha256!==null&&hash!==expectedSha256)throw Error('This runtime did not reproduce the kept audio exactly. Use the kept WAV to hear that recording.');
    const {wav,...report}=artifact;
    const audioURL=makeURL(new Blob([wav],{type:'audio/wav'}));let reportURL;
    try{reportURL=makeURL(new Blob([JSON.stringify(report,null,2)+'\n'],{type:'application/json'}));}catch(error){revokeURL(audioURL);throw error;}
