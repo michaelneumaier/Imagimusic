@@ -15,7 +15,7 @@ export function createLivingMovieControls({getSource,getOptions,canMake,onChange
   controller=new AbortController();const signal=controller.signal;refresh();onChange();$('cancel-film').focus({preventScroll:true});
   try{
    $('film-status').textContent='Preparing your original phrase silently…';
-   job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),record.source);
+   job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),record);
    const pcm=await job.promise;job=null;
    const result=await exportLivingMovie(record,pcm,{signal,onProgress:text=>$('film-status').textContent=text});
    if(signal.aborted)throw new DOMException('Cancelled','AbortError');

@@ -17,7 +17,7 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
-let presentationVersion=3,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
+let arrangementVersion=1,presentationVersion=3,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
@@ -25,7 +25,8 @@ motionPreference.addEventListener('change',()=>{if(!choseCameraMotion)$('camera-
 let world=null,session=null,raf=0,wantsFocus=false,returnFocus=false,liveResponse=null,replayResponse=null,replayCount=0,replayFocus=false,selectedPCM=null,seenCapture=null,seenComparison=null;
 const bodyButtons=[...document.querySelectorAll('[data-length]')];
 let restoreVersion=0,movie=null,explorationJob=null,explorationURL=null,branchOrigin=null,pendingBranchOrigin=null;
-let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original';
+let examplePlaying=false,generatedPlaying=false,generatedPhrase=null,generatedSpacing='original',generatedArrangementVersion=1;
+const arrangementButtons=[...document.querySelectorAll('[data-arrangement]')];
 const spacingButtons=[...document.querySelectorAll('[data-spacing]')];
 const exampleName=()=>generatedPlaying?'A generated piece':'An authored example';
 const generatedTitle=phrase=>({repeat:'A returning motif',linger:'The last touch waits',soften:'A softer return'})[phrase.variation];
@@ -41,7 +42,7 @@ function controls(){
  $('another-piece').disabled=$('generate-piece').disabled;
  $('replay-generated').disabled=$('hear-first').disabled||!generatedPhrase;
  $('explore-generated').disabled=$('replay-generated').disabled;
- for(const b of spacingButtons)b.disabled=$('replay-generated').disabled;
+ for(const b of [...spacingButtons,...arrangementButtons])b.disabled=$('replay-generated').disabled;
  $('open-recipe').disabled=!world||busy||repeat;
  $('return-branch').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!branchCapture?.current;
  $('play-body').disabled=!world||busy||repeat||capture.pending||comparison.pending||branchPending||!selectedPCM||selectedPCM.record.design.lengthMm===80;
@@ -134,7 +135,7 @@ session=createTineLiveSession({listeningDb:0,onChange:event=>{
  else if(event.state==='playing')runView();
 }});
 async function startPlaying(nextDesign){
- const origin=nextDesign.lengthMm===80?null:selectedPCM===branchCapture.current?branchOrigin:createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion});
+ const origin=nextDesign.lengthMm===80?null:selectedPCM===branchCapture.current?branchOrigin:createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion,arrangementVersion});
  branchReturnFocus=false;restoreVersion++;cancelExploration();pendingBranchOrigin=origin;
  cancelArrangement();unfolding=false;examplePlaying=false;comparison.cancel();capture.cancel();branchCapture.cancel();replay.park();playingDesign=nextDesign;selectPCM(nextDesign.lengthMm===80?capture.current:selectedPCM);liveResponse=null;world?.response(null);world?.acknowledgeTouch(false);wantsFocus=true;
  $('touch-note').textContent='Touches join the vibration already ringing. The gold spot appears only after a touch is accepted.';
@@ -155,27 +156,28 @@ $('again').addEventListener('click',async()=>{
  try{await playing;}catch(error){$('playing-status').textContent=error.message;}
 });
 function cancelArrangement(){arrangementJob?.cancel();arrangementJob=null;}
-async function playArrangement(source,example=false,generated=false){
+async function playArrangement(source,example=false,generated=false,version=arrangementVersion){
  examplePlaying=example;generatedPlaying=generated;restoreVersion++;
  if(!example)selectPCM(capture.current);world?.view('opening');for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view==='opening'));
  unfolding=true;lastPart=null;replayReturnButton=example?(generated?'replay-generated':'begin'):'unfold';arrangementPCM=null;arrangementView=null;
- let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),source);}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
- const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingPerformanceView(source,presentationVersion);return pcm;});
- $('touch-note').textContent=example?exampleName()+': a phrase becomes a round, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
+ let job;try{job=createAudioRenderJob(new URL('./arrangement-worker.js',import.meta.url),createLivingRecord(source,{presentationVersion,arrangementVersion:version}));}catch(error){unfolding=false;$('playing-status').textContent=error.message;controls();return;}arrangementJob=job;
+ const prepared=job.promise.then(pcm=>{if(arrangementJob!==job)throw new DOMException('Arrangement cancelled','AbortError');arrangementJob=null;arrangementPCM=pcm;arrangementView=createLivingPerformanceView(source,presentationVersion,version);return pcm;});
+ $('touch-note').textContent=example?exampleName()+': a phrase crosses three bodies, then returns. Your own phrase stays separate.':'Five complete passes: original, three staggered answers, then the original again. Independent bodies; no mechanical coupling.';
  document.querySelector('.scene').scrollIntoView({block:'center',behavior:'instant'});
  const playing=replay.play(prepared);replayFocus=true;controls();
  try{await playing;}catch(error){cancelArrangement();if(error.name!=='AbortError')$('playing-status').textContent=error.message;}
 }
 $('unfold').addEventListener('click',()=>{if(!$('unfold').disabled)playArrangement(capture.current.record);});
-$('hear-first').addEventListener('click',()=>{if(!$('hear-first').disabled)playArrangement(createLivingGreeting(),true);});
+$('hear-first').addEventListener('click',()=>{if(!$('hear-first').disabled)playArrangement(createLivingGreeting(),true,false,1);});
 function previewGenerated(seed,spacing){
  generatedPhrase=createLivingDirectedPhrase(seed,spacing);generatedSpacing=spacing;
  $('generated-actions').hidden=false;
  for(const b of spacingButtons)b.setAttribute('aria-pressed',String(b.dataset.spacing===spacing));
  $('generated-title').textContent=generatedTitle(generatedPhrase);
- $('generated-note').textContent=`${LIVING_PHRASE_SPACING[spacing].name}. A small motif crosses three bodies, then comes home.`;
+ $('generated-note').textContent=`${LIVING_PHRASE_SPACING[spacing].name} · ${generatedArrangementVersion===2?'Spacious exchange':'Overlapping round'}. A small motif crosses three bodies, then comes home.`;
+ for(const b of arrangementButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.arrangement)===generatedArrangementVersion));
  $('generated-identity').textContent=`Seed ${seed} · phrase grammar 1 · spacing direction 1. Six generated touches, with a ${generatedPhrase.variation==='repeat'?'repeated motif':generatedPhrase.variation==='linger'?'delayed final touch':'softer second cell'}. Kept encounters preserve the exact touches; this seed and direction label are not included in the saved encounter format.`;
- playArrangement(generatedPhrase.source,true,true);
+ playArrangement(generatedPhrase.source,true,true,generatedArrangementVersion);
 }
 for(const id of ['generate-piece','another-piece'])$(id).addEventListener('click',()=>{
  if($(id).disabled)return;
@@ -185,14 +187,18 @@ for(const button of spacingButtons)button.addEventListener('click',()=>{
  if(button.disabled||!generatedPhrase)return;
  previewGenerated(generatedPhrase.seed,button.dataset.spacing);
 });
-$('replay-generated').addEventListener('click',()=>{if(!$('replay-generated').disabled)playArrangement(generatedPhrase.source,true,true);});
+for(const button of arrangementButtons)button.addEventListener('click',()=>{
+ if(button.disabled||!generatedPhrase)return;
+ generatedArrangementVersion=Number(button.dataset.arrangement);previewGenerated(generatedPhrase.seed,generatedSpacing);
+});
+$('replay-generated').addEventListener('click',()=>{if(!$('replay-generated').disabled)playArrangement(generatedPhrase.source,true,true,generatedArrangementVersion);});
 $('explore-generated').addEventListener('click',async()=>{
  if($('explore-generated').disabled)return;
- const phrase=generatedPhrase;park();const own=restoreVersion;
+ const phrase=generatedPhrase,version=generatedArrangementVersion;park();const own=restoreVersion;
  await capture.load(phrase.source);if(own!==restoreVersion)return;
  if(JSON.stringify(capture.current?.record)!==JSON.stringify(phrase.source)){$('generated-note').textContent='This piece could not be prepared for exploration. The previous original remains available.';return;}
- unfolding=false;examplePlaying=false;generatedPlaying=false;
- $('generated-note').textContent=`${generatedTitle(phrase)} is now your current original, at ${LIVING_PHRASE_SPACING[phrase.spacing].name.toLowerCase()}. Compare its bodies, play an answer, or keep the encounter.`;
+ arrangementVersion=version;unfolding=false;examplePlaying=false;generatedPlaying=false;
+ $('generated-note').textContent=`${generatedTitle(phrase)} is now your current original, at ${LIVING_PHRASE_SPACING[phrase.spacing].name.toLowerCase()}, with ${version===2?'a spacious exchange':'an overlapping round'}. Compare its bodies, play an answer, or keep the encounter.`;
  $('touch-note').textContent='This original phrase was generated. Its timing and accents remain intact when you compare bodies or keep the encounter.';
  $('playing-status').textContent='Generated phrase adopted quietly. Hear again, unfold it, or choose another body to play.';controls();
 });
@@ -214,12 +220,12 @@ $('level').addEventListener('input',()=>{const db=Number($('level').value);sessi
 function park(){pendingBranchOrigin=null;cancelExploration();branchReturnFocus=false;movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();branchCapture?.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
-movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!explorationJob&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!branchCapture?.pending&&!!capture.current,onChange:controls});
+movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion,arrangementVersion}),canMake:()=>!!world&&!explorationJob&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!branchCapture?.pending&&!!capture.current,onChange:controls});
 controls();
 
 $('keep-encounter').addEventListener('click',()=>{
  if($('keep-encounter').disabled)return;
- try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
+ try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion,arrangementVersion});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
  catch(error){$('keep-note').textContent=error.message;}
 });
 function cancelExploration(){explorationJob?.cancel();explorationJob=null;}
@@ -253,7 +259,7 @@ async function restoreExploration(value){
  }finally{if(own===restoreVersion){explorationJob=null;controls();}}
 }
 function applyPresentation(record){
- presentationVersion=livingPresentationVersion(record);world?.setLook(LIVING_PRESENTATIONS[presentationVersion].look);
+ arrangementVersion=record.arrangementVersion;presentationVersion=livingPresentationVersion(record);world?.setLook(LIVING_PRESENTATIONS[presentationVersion].look);
  $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
 }
 async function restoreRecord(record,origin,note=$('keep-note')){
@@ -264,7 +270,7 @@ async function restoreRecord(record,origin,note=$('keep-note')){
  // Commit presentation only after source reconstruction succeeds.
  applyPresentation(record);
  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
- note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, arrangement version and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
+ note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, ${arrangementVersion===2?'spacious exchange':'overlapping round'} and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
 }
 async function restoreAddress(){
  park();if(!location.hash)return;

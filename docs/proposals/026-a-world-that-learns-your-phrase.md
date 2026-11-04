@@ -211,3 +211,9 @@ Across these examples, the round overlaps all three answers' first-to-last-touch
 ## Spacious arrangement identity prepared
 
 The core score and shared performer view now support arrangement2, reproducing the spaced-study audio exactly across nine authored/generated examples. The original round remains version1 and retains its output. This is a foundation for the explicit arrangement choice above, not yet a visitor-facing feature: record readers, runtime worker and film controls still use1. Next carry the identity through those complete paths, including retained original context in paired explorations, before offering the choice. Numerical and timing checks do not establish a listener preference.
+
+## Spacious choice completes the keeping loop
+
+Generated pieces now offer overlapping or spacious answers under Shape this piece. Both retain the exact source motif and accents. Explore adopts the selected score, and saved addresses, recipes, paired original context and films preserve it. Earlier records and the fixed introduction retain their original round. An actual19.075second generated spacious film has been downloaded, its573frame-state hashes reconstructed, and its recipe reopened quietly through the visitor controls. Full838test regression passes.
+
+This supplies a meaningful creative input while keeping one-action listening complete. The next creative milestone should improve the experience of an entire short piece—how its motif becomes recognizable, how the answers create contrast, and how its return feels resolved. More duration, parameters or randomness alone will not establish that. Physical source remains an ideal impulse model with artistic score-driven staging; musical quality still needs listening assessment.

@@ -16,7 +16,7 @@ test('kept encounter rebuilds exact stereo PCM, plan and sampled visual response
 });
 test('recipe and bounded address refuse unknown versions, extra settings and malformed sources without coercion',()=>{
  const record=createLivingRecord(source());
- for(const extra of [{version:3},{presentationVersion:4},{presentationVersion:"2"},{arrangementVersion:2},{cameraMotion:1},{reveal:'true'},{gain:8},{source:{...source(),events:[]}}])assert.throws(()=>validateLivingRecord({...record,...extra}));
+ for(const extra of [{version:3},{presentationVersion:4},{presentationVersion:"2"},{arrangementVersion:3},{arrangementVersion:"2"},{cameraMotion:1},{reveal:'true'},{gain:8},{source:{...source(),events:[]}}])assert.throws(()=>validateLivingRecord({...record,...extra}));
  for(const hash of ['#tine-live=abc','#living=%','#living=null','#living='+('x'.repeat(8192))])assert.throws(()=>readLivingAddress(hash));
 });
 

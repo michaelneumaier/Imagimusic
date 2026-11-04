@@ -8,7 +8,7 @@ export const LIVING_MOVIE_HASH_DIGITS=12;
 /** Fixed-time source for a film. This proves response/presentation state,
  * not pixels, codec bytes, output-device timing or an acoustic field. */
 export function createLivingMoviePlan(value){
- const record=validateLivingRecord(value),view=createLivingPerformanceView(record.source,livingPresentationVersion(record)),arrangement=view.plan;
+ const record=validateLivingRecord(value),view=createLivingPerformanceView(record.source,livingPresentationVersion(record),record.arrangementVersion),arrangement=view.plan;
  const fps=30,duration=arrangement.frames/arrangement.sampleRate,times=new FrameClock({fps}).times(duration);
  function sample(seconds){
   const frame=view.at(seconds);

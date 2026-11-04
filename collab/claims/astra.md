@@ -806,3 +806,9 @@ Generated composition comparison complete:10auditions, measured score-span trade
 Versioned spacious score foundation: owns src/living/arrangement.js, performance-view.js, choreography.js and tests/living-arrangement-versions.test.js. Introduce explicit arrangement2 with the measured spaced timing and shared contact timeline; preserve default1. Saved-record and visitor adoption remain a subsequent integration, so record readers still refuse2 until all paths carry it.
 
 Versioned spacious score foundation complete: explicit2 and shared timed contacts verified against nine study fixtures;27targeted checks and final4version checks pass; direct pre-change default output comparison unchanged. Claims released. Visitor/record/worker/film integration remains next; no premature schema admission or default change.
+
+Spacious encounter integration: owns living record/worker/movie-plan/movie-controls/main, living.html, related record/arrangement integration tests and movie browser fixture. Carry arrangement2 through generated preview/adoption, kept origin, address/file restore and film; preserve1 defaults and legacy schema1.
+
+Spacious integration discovery/evidence: also owns Living catalog description, project.html current entrance copy, and current plan/evidence appendices. No new catalog destination.
+
+Spacious encounter integration complete: generated choice, worker/record/live/film propagation, quiet restore and retained paired origin verified; actual573frame film and source recipe downloaded and reconstructed.52targeted and full838tests pass; native narrow flow checked. Home/catalog/plan/evidence reconciled. Claims released; no independent review claimed.
