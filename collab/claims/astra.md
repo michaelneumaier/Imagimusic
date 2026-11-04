@@ -912,3 +912,7 @@ Motif development study complete: two new WAV/reports98.79s/122.61s, optional ex
 Journey synthesis checkpoint: owns project.html, Living catalog description, existing proposal026 and own notes. Reconcile homepage/vision/roadmap/history with three journey studies and explicit adoption gates; preserve43catalog entries and current default paths. No publication or audience-results claim.
 
 Journey synthesis checkpoint complete: homepage/current vision/roadmap/history and proposal current build order reconciled;43catalog entries retained, links200, unique IDs and syntax/diff checked. Claims released. Native layout and listening evidence still outstanding; no independent review or publication.
+
+Long-form performer foundation: owns new journey-choreography.js, tests and audit tool plus own notes. Plan actual flattened journey touches per body, retaining source IDs/times and independent-pass limits. Audit complete contacts, actor recovery/lane geometry and same-body tail overlaps before scene integration. Earlier presentation identities unchanged.
+
+Long-form performer foundation complete:1996/1996contacts across12cases,79Living tests pass. Audit identifies28same-body overlaps, each25ms after both first touches, requiring explicit scene treatment. Claims released. Core planning only; no browser/scene/physical-contact or independent-review claim.
