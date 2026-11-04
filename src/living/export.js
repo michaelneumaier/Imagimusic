@@ -1,5 +1,6 @@
 import {Output,Mp4OutputFormat,BufferTarget,CanvasSource,AudioBufferSource,Quality,canEncodeVideo,canEncodeAudio} from '../../vendor/mediabunny/mediabunny.mjs';
 import {createLivingMoviePlan,validateLivingMovieAudio,LIVING_MOVIE_HASH_DIGITS} from './movie-plan.js';
+import {LIVING_PRESENTATIONS} from './presentation.js';
 import {createLivingScene} from './scene.js';
 import {traceHash} from '../state.js';
 import {groveMovieAudioEvidence} from '../grove/movie-audio.js';
@@ -19,7 +20,7 @@ export async function exportLivingMovie(record,source,{signal,onProgress=()=>{}}
  const buffer=new AudioBuffer({length:manifest.audioSamples,numberOfChannels:2,sampleRate});pcm.channels.forEach((c,i)=>buffer.copyToChannel(c,i));
  const canvas=document.createElement('canvas');let scene,output,tasks=[],finalized=false;
  try{
-  scene=createLivingScene(canvas,{width,height});
+  scene=createLivingScene(canvas,{width,height});scene.setLook(LIVING_PRESENTATIONS[manifest.presentationVersion].look);
   const target=new BufferTarget();output=new Output({format:new Mp4OutputFormat(),target});
   const video=new CanvasSource(canvas,{codec:'avc',quality:new Quality({bitrate:4_000_000})}),audio=new AudioBufferSource({codec:'aac',quality:new Quality({bitrate:192_000})});
   output.addVideoTrack(video,{frameRate:fps});output.addAudioTrack(audio);await output.start();check();

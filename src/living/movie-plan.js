@@ -1,3 +1,4 @@
+import {livingPresentationVersion} from './presentation.js';
 import {validateLivingRecord} from './record.js';
 import {createLivingArrangement} from './arrangement.js';
 import {createLivingArrangementView} from './arrangement-view.js';
@@ -14,7 +15,7 @@ export function createLivingMoviePlan(value){
   const frame=view.at(seconds);
   return {...frame,cameraOpen:record.cameraMotion?frame.cameraOpen:1,bodies:frame.bodies.map(body=>({...body,points:record.reveal?body.points:null}))};
  }
- const manifest={kind:'imagimusic-living-movie',version:1,presentationVersion:1,record,width:1280,height:720,fps,sampleRate:arrangement.sampleRate,audioSamples:arrangement.frames,duration,frames:times.length,videoDuration:times.length/fps,hashDigits:LIVING_MOVIE_HASH_DIGITS,frameHashes:times.map(t=>traceHash(sample(t),LIVING_MOVIE_HASH_DIGITS)),hashScope:'Three retained-mode displacement envelopes, accepted-touch marks, phase/count and camera opening at each i/30 timestamp. Reveal and camera-follow choices are applied. Non-cryptographic trace hashes round to 12 decimal places (picometres for displacement). Not rendered pixels or encoded bytes.',camera:'Canonical opening-to-ensemble path, or fixed wide view; manual browser orbit is excluded.',audioPolicy:'Original arrangement stereo Float32 source, no visit listening gain. AAC film audio is lossy; keep source WAV separately. Final video frame may extend less than 1/30 second beyond the exact soundtrack.'};
+ const manifest={kind:'imagimusic-living-movie',version:1,presentationVersion:livingPresentationVersion(record),record,width:1280,height:720,fps,sampleRate:arrangement.sampleRate,audioSamples:arrangement.frames,duration,frames:times.length,videoDuration:times.length/fps,hashDigits:LIVING_MOVIE_HASH_DIGITS,frameHashes:times.map(t=>traceHash(sample(t),LIVING_MOVIE_HASH_DIGITS)),hashScope:'Three retained-mode displacement envelopes, accepted-touch marks, phase/count and camera opening at each i/30 timestamp. Reveal and camera-follow choices are applied. Non-cryptographic trace hashes round to 12 decimal places (picometres for displacement). Not rendered pixels or encoded bytes.',camera:'Canonical opening-to-ensemble path, or fixed wide view; manual browser orbit is excluded.',audioPolicy:'Original arrangement stereo Float32 source, no visit listening gain. AAC film audio is lossy; keep source WAV separately. Final video frame may extend less than 1/30 second beyond the exact soundtrack.'};
  return {manifest,times,sample};
 }
 

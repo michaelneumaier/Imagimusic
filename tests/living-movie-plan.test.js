@@ -26,3 +26,12 @@ test('kept presentation choices affect the film state without altering its sound
  assert.throws(()=>validateLivingMovieAudio({...pcm,channels:[pcm.channels[0]]},b.manifest));
  const bad=structuredClone(pcm);bad.channels[0][5]=NaN;assert.throws(()=>validateLivingMovieAudio(bad,b.manifest));
 });
+
+test('film appearance follows recipe identity without changing score or frame-state hashes',()=>{
+ const fresh=createLivingRecord(source(48000)),warm=createLivingRecord(fresh.source,{presentationVersion:1});
+ const {presentationVersion,...legacyFields}=warm,legacy={...legacyFields,version:1};
+ const a=createLivingMoviePlan(fresh),b=createLivingMoviePlan(warm),c=createLivingMoviePlan(legacy);
+ assert.equal(a.manifest.presentationVersion,2);assert.equal(b.manifest.presentationVersion,1);assert.equal(c.manifest.presentationVersion,1);
+ assert.deepEqual(a.times,c.times);assert.deepEqual(a.manifest.frameHashes,c.manifest.frameHashes);
+ assert.deepEqual(a.sample(.5),c.sample(.5));assert.deepEqual(c.manifest.record,legacy);
+});

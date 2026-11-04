@@ -746,3 +746,5 @@
 - 2026-11-04 (Astra): Porcelain at dusk combines pale support with original dark scene as one controlled visual candidate. Native narrow opening/held-return and two actual1280×720 PNGs inspected. Recommended for continued refinement; blade emphasis remains weak. Production appearance unchanged.
 
 - 2026-11-04 (Astra): refined dusk steel reflections; exact-pose opening/held-return PNGs inspected and preserved. Candidate recommended for versioned live/film integration with legacy appearance preservation. Production scene still unchanged.
+
+- 2026-11-04 (Astra): Porcelain at dusk adopted for fresh Living encounters with strict recipe v2 appearance identity; legacy v1 retains Warm studio. Actual warm/dusk browser films, extracted frames, equal source-audio evidence, quiet address/file return and Keep verified. Legacy/new source packages verify; full809/809 tests pass (184.238s, concurrency2).

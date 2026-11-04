@@ -180,3 +180,6 @@ The visual synthesis candidate is now **Porcelain at dusk**, available in the ex
 
 
 The dusk candidate now includes broader steel reflections (render roughness0.48, environment multiplier2.4). Opening and held-return captures show improved blade presence alongside the pale support. It is the preferred visual candidate for integration. The next implementation step is a declared appearance identity shared by live viewing and film export, with legacy warm-studio recipes continuing to reopen coherently. This changes presentation only; the spaced musical answer remains a separate experiment.
+
+
+Appearance integration is now implemented: fresh visits use Porcelain at dusk; strict recipe v2 declares presentation1 or2, while recipe v1 remains byte-shape compatible and selects Warm studio. Successful restore commits source and appearance together; film export selects the same presentation identity. Camera/reveal remain separate choices, and source sound/arrangement version1 are unchanged. Native warm/dusk address reopening and an actual presentation2 film are verified; keep refining the musical reveal within this clearer visual identity. The preserved warm source package still passes its original verifier.

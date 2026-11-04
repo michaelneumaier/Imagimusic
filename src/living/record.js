@@ -1,13 +1,15 @@
 import {createLivingArrangement} from './arrangement.js';
-const keys=['kind','version','arrangementVersion','source','cameraMotion','reveal'];
+const legacyKeys=['kind','version','arrangementVersion','source','cameraMotion','reveal'];
 export const LIVING_ADDRESS_LIMIT=8192;
 export function validateLivingRecord(value){
- if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||!keys.every(k=>Object.hasOwn(value,k))||value.kind!=='imagimusic-living-encounter'||value.version!==1||value.arrangementVersion!==1||typeof value.cameraMotion!=='boolean'||typeof value.reveal!=='boolean')throw Error('Unsupported Living Instrument encounter.');
+ const keys=value?.version===2?[...legacyKeys,'presentationVersion']:legacyKeys;
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||!keys.every(k=>Object.hasOwn(value,k))||value.kind!=='imagimusic-living-encounter'||![1,2].includes(value.version)||value.arrangementVersion!==1||typeof value.cameraMotion!=='boolean'||typeof value.reveal!=='boolean')throw Error('Unsupported Living Instrument encounter.');
+ if(value.version===2&&![1,2].includes(value.presentationVersion))throw Error('Unsupported Living Instrument presentation.');
  const plan=createLivingArrangement(value.source);
- return Object.freeze({kind:'imagimusic-living-encounter',version:1,arrangementVersion:1,source:plan.source,cameraMotion:value.cameraMotion,reveal:value.reveal});
+ return Object.freeze({kind:'imagimusic-living-encounter',version:value.version,arrangementVersion:1,source:plan.source,cameraMotion:value.cameraMotion,reveal:value.reveal,...(value.version===2?{presentationVersion:value.presentationVersion}:{})});
 }
-export function createLivingRecord(source,{cameraMotion=true,reveal=true}={}){
- return validateLivingRecord({kind:'imagimusic-living-encounter',version:1,arrangementVersion:1,source,cameraMotion,reveal});
+export function createLivingRecord(source,{cameraMotion=true,reveal=true,presentationVersion=2}={}){
+ return validateLivingRecord({kind:'imagimusic-living-encounter',version:2,arrangementVersion:1,source,cameraMotion,reveal,presentationVersion});
 }
 export function livingFragment(value){
  const hash='#living='+encodeURIComponent(JSON.stringify(validateLivingRecord(value)));

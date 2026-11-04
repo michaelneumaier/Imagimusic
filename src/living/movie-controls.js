@@ -1,3 +1,4 @@
+import {LIVING_PRESENTATIONS,livingPresentationVersion} from './presentation.js';
 import {createLivingRecord} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
 import {exportLivingMovie} from './export.js';
@@ -22,7 +23,7 @@ export function createLivingMovieControls({getSource,getOptions,canMake,onChange
    const next=[];const links=[];
    try{for(const [suffix,blob,label] of artifacts){const url=URL.createObjectURL(blob);next.push(url);const a=document.createElement('a');a.href=url;a.download=result.stem+suffix;a.textContent=label;links.push(a);}}catch(error){next.forEach(URL.revokeObjectURL);throw error;}
    $('film-downloads').replaceChildren(...links);urls.forEach(URL.revokeObjectURL);urls=next;
-   $('film-result').hidden=false;$('film-description').textContent=`Prepared film: ${record.source.events.length} original ${record.source.events.length===1?'touch':'touches'} · ${result.manifest.duration.toFixed(2)} seconds · ${record.cameraMotion?'camera journey':'wide still view'} · ${record.reveal?'response veils':'solid bodies'}. These downloads stay with this phrase until another film succeeds.`;
+   $('film-result').hidden=false;$('film-description').textContent=`Prepared film: ${LIVING_PRESENTATIONS[livingPresentationVersion(record)].name} · ${record.source.events.length} original ${record.source.events.length===1?'touch':'touches'} · ${result.manifest.duration.toFixed(2)} seconds · ${record.cameraMotion?'camera journey':'wide still view'} · ${record.reveal?'response veils':'solid bodies'}. These downloads stay with this phrase until another film succeeds.`;
    $('film-status').textContent='Your film is ready. Save it below; nothing has played or been uploaded.';
   }catch(error){$('film-status').textContent=(error.name==='AbortError'?'Film preparation cancelled.':'The film could not be prepared. '+error.message)+' Your phrase and any previous film remain available.';}
   finally{job=null;controller=null;const focused=document.activeElement===$('cancel-film');refresh();onChange();if(focused)$('make-film').focus({preventScroll:true});}

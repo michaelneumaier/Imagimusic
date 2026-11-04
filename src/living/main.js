@@ -5,6 +5,7 @@ import {createLivingRecord,livingFragment,readLivingAddress} from './record.js';
 import {createAudioRenderJob} from '../audio-render-job.js';
 import {createLivingArrangementView} from './arrangement-view.js';
 import {createLivingResponse} from './response.js';
+import {LIVING_PRESENTATIONS,livingPresentationVersion} from './presentation.js';
 import {createLivingScene} from './scene.js';
 import {createTineLiveSession} from '../tine/live-session.js';
 import {createTineComparisonSession} from '../tine/live-comparison-session.js';
@@ -14,6 +15,7 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
+let presentationVersion=2;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});
@@ -58,17 +60,17 @@ function animate(){
  }else $('remaining').textContent=t<4?`${Math.max(0,4-t).toFixed(1)} seconds to touch`:'Letting it ring';
  if(active(session.state)||repeat)raf=requestAnimationFrame(animate);
 }
-function stopView(){cancelAnimationFrame(raf);raf=0;world?.response(null);if(unfolding){lastPart=null;world?.clearArrangement();status.textContent='80 × 10 × 1 mm · drag to look around';canvas.setAttribute('aria-label','Three-dimensional 80 mm steel blade clamped at one end on a dark ceramic arch.');if(examplePlaying)selectPCM(selectedPCM);}$('remaining').textContent='Quiet';}
+function stopView(){cancelAnimationFrame(raf);raf=0;world?.response(null);if(unfolding){lastPart=null;world?.clearArrangement();status.textContent='80 × 10 × 1 mm · drag to look around';canvas.setAttribute('aria-label','Three-dimensional 80 mm steel blade clamped at one end on a ceramic arch.');if(examplePlaying)selectPCM(selectedPCM);}$('remaining').textContent='Quiet';}
 function runView(){if(!raf)raf=requestAnimationFrame(animate);}
 try{
- world=createLivingScene(canvas,{onTouch:touch});status.textContent='80 × 10 × 1 mm · drag to look around';
+ world=createLivingScene(canvas,{onTouch:touch});world.setLook(LIVING_PRESENTATIONS[presentationVersion].look);status.textContent='80 × 10 × 1 mm · drag to look around';
  for(const button of buttons)button.addEventListener('click',()=>{world.view(button.dataset.view);for(const b of buttons)b.setAttribute('aria-pressed',String(b===button));status.textContent=button.textContent;});
 }catch(error){status.textContent='The 3D view could not open. The sound sketch and scene boards are available below.';for(const b of buttons)b.disabled=true;console.error(error);}
 function describeBody(){const mm=selectedPCM?.record.design.lengthMm??80;return selectedPCM?`${mm===80?'Original':mm===95?'Longer':'Shorter'} body · ${mm} mm. Choose Hear again. Your touches and their timing stay the same; Begin returns to the original body.`:'First make a phrase. Then discover how it sounds in another body.';}
 function selectPCM(pcm){
  selectedPCM=pcm;const mm=pcm?.record.design.lengthMm??80;world?.setLength(mm);
  status.textContent=`${mm} × 10 × 1 mm · drag to look around`;
- canvas.setAttribute('aria-label',`Three-dimensional ${mm} mm steel blade clamped at one end on a dark ceramic arch. Use the view buttons below to inspect it.`);
+ canvas.setAttribute('aria-label',`Three-dimensional ${mm} mm steel blade clamped at one end on a ceramic arch. Use the view buttons below to inspect it.`);
  for(const b of bodyButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.length)===mm));
  $('body-path').hidden=!pcm||mm===80;if(pcm)$('body-path').href='tine-play.html'+tineLiveFragment(pcm.record);
  $('body-note').textContent=describeBody();
@@ -154,12 +156,12 @@ $('level').addEventListener('input',()=>{const db=Number($('level').value);sessi
 function park(){movie?.cancel();restoreVersion++;cancelArrangement();wantsFocus=false;replayFocus=false;comparison.cancel();capture.cancel();replay.park();session.park();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();park();status.textContent='The 3D view was interrupted. Reload to restore it; the sound sketch remains available.';for(const b of buttons)b.disabled=true;world?.dispose();world=null;controls();});
-movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!!capture.current,onChange:controls});
+movie=createLivingMovieControls({getSource:()=>capture.current.record,getOptions:()=>({cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion}),canMake:()=>!!world&&!active(session.state)&&!listening()&&!capture.pending&&!comparison.pending&&!!capture.current,onChange:controls});
 controls();
 
 $('keep-encounter').addEventListener('click',()=>{
  if($('keep-encounter').disabled)return;
- try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
+ try{const record=createLivingRecord(capture.current.record,{cameraMotion:$('camera-motion').checked,reveal:$('reveal').checked,presentationVersion});history.replaceState(null,'',livingFragment(record));$('keep-note').textContent='Encounter kept in this address. Bookmark or copy it to return quietly. New playing changes the address only when you choose Keep again.';}
  catch(error){$('keep-note').textContent=error.message;}
 });
 async function restoreRecord(record,origin,note=$('keep-note')){
@@ -168,9 +170,10 @@ async function restoreRecord(record,origin,note=$('keep-note')){
  await capture.load(record.source);if(own!==restoreVersion)return;
  if(!capture.current||JSON.stringify(capture.current.record)!==JSON.stringify(record.source)){note.textContent='This encounter could not be prepared. Your previous phrase and address remain available.';return;}
  // Commit presentation only after source reconstruction succeeds.
+ presentationVersion=livingPresentationVersion(record);world?.setLook(LIVING_PRESENTATIONS[presentationVersion].look);
  $('camera-motion').checked=record.cameraMotion&&!motionPreference.matches;choseCameraMotion=true;$('reveal').checked=record.reveal;
  $('playing-status').textContent='Your kept phrase is ready. Hear it again or unfold it when you choose.';
- note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, arrangement version and reveal choice restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
+ note.textContent=`Kept encounter reopened quietly from ${origin}: original touches, arrangement version and reveal choice restored. ${LIVING_PRESENTATIONS[presentationVersion].name} appearance restored. Listening level and manual camera position are not saved.`+(record.cameraMotion&&motionPreference.matches?' Camera motion is off for your reduced-motion preference.':'')+(origin==='a recipe file'?' The address is unchanged; choose Keep encounter in address to update it.':'');
 }
 async function restoreAddress(){
  park();if(!location.hash)return;

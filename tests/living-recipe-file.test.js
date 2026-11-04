@@ -9,7 +9,7 @@ test('downloaded pretty JSON recipe restores exact source and presentation witho
 test('bounded reader refuses oversized files before reading and refuses manifests, malformed JSON and unsupported recipes',async()=>{
  let read=false;await assert.rejects(readLivingRecipeFile({size:8193,text:async()=>{read=true;return '{}';}}));assert.equal(read,false);
  await assert.rejects(readLivingRecipeFile({size:2,text:async()=>'é'.repeat(5000)}));
- for(const value of [null,{...record,version:2},{...record,gain:8},{...record,source:{...record.source,events:[]}}])await assert.rejects(readLivingRecipeFile(new Blob([JSON.stringify(value)])));
+ for(const value of [null,{...record,version:3},{...record,gain:8},{...record,source:{...record.source,events:[]}}])await assert.rejects(readLivingRecipeFile(new Blob([JSON.stringify(value)])));
  await assert.rejects(readLivingRecipeFile(new Blob(['{'])));await assert.rejects(readLivingRecipeFile(new Blob([JSON.stringify({kind:'imagimusic-living-movie'})])),/film manifest/);
  await assert.rejects(readLivingRecipeFile({size:2,text:async()=>{throw Error('read failed');}}),/read failed/);
 });

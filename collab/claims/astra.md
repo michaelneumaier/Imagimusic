@@ -702,3 +702,7 @@ Living consolidated light candidate complete: narrow opening/wide-return and act
 Living candidate blade emphasis: owns looks.js, scene.js presentation setter, living-look.html explanation. Tune only dusk steel roughness/reflection strength, restore defaults for reference choices, inspect actual fixed-pose stills before recommending adoption.
 
 Living candidate blade emphasis complete: actual fixed-pose PNGs inspected, preferred candidate and versioned integration requirement documented. Claim released.
+
+Living appearance integration: owns record.js, presentation.js, main.js, movie-plan.js/export.js/movie-controls.js, living.html, associated record/movie tests and documentation. Strict recipe v2 declares presentation1/2; legacy v1 validates unchanged and maps warm studio. New visits use dusk; successful restore commits appearance; film uses the record-selected look. No arrangement/audio change.
+
+Living appearance integration complete: recipe v2, legacy appearance, live/export mapping and actual film/file-return evidence saved; full809 regression passes. Claims released.
