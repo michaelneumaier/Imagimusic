@@ -44,6 +44,6 @@ export function createLivingSharedPhrasePass(value,{guestLimit=Math.min(3,8-(val
  }
  return Object.freeze({source,guestLimit,start:()=>pass.start(),strike,quiet,process,
   snapshot:()=>({...pass.snapshot(),applied:applied.slice(),guestTouches:guests,guestLimit}),
-  get frame(){return pass.frame;},get state(){return pass.state;},
+  get frame(){return pass.frame;},get state(){return pass.state;},get touchCount(){return applied.length;},
  });
 }
