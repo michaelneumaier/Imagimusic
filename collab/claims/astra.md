@@ -898,3 +898,7 @@ Connected journey comparison complete: two connected WAV/reports40.21s/47.48s pr
 Journey listening comparison: owns living-journey.html, src/living/journey-main.js, src/living/journey.css and one workshop link in living-look.html; own evidence notes. One local player for baseline/connected studies with actual chapter timings, quiet switches and explicit render availability errors. No production default or catalog expansion.
 
 Journey listening comparison implemented: page/14resources200,11targeted tests pass, syntax/diff/IDs checked. Claims released. Native Safari verification remains outstanding after two native-pipe startup failures; no visual/playback or independent-review claim.
+
+Journey score view: owns new src/living/journey-score.js/tests, journey-main.js/journey.css/living-journey.html and own notes. Project both actual plans onto three instrument lanes with complete voice spans/touches and audio-clock cursor. Explicit score diagram, not physical motion; retain listening accessibility and no added input requirement.
+
+Journey score view implemented: exact35/17voice clock mapping verified across both seeds;75Living tests pass, resources200 and syntax/diff clean. Claims released. Native layout/playback-sync verification remains outstanding because native control cannot start. No physical-motion or audibility claim.
