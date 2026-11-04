@@ -1131,3 +1131,5 @@ Optional saved-touch cues integrated: lazy bounded geometry, default-off replay 
 Longer unattended listening study complete: A way home, three related 48-second chapters, exact motif return, strict chapter admission, one explicit generated player and catalog/preparer discovery. Three focused tests, independent WAV/hash/HTTP/readiness and diff checks pass. Claims released; native listening/appeal and independent review remain open.
 
 Longer journey picture complete: renderer-admitted embedded chapters, exact media-clock boundary/seek sampling, shared scene lifecycle, reduced-motion/still choice and optional cues. Twenty focused tests pass; embedded records/WAV identity/HTTP/syntax/diff checked. Claims released; native appearance/sync and independent review remain open.
+
+Homepage invitation/current milestones complete: unattended journey first, optional participation and exploration routes, preserved earlier paths under disclosure, current roadmap corrections and appended history. Balanced HTML/19 IDs/62 local resources/retained destinations/home readiness/diff checked. Claims released; native layout and independent review remain pending.

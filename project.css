@@ -24,3 +24,6 @@
  .hero .actions{margin-top:18px;gap:14px;font-size:13px}.hero .primary{padding:12px 14px}
  .hero .specimen{padding:0}.specimen figcaption{font-size:10px;padding-top:10px}
 }
+
+/* A complete listening encounter precedes the deeper workshop history. */
+.arrival{border-top:1px solid var(--line);padding:36px 0 42px}.arrival-routes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:36px}.arrival-routes article{display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:22px}.arrival-routes h3{font-size:29px}.arrival-routes p{font-size:15px;flex:1}.arrival-routes a{color:var(--mint);font-size:14px;margin-top:12px}.arrival>.quiet{max-width:760px;margin-top:34px}.workshop-overview{border-top:1px solid var(--line);margin:0 0 65px;padding-top:22px}.workshop-overview>summary{cursor:pointer;color:var(--mint);font-size:14px}.workshop-overview>.now{margin-top:25px;margin-bottom:0}@media(max-width:700px){.arrival-routes{grid-template-columns:1fr;gap:26px}.arrival{padding-top:24px}.arrival-routes h3{margin-top:12px}.workshop-overview{margin-bottom:45px}}
