@@ -762,3 +762,7 @@ Paired visitor keeping: owns src/tine/live-capture.js and its tests for staged a
 Paired keeping evidence: also owns append-only collab/notes/astra-living-instrument.md and proposal026 current checkpoint reconciliation, limited to this completed integration.
 
 Paired visitor keeping complete: actual local download retains correct parent after a fresh original, quiet file reopen restores both, original/response return and malformed-file retention verified in Safari390px. Full825/825 regression passes; evidence and proposal updated. Claims released. Next: versioned contact choreography and one directed passage, retaining the production score pending listening judgment.
+
+Creative steering: owns proposal026 update for Michael's low-input procedural-performance question. Make autonomous watching/listening a first-class entry, with optional creative direction and playable takeover. Existing contact integration remains unstarted; no runtime claims.
+
+Creative steering recorded in proposal026: automatic, lightly directed and hands-on entrances share one compositional world. Fixed greeting distinguished from future seeded composition. Claim released. Next procedural work should produce a bounded complete piece before endless generation or a large prompt surface.

@@ -161,3 +161,21 @@ Then work toward the single directed encounter above. Do not create another perm
 The first implementation item from the synthesis checkpoint is now available in the flagship: Keep both phrases prepares a local file containing the retained original encounter and the new body performance. The shared opener restores them together quietly and selects the new phrase. A native save after starting a newer original verified that the older response still keeps its correct parent. Invalid replacement retained the existing pair. Existing encounter addresses and films continue to use the original only.
 
 The next creative slice is the directed passage: adopt contact choreography under a new presentation identity, preserve earlier keepsakes, and assess the whole passage as music and visible action. Full-versus-abbreviated response preference remains an open listening judgment; retain the current score as the working baseline.
+
+## A complete performance with little or no input
+
+Michael asks whether the experience requires constant user input, and emphasizes procedural creation with little input or a few creative choices. It should not require continuing participation. A visitor should be able to press Play and receive a complete, beautiful musical performance. Personal playing is an equally supported entrance, and the generated performance should remain available for later exploration as a playable world.
+
+There are three proposed entrances to the same system:
+
+- Just listen and watch. The system chooses a reproducible seed, admitted instruments, a musical idea and a bounded composed arc. It stages and performs that arc, including a satisfying ending. Another seed offers another performance.
+- Give it a direction. Optionally choose a few qualities such as sparse or intricate, intimate or expansive, and a desired duration; or supply a small played motif. These choices guide composition and staging. They should not demand detailed programming or continuous adjustment.
+- Enter and play. Take over a prepared instrument, change an admitted structural choice, or answer a phrase. The world retains enough of its current musical identity that interaction feels like joining it. The timing and transition mechanics of takeover need explicit design; the current four-second recording window is not that final interaction.
+
+The automatic mode must have an authored musical grammar: motif, variation, register, density, contrast, rest and return. Randomness chooses among coherent possibilities within that grammar. The procedural body system supplies playable voices; the composition system gives those voices a reason to enter; the director reveals their relationships. Generating instruments, composing for them and staging their performance are distinct responsibilities that need to agree about one event timeline.
+
+Start with a complete finite piece, not an endless loop. Endings and replayability let us assess whether the music holds together. A later ambient mode could create longer evolving performances with intentional arrivals and departures, optional intervention and a graceful stop. Longer duration alone does not establish musical development.
+
+The immediate production example already supports listening without playing, but it is a fixed authored greeting and round. It is not yet a broad generative composer. The next procedural slice should use one bounded seeded phrase grammar over the existing admitted tine bodies, preserve its source and seed, and produce the same complete playback and filmable plan used by the interactive route. Compare a small set of contrasting seeds by listening before expanding the parameter surface. Short, sparse and dense material must have deliberate space and endings, rather than merely passing numerical validity checks.
+
+This expands the Returning Room milestone: a newcomer can receive a compelling complete performance with one action, optionally influence what is created, and discover that the world they watched is playable. The automatic path must stand on its own artistically. The interactive path adds authorship without becoming an obligation. Free-form poetic prompts may eventually help express direction, but the first controls should have clear, audible effects; no language model or emotional interpretation is required for this first proof.
