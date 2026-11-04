@@ -886,3 +886,7 @@ Opt-in continued listening: owns new listening-continuation.js/tests plus main.j
 Continued listening discovery: also owns the existing home/catalog description and current proposal/evidence appendices for the visit-local opt-in feature.
 
 Continued listening complete:76focused tests pass; native automatic seed transition, Quiet during playback/pause and keep-during-pause verified. Home/catalog/plan/evidence updated. Claims released. Visit-local only, original/address retained; no independent or listening-preference claim.
+
+Autonomous journey composition study: owns new src/living/journey-study.js, tests/living-journey-study.test.js, tools/render-living-journey-study.mjs and own evidence notes. Compose a finite seven-chapter development of one seed with exact return; render local listening artifact and structural evidence. No production format/default changes; no Fable review claimed.
+
+Autonomous journey study complete: two local WAV/report artifacts (118.88s and134.27s),72Living tests pass with exact opening/return and all chapter PCM verified. Claims released. Study only; continuity and listening preference unresolved; no independent review claimed.
