@@ -1119,3 +1119,5 @@ Offered ensemble variety refined: three distinct first gaps and accent shapes, r
 Ensemble resonance-family research complete: same-score current/near-octave/open-triad comparison, strict record admission, unchanged baseline PCM/WAV, explicit shared player and catalog/preparer discovery. Independent WAV/hash/HTTP/home-readiness/syntax/diff checks pass. Claims released; live family unchanged and native preference/recognition/independent assessment remain open.
 
 Saved ensemble response foundation complete: immutable structural copy after worker admission, arbitrary-time modal sampler from actual saved geometry/history, range/framing/physical-state coverage. 179 focused tests pass under --no-maglev. Claims released; scene width support, media-clock binding, native assessment and independent review remain ahead.
+
+Saved-width scene support complete: extracted real body geometry, admitted width/edge/clamp support, exact default geometry fingerprints and actual widest-body framing. Full1,138tests pass under --no-maglev; HTTP/syntax/diff pass. Claims released; saved replay media-clock binding, native rendering and independent review remain ahead.
