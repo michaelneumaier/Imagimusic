@@ -13,7 +13,7 @@ try{
 }catch{status.textContent='The instrument picture is unavailable. Listening still works.';}
 
 try{
- personal=setupEnsembleJourneyControls({audio,beforePrepare:()=>visual?.clear(),elements:{pads:[0,1,2].map(i=>$(`personal-pad-${i}`)),reset:$('personal-reset'),prepare:$('personal-prepare'),cancel:$('personal-cancel'),listen:$('personal-listen'),status:$('personal-status'),wav:$('personal-wav'),chapters:[1,2,3].map(i=>$(`personal-chapter-${i}`))}});
+ personal=setupEnsembleJourneyControls({audio,beforePrepare:()=>visual?.clear(),elements:{pads:[0,1,2].map(i=>$(`personal-pad-${i}`)),reset:$('personal-reset'),prepare:$('personal-prepare'),cancel:$('personal-cancel'),listen:$('personal-listen'),status:$('personal-status'),wav:$('personal-wav'),file:$('personal-file'),recipe:$('personal-recipe'),chapters:[1,2,3].map(i=>$(`personal-chapter-${i}`))}});
 }catch{$('personal-status').textContent='Personal preparation is unavailable. The offered journey still works.';}
 
 window.addEventListener('pagehide',()=>{personal?.stop();visual?.clear();});
