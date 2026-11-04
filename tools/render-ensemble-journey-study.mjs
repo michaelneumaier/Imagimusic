@@ -1,0 +1,27 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+import {createEnsembleJourneyStudy} from '../src/living/ensemble-journey-study.js';
+import {renderContinuousEnsembleRecord} from '../src/living/continuous-ensemble-record.js';
+import {stereoWav} from '../src/loom/model.js';
+import {openPhrasePlayer} from './open-phrase-player.mjs';
+const directory=resolve(process.argv[2]??'renders/living-ensemble-journey-study');mkdirSync(directory,{recursive:true});
+const plan=createEnsembleJourneyStudy(),sampleRate=plan.sampleRate,mono=new Float32Array(plan.seconds*sampleRate),chapters=[];
+let offset=0;
+for(const [index,chapter] of plan.chapters.entries()){
+ const rendered=renderContinuousEnsembleRecord(chapter.record),samples=rendered.channels[0];
+ assert.equal(samples.length,48*sampleRate);assert.ok(samples.at(-1)===0);
+ mono.set(samples,offset);
+ const file=`chapter-${index+1}.json`;writeFileSync(resolve(directory,file),JSON.stringify(rendered.record,null,2)+'\n');
+ chapters.push({name:chapter.name,startSeconds:offset/sampleRate,seconds:rendered.seconds,file,events:chapter.events,rawSha256:createHash('sha256').update(new Uint8Array(samples.buffer)).digest('hex')});offset+=samples.length;
+}
+assert.equal(offset,mono.length);
+let peak=0;const channels=[0,1].map(()=>Float32Array.from(mono,x=>{const sample=x*24/Math.sqrt(2);assert.ok(Number.isFinite(sample)&&Math.abs(sample)<1);peak=Math.max(peak,Math.abs(sample));return sample;}));
+const wav=new Uint8Array(stereoWav({sampleRate,channels})),wavSha256=createHash('sha256').update(wav).digest('hex');writeFileSync(resolve(directory,'journey.wav'),wav);
+const scope='A procedural three-chapter study from one seed-selected motif, with an authored form and the existing 80 / 95 / 65 mm bodies. The opening rhythm and accents return exactly in the final chapter. Each 48-second chapter is independently physically admitted, fades for 25 ms, and the next begins from rest; this is a joined presentation, not a continuous 144-second physical capture. Several seconds of decay precede each boundary. Fixed mix one third and preview gain 24; no per-chapter normalization. Independent four-mode bodies with velocity pickups, without acoustic radiation or mechanical coupling. No claim of perceptual coherence, spiritual effect or listener preference has been established. The live experience is unchanged.';
+writeFileSync(resolve(directory,'report.json'),JSON.stringify({kind:'imagimusic-ensemble-journey-study-report',version:1,seed:plan.seed,sampleRate,seconds:plan.seconds,wavSha256,previewPeak:peak,chapters,scope},null,2)+'\n');
+const cases=[{label:'Arrival → Wandering → Homecoming · 2:24',file:'journey.wav',wavSha256}];
+let html=openPhrasePlayer({title:'A way home',intro:'Begin once and let a small musical idea travel. Three ringing instruments share, scatter and gradually recover its shape. Nothing needs to be played or adjusted.',question:'Did you recognize something returning near the end? Was the space between phrases inviting, or did your attention drift? Either response helps us shape the next version.',disclosure:scope,cases,playLinkHref:'../../living-ensemble.html',playLinkLabel:'Return to the live ensemble ↗',listeningDb:0,listeningKey:'imagimusic-ensemble-journey-db',listeningHelp:'The file uses fixed preview gain 24. This control adds the same playback level throughout; begin quietly.'});
+html=html.replace('<small>','<details><summary>Keep or inspect the chapters</summary><p>Each chapter can be reopened separately in the live ensemble’s saved-performance player.</p>'+chapters.map(c=>`<p><a href="${c.file}" download>${c.name} · saved instruments ↓</a> · begins at ${c.startSeconds} seconds</p>`).join('')+'</details><small>');
+writeFileSync(resolve(directory,'index.html'),html);console.log(JSON.stringify({directory,seconds:plan.seconds,wavSha256,previewPeak:peak,chapters:chapters.map(({events,...c})=>({...c,eventCount:events.length}))},null,2));

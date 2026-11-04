@@ -1127,3 +1127,5 @@ Saved ensemble visual replay integrated: separate optional scene from worker-adm
 Saved-touch choreography research complete: separate staging identity, actual activation/length poses, grouped simultaneous histories, at most three anticipatory cues and bounded fade. Four isolated tests pass; syntax/diff pass. Claims released. Not connected to scene; rendering/legibility/distraction/native and independent assessment remain ahead.
 
 Optional saved-touch cues integrated: lazy bounded geometry, default-off replay option, saved-position contact and media-clock behavior. Full 1,152 tests pass under --no-maglev; served resources, IDs, syntax and diff checks pass. Claims released; native appeal/sync and independent review remain open.
+
+Longer unattended listening study complete: A way home, three related 48-second chapters, exact motif return, strict chapter admission, one explicit generated player and catalog/preparer discovery. Three focused tests, independent WAV/hash/HTTP/readiness and diff checks pass. Claims released; native listening/appeal and independent review remain open.
