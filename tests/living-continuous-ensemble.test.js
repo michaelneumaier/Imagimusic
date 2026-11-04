@@ -13,7 +13,7 @@ function render(seed=42,blockSize=1024,quietFrame=null){
  return {p,events,mono};
 }
 test('orchestration retains every source note and gives the opening and home to the original body',()=>{
- for(const seed of [0,42,2950288811,0xffffffff]){
+ for(const seed of [0,42,2950288811,0xffffffff,3911836942,3382146154]){
   const p=createContinuousEnsembleStudy(seed),source=createContinuousReturnStudy(seed);
   assert.deepEqual(p.events.map(({frame,strength})=>({frame,strength})),source.events);
   assert.deepEqual(p.bodies.map(b=>b.lengthMm),[80,95,65]);assert.equal(p.mixGain,1/3);
@@ -23,7 +23,7 @@ test('orchestration retains every source note and gives the opening and home to 
  }
 });
 test('all three continuous histories reconstruct every mixed sample without resets or normalization',()=>{
- for(const seed of [42,2950288811,0xffffffff]){
+ for(const seed of [42,2950288811,0xffffffff,3911836942,3382146154]){
   const {p,mono,events}=render(seed),records=p.records(),channels=records.map(record=>renderContinuousTineRecord(record).channels[0]);
   const reconstructed=Float32Array.from(mono,(_,i)=>(channels[0][i]+channels[1][i]+channels[2][i])*p.plan.mixGain);
   assert.deepEqual(mono,reconstructed);assert.equal(events.length,25);

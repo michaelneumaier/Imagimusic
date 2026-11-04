@@ -50,3 +50,12 @@ test('future adaptive answers retain record capacity under sustained tiny-guest 
  }
  assert.deepEqual(counts,[4085,4086,4087]);assert.deepEqual(p.records().map(r=>r.events.filter(e=>e.origin==='score').length),[11,9,6]);assert.ok(p.records().every(r=>r.events.length<=4096));
 });
+
+test('newly offered rhythms admit remembered input and retain exact mixed replay',()=>{
+ for(const seed of [3911836942,3382146154]){
+  const {p,samples}=run(()=>createMemoryEnsemblePerformance(seed),script);
+  assert.equal(p.plan.contributions.length,3);assert.equal(p.state,'ended');
+  assert.deepEqual(renderContinuousEnsembleRecord({kind:'imagimusic-continuous-ensemble-record',version:1,mixGain:1/3,records:p.records()}).channels[0],samples);
+  assert.deepEqual(p.plan.sections[0],createContinuousEnsemblePerformance(seed).plan.sections[0]);
+ }
+});

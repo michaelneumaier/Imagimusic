@@ -4,7 +4,7 @@ import {setupContinuousEnsembleControls} from '../src/living/continuous-ensemble
 function fixture({whole=false,mode=false,continued=false}={}){
  const make=()=>({disabled:false,hidden:true,value:'42',handlers:{},addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){return this.handlers[type]?.(event);}});
  const elements={...Object.fromEntries(['start','quiet','seed','status','count','result','strength'].map(name=>[name,make()])),downloads:[make(),make(),make()],pads:[make(),make(),make()]};elements.strength.value='.05';
- elements.seed.options=['42','2950288811','4294967295'].map(value=>({value}));if(continued){elements.continueListening=make();elements.continueListening.checked=true;}
+ elements.seed.options=['42','3911836942','3382146154'].map(value=>({value}));if(continued){elements.continueListening=make();elements.continueListening.checked=true;}
  if(whole)elements.whole=make();if(mode){elements.mode=make();elements.mode.value='memory';}
  const calls=[],blobs=[],revoked=[],options=[],tasks=new Map();let taskId=0,visible=true,startFailure=false;let notify,failAt=-1,gate=null;
  const session={state:'idle',touches:0,async start(seed,settings){if(startFailure)throw Error('Audio resume refused');options.push(['audio',settings]);calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
@@ -66,7 +66,7 @@ test('optional remembered choice locks with playback and names answers only afte
 test('continued listening is opt-in and cycles the three gestures only after completed keeping',async()=>{
  const once=fixture();await once.elements.start.fire('click');once.emit({state:'ended',finished});assert.equal(once.tasks.size,0);
  const f=fixture({continued:true,mode:true});assert.equal(f.calls.length,0);await f.elements.start.fire('click');assert.equal(f.tasks.size,0);
- for(const [current,next] of [[42,'2950288811'],[2950288811,'4294967295'],[4294967295,'42']]){
+ for(const [current,next] of [[42,'3911836942'],[3911836942,'3382146154'],[3382146154,'42']]){
   f.emit({state:'verifying'});assert.equal(f.tasks.size,0);f.emit({state:'ended',finished:{...finished,seed:current}});
   assert.equal(f.tasks.size,1);assert.equal([...f.tasks.values()][0].ms,3000);assert.equal(f.elements.quiet.textContent,'Stop listening');assert.equal(f.elements.quiet.disabled,false);assert.equal(f.elements.mode.disabled,true);
   await f.next();assert.equal(f.elements.seed.value,next);assert.deepEqual(f.calls.at(-1),['start',Number(next)]);assert.deepEqual(f.options.at(-1),['audio',{mode:'memory'}]);assert.equal(f.controls.remembers,false);
