@@ -1056,3 +1056,5 @@ Autonomous continuous worklet complete: one-start score, acknowledged guest/Quie
 Continuous completion verification complete: reconstruct known composition and accepted guests, require matching acknowledged ending, source/history and physical state. Nine focused and full985tests pass. Claims released; cancellable worker/session/native playback and independent review remain ahead.
 
 Cancellable continuous verification worker complete: strict request, actual background reconstruction, bounded timeout and exactly-once release/cancellation. Thirty-four focused tests pass; modules200. Claims released; browser session/native playback and independent review remain ahead.
+
+Continuous browser session foundation complete: cancellable context setup, acknowledged touches/Quiet, validated live events, bounded drain plus worker verification and retained previous result on failure. Forty focused tests pass; module200. Claims released; controls/native listening and independent review remain ahead.
