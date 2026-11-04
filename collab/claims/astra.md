@@ -854,3 +854,7 @@ Damped release foundation complete:9 focused tests pass;5 experimental whole-pie
 Released-reply workshop integration: owns src/living/{answer-study,arrangement-view,choreography,look-main}.js, living-look.html, tools/render-living-answer-study.mjs and new released-study integration test. Share explicit first-answer release metadata between audio, response and comparison; retain earlier scores and published hashes.
 
 Released-reply workshop integration complete:36WAVs regenerated with matched response/model metadata;66focused tests pass; native generated playback reaches18.23sreturn. Claims released. Whole-piece preference and any new saved arrangement remain open; no independent review claimed.
+
+Released score pacing: owns answer-study.js, released-study tests, existing workshop/tool copy and evidence appendices. Bring later answers forward after a source-derived settling interval; retain full local motifs/return and preserve old published arrangements. Existing released experiment is not a saved identity.
+
+Released score pacing complete:67focused tests pass;36WAVs regenerated; all later motifs and exact original return retained at earlier times. Claims released. Workshop-only artistic rule; independent review and subjective preference unclaimed.
