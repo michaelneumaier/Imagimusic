@@ -718,3 +718,9 @@ Living response experiment: owns src/living/answer-study.js, tests/living-answer
 Response study reproduction: owns tools/prepare-project-home.mjs registration; no added catalog entry or flagship control.
 
 Living response experiment complete: controlled prefix derivation,8 local WAV/report artifacts, reproduction helper,6 focused tests, independent file checks and native listening controls verified. Claims released. Musical preference remains explicitly open; continue contact staging on current production score.
+
+Living contact staging: owns src/living/choreography.js, tests/living-choreography.test.js, scene.js opt-in striker construction, look-main.js/living-look.html workshop control. Reuse existing planner read-only for stationary per-blade actors on known positive-impulse scores; preserve production rendering defaults and appearance identities. No live anticipation or collision acoustics.
+
+Contact staging geometry: also owns src/living/striker-geometry.js, shared by renderer and clearance checks. Workshop precision is now10ms with explicit approach/contact/recovery checkpoints; saved production appearance unchanged.
+
+Living contact staging foundation complete: planner adapter, shared rig geometry, optional workshop rendering and exact inspection controls checked. Claims released. Next refine performer silhouette and inspect a complete staged passage; no production adoption yet.

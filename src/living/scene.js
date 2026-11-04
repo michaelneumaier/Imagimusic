@@ -1,3 +1,4 @@
+import {STRIKER_GEOMETRY as SG,livingStrikerPose} from './striker-geometry.js';
 import {LIVING_LOOKS} from './looks.js';
 import * as T from '../../vendor/three/build/three.module.js';
 import {OrbitControls} from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
@@ -49,8 +50,32 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   mesh(new T.CylinderGeometry(.058,.058,.008,6),dark,[-.4,3.918,z]);
  }
  function setLength(mm){length=mm/10;blade.scale.x=(length+.8)/8.8;blade.position.x=(length-.8)/2;marker.position.x=.85*length;marker.visible=false;veil.visible=false;}
+ // Workshop-only contact rig; created lazily so published appearances stay intact.
+ const contactActors=new Map(),contactGroup=new T.Group();objects.add(contactGroup);contactGroup.visible=false;
+ const armLength=Math.hypot(SG.reach,SG.drop);
+ function performers(poses){
+  contactGroup.visible=poses.length>0;
+  for(const rig of contactActors.values())rig.root.visible=false;
+  for(const pose of poses){
+   let rig=contactActors.get(pose.id);
+   if(!rig){
+    const root=new T.Group();contactGroup.add(root);
+    mesh(new T.CylinderGeometry(.055,.075,SG.pivotY,16),bronze,[0,SG.pivotY/2,SG.postZ],root);
+    mesh(new T.CylinderGeometry(.25,.3,.12,24),dark,[0,.06,SG.postZ],root);
+    const axle=mesh(new T.CylinderGeometry(.065,.065,SG.postZ-pose.lane,16),bronze,[0,SG.pivotY,(SG.postZ+pose.lane)/2],root);axle.rotation.x=Math.PI/2;
+    const arm=new T.Group();arm.position.set(0,SG.pivotY,pose.lane);root.add(arm);
+    const shaft=mesh(new T.CylinderGeometry(.025,.025,armLength,16),steel,[armLength/2,0,0],arm);shaft.rotation.z=-Math.PI/2;
+    mesh(new T.SphereGeometry(SG.headRadius,24,16),bronze,[armLength,0,0],arm);
+    mesh(new T.SphereGeometry(.1,20,12),dark,[0,0,0],arm);
+    rig={root,arm};contactActors.set(pose.id,rig);
+   }
+   const geometry=livingStrikerPose(length*10,pose.down,pose.lane);
+   rig.root.visible=true;rig.root.position.x=geometry.pivot[0];
+   rig.arm.rotation.z=geometry.angle;
+  }
+ }
  setLength(mm);
- return {objects,blade,response,setLength,acknowledgeTouch(value){marker.visible=value;}};
+ return {objects,blade,response,setLength,performers,acknowledgeTouch(value){marker.visible=value;}};
  }
  const bodies=[makeBody(80),makeBody(95),makeBody(65)];
  bodies[1].objects.position.set(-11,0,-4);bodies[2].objects.position.set(10,0,-4);
@@ -102,8 +127,9 @@ export function createLivingScene(canvas,{onTouch=()=>{},width:fixedWidth,height
   renderer.toneMappingExposure=look.exposure;scene.environmentIntensity=look.environment;
   key.color.setHex(look.key);key.intensity=look.keyPower;rim.color.setHex(look.rim);rim.intensity=look.rimPower;render();
  }
+ function performers(poses=[]){for(let i=0;i<3;i++)bodies[i].performers(poses.filter(p=>p.body===i));}
  function clearArrangement(){controls.enabled=true;for(const b of bodies){b.response(null);b.acknowledgeTouch(false);}openCamera(0);render();}
  const observer=fixed?null:new ResizeObserver(resize);observer?.observe(canvas);resize();
  function dispose(){disposed=true;observer?.disconnect();controls.dispose();studio.dispose();canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();renderer.dispose();}
- return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,dispose};
+ return {view,render,setLook,response,setLength,acknowledgeTouch,arrangementFrame,clearArrangement,performers,dispose};
 }
