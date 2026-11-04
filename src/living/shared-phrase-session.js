@@ -54,7 +54,7 @@ export function createLivingSharedPhraseSession({createContext=rate=>new AudioCo
     if(data.type==='applied'&&data.command==='strike'){touches++;emit({event:{frame:data.frame,strength:data.strength}});}
     if(data.type==='state'&&['playing','ringing','ending'].includes(data.state)&&!(state==='ending'&&data.state!=='ending')){state=data.state;emit();}
     if(data.type==='origin'){if(s.originAudioFrame!==null||data.sampleRate!==source.sampleRate||!Number.isSafeInteger(data.audioFrame)||data.audioFrame<0)throw Error('Invalid shared audio origin.');s.originAudioFrame=data.audioFrame;s.origin=data.audioFrame/data.sampleRate;emit({originAudioFrame:data.audioFrame,sampleRate:data.sampleRate});}
-    if(data.type==='applied'&&data.command==='quiet')s.quietFrame=data.frame;
+    if(data.type==='applied'&&data.command==='quiet'){s.quietFrame=data.frame;emit({endingFrame:data.frame});}
     if(data.type==='touches'){if(!Array.isArray(data.touches)||data.touches.length+s.history.length>8)throw Error('Invalid shared touch history.');
      let previous=s.history.at(-1)?.frame??0;
      for(const [offset,event] of data.touches.entries()){if(!event||event.index!==s.history.length+offset||!Number.isInteger(event.frame)||event.frame<previous||event.frame>Math.min(4*source.sampleRate,source.fadeStart)||!Number.isFinite(event.strength)||event.strength<=0||event.strength>.1||!['score','guest'].includes(event.origin)||s.originAudioFrame===null||event.audioFrame!==s.originAudioFrame+event.frame)throw Error('Invalid accepted shared touch.');previous=event.frame;}

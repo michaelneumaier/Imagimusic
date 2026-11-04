@@ -1,3 +1,4 @@
+import {createSharedPhraseVisual} from './shared-phrase-visual.js';
 import {setupSharedPhraseControls} from './shared-phrase-controls.js';
 import {setupPersonalOriginalListening} from './personal-original-listening.js';
 import {createLivingJourneyStudy} from './journey-study.js';
@@ -197,7 +198,9 @@ for(const event of ['timeupdate','pause','playing','ended','seeked','error'])aud
 function park(){shared?.stop();original?.park();film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 original=setupPersonalOriginalListening({getSource:()=>personalSource,beforePlay:()=>{stop({keepOriginal:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{audio:$('original-audio'),listen:$('original-listen'),quiet:$('original-quiet'),status:$('original-status')}});
-shared=setupSharedPhraseControls({getSource:()=>personalSource,beforePlay:()=>{stop({keepShared:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{start:$('shared-start'),pad:$('shared-pad'),strength:$('shared-strength'),quiet:$('shared-quiet'),status:$('shared-status'),history:$('shared-history'),download:$('shared-download'),replay:$('shared-replay'),develop:$('shared-develop'),result:$('shared-result')}});
+$('shared-motion').checked=!reducedMotion.matches;
+const sharedVisual=createSharedPhraseVisual({canvas:$('shared-canvas'),motion:$('shared-motion'),details:$('shared-phrase'),status:$('shared-visual-status'),getTime:()=>shared?.time()??0});
+shared=setupSharedPhraseControls({visual:sharedVisual,getSource:()=>personalSource,beforePlay:()=>{stop({keepShared:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{start:$('shared-start'),pad:$('shared-pad'),strength:$('shared-strength'),quiet:$('shared-quiet'),status:$('shared-status'),history:$('shared-history'),download:$('shared-download'),replay:$('shared-replay'),develop:$('shared-develop'),result:$('shared-result')}});
 choose();
 film=setupLivingJourneyMovieControls({getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
 function openPersonalAddress(){
