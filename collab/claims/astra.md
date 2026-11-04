@@ -694,3 +694,7 @@ Living visual composition comparison complete: matching score/audio, quiet reset
 Living workshop still-camera route: owns living-look.html and look-main.js. Explicit camera-follow option, reduced-motion initial preference and user-choice retention, accurate scene labels and camera-named stills. Reuse existing scene wide/orbit behavior; no production change.
 
 Living workshop still-camera route complete: native retained choice, wide return, named capture link and active-playback pause checked; reduced-motion wiring inspected without changing OS preferences. Claim released.
+
+Living consolidated light candidate: owns looks.js and living-look.html. Add porcelain-at-dusk candidate combining pale support readability with dark veil contrast; retain references and production defaults. Native opening/held-return inspection before recording art-direction judgment.
+
+Living consolidated light candidate complete: narrow opening/wide-return and actual PNG evidence recorded; candidate recommended for blade-emphasis refinement, production unchanged. Claim released.

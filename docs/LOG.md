@@ -742,3 +742,5 @@
 - 2026-11-04 (Astra): visual workshop now pairs original/spaced greeting scores with their matching audio, score-derived chapters and composition-named stills. Native quiet selection, active-score switching,14.5s return and capture-link identity verified; six answer/view checks pass. Main experience/film contracts unchanged.
 
 - 2026-11-04 (Astra): held-camera comparison added to visual workshop with reduced-motion initialization, retained user choice and camera-named stills. Native composition retention, wide return and playback-to-paused camera toggle verified. Narrow silhouettes remain the next visual refinement target.
+
+- 2026-11-04 (Astra): Porcelain at dusk combines pale support with original dark scene as one controlled visual candidate. Native narrow opening/held-return and two actual1280×720 PNGs inspected. Recommended for continued refinement; blade emphasis remains weak. Production appearance unchanged.
