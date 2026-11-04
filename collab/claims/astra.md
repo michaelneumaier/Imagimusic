@@ -1050,3 +1050,5 @@ Continuous performance capture complete: separate strict sixty-second/from-rest 
 Continuous finite transport complete: explicit start/Quiet/cancel/end, bounded capture with score-slot reservation, exact saved reconstruction, scheduler cancellation/accessors. Sixteen focused tests pass. Claims released; composer/worklet/native listening and independent review remain ahead.
 
 Autonomous continuous return study complete: seeded48second/eight-passage rhythmic form, automatic look-ahead, optional guest with unchanged score, unattended/one-touch exact-capture WAV comparison. Twenty-one focused tests pass; local artifacts200. Claims released; native listening/worklet/browser and independent review remain ahead.
+
+Autonomous continuous worklet complete: one-start score, acknowledged guest/Quiet/cancel, origin-clock accepted events and completed capture, bounded command identities and terminal failure silence. Twenty-seven focused tests pass; module200. Claims released; main-thread lifecycle/native device and independent review remain ahead.
