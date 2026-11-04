@@ -942,3 +942,7 @@ Journey artifact preparation complete: full877tests pass; current sixpairs verif
 Fresh journey render worker: owns new journey-artifact.js/journey-worker.js, real-worker test bridge/tests and own notes. Strict transient seed/treatment request produces bounded PCM16/WAV/hash/plan off main thread through existing cancellable job. Verify exact prepared-fixture identity and actual worker cancellation before any new visitor controls.
 
 Fresh journey worker foundation complete: four real-thread tests pass; fresh boundary seed rendered, dispatched cancellation verified, all three seed42WAV identities retained. Claims released. No visitor generation controls or browser-worker verification yet; transient artifact only, no saved identity or independent review.
+
+Visitor fresh journey integration: owns journey-generation.js/tests, journey-main.js/living-journey.html and own notes. One-action fresh seed uses worker, quiet cancellation and exact-plan/hash validation; retain current generated WAV/report URLs for replay/download until selection changes. No saved encounter identity or default score change.
+
+Visitor fresh generation implemented: new seed -> worker -> exact-plan/hash-verified playback/downloads, cached replay and cancellation.14focused tests plus fresh89.175sartifact/download check pass; resources200/IDs/syntax/diff checked. Claims released. Native one-action playback/controls/downloads remain unverified; no saved recipe or independent review claim.

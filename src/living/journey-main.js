@@ -7,9 +7,12 @@ import {createLivingJourneyView} from './journey-view.js';
 import {createLivingJourneyLayout} from './journey-layout.js';
 import {createLivingScene} from './scene.js';
 import {createLivingJourneyMedia} from './journey-media.js';
+import {createLivingJourneyGeneration} from './journey-generation.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 const media=createLivingJourneyMedia();
+const generated=createLivingJourneyGeneration();
+let generatedChoice=false,selectedRequest=null;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
 let scene=null,journeyView=null,raf=0,lastDraw=-Infinity;
@@ -61,25 +64,43 @@ function update(){
  $('quiet').disabled=audio.paused&&!starting;
  if(!starting)$('status').textContent=audio.error?'Audio unavailable. See the local rendering instructions below.':audio.ended?'The journey has settled.':`${audio.paused?'Paused':'Playing'} · ${clock(audio.currentTime)} · ${active.map(s=>s.name).join(' / ')||'a moment of space'}`;
 }
-function stop(){generation++;starting=false;media.cancel();player.stop();update();}
+function stop(){generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
 function choose(){
- generation++;starting=false;player.stop();media.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
+ generation++;starting=false;player.stop();media.clear();generated.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
  const shape=document.querySelector('[name=shape]:checked').value,seed=Number($('seed').value);
+ generatedChoice=$('seed').selectedOptions[0]?.dataset.generated==='true';
+ selectedRequest={kind:'imagimusic-living-journey-request',version:1,seed,treatment:shape};
  const treatment={connected:{make:createLivingConnectedJourneyStudy,suffix:'-connected',description:'One opening, five connected exchanges, one return. Each middle exchange begins while the previous sound is still ringing.'},chapters:{make:createLivingJourneyStudy,suffix:'',description:'Seven self-contained chapters. Each presents the phrase, develops it across the bodies, and returns to its own opening.'},evolving:{make:createLivingEvolvingJourneyStudy,suffix:'-evolving',description:'One opening, twelve developing exchanges, one return. The rhythm turns and the accents move, then the familiar rhythm and accents come back before home.'}}[shape];
  plan=treatment.make(seed);
  prepareEnsemble();
  buildScore();drawScore(0);
  url=`renders/living-journey-study/journey-${seed}${treatment.suffix}.wav`;
  $('download').href=url;$('report').href=url.replace(/\.wav$/,'.json');
+ $('download').hidden=$('report').hidden=generatedChoice;
+ $('download').setAttribute('download','');$('report').removeAttribute('download');$('report').textContent='Inspect the score';
  $('duration').textContent=clock(plan.frames/plan.sampleRate);
  $('description').textContent=treatment.description;
  rows=plan.sections.map(s=>{const li=document.createElement('li'),name=document.createElement('span'),time=document.createElement('small');name.textContent=s.name;time.textContent=`${clock(s.startFrame/plan.sampleRate)}–${clock(s.endFrame/plan.sampleRate)}`;li.append(name,time);return li;});
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
-$('listen').addEventListener('click',async()=>{
- const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent='Checking the journey audio and score…';
- try{await player.prepare();if(own!==generation)return;const verified=await media.prepare(url,plan);if(own!==generation)return;const playing=await player.play(verified);if(own!==generation||!playing)return;starting=false;audio.hidden=false;update();}
- catch(error){if(own!==generation)return;starting=false;player.stop();$('quiet').disabled=true;$('status').textContent=`Playback could not start: ${error.message} See the local rendering instructions below.`;}
+async function listen(){
+ const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent=generatedChoice?'Making your journey locally… Quiet cancels preparation.':'Checking the journey audio and score…';
+ try{
+  await player.prepare();if(own!==generation)return;
+  let verified;
+  if(generatedChoice){
+   const artifact=await generated.prepare(selectedRequest,plan);if(own!==generation)return;verified=artifact.audioURL;
+   const stem=`imagimusic-journey-${artifact.seed}-${artifact.treatment}`;
+   $('download').href=artifact.audioURL;$('download').download=stem+'.wav';$('report').href=artifact.reportURL;$('report').download=stem+'.json';$('report').textContent='Keep the score report';$('download').hidden=$('report').hidden=false;
+  }else verified=await media.prepare(url,plan);
+  if(own!==generation)return;const playing=await player.play(verified);if(own!==generation||!playing)return;starting=false;audio.hidden=false;update();
+ }catch(error){if(own!==generation)return;starting=false;player.stop();$('quiet').disabled=true;$('status').textContent=`Playback could not start: ${error.message} ${generatedChoice?'Try Listen again, or choose a prepared seed.':'See the local rendering instructions below.'}`;}
+}
+$('listen').addEventListener('click',listen);
+$('new-journey').addEventListener('click',()=>{
+ let seed;do{seed=crypto.getRandomValues(new Uint32Array(1))[0];}while([...$('seed').options].some(o=>Number(o.value)===seed));
+ let option=$('fresh-seed');if(!option){option=document.createElement('option');option.id='fresh-seed';option.dataset.generated='true';$('seed').append(option);}
+ option.value=String(seed);option.textContent=`Your new idea · ${seed}`;$('seed').value=String(seed);choose();listen();
 });
 $('quiet').addEventListener('click',stop);
 $('seed').addEventListener('change',choose);
@@ -93,6 +114,6 @@ $('ensemble-veils').addEventListener('change',drawEnsemble);
 $('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
 $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){generation++;starting=false;media.cancel();stopAnimation();player.park();if(plan)update();}
+function park(){generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
 choose();
