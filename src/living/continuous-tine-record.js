@@ -46,3 +46,6 @@ export function renderContinuousTineRecord(value){
  const record=parse(value),frames=record.fadeStart+Math.round(.025*record.sampleRate),samples=new Float32Array(frames),snapshot=walk(record,samples);
  return {record,sampleRate:record.sampleRate,frames,seconds:frames/record.sampleRate,channels:[samples],snapshot};
 }
+
+/** Structural copy only; physical admission still requires validate/render. */
+export {parse as parseContinuousTineRecord};

@@ -1,4 +1,4 @@
-import {CONTINUOUS_TINE_RECORD_LIMIT,validateContinuousTineRecord,renderContinuousTineRecord} from './continuous-tine-record.js';
+import {CONTINUOUS_TINE_RECORD_LIMIT,parseContinuousTineRecord,validateContinuousTineRecord,renderContinuousTineRecord} from './continuous-tine-record.js';
 export const CONTINUOUS_ENSEMBLE_RECORD_LIMIT=3*CONTINUOUS_TINE_RECORD_LIMIT+1024;
 const exact=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
 function shape(value){
@@ -24,3 +24,7 @@ export function renderContinuousEnsembleRecord(value){
  for(let i=0;i<frames;i++)samples[i]=(parts[0].channels[0][i]+parts[1].channels[0][i]+parts[2].channels[0][i])*record.mixGain;
  return {record,sampleRate,frames,seconds,channels:[samples],snapshot:parts.map(part=>part.snapshot)};
 }
+
+/** Structural copy for presenting an already worker-validated capture.
+ * This does not run the physical admission trajectory. */
+export function parseContinuousEnsembleRecord(value){shape(value);return canonical(value.records.map(parseContinuousTineRecord));}

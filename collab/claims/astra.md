@@ -1117,3 +1117,5 @@ Optional quieter ensemble presentation complete: reversible listening-only view,
 Offered ensemble variety refined: three distinct first gaps and accent shapes, reproducible 27-combination score probe, unchanged generator/old-seed semantics. 15 fixed/control and six memory tests pass; served menu matches measurement; syntax/diff pass. Claims released; perceptual variety, long-session appeal and independent review remain open.
 
 Ensemble resonance-family research complete: same-score current/near-octave/open-triad comparison, strict record admission, unchanged baseline PCM/WAV, explicit shared player and catalog/preparer discovery. Independent WAV/hash/HTTP/home-readiness/syntax/diff checks pass. Claims released; live family unchanged and native preference/recognition/independent assessment remain open.
+
+Saved ensemble response foundation complete: immutable structural copy after worker admission, arbitrary-time modal sampler from actual saved geometry/history, range/framing/physical-state coverage. 179 focused tests pass under --no-maglev. Claims released; scene width support, media-clock binding, native assessment and independent review remain ahead.
