@@ -842,3 +842,7 @@ Presentation4 adoption complete:59 targeted and845 full tests pass; actual525-fr
 Fragment journey comparison: owns tools/render-living-answer-study.mjs, src/living/{choreography,arrangement-view,look-main}.js, living-look.html and a focused fragment staging test. Connect existing fragment score to generated audio and visual workshop, count actual touches, preserve published scores and default paths. Evidence appendices follow.
 
 Fragment journey comparison complete:27 WAVs rendered,13 focused tests pass, native generated selection/audio metadata/first-answer control checked. Claims released. Full-passage aesthetic evaluation remains next; no independent review claimed.
+
+Partial-reply tail evidence: owns tools/render-living-answer-study.mjs and current evidence/plan appendices. Add source-window RMS and onset-gap context to existing comparison/report; distinguish ringing from silence without inventing an audibility threshold. Preserve score pending perceptual assessment.
+
+Partial-reply tail evidence complete:54 source-window measurements verified, regenerated existing comparisons, native18.23s return confirmed. Claims released. No score timing change or subjective listening verdict.
