@@ -894,3 +894,7 @@ Autonomous journey study complete: two local WAV/report artifacts (118.88s and13
 Connected journey comparison: owns new src/living/connected-journey-study.js, new connected journey tests, tools/render-living-journey-study.mjs and own evidence notes. Retain baseline; one opening/return with five connected exchanges, preserve each voice's full render and explicit independent-pass limitation.
 
 Connected journey comparison complete: two connected WAV/reports40.21s/47.48s preserve baseline artifacts;74Living tests pass and PCM16 artifact probed. Claims released. One exact isolated opening/return; independent tails overlap internally. No preference, continuous-body or independent-review claim.
+
+Journey listening comparison: owns living-journey.html, src/living/journey-main.js, src/living/journey.css and one workshop link in living-look.html; own evidence notes. One local player for baseline/connected studies with actual chapter timings, quiet switches and explicit render availability errors. No production default or catalog expansion.
+
+Journey listening comparison implemented: page/14resources200,11targeted tests pass, syntax/diff/IDs checked. Claims released. Native Safari verification remains outstanding after two native-pipe startup failures; no visual/playback or independent-review claim.
