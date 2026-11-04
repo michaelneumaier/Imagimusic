@@ -1,14 +1,16 @@
 import test from 'node:test';
+import {createContinuousEnsembleVisual} from '../src/living/continuous-ensemble-visual.js';
+import {createContinuousEnsemblePerformance} from '../src/living/continuous-ensemble-study.js';
 import {createMemoryReturnPerformance} from '../src/living/memory-return-study.js';
 import assert from 'node:assert/strict';
 import {createContinuousReturnVisual} from '../src/living/continuous-return-visual.js';
 import {createContinuousReturnStudy} from '../src/living/continuous-return-study.js';
 const plan=createContinuousReturnStudy(42),source={events:plan.events.slice(0,2)};
-function fixture(options={}){
+function fixture({createBinding=createContinuousReturnVisual,...options}={}){
  const make=()=>({handlers:{},checked:true,open:true,addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){this.handlers[type]?.(event);}});
  const canvas=make(),motion=make(),details=make(),status=make(),frames=[],tasks=new Map();let time=0,next=0,disposed=0,created=0;
  const scene={instanceFrame:frame=>frames.push(frame),setLook(){},dispose(){disposed++;}};
- const view=createContinuousReturnVisual({canvas,motion,details,status,getTime:()=>time,loadScene:async()=>(canvas,options)=>{assert.equal(options.responseMagnification,1000);created++;return scene;},schedule:fn=>{tasks.set(++next,fn);return next;},cancel:id=>tasks.delete(id),isVisible:()=>details.open,...options});
+ const view=createBinding({canvas,motion,details,status,getTime:()=>time,loadScene:async()=>(canvas,options)=>{assert.equal(options.responseMagnification,1000);created++;return scene;},schedule:fn=>{tasks.set(++next,fn);return next;},cancel:id=>tasks.delete(id),isVisible:()=>details.open,...options});
  return {view,canvas,motion,details,status,frames,tasks,get created(){return created;},get disposed(){return disposed;},set time(v){time=v;},tick(stamp){const [id,fn]=tasks.entries().next().value;tasks.delete(id);fn(stamp);}};
 }
 const flush=async()=>{await Promise.resolve();await Promise.resolve();};
@@ -51,4 +53,18 @@ test('explicit remembered mode displays both answers through completion',async()
  while(p.state!=='ended')f.view.update({state:'playing',events:p.process(new Float32Array(4096))});
  f.view.update({state:'ended',finished:{record:p.record()}});
  assert.equal(f.disposed,0);assert.equal(f.frames.at(-1).touches,p.snapshot().events.length);assert.equal(f.frames.at(-1).instances[0].endingOpacity,0);assert.equal(f.tasks.size,0);f.view.dispose();
+});
+
+test('ensemble binding follows three bodies, holds still and completes their common ending',async()=>{
+ const f=fixture({createBinding:createContinuousEnsembleVisual}),p=createContinuousEnsemblePerformance();f.view.begin(42);await flush();p.start();
+ while(p.frame<7*48000)f.view.update({state:'playing',events:p.process(new Float32Array(Math.min(4096,7*48000-p.frame)))});
+ f.time=7;f.tick(0);assert.equal(f.frames.at(-1).instances.length,3);assert.ok(f.frames.at(-1).instances[0].points);assert.ok(f.frames.at(-1).instances[1].points);assert.equal(f.frames.at(-1).instances[2].points,null);
+ f.motion.checked=false;f.motion.fire('change');assert.equal(f.tasks.size,0);const held=f.frames.length;
+ while(p.state!=='ended')f.view.update({state:'playing',events:p.process(new Float32Array(4096))});assert.equal(f.frames.length,held);
+ f.view.update({state:'ended',finished:{records:p.records()}});assert.equal(f.disposed,0);assert.equal(f.frames.at(-1).touches,25);assert.ok(f.frames.at(-1).instances.every(body=>body.endingOpacity===0));assert.equal(f.tasks.size,0);f.view.dispose();
+});
+test('mismatched ensemble completion removes only its picture',async()=>{
+ const f=fixture({createBinding:createContinuousEnsembleVisual}),p=createContinuousEnsemblePerformance();f.view.begin(42);await flush();p.start();p.quiet();p.process(new Float32Array(1200));
+ const records=structuredClone(p.records());records[1].fadeStart=1;f.view.update({state:'ended',finished:{records}});
+ assert.equal(f.disposed,1);assert.equal(f.tasks.size,0);assert.match(f.status.textContent,/Listening and keeping still work/);
 });

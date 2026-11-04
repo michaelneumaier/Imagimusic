@@ -2,6 +2,8 @@ import {createContinuousReturnView} from './continuous-return-view.js';
 
 /** Graphics are optional; nothing here starts, stops or changes audio. */
 export function createContinuousReturnVisual({canvas,motion,details,status,getTime,
+ createView=createContinuousReturnView,finishedFadeStart=finished=>finished.record.fadeStart,
+ description='One continuous body · response bound magnified 1,000× · gold markers acknowledge accepted touches.',
  loadScene=async()=> (await import('./scene.js')).createLivingScene,
  schedule=requestAnimationFrame,cancel=cancelAnimationFrame,isVisible=()=>!document.hidden&&details.open,
 }){
@@ -14,12 +16,12 @@ export function createContinuousReturnVisual({canvas,motion,details,status,getTi
  async function ensureScene(){
   if(scene||!model||loading||!isVisible())return;
   loading=true;const own=epoch;
-  try{const createScene=await loadScene();if(own!==epoch||!isVisible())return;scene=createScene(canvas,{ensemble:model.layout,responseMagnification:model.magnification});scene.setLook('dusk');status.textContent='One continuous body · response bound magnified 1,000× · gold markers acknowledge accepted touches.';refresh();}
+  try{const createScene=await loadScene();if(own!==epoch||!isVisible())return;scene=createScene(canvas,{ensemble:model.layout,responseMagnification:model.magnification});scene.setLook('dusk');status.textContent=description;refresh();}
   catch(error){if(own===epoch)fail(error);}finally{if(own===epoch)loading=false;}
  }
  function begin(seed=42,options={}){
   epoch++;loading=false;stopFrames();active=false;last=-Infinity;heldTime=0;endLimit=48;
-  try{model=createContinuousReturnView(seed,options);if(scene)scene.instanceFrame(model.at(0),true);ensureScene();}
+  try{model=createView(seed,options);if(scene)scene.instanceFrame(model.at(0),true);ensureScene();}
   catch(error){model=null;fail(error);}
  }
  function update(event){
@@ -28,7 +30,7 @@ export function createContinuousReturnVisual({canvas,motion,details,status,getTi
    if(event.events)model.accept(event.events);
    if(event.endingFrame!==undefined){model.end(event.endingFrame);endLimit=(event.endingFrame+Math.round(.025*model.plan.sampleRate))/model.plan.sampleRate;}
    active=['playing','ending','verifying'].includes(event.state);
-   if(event.finished){model.end(event.finished.record.fadeStart);heldTime=(event.finished.record.fadeStart+Math.round(.025*model.plan.sampleRate))/model.plan.sampleRate;active=false;refresh();}
+   if(event.finished){const fadeStart=finishedFadeStart(event.finished,model.plan);model.end(fadeStart);heldTime=(fadeStart+Math.round(.025*model.plan.sampleRate))/model.plan.sampleRate;active=false;refresh();}
    else if(active){if(scene&&motion.checked&&raf===null&&isVisible())raf=schedule(tick);}
    else stopFrames();
   }catch(error){fail(error);}
