@@ -1016,3 +1016,5 @@ Direct personal journey handoff: owns living.html/main.js, journey-main.js/HTML 
 Direct personal journey handoff complete: admitted retained originals link through existingtine-livefragment to quiet journey arrival/hashchange; four focused tests and pages/IDs/resources/syntax/diff pass. Claims released. Native navigation/back/playback and independent review pending.
 
 Personal journey films complete: strict personal source identity, full ensemble framing, soundtrack/report validation, film session labels and source-package verifier extended.18focused tests pass and prior seeded fixture verifies unchanged. Claims released; native picture/sound verification and independent review pending.
+
+Personal journey discovery complete: homepage invitation, roadmap and dated history now describe the personal source handoff and experimental films; journey workshop has its own searchable catalog entry. Local HTTP,44catalog destinations,92home resources/links,18unique IDs,syntax and diff checks pass. Claims released; native layout and interaction remain unverified.
