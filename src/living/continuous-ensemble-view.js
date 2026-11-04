@@ -9,7 +9,7 @@ export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
  const plan=createContinuousEnsembleStudy(seed,{sampleRate}),models=plan.bodies.map(body=>createTineImpulse(requestForTineDesign(body).geometry));
  const units=models.map((model,i)=>model.strike({activation:plan.bodies[i].activation,impulseNs:1e-6}));
  const positions=Array.from({length:81},(_,i)=>i/80),shapes=models.map(model=>positions.map(u=>model.modes.map(mode=>Math.abs(mode.shape(u)))));
- const checkpoints=[[],[],[]],history=[];let fadeStart=plan.frames-Math.round(.025*sampleRate);
+ const checkpoints=[[],[],[]],history=[];let scores=0,fadeStart=plan.frames-Math.round(.025*sampleRate);
  const locations=[[0,0,5],[-13,0,-5],[13,0,-5]],magnification=1000;
  const layout=Object.freeze({instances:Object.freeze(plan.bodies.map((body,id)=>Object.freeze({id,bodyMm:body.lengthMm,position:Object.freeze(locations[id])}))),camera:Object.freeze({target:Object.freeze([3,3.5,0]),direction:Object.freeze([5,8,18]),radius:24})});
  function propagate(body,previous,frame){
@@ -20,17 +20,22 @@ export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
   });return {q,v};
  }
  function accept(batch){
-  if(!Array.isArray(batch)||history.length+batch.length>plan.events.length)throw Error('Invalid ensemble visual history.');
-  const next=[[],[],[]],events=[];
-  for(const [offset,input] of batch.entries()){
-   const expected=plan.events[history.length+offset],body=expected.body;
-   if(!input||input.origin!=='score'||input.body!==body||input.frame!==expected.frame||input.strength!==expected.strength||input.index!==checkpoints[body].length+next[body].length||input.frame>fadeStart)throw Error('The visible ensemble differs from its accepted score.');
+  if(!Array.isArray(batch)||history.length+batch.length>3*4096)throw Error('Invalid ensemble visual history.');
+  const next=[[],[],[]],events=[];let scoreCount=scores,previousFrame=history.at(-1)?.frame??0;
+  for(const input of batch){
+   const body=input?.body;
+   if(!input||!Number.isInteger(body)||body<0||body>2||!['score','guest'].includes(input.origin)||!Number.isInteger(input.frame)||input.frame<previousFrame||input.frame>fadeStart||!Number.isFinite(input.strength)||input.strength===0||Math.abs(input.strength)>.1||input.index!==checkpoints[body].length+next[body].length||input.index>=4096)throw Error('The visible ensemble differs from its accepted score.');
+   const expected=plan.events[scoreCount];
+   if(input.origin==='score'){
+    if(!expected||input.body!==expected.body||input.frame!==expected.frame||input.strength!==expected.strength)throw Error('The visible ensemble differs from its accepted score.');scoreCount++;
+   }else if(expected?.frame<=input.frame)throw Error('A guest cannot precede a due ensemble score note.');
+   previousFrame=input.frame;
    const previous=next[body].at(-1)??checkpoints[body].at(-1),state=propagate(body,previous,input.frame);
    state.v.forEach((_,i)=>state.v[i]+=input.strength*units[body].initialVelocity[i]);
-   const event=Object.freeze({body,frame:input.frame,strength:input.strength,index:input.index,origin:'score'});
+   const event=Object.freeze({body,frame:input.frame,strength:input.strength,index:input.index,origin:input.origin});
    next[body].push({...state,event});events.push(event);
   }
-  next.forEach((items,body)=>checkpoints[body].push(...items));history.push(...events);
+  next.forEach((items,body)=>checkpoints[body].push(...items));history.push(...events);scores=scoreCount;
  }
  function end(frame){
   if(!Number.isInteger(frame)||frame<0||frame>fadeStart||frame<(history.at(-1)?.frame??0))throw Error('Invalid ensemble visual ending.');fadeStart=frame;
@@ -44,7 +49,7 @@ export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
    touches+=lo;const previous=items[lo-1],state=propagate(body,previous,frame),last=previous?.event;
    const amplitudesM=models[body].modes.map((m,i)=>Math.hypot(state.q[i],(state.v[i]+m.gamma*state.q[i])/m.omegaD));
    const points=previous?positions.map((u,i)=>({u,boundM:shapes[body][i].reduce((sum,shape,j)=>sum+shape*amplitudesM[j],0)})):null;
-   const touchMarker=last&&frame-last.frame<Math.round(.12*sampleRate)&&endingOpacity>0?{activation:plan.bodies[body].activation,frame:last.frame,origin:'score'}:null;
+   const touchMarker=last&&frame-last.frame<Math.round(.12*sampleRate)&&endingOpacity>0?{activation:plan.bodies[body].activation,frame:last.frame,origin:last.origin}:null;
    return {...layout.instances[body],points,amplitudesM,touches:lo,touched:!!previous,touchMarker,endingOpacity,passId:previous?body:null,localSeconds:frame/sampleRate};
   });
   return {seconds,frame,touches,instances,performers:[]};

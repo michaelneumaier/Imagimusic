@@ -12,16 +12,20 @@ class ContinuousEnsembleProcessor extends AudioWorkletProcessor{
    try{
     if(this.terminal||this.failed)throw Error('This continuous performance has finished.');
     if(!data||!Number.isInteger(data.id)||data.id<=this.lastId||data.id<0||data.id>=8192)throw Error('Command identities must increase within 0…8191.');
-    if(!['start','quiet','cancel'].includes(data.type))throw Error('Unknown continuous performance command.');
+    if(!['start','strike','quiet','cancel'].includes(data.type))throw Error('Unknown continuous performance command.');
     this.lastId=data.id;
     const frame=this.performance.frame;let events=[];
     if(data.type==='start')this.performance.start();
+    if(data.type==='strike'){
+     const result=this.performance.tryGuest(data.body,data.strength);this.publish(result.events);
+     if(!result.admitted)throw Error(result.reason);
+    }
     if(data.type==='quiet'){
      if(this.performance.state!=='playing')throw Error('Only a playing performance can end quietly.');
      events=this.performance.quiet();this.publish(events);
     }
     if(data.type==='cancel'){this.performance.cancel();this.pending=[];this.terminal=true;}
-    this.port.postMessage({type:'applied',id:data.id,command:data.type,frame,state:this.performance.state});
+    this.port.postMessage({type:'applied',id:data.id,command:data.type,frame,state:this.performance.state,...(data.type==='strike'?{body:data.body,strength:data.strength}:{})});
     if(data.type==='cancel')this.port.postMessage({type:'cancelled',frame});
    }catch(error){this.port.postMessage({type:'refused',id:data?.id,message:error.message,state:this.performance.state,frame:this.performance.frame});}
   };

@@ -31,6 +31,25 @@ test('continuous ensemble production worklet and completion evidence',async t=>{
    assert.deepEqual(result.records,data.records);assert.equal(worker.terminations,1);assert.equal(result.kind,'imagimusic-continuous-ensemble-completion');
    assert.equal(touches(p).length,25);assert.ok(touches(p).every(e=>e.audioFrame===origin+e.frame));assert.ok(block(p).left.every(x=>x===0));assert.equal(p.port.messages.filter(m=>m.type==='finished').length,1);
   });
+  await t.test('signed guests across all bodies survive live playback, real worker verification and raw replay',async()=>{
+   const p=make();send(p,{id:0,type:'start'});send(p,{id:1,type:'strike',body:2,strength:.05});send(p,{id:2,type:'strike',body:0,strength:-.025});
+   send(p,{id:3,type:'strike',body:9,strength:.05});send(p,{id:2,type:'strike',body:1,strength:.05});assert.equal(touches(p).length,0);
+   const origin=currentFrame,all=new Float32Array(48*sampleRate);let offset=0,active=true,joined=false;
+   while(active){if(offset>=51200&&!joined){send(p,{id:4,type:'strike',body:1,strength:.025});joined=true;}const result=block(p);all.set(result.left,offset);offset+=128;active=result.active;}
+   const data=p.port.messages.find(m=>m.type==='finished'),history=touches(p),channels=data.records.map(r=>renderContinuousTineRecord(r).channels[0]);
+   assert.deepEqual(all,Float32Array.from(all,(_,i)=>(channels[0][i]+channels[1][i]+channels[2][i])*data.plan.mixGain));
+   assert.deepEqual(history.filter(e=>e.origin==='guest').map(e=>[e.body,e.frame,e.strength]),[[2,0,.05],[0,0,-.025],[1,51200,.025]]);
+   const acks=p.port.messages.filter(m=>m.type==='applied'&&m.command==='strike');assert.deepEqual(acks.map(e=>[e.body,e.strength]),[[2,.05],[0,-.025],[1,.025]]);assert.equal(p.port.messages.filter(m=>m.type==='refused').length,2);
+   const input={seed:42,sampleRate,data,touches:history,originAudioFrame:origin,quietFrame:null},job=createContinuousEnsembleVerifyJob(input,{WorkerClass:Bridge}),worker=Bridge.last;
+   assert.deepEqual((await job.promise).records,data.records);await worker.stopped;
+   for(const change of [x=>x[0].strength=.04,x=>x[0].body=1,x=>x[0].origin='score',x=>x.reverse()]){const altered=structuredClone(history);change(altered);assert.throws(()=>validateContinuousEnsembleFinished(42,sampleRate,data,altered,origin));}
+  });
+  await t.test('an immediate Quiet retains accepted pre-origin guests and no later score',()=>{
+   const p=make();send(p,{id:0,type:'start'});send(p,{id:1,type:'strike',body:1,strength:.05});send(p,{id:2,type:'quiet'});send(p,{id:3,type:'strike',body:0,strength:.05});
+   const origin=currentFrame;let active=true;while(active)active=block(p).active;
+   const data=p.port.messages.find(m=>m.type==='finished'),result=validateContinuousEnsembleFinished(42,sampleRate,data,touches(p),origin,0);
+   assert.deepEqual(result.records.map(r=>r.events.length),[0,1,0]);assert.equal(touches(p)[0].audioFrame,origin);assert.equal(p.port.messages.filter(m=>m.type==='refused').length,1);
+  });
   await t.test('Quiet before origin and during music preserves all body endings',()=>{
    for(const blocks of [0,400]){
     const p=make();send(p,{id:0,type:'start'});const origin=currentFrame;for(let i=0;i<blocks;i++)block(p);

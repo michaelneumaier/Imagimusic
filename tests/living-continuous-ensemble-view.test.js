@@ -51,3 +51,15 @@ test('held camera contains all three bodies and declared response bounds at wide
   }
  }
 });
+
+test('guest impulses remain on their chosen bodies with atomic due-score ordering',()=>{
+ const p=createContinuousEnsemblePerformance(),view=createContinuousEnsembleView(),models=view.plan.bodies.map(b=>createTineImpulse(requestForTineDesign(b).geometry));p.start();
+ view.accept(p.tryGuest(2,.05).events);view.accept(p.tryGuest(0,-.025).events);
+ assert.equal(view.at(0).instances[2].touchMarker.origin,'guest');assert.equal(view.at(0).instances[0].touchMarker.origin,'guest');assert.equal(view.at(0).instances[1].points,null);
+ const target=p.plan.sections[1].events[0].frame;while(p.frame<target)view.accept(p.process(new Float32Array(Math.min(4096,target-p.frame))));
+ const accepted=p.tryGuest(0,.025).events,before=view.accepted;assert.throws(()=>view.accept(accepted.slice().reverse()),/due/);assert.deepEqual(view.accepted,before);view.accept(accepted);
+ while(p.state!=='ended')view.accept(p.process(new Float32Array(1001)));
+ const picture=view.at(48),snapshots=p.snapshot();assert.equal(picture.touches,28);
+ picture.instances.forEach((body,i)=>models[i].modes.forEach((m,j)=>{const state=snapshots[i].body.modes[j],expected=Math.hypot(state.displacementM,(state.velocityMPerS+m.gamma*state.displacementM)/m.omegaD);assert.ok(Math.abs(body.amplitudesM[j]-expected)<1e-15);}));
+ assert.equal(view.accepted.filter(e=>e.origin==='guest').length,3);
+});
