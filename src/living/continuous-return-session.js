@@ -1,5 +1,5 @@
 import {createContinuousReturnStudy} from './continuous-return-study.js';
-import {createContinuousReturnVerifyJob} from './continuous-return-verify-job.js';
+import {createContinuousReturnVerifyJob,createMemoryReturnVerifyJob} from './continuous-return-verify-job.js';
 import {createListeningLevel,listeningGain} from '../grove/listening-level.js';
 const aborted=()=>Object.assign(Error('Continuous listening cancelled.'),{name:'AbortError'});
 export function createContinuousListeningStage(context,{db}){
@@ -7,9 +7,9 @@ export function createContinuousListeningStage(context,{db}){
  try{input.connect(level.input);}catch(error){input.disconnect();level.dispose();throw error;}
  return {input,output:level.output,setDb:level.setDb,dispose(){input.disconnect();level.dispose();}};
 }
-export function createContinuousReturnSession({createContext=rate=>new AudioContext({sampleRate:rate}),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-continuous-return',options),createListeningStage=createContinuousListeningStage,createVerifyJob=createContinuousReturnVerifyJob,listeningDb=0,onChange=()=>{}}={}){
- listeningGain(listeningDb);let active=null,state='idle',touches=0,lastFinished=null;
- const emit=extra=>onChange({state,touches,...extra});
+export function createContinuousReturnSession({createContext=rate=>new AudioContext({sampleRate:rate}),createNode=(context,options)=>new AudioWorkletNode(context,options.processorOptions.mode==='memory'?'imagimusic-memory-return':'imagimusic-continuous-return',options),createListeningStage=createContinuousListeningStage,createVerifyJob=createContinuousReturnVerifyJob,createMemoryVerifyJob=createMemoryReturnVerifyJob,listeningDb=0,onChange=()=>{}}={}){
+ listeningGain(listeningDb);let active=null,state='idle',touches=0,lastFinished=null,selectedMode='fixed';
+ const emit=extra=>onChange({state,touches,mode:selectedMode,...extra});
  function closeAudio(s){
   if(s.audioClosed)return;s.audioClosed=true;s.context.onstatechange=null;
   if(s.node){s.node.port.onmessage=null;s.node.onprocessorerror=null;s.node.disconnect();s.node.port.close();}
@@ -41,6 +41,7 @@ export function createContinuousReturnSession({createContext=rate=>new AudioCont
     const key=data.type==='ready'?'ready':data.id,pending=s.pending.get(key);
     if(!pending)throw Error('Unexpected continuous acknowledgment.');
     if(data.type==='ready'){
+     if(s.mode==='memory'?(data.kind!=='imagimusic-memory-return-study'||data.version!==1):(data.kind!==undefined||data.version!==undefined))throw Error('The processor prepared a different composition mode.');
      if(data.seed!==s.plan.seed||data.sampleRate!==s.plan.sampleRate||data.frames!==s.plan.frames)throw Error('The processor prepared a different continuous study.');
     }else if(data.type==='applied'){
      if(data.command!==pending.command||!Number.isInteger(data.frame)||data.frame<0||data.frame>s.plan.frames)throw Error('Invalid continuous command acknowledgment.');
@@ -68,7 +69,7 @@ export function createContinuousReturnSession({createContext=rate=>new AudioCont
    if(data.type==='finished'){
     if(s.verifying||s.history.filter(e=>e.origin==='guest').length!==touches)throw Error('Invalid continuous completion or guest acknowledgments.');
     s.verifying=true;clearTimeout(s.watchdog);state='verifying';emit();
-    s.verifyJob=createVerifyJob({seed:s.plan.seed,sampleRate:s.plan.sampleRate,data,touches:s.history,originAudioFrame:s.originAudioFrame,quietFrame:s.quietFrame});
+    s.verifyJob=(s.mode==='memory'?createMemoryVerifyJob:createVerifyJob)({seed:s.plan.seed,sampleRate:s.plan.sampleRate,data,touches:s.history,originAudioFrame:s.originAudioFrame,quietFrame:s.quietFrame});
     s.verifyJob.promise.then(result=>{if(active!==s)return;s.verified=result;complete(s);},error=>fail(s,error));
     const latency=value=>Number.isFinite(value)&&value>=0?Math.min(value,.5):0;
     s.drainTimer=setTimeout(()=>{if(active!==s)return;closeAudio(s);s.drained=true;complete(s);},1000*(Math.max(.05,latency(s.context.baseLatency)+latency(s.context.outputLatency))+.025));return;
@@ -76,17 +77,18 @@ export function createContinuousReturnSession({createContext=rate=>new AudioCont
    throw Error('Unexpected continuous audio message.');
   }catch(error){fail(s,error);}
  }
- async function start(seed=42,{sampleRate=48000}={}){
-  const plan=createContinuousReturnStudy(seed,{sampleRate});release(active);state='preparing';touches=0;emit();let s;
+ async function start(seed=42,{sampleRate=48000,mode='fixed'}={}){
+  if(!['fixed','memory'].includes(mode))throw Error('Choose a supported composition mode.');
+  const plan=createContinuousReturnStudy(seed,{sampleRate});release(active);selectedMode=mode;state='preparing';touches=0;emit();let s;
   try{
-   const context=createContext(sampleRate);s={context,plan,pending:new Map(),nextId:0,pendingTouches:0,history:[],originAudioFrame:null,quietFrame:null,audioClosed:false};active=s;
+   const context=createContext(sampleRate);s={context,plan,mode,pending:new Map(),nextId:0,pendingTouches:0,history:[],originAudioFrame:null,quietFrame:null,audioClosed:false};active=s;
    await context.resume();if(active!==s)throw aborted();
    if(context.sampleRate!==sampleRate)throw Error('The audio context did not preserve the requested sample rate.');
    if(context.state!=='running')throw Error('Audio is interrupted.');
    context.onstatechange=()=>{if(active===s&&context.state!=='running')park('interrupted');};
-   await context.audioWorklet.addModule(new URL('./continuous-return-worklet.js',import.meta.url));if(active!==s)throw aborted();
+   await context.audioWorklet.addModule(new URL(mode==='memory'?'./memory-return-worklet.js':'./continuous-return-worklet.js',import.meta.url));if(active!==s)throw aborted();
    const ready=wait(s,'ready',5000);
-   s.node=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[1],processorOptions:{seed,sampleRate}});
+   s.node=createNode(context,{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[1],processorOptions:{seed,sampleRate,mode}});
    s.node.port.onmessage=({data})=>receive(s,data);s.node.onprocessorerror=()=>fail(s,Error('The continuous audio processor stopped.'));
    s.listening=createListeningStage(context,{db:listeningDb});s.listening.output.connect(context.destination);s.node.connect(s.listening.input);
    await ready;if(active!==s)throw aborted();await command(s,'start');if(active!==s)throw aborted();

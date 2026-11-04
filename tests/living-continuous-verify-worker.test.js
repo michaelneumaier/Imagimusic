@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Worker} from 'node:worker_threads';
 import {createContinuousReturnPerformance} from '../src/living/continuous-return-study.js';
-import {createContinuousReturnVerifyJob} from '../src/living/continuous-return-verify-job.js';
+import {createContinuousReturnVerifyJob,createMemoryReturnVerifyJob} from '../src/living/continuous-return-verify-job.js';
 class BrowserWorkerBridge{
  static instances=[];
  constructor(url){this.started=new Promise(resolve=>this.markStarted=resolve);this.worker=new Worker(new URL('./living-journey-node-worker.js',import.meta.url),{workerData:url.href});this.worker.on('message',data=>data.testStarted?this.markStarted():this.onmessage?.({data}));this.worker.on('error',error=>this.onerror?.({message:error.message}));BrowserWorkerBridge.instances.push(this);}
@@ -41,4 +41,20 @@ test('timeout, worker errors, malformed replies and clone failures all release o
  const timeout=createContinuousReturnVerifyJob(input,{WorkerClass:FakeWorker,timeoutMs:5}),timed=instance;await assert.rejects(timeout.promise,/timed out/);assert.equal(timed.terminations,1);
  class CloneFailure extends FakeWorker{postMessage(){throw Error('Clone failed');}}
  const failed=createContinuousReturnVerifyJob(input,{WorkerClass:CloneFailure}),clone=instance;await assert.rejects(failed.promise,/Clone failed/);assert.equal(clone.terminations,1);
+});
+
+test('verification jobs refuse a completion from the other composition mode',async()=>{
+ let worker;
+ class FakeWorker{constructor(){worker=this;this.terminations=0;}postMessage(){}terminate(){this.terminations++;}}
+ const input={seed:42,sampleRate:48000,originAudioFrame:0};
+ const base={seed:42,originAudioFrame:0,record:{kind:'imagimusic-continuous-tine-record',sampleRate:48000},snapshot:{state:'ended'}};
+ for(const [factory,identity] of [
+  [createContinuousReturnVerifyJob,{kind:'imagimusic-memory-return-completion',version:1}],
+  [createMemoryReturnVerifyJob,{}],
+  [createMemoryReturnVerifyJob,{kind:'imagimusic-memory-return-completion',version:2}],
+ ]){
+  const job=factory(input,{WorkerClass:FakeWorker}),current=worker;
+  current.onmessage({data:{type:'verified',result:{...base,...identity}}});
+  await assert.rejects(job.promise,/verification response/);assert.equal(current.terminations,1);
+ }
 });

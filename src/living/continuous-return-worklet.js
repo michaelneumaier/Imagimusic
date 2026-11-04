@@ -4,6 +4,7 @@ export const CONTINUOUS_RETURN_PROCESSOR='imagimusic-continuous-return';
 class ContinuousReturnProcessor extends AudioWorkletProcessor{
  constructor({processorOptions={}}={}){
   super();
+  if(processorOptions.mode!==undefined&&processorOptions.mode!=='fixed')throw Error('This processor plays the fixed study.');
   if(processorOptions.sampleRate!==sampleRate)throw Error('The continuous study must match the audio context sample rate.');
   this.performance=createContinuousReturnPerformance(processorOptions.seed,{sampleRate});
   this.lastId=-1;this.originAudioFrame=null;this.pending=[];this.terminal=false;this.failed=false;this.lastState='idle';
