@@ -954,3 +954,7 @@ Generated score return implemented: bounded strict silent report import, exact r
 Generator coverage audit: owns tools/audit-living-journey-grammar.mjs, bounded-family copy in journey page and own notes. Enumerate all grammar1 parameter combinations through actual seeds, then audit all three journey plans and performer allocations; distinguish mathematical source diversity from perceived novelty.
 
 Generator coverage audit complete:324reachable/distinct source tuples,972plans and161676exact touch assignments audited; size/instance/return checks pass. Bounded-family copy corrected. Claims released. No exhaustive audio/perceptual/GPU claim; new-seed novelty is explicitly limited and richer musical relationships remain next.
+
+Body relationship study: owns tools/render-living-tuning-study.mjs, tests/living-tuning-study.test.js and own evidence notes. Compare existing, adjacent admitted and precise fifth-related body lengths on the identical arrangement2 score; retain physical changes in mass/decay/output, no normalization or production/schema changes.
+
+Body relationship study complete: six WAV/report pairs across two seeds; baseline PCM identity, preserved score/opening/home and exact intended modal ratios verified by two passing tests. Claims released. Study-only geometry; listening preference, native presentation and independent review remain open.
