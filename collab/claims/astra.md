@@ -938,3 +938,7 @@ Journey media identity complete: all six real WAV/report/current-plan pairs veri
 Journey artifact preparation: owns new tools/prepare-living-journeys.mjs, existing prepare-project-home.mjs and journey page's local render instructions plus own notes. Check/rebuild all six exact report/WAV pairs, integrate with established local preparation, and verify fresh-directory repair without touching current artifacts.
 
 Journey artifact preparation complete: full877tests pass; current sixpairs verify; isolated fresh rebuild/idempotent rerun/single-corrupt-pair repair verified; home --check ready. Claims released. Native browser and musical evaluation still open; no independent review or publication.
+
+Fresh journey render worker: owns new journey-artifact.js/journey-worker.js, real-worker test bridge/tests and own notes. Strict transient seed/treatment request produces bounded PCM16/WAV/hash/plan off main thread through existing cancellable job. Verify exact prepared-fixture identity and actual worker cancellation before any new visitor controls.
+
+Fresh journey worker foundation complete: four real-thread tests pass; fresh boundary seed rendered, dispatched cancellation verified, all three seed42WAV identities retained. Claims released. No visitor generation controls or browser-worker verification yet; transient artifact only, no saved identity or independent review.
