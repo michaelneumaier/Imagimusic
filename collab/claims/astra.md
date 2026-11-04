@@ -1091,3 +1091,5 @@ Continuous ensemble session complete: strict live evidence/acknowledgments, comm
 Ensemble listening entry/discovery complete: explicit Begin/Quiet, optional three-body scene, independent verified component keeping, home/catalog/history and reciprocal link. Full1069tests pass under --no-maglev; HTTP/IDs/syntax/diff pass. Claims released; native/aesthetic assessment and independent review pending; ensemble replay/guest influence remain ahead.
 
 Continuous ensemble keeping foundation complete: strict common-clock three-body record, exact mixed replay/floatWAV worker and reproducible compound artifacts.118focused tests pass under --no-maglev. Claims released; page keep/replay binding, native assessment and independent review ahead.
+
+Ensemble keep/replay interface complete: atomic whole/component keeping, silent file/latest preparation, explicit sound-only replay, shared level, mutual exclusion and retained failures; home/history/catalog updated.123focused tests pass under --no-maglev; HTTP/IDs/syntax/diff pass. Claims released; native/aesthetic assessment and independent review pending.

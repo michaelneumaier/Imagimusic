@@ -2,7 +2,8 @@ import {createAudioRenderJob} from '../audio-render-job.js';
 import {createTineStudyPlayer} from '../tine/study-player.js';
 import {createContinuousListeningStage} from './continuous-return-session.js';
 import {CONTINUOUS_TINE_RECORD_LIMIT} from './continuous-tine-record.js';
-export function setupContinuousReturnReplay({elements,getSource,beforePlay,createPlayer=options=>createTineStudyPlayer({...options,createStage:createContinuousListeningStage}),createJob=text=>createAudioRenderJob(new URL('./continuous-return-audio-worker.js',import.meta.url),text),makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url)}){
+const singleFormat={audioKind:'imagimusic-continuous-return-audio',limit:CONTINUOUS_TINE_RECORD_LIMIT,limitLabel:'512 KiB',validRecord:(record,rate)=>record?.kind==='imagimusic-continuous-tine-record'&&record.sampleRate===rate,notes:record=>record.events.length};
+export function setupContinuousReturnReplay({elements,getSource,beforePlay,format=singleFormat,createPlayer=options=>createTineStudyPlayer({...options,createStage:createContinuousListeningStage}),createJob=text=>createAudioRenderJob(new URL('./continuous-return-audio-worker.js',import.meta.url),text),makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url)}){
  const {file,prepare,cancel,listen,quiet,audio,status,wav,json}=elements,player=createPlayer({audio});let version=0,job=null,busy=false,current=null;
  function update(){cancel.disabled=!busy;listen.disabled=busy||!current;quiet.disabled=audio.paused;}
  function stop(){version++;job?.cancel();job=null;busy=false;player.park();update();}
@@ -10,15 +11,15 @@ export function setupContinuousReturnReplay({elements,getSource,beforePlay,creat
   beforePlay();stop();const own=version;busy=true;update();status.textContent='Reconstructing the kept performance…';
   try{
    const text=await read();if(own!==version)return;job=createJob(text);const artifact=await job.promise;if(own!==version)return;job=null;
-   if(artifact?.kind!=='imagimusic-continuous-return-audio'||artifact.version!==1||!Number.isInteger(artifact.sampleRate)||artifact.sampleRate<8000||artifact.sampleRate>96000||!(artifact.wav instanceof ArrayBuffer)||!Number.isInteger(artifact.frames)||artifact.frames<1||artifact.frames>60*artifact.sampleRate||artifact.wav.byteLength!==58+artifact.frames*4||artifact.record?.kind!=='imagimusic-continuous-tine-record'||artifact.sampleRate!==artifact.record.sampleRate)throw Error('Invalid prepared continuous audio.');
+   if(artifact?.kind!==format.audioKind||artifact.version!==1||!Number.isInteger(artifact.sampleRate)||artifact.sampleRate<8000||artifact.sampleRate>96000||!(artifact.wav instanceof ArrayBuffer)||!Number.isInteger(artifact.frames)||artifact.frames<1||artifact.frames>60*artifact.sampleRate||artifact.wav.byteLength!==58+artifact.frames*4||!format.validRecord(artifact.record,artifact.sampleRate,artifact.frames))throw Error('Invalid prepared continuous audio.');
    const urls=[];try{urls.push(makeURL(new Blob([artifact.wav],{type:'audio/wav'})));urls.push(makeURL(new Blob([JSON.stringify(artifact.record,null,2)+'\n'],{type:'application/json'})));}catch(error){urls.forEach(revokeURL);throw error;}
    const old=current;current={artifact,urls};audio.hidden=true;audio.removeAttribute('src');audio.load();
    wav.href=urls[0];json.href=urls[1];wav.hidden=false;json.hidden=false;old?.urls.forEach(revokeURL);
-   status.textContent=`Ready, silently · ${(artifact.frames/artifact.sampleRate).toFixed(2)} seconds · ${artifact.record.events.length} touches. Choose Listen to replay.`;
+   status.textContent=`Ready, silently · ${(artifact.frames/artifact.sampleRate).toFixed(2)} seconds · ${format.notes(artifact.record)} touches. Choose Listen to replay.`;
   }catch(error){if(own===version&&error.name!=='AbortError')status.textContent=`Could not prepare this performance: ${error.message}`;}
   finally{if(own===version){busy=false;job=null;update();}}
  }
- file.addEventListener('change',()=>{const selected=file.files?.[0];file.value='';if(!selected)return;return open(async()=>{if(!Number.isSafeInteger(selected.size)||selected.size<1||selected.size>CONTINUOUS_TINE_RECORD_LIMIT)throw Error('Choose a performance JSON no larger than 512 KiB.');return selected.text();});});
+ file.addEventListener('change',()=>{const selected=file.files?.[0];file.value='';if(!selected)return;return open(async()=>{if(!Number.isSafeInteger(selected.size)||selected.size<1||selected.size>format.limit)throw Error(`Choose a performance JSON no larger than ${format.limitLabel}.`);return selected.text();});});
  prepare.addEventListener('click',()=>open(()=>{const source=getSource();if(!source)throw Error('Complete a performance first, or open a saved JSON.');return JSON.stringify(source);}));
  cancel.addEventListener('click',()=>{stop();status.textContent='Preparation cancelled. The previous prepared performance is still available.';});
  listen.addEventListener('click',async()=>{
