@@ -828,3 +828,7 @@ Attention handoff refinement: owns attention-view.js and tests plus current evid
 Attention inspection shortcuts: also owns look-main.js/living-look.html chapter buttons to inspect each answer at its first contact+100ms, replacing the single middle-answer shortcut.
 
 Attention handoff refinement complete: persistent zoom-velocity corner measured and removed with smooth variance/influence; six targeted tests pass; native longest-source first/last-answer captures inspected. Claims released. Still workshop-only; no general visibility or comfort verdict.
+
+Attention contact visibility audit: owns tests/living-attention-visibility.test.js and current evidence/plan appendices. Project full head bounding cubes at approach/contact/recovery for all fixture events, both arrangements and wide/square/portrait aspects. Scope is screen containment, not occlusion or motion comfort; inspect dense native case.
+
+Attention contact audit complete:54000projection checks pass across9fixtures/2scores/3aspects/5phases; minimum5.917%image-edge margin. Dense native round inspected and completed14.1sreturn. Claims released. Next versioned4 integration; production unchanged in this audit.

@@ -229,3 +229,7 @@ The existing visual workshop now has a phrase-level attention candidate: anticip
 ## Camera handoffs refined
 
 Measured a zoom-velocity corner in the first attention candidate and replaced the maximum-based radius with a smooth weighted-spread curve. The handoff regression now converges toward zero velocity discontinuity. First, middle and last answer shortcuts make the existing workshop useful for inspecting an entire passage’s framing. The longest generated source has been inspected at its first and last entries: closer attention can crop silent neighbours, and a new answer initially shares the frame with the previous release. These are explicit artistic tradeoffs to assess, not a reason to silently change saved appearances.
+
+## Attention is ready for versioned integration
+
+A contact-framing audit covers every assigned head’s approach/contact/recovery in nine fixtures, both arrangements and three screen shapes. All54000projected bounding-cube corners fit with margin; the dense native round also reaches its return and keeps all three groups in the inspected overlap. Together with the first/last spacious shots and smooth handoff regression, this supports integrating the candidate as a new presentation4. The next step must preserve1/2/3, carry cameraShot through live and film state, honor held/reduced-motion views, and verify an actual film. This is a visual direction decision, not proof of universal framing, lack of occlusion or listener preference.
