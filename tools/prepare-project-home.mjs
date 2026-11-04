@@ -6,6 +6,7 @@ import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 import {checkLivingJourneyArtifacts} from './prepare-living-journeys.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['When an opening returns','renders/living-memory-ensemble-study','tools/render-memory-ensemble-study.mjs',[],false,'memory-ensemble'],
  ['A phrase remembered','renders/living-journey-study','tools/prepare-living-journeys.mjs',[],false,'journey'],
  ['How should a generated piece answer?','renders/living-generated-answer-study','tools/render-living-answer-study.mjs',['--generated']],
  ['A phrase with room to breathe','renders/living-answer-study','tools/render-living-answer-study.mjs'],
@@ -36,7 +37,7 @@ async function available(directory,visual=false,kind=null){
   if(!files.length&&!visual)return false;
   if(visual)files.push(...[...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(m=>m[1]));
   await Promise.all(files.map(file=>fs.access(path.join(root,directory,file))));
-  await fs.access(path.join(root,directory,'report.json'));
+  await fs.access(path.join(root,directory,kind==='memory-ensemble'?'comparison.json':'report.json'));
   return true;
  }catch{return false;}
 }

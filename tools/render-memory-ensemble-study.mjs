@@ -1,3 +1,4 @@
+import {openPhrasePlayer} from './open-phrase-player.mjs';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -20,4 +21,14 @@ for(const name of ['joined','remembered']){
  outputs.push({name,seconds:48,events:record.records.map(r=>r.events.length),previewGain:24,mixGain:1/3,peak,sha256:createHash('sha256').update(wav).digest('hex'),plan:p.plan});
 }
 writeFileSync(resolve(directory,'comparison.json'),JSON.stringify({kind:'imagimusic-memory-ensemble-comparison',version:1,guests,outputs,scope:'Same scripted guest input, bodies and fixed mix/preview gain. Only space and recollection change. First three accepted guests before6seconds answer at18.5seconds on next numbered voices at65percent strength and at36.5seconds on their original voices at85percent. Relative timing compresses uniformly only if the gesture spans more than3seconds. Original opening/home remain. This is a bounded authored response, not learned preference or emotional interpretation. Raw compound JSONs reopen for sound-only replay on the ensemble page; this comparison report is not an import. No native playback, recognition or aesthetic preference claim.'},null,2)+'\n');
+writeFileSync(resolve(directory,'index.html'),openPhrasePlayer({
+ title:'When an opening returns',
+ intro:'Three small touches enter a piece already unfolding. Hear the same opening twice: once with the written score continuing, once with those touches shaping later answers. Each example lasts 48 seconds; choose one, then simply listen.',
+ question:'The examples first differ at 18.5 seconds. In the remembered version, the opening rhythm answers through neighboring voices, then returns on its original voices at 36.5 seconds. Does that connection come through? Does either version invite you to stay? Hearing no meaningful difference is useful too.',
+ disclosure:'Authored demonstration, not a recording of your playing: three positive touches at 1.0, 1.1 and 1.8 seconds on voices 3, 1 and 2. Same seed, independent 80/95/65 mm four-mode tine models and shared clock. Only the two answer passages change; the opening and final homecoming score stay intact, although their continuing physical states can differ. Preview files use the same fixed one-third mix, gain 24 and centered stereo PCM16 encoding, with no per-example normalization or loudness matching. Their raw captured histories reconstruct exactly. This comparison does not establish recognition, preference, acoustic realism or measured device synchronization.',
+ cases:outputs.map(output=>({label:output.name==='joined'?'Joined · the written score continues':'Remembered · the opening shapes two answers',file:output.name+'.wav',wavSha256:output.sha256})),
+ playLinkLabel:'Try a small opening of your own ↗',playLinkHref:'../../living-ensemble.html',
+ listeningDb:0,listeningKey:'imagimusic-memory-ensemble-study-db',
+ listeningHelp:'Both examples share this extra listening level, remembered in this browser. The WAV previews already contain a fixed gain of 24; this control changes playback only. Strong peaks meet a sample ceiling and can change tone. No example is normalized separately.',
+}));
 console.log(JSON.stringify({directory,outputs:outputs.map(({plan,...rest})=>rest)},null,2));

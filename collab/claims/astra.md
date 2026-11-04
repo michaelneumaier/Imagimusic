@@ -1107,3 +1107,5 @@ Remembered ensemble audio contracts complete: explicit worklet/completion identi
 Remembered ensemble body view complete: explicit optional mode, atomic derived-score admission, physical-state agreement and held-scene binding. 156 focused tests pass under --no-maglev. Claims released; session/UI integration and independent/native assessment remain ahead.
 
 Remembered ensemble browser integration complete: mode-specific session/worklet/default verifier, atomic adaptive history, optional locked style, accepted-input phase wording, home/catalog milestone and keeping continuity. Full 1,125 tests pass under --no-maglev; HTTP/IDs/syntax/diff checks pass. Claims released. Native listening, artistic assessment and independent review remain open.
+
+Remembered ensemble listening comparison complete: explicit one-player generated study, unchanged WAV hashes, local hash-bearing notes, accurate gain disclosure, catalog discovery and home preparation. Render/reconstruction, template smoke, HTTP/IDs, home readiness and syntax/diff checks pass. Claims released; native/aesthetic and independent assessment remain open.
