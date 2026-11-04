@@ -740,3 +740,5 @@
 - 2026-11-03 (Astra): composition workshop compares original round with gesture-span-based spaced answers for four sources (eight WAVs). Exact original/return preservation, six focused tests, independent WAV/hash checks and native narrow playback/tab-away verified. Production score stays v1; recognition-versus-momentum listening decision remains open.
 
 - 2026-11-04 (Astra): visual workshop now pairs original/spaced greeting scores with their matching audio, score-derived chapters and composition-named stills. Native quiet selection, active-score switching,14.5s return and capture-link identity verified; six answer/view checks pass. Main experience/film contracts unchanged.
+
+- 2026-11-04 (Astra): held-camera comparison added to visual workshop with reduced-motion initialization, retained user choice and camera-named stills. Native composition retention, wide return and playback-to-paused camera toggle verified. Narrow silhouettes remain the next visual refinement target.

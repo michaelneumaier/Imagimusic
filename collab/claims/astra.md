@@ -690,3 +690,7 @@ Living answer composition comparison complete: eight local WAVs/report/manual wo
 Living visual composition comparison: owns living-look.html, src/living/look-main.js and tests/living-answer-study.test.js. Add explicit original/spaced greeting selection with matching generated audio, plan-derived chapter moments and quiet reset; keep production scene/film defaults unchanged.
 
 Living visual composition comparison complete: matching score/audio, quiet reset, adaptive chapters and named stills checked natively; six focused answer/view tests pass. Claim released.
+
+Living workshop still-camera route: owns living-look.html and look-main.js. Explicit camera-follow option, reduced-motion initial preference and user-choice retention, accurate scene labels and camera-named stills. Reuse existing scene wide/orbit behavior; no production change.
+
+Living workshop still-camera route complete: native retained choice, wide return, named capture link and active-playback pause checked; reduced-motion wiring inspected without changing OS preferences. Claim released.
