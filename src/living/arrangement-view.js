@@ -1,8 +1,10 @@
+import {createTineDampedRelease} from '../tine/damped-release.js';
 import {createLivingResponse} from './response.js';
 /** Project the immutable rendered plan onto its three bodies. Each complete
  * voice has its own local clock; no visible response before its accepted touch.
  */
 export function createLivingArrangementView(plan){
+ const releases=plan.bodies.map((record,i)=>plan.releases?.[i]?createTineDampedRelease(record,plan.releases[i]):null);
  const responses=plan.bodies.map(record=>{const view=createLivingResponse(record.design,record.sampleRate);record.events.forEach(e=>view.accept(e));return view;});
  return {at(seconds){
   if(!Number.isFinite(seconds)||seconds<0||seconds>plan.frames/plan.sampleRate)throw Error('Arrangement time is outside the recording.');
@@ -10,7 +12,7 @@ export function createLivingArrangementView(plan){
   for(const voice of plan.voices){
    const localFrame=frame-voice.startFrame,record=plan.bodies[voice.body];
    const count=record.events.filter(e=>e.frame<=localFrame).length;touches+=count;
-   if(frame>=voice.startFrame&&frame<voice.endFrame)bodies[voice.body]={points:responses[voice.body].at(Math.max(0,localFrame)/plan.sampleRate).points,touched:count>0};
+   if(frame>=voice.startFrame&&frame<voice.endFrame)bodies[voice.body]={points:(releases[voice.body]&&localFrame>=releases[voice.body].startFrame?releases[voice.body]:responses[voice.body]).at(Math.max(0,localFrame)/plan.sampleRate).points,touched:count>0};
   }
   const ease=x=>{const u=Math.max(0,Math.min(1,x));return u*u*(3-2*u);};
   const openingEnd=plan.voices[0].endFrame,answerEnd=plan.voices[3].endFrame;

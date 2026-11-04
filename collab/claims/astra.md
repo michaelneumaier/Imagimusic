@@ -850,3 +850,7 @@ Partial-reply tail evidence complete:54 source-window measurements verified, reg
 Damped release foundation: owns new src/tine/damped-release.js and tests/tine-damped-release.test.js plus evidence appendices. Experimental post-touch added modal viscous damping with continuous displacement/velocity and matched response/audio; no finite contact or saved-schema change. Existing physics/kernel remain untouched.
 
 Damped release foundation complete:9 focused tests pass;5 experimental whole-piece WAVs rendered with unchanged other voices and explicit distributed-loss limits. Claims released. Matching workshop integration and listening assessment remain next; no independent review claimed.
+
+Released-reply workshop integration: owns src/living/{answer-study,arrangement-view,choreography,look-main}.js, living-look.html, tools/render-living-answer-study.mjs and new released-study integration test. Share explicit first-answer release metadata between audio, response and comparison; retain earlier scores and published hashes.
+
+Released-reply workshop integration complete:36WAVs regenerated with matched response/model metadata;66focused tests pass; native generated playback reaches18.23sreturn. Claims released. Whole-piece preference and any new saved arrangement remain open; no independent review claimed.

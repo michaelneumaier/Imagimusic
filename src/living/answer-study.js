@@ -1,4 +1,5 @@
 import {createLivingArrangement,renderLivingArrangement} from './arrangement.js';
+import {createTineDampedRelease} from '../tine/damped-release.js';
 import {renderTineLiveRecord} from '../tine/live-record.js';
 
 /** Experimental score, deliberately outside the saved encounter schema.
@@ -30,10 +31,24 @@ export function createLivingFragmentAnswer(value){
   derivation:Object.freeze({rule:'first-half-onset-groups',retainedSourceIndices:Object.freeze(events.flatMap((e,i)=>e.frame<=last?[i]:[])),omittedSourceIndices:Object.freeze(events.flatMap((e,i)=>e.frame>last?[i]:[]))})});
 }
 
+/** The same fragment score, with ideal distributed loss on its first answer.
+ * If a recording ends sooner, engagement is limited to its fade start.
+ * Metadata is study-only and never accepted as a saved encounter version.
+ */
+export function createLivingReleasedAnswer(value){
+ const base=createLivingFragmentAnswer(value),body=base.bodies[1];
+ const release=Object.freeze({startFrame:Math.min(body.fadeStart,body.events.at(-1).frame+Math.round(.45*base.sampleRate)),addedDecayRate:12});
+ return Object.freeze({...base,kind:'imagimusic-living-released-study',releases:Object.freeze([null,release,null])});
+}
+export function renderLivingStudyBody(plan,index){
+ const record=plan.bodies[index],release=plan.releases?.[index];
+ return release?createTineDampedRelease(record,release).render():renderTineLiveRecord(record);
+}
+
 export function renderLivingAnswerStudy(value,treatment='spaced'){
  if(treatment==='round')return renderLivingArrangement(value);
- if(!['spaced','fragment'].includes(treatment))throw Error('Unknown answer treatment.');
- const plan=treatment==='fragment'?createLivingFragmentAnswer(value):createLivingSpacedAnswer(value),stems=plan.bodies.map(b=>renderTineLiveRecord(b).channels[0]);
+ if(!['spaced','fragment','released'].includes(treatment))throw Error('Unknown answer treatment.');
+ const plan=treatment==='released'?createLivingReleasedAnswer(value):treatment==='fragment'?createLivingFragmentAnswer(value):createLivingSpacedAnswer(value),stems=plan.bodies.map((b,i)=>renderLivingStudyBody(plan,i).channels[0]);
  const sum=[new Float64Array(plan.frames),new Float64Array(plan.frames)];
  for(const v of plan.voices){
   const angle=(v.pan+1)*Math.PI/4,gains=[Math.cos(angle)*v.gain,Math.sin(angle)*v.gain];
