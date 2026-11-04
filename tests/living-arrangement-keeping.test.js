@@ -11,7 +11,7 @@ import {createTineLiveComparison} from '../src/tine/live-comparison.js';
 import {readLivingKeptFile} from '../src/living/recipe-file.js';
 
 test('spacious encounters survive address, recipe, paired origin and every film frame',async()=>{
- for(const source of [createLivingGreeting(),createLivingGeneratedPhrase(42).source])for(const presentationVersion of [1,2,3]){
+ for(const source of [createLivingGreeting(),createLivingGeneratedPhrase(42).source])for(const presentationVersion of [1,2,3,4]){
   const record=createLivingRecord(source,{arrangementVersion:2,presentationVersion});
   assert.deepEqual(readLivingAddress(livingFragment(record)),record);
   assert.deepEqual(await readLivingKeptFile(new Blob([JSON.stringify(record)])),record);

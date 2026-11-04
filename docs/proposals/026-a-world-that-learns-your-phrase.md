@@ -233,3 +233,14 @@ Measured a zoom-velocity corner in the first attention candidate and replaced th
 ## Attention is ready for versioned integration
 
 A contact-framing audit covers every assigned head’s approach/contact/recovery in nine fixtures, both arrangements and three screen shapes. All54000projected bounding-cube corners fit with margin; the dense native round also reaches its return and keeps all three groups in the inspected overlap. Together with the first/last spacious shots and smooth handoff regression, this supports integrating the candidate as a new presentation4. The next step must preserve1/2/3, carry cameraShot through live and film state, honor held/reduced-motion views, and verify an actual film. This is a visual direction decision, not proof of universal framing, lack of occlusion or listener preference.
+
+
+## Phrase attention adopted; automatic musical form next
+
+Fresh encounters now use Following the answer (presentation4), including saved recipes, addresses and films. Older appearances remain reproducible. The actual525-frame film reconstructs exactly and the full845-test suite passes. Held viewing remains available. This completes the camera adoption proposed above; it does not establish a listening preference.
+
+Michael clarified that little or no ongoing input is central. Treat three entrances as equally complete: listen to an automatic piece, offer one small seed, or play and then step back. The automatic path must have its own satisfying musical form; participation is optional. Spirituality and psychedelia should arise through recognizable recurrence, transformed perspective, shared rhythm, spaciousness and return, without claims about altered consciousness.
+
+Next composition experiment: develop one bounded journey from the existing six-touch generated seed. Establish the motif alone, answer with a deliberately sparse fragment, let the full motif become recognizable across the three bodies, leave a measured breath, then return to the original. Compare it with the current round using the exact same seed and listening gain. The fragment should retain actual source onsets/accents rather than generate unrelated decorative activity. Plan rests from sounding tails as well as note spans. Avoid randomizing every section: memory of the initial motif is the point.
+
+Before adoption, produce inspectable score and audio evidence, stage each actual touch with its assigned performer, and evaluate the whole passage in the existing workshop. If the treatment earns adoption, give it a distinct arrangement identity carried through keeping/live/film, preserving earlier scores. No new visitor settings or study destination are needed for the first comparison. Do not label numerical validity as musical beauty; listener assessment remains necessary. An endless mode comes after a short piece can end convincingly.

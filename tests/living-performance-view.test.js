@@ -46,6 +46,6 @@ test('contact presentation does not change sound and can hide veils or hold the 
  const signed={...source,events:[{frame:24000,strength:-.05}]};
  assert.doesNotThrow(()=>createLivingRecord(signed,{presentationVersion:2}));
  assert.throws(()=>createLivingRecord(signed,{presentationVersion:3}),/positive/);
- assert.throws(()=>validateLivingRecord({...record,presentationVersion:4}));
- for(const version of [4,'3','__proto__',null])assert.throws(()=>createLivingPerformanceView(source,version));
+ assert.throws(()=>validateLivingRecord({...record,presentationVersion:5}));
+ for(const version of [5,'3','__proto__',null])assert.throws(()=>createLivingPerformanceView(source,version));
 });

@@ -17,7 +17,7 @@ import {createTineDesign} from '../tine/address.js';
 import {tineLiveFragment} from '../tine/live-address.js';
 const $=id=>document.getElementById(id),canvas=$('instrument'),status=$('scene-status'),buttons=[...document.querySelectorAll('[data-view]')];
 const design=createTineDesign();
-let arrangementVersion=1,presentationVersion=3,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
+let arrangementVersion=1,presentationVersion=4,playingDesign=design,branchCapture=null,seenBranch=null,branchReturnFocus=false;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let choseCameraMotion=false;
 $('camera-motion').checked=!motionPreference.matches;
 $('camera-motion').addEventListener('change',()=>{choseCameraMotion=true;});

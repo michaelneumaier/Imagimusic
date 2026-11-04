@@ -7,7 +7,7 @@ const solo={target:[3.5,2,0],direction:unit([10,6.5,14]),radius:6.6};
 const wide={target:[3,2,-2],direction:unit([5,9,19]),radius:16};
 const positions=[[0,0,0],[-11,0,-4],[10,0,-4]];
 
-/** Workshop-only phrase-level attention. Each answer draws the camera in
+/** Presentation4 phrase-level attention. Preserve for saved encounters/films. Each answer draws the camera in
  * over800ms before its first touch, holds through its final touch plus300ms,
  * then releases over800ms. Overlapping invitations share a weighted frame.
  * This is artistic direction, not acoustic energy or a physical camera model.

@@ -832,3 +832,9 @@ Attention handoff refinement complete: persistent zoom-velocity corner measured 
 Attention contact visibility audit: owns tests/living-attention-visibility.test.js and current evidence/plan appendices. Project full head bounding cubes at approach/contact/recovery for all fixture events, both arrangements and wide/square/portrait aspects. Scope is screen containment, not occlusion or motion comfort; inspect dense native case.
 
 Attention contact audit complete:54000projection checks pass across9fixtures/2scores/3aspects/5phases; minimum5.917%image-edge margin. Dense native round inspected and completed14.1sreturn. Claims released. Next versioned4 integration; production unchanged in this audit.
+
+Presentation4 adoption: owns presentation.js, record.js, performance-view.js, movie-plan.js, main.js, attention-view.js identity comment, living.html and relevant tests/movie browser fixture. New fresh encounters use phrase attention; earlier1/2/3 unchanged; held films must null cameraShot before render. Full regression and actual native film before milestone.
+
+Presentation4 discovery/evidence: also owns living-look.html published-treatment copy, catalog description and current plan/evidence appendices.
+
+Presentation4 adoption complete:59 targeted and845 full tests pass; actual525-frame film reconstructed, native generated recipe/address identity checked. Evidence and next low-input composition experiment documented. Claims released; no independent review claimed.
