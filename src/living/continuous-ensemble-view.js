@@ -1,12 +1,15 @@
 import {createContinuousEnsembleStudy} from './continuous-ensemble-study.js';
+import {createMemoryEnsembleStudy} from './memory-ensemble-study.js';
 import {requestForTineDesign} from '../tine/address.js';
 import {createTineImpulse} from '../tine/impulse.js';
 
 /** A visual reading of acknowledged score events. Each body has its own state;
  * spatial relationships stage the musical exchange, not mechanical coupling.
  * Veils show magnified displacement bounds, not audio-frequency motion. */
-export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
- const plan=createContinuousEnsembleStudy(seed,{sampleRate}),models=plan.bodies.map(body=>createTineImpulse(requestForTineDesign(body).geometry));
+export function createContinuousEnsembleView(seed=42,{sampleRate=48000,mode='fixed'}={}){
+ if(!['fixed','memory'].includes(mode))throw Error('Choose a supported ensemble visual composition mode.');
+ let plan=(mode==='memory'?createMemoryEnsembleStudy:createContinuousEnsembleStudy)(seed,{sampleRate}),memory=[],sealed=false;
+ const models=plan.bodies.map(body=>createTineImpulse(requestForTineDesign(body).geometry));
  const units=models.map((model,i)=>model.strike({activation:plan.bodies[i].activation,impulseNs:1e-6}));
  const positions=Array.from({length:81},(_,i)=>i/80),shapes=models.map(model=>positions.map(u=>model.modes.map(mode=>Math.abs(mode.shape(u)))));
  const checkpoints=[[],[],[]],history=[];let scores=0,fadeStart=plan.frames-Math.round(.025*sampleRate);
@@ -21,24 +24,30 @@ export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
  }
  function accept(batch){
   if(!Array.isArray(batch)||history.length+batch.length>3*4096)throw Error('Invalid ensemble visual history.');
-  const next=[[],[],[]],events=[];let scoreCount=scores,previousFrame=history.at(-1)?.frame??0;
+  const next=[[],[],[]],events=[];let scoreCount=scores,previousFrame=history.at(-1)?.frame??0,candidatePlan=plan,candidateSealed=sealed;const candidateMemory=memory.slice();
   for(const input of batch){
    const body=input?.body;
    if(!input||!Number.isInteger(body)||body<0||body>2||!['score','guest'].includes(input.origin)||!Number.isInteger(input.frame)||input.frame<previousFrame||input.frame>fadeStart||!Number.isFinite(input.strength)||input.strength===0||Math.abs(input.strength)>.1||input.index!==checkpoints[body].length+next[body].length||input.index>=4096)throw Error('The visible ensemble differs from its accepted score.');
-   const expected=plan.events[scoreCount];
+   if(mode==='memory'&&!candidateSealed&&input.frame>=6*sampleRate){candidatePlan=createMemoryEnsembleStudy(seed,{sampleRate,contributions:candidateMemory});candidateSealed=true;}
+   const expected=candidatePlan.events[scoreCount];
    if(input.origin==='score'){
     if(!expected||input.body!==expected.body||input.frame!==expected.frame||input.strength!==expected.strength)throw Error('The visible ensemble differs from its accepted score.');scoreCount++;
-   }else if(expected?.frame<=input.frame)throw Error('A guest cannot precede a due ensemble score note.');
+   }else{
+    if(expected?.frame<=input.frame)throw Error('A guest cannot precede a due ensemble score note.');
+    if(mode==='memory'&&input.frame<6*sampleRate&&candidateMemory.length<3)candidateMemory.push({body,frame:input.frame,strength:input.strength,index:input.index,origin:'guest'});
+   }
    previousFrame=input.frame;
    const previous=next[body].at(-1)??checkpoints[body].at(-1),state=propagate(body,previous,input.frame);
    state.v.forEach((_,i)=>state.v[i]+=input.strength*units[body].initialVelocity[i]);
    const event=Object.freeze({body,frame:input.frame,strength:input.strength,index:input.index,origin:input.origin});
    next[body].push({...state,event});events.push(event);
   }
-  next.forEach((items,body)=>checkpoints[body].push(...items));history.push(...events);scores=scoreCount;
+  next.forEach((items,body)=>checkpoints[body].push(...items));history.push(...events);scores=scoreCount;plan=candidatePlan;memory=candidateMemory;sealed=candidateSealed;
  }
  function end(frame){
-  if(!Number.isInteger(frame)||frame<0||frame>fadeStart||frame<(history.at(-1)?.frame??0))throw Error('Invalid ensemble visual ending.');fadeStart=frame;
+  if(!Number.isInteger(frame)||frame<0||frame>fadeStart||frame<(history.at(-1)?.frame??0))throw Error('Invalid ensemble visual ending.');
+  if(mode==='memory'&&!sealed&&frame>=6*sampleRate){plan=createMemoryEnsembleStudy(seed,{sampleRate,contributions:memory});sealed=true;}
+  fadeStart=frame;
  }
  function at(seconds){
   if(!Number.isFinite(seconds)||seconds<0||seconds>48)throw Error('Invalid ensemble visual time.');
@@ -54,5 +63,5 @@ export function createContinuousEnsembleView(seed=42,{sampleRate=48000}={}){
   });
   return {seconds,frame,touches,instances,performers:[]};
  }
- return Object.freeze({plan,layout,magnification,accept,end,at,get accepted(){return history.slice();}});
+ return Object.freeze({get plan(){return plan;},layout,magnification,accept,end,at,get accepted(){return history.slice();}});
 }

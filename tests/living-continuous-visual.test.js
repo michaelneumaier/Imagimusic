@@ -1,3 +1,4 @@
+import {createMemoryEnsemblePerformance} from '../src/living/memory-ensemble-study.js';
 import test from 'node:test';
 import {createContinuousEnsembleVisual} from '../src/living/continuous-ensemble-visual.js';
 import {createContinuousEnsemblePerformance} from '../src/living/continuous-ensemble-study.js';
@@ -67,4 +68,14 @@ test('mismatched ensemble completion removes only its picture',async()=>{
  const f=fixture({createBinding:createContinuousEnsembleVisual}),p=createContinuousEnsemblePerformance();f.view.begin(42);await flush();p.start();p.quiet();p.process(new Float32Array(1200));
  const records=structuredClone(p.records());records[1].fadeStart=1;f.view.update({state:'ended',finished:{records}});
  assert.equal(f.disposed,1);assert.equal(f.tasks.size,0);assert.match(f.status.textContent,/Listening and keeping still work/);
+});
+
+
+test('ensemble binding displays remembered answers on their actual bodies through completion',async()=>{
+ const f=fixture({createBinding:createContinuousEnsembleVisual}),p=createMemoryEnsemblePerformance();f.view.begin(42,{mode:'memory'});await flush();p.start();
+ f.view.update({state:'playing',events:p.tryGuest(2,.05).events});
+ while(p.frame<888128)f.view.update({state:'playing',events:p.process(new Float32Array(Math.min(4096,888128-p.frame)))});
+ f.time=18.5;f.tick(0);assert.equal(f.frames.at(-1).instances[0].touchMarker.frame,888000);assert.equal(f.frames.at(-1).instances[2].touchMarker,null);
+ while(p.state!=='ended')f.view.update({state:'playing',events:p.process(new Float32Array(4096))});
+ f.view.update({state:'ended',finished:{records:p.records()}});assert.equal(f.disposed,0);assert.equal(f.frames.at(-1).touches,p.records().reduce((n,r)=>n+r.events.length,0));assert.ok(f.frames.at(-1).instances.every(body=>body.endingOpacity===0));assert.equal(f.tasks.size,0);f.view.dispose();
 });
