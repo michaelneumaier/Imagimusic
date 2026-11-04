@@ -802,3 +802,7 @@ Generated audition regeneration: also owns prepare-project-home.mjs registry ent
 Generated comparison evidence: also owns current appendices in proposal026 and astra-living-instrument notes. Preserve existing production arrangements and saved identities; this is comparison evidence, not a listening verdict.
 
 Generated composition comparison complete:10auditions, measured score-span tradeoff, matching existing visual-workshop source selection and preparation helper verified.15targeted tests;10WAV audits;8legacyWAV hashes unchanged; native generated playback and authored return checked. Evidence/plan updated; claims released. Production remains round1 pending explicit versioned choice work.
+
+Versioned spacious score foundation: owns src/living/arrangement.js, performance-view.js, choreography.js and tests/living-arrangement-versions.test.js. Introduce explicit arrangement2 with the measured spaced timing and shared contact timeline; preserve default1. Saved-record and visitor adoption remain a subsequent integration, so record readers still refuse2 until all paths carry it.
+
+Versioned spacious score foundation complete: explicit2 and shared timed contacts verified against nine study fixtures;27targeted checks and final4version checks pass; direct pre-change default output comparison unchanged. Claims released. Visitor/record/worker/film integration remains next; no premature schema admission or default change.
