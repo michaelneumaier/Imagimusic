@@ -978,3 +978,7 @@ Homepage journey checkpoint complete: current access, roadmap, history and exist
 Journey film source: owns new src/living/journey-movie-plan.js and tests/living-journey-movie-plan.test.js plus own notes. Snapshot canonical selected journey, held layout/reveal and fixed30fps frame state with explicit hash scope; no browser encoder or saved flagship identity changes yet.
 
 Journey film source complete: canonical30fps frame source, immutable identity and applied reveal; two focused tests pass, six manifests16870frames match existing report/WAV identities and durations. Claims released. Encoder/controls/native artifact verification remain ahead; no film-ready claim.
+
+Journey film soundtrack: owns new journey-movie-audio.js/tests and own notes. Snapshot generated artifact, validate full score/film identity and canonical PCM16 WAV header/hash, decode actual kept samples for future AAC encoding and preserve exact WAV; cancellation across hashing.
+
+Journey film soundtrack complete: three focused tests pass; six regenerated soundtracks match existing prepared WAV hashes and exact movie-plan samples. Canonical PCM16 decode retains original bytes, snapshots callers and checks cancellation. Claims released. Encoder/visitor/native verification remain ahead.
