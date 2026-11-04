@@ -62,3 +62,10 @@ test('journey adapter follows chapter changes and backward seeking in one scene'
  f.audio.paused=true;f.audio.currentTime=2;f.audio.fire('seeked');assert.equal(f.frames.at(-1).chapter,0);assert.equal(f.frames.at(-1).touches,1);assert.equal(f.tasks.size,0);
  f.audio.currentTime=144;f.audio.ended=true;f.audio.fire('ended');assert.deepEqual(f.frames.at(-1).savedTouches,[]);assert.equal(f.layouts.length,1);f.view.dispose();
 });
+
+test('ending comparison changes its physical picture only for the modeled-loss source',async()=>{
+ const {createEnsembleEndingView}=await import('../src/living/ensemble-ending-view.js'),{createEnsembleJourneyStudy}=await import('../src/living/ensemble-journey-study.js'),{createContinuousTineRelease}=await import('../src/living/continuous-tine-release.js');
+ const records=createEnsembleJourneyStudy().chapters.map(c=>c.record),checkpoints=records.map((r,c)=>r.records.map(body=>createContinuousTineRelease(body,{startFrame:(c===2?42:45)*48000}).checkpoint));
+ const f=fixture({createModels:createEnsembleEndingView});f.prepared={identity:'blob:one',record:{records,checkpoints,treatment:'modeled'}};f.audio.currentTime=46;f.play();await flush();const modeled=f.frames.at(-1).instances[0];assert.equal(modeled.releaseEngaged,true);
+ f.prepared={identity:'blob:two',record:{records,checkpoints,treatment:'gentler'}};f.audio.src='blob:two';f.play();await flush();const fade=f.frames.at(-1).instances[0];assert.equal(fade.releaseEngaged,undefined);assert.ok(fade.points[40].boundM>modeled.points[40].boundM);assert.equal(f.disposed,1);assert.equal(f.audio.paused,false);f.view.dispose();
+});
