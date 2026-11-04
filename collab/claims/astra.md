@@ -1101,3 +1101,5 @@ Ensemble guest audio/view evidence complete: body/strength worklet commands, exa
 Optional ensemble browser participation complete: correlated guest history, one-pending command lifecycle, optional body/strength controls, view/keep/replay continuity and home/catalog/history. Full1091tests pass under --no-maglev; HTTP/IDs/syntax/diff pass. Claims released; adaptive ensemble replies, native assessment and independent review ahead.
 
 Remembered ensemble research complete: separate performance/study, exact no-input continuity, two bounded cross-voice answers, capacity/boundary coverage and reproducible comparison. 141 focused tests pass under --no-maglev. Claims released; browser integration, native listening and independent review remain ahead.
+
+Remembered ensemble audio contracts complete: explicit worklet/completion identity, adaptive reconstruction, cancellable worker and production-host tests. 151 focused tests pass under --no-maglev. Claims released; matching visual/session/browser mode and independent/native assessment ahead.
