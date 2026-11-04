@@ -4,6 +4,7 @@ import {createContinuousEnsembleReplayView} from './continuous-ensemble-replay-v
 /** Optional picture of the worker-admitted saved capture, driven by media time.
  * Never changes audio, playback state or the live instrument's scene. */
 export function createContinuousEnsembleReplayVisual({audio,canvas,motion,cues=null,disclosures,status,getPrepared,
+ createModels=record=>({view:createContinuousEnsembleReplayView(record),motion:createSavedTouchMotion(record)}),
  loadScene=async()=>(await import('./scene.js')).createLivingScene,
  schedule=requestAnimationFrame,cancel=cancelAnimationFrame,visibilityTarget=document,
  isVisible=()=>!document.hidden&&disclosures.every(details=>details.open),
@@ -43,7 +44,7 @@ export function createContinuousEnsembleReplayVisual({audio,canvas,motion,cues=n
   if(disposed)return;
   try{
    const prepared=getPrepared();if(!prepared||prepared.identity!==source())throw Error('Saved picture does not match the playing source.');
-   if(identity!==prepared.identity){clear();model=createContinuousEnsembleReplayView(prepared.record);choreography=createSavedTouchMotion(model.record);identity=prepared.identity;}
+   if(identity!==prepared.identity){clear();const models=createModels(prepared.record);model=models.view;choreography=models.motion;identity=prepared.identity;}
    last=-Infinity;ensureScene();refresh();
   }catch{clear();fail();}
  }

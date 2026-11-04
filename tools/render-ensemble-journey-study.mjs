@@ -7,12 +7,12 @@ import {renderContinuousEnsembleRecord} from '../src/living/continuous-ensemble-
 import {stereoWav} from '../src/loom/model.js';
 import {openPhrasePlayer} from './open-phrase-player.mjs';
 const directory=resolve(process.argv[2]??'renders/living-ensemble-journey-study');mkdirSync(directory,{recursive:true});
-const plan=createEnsembleJourneyStudy(),sampleRate=plan.sampleRate,mono=new Float32Array(plan.seconds*sampleRate),chapters=[];
+const plan=createEnsembleJourneyStudy(),sampleRate=plan.sampleRate,mono=new Float32Array(plan.seconds*sampleRate),chapters=[],admittedRecords=[];
 let offset=0;
 for(const [index,chapter] of plan.chapters.entries()){
  const rendered=renderContinuousEnsembleRecord(chapter.record),samples=rendered.channels[0];
  assert.equal(samples.length,48*sampleRate);assert.ok(samples.at(-1)===0);
- mono.set(samples,offset);
+ mono.set(samples,offset);admittedRecords.push(rendered.record);
  const file=`chapter-${index+1}.json`;writeFileSync(resolve(directory,file),JSON.stringify(rendered.record,null,2)+'\n');
  chapters.push({name:chapter.name,startSeconds:offset/sampleRate,seconds:rendered.seconds,file,events:chapter.events,rawSha256:createHash('sha256').update(new Uint8Array(samples.buffer)).digest('hex')});offset+=samples.length;
 }
@@ -24,4 +24,7 @@ writeFileSync(resolve(directory,'report.json'),JSON.stringify({kind:'imagimusic-
 const cases=[{label:'Arrival → Wandering → Homecoming · 2:24',file:'journey.wav',wavSha256}];
 let html=openPhrasePlayer({title:'A way home',intro:'Begin once and let a small musical idea travel. Three ringing instruments share, scatter and gradually recover its shape. Nothing needs to be played or adjusted.',question:'Did you recognize something returning near the end? Was the space between phrases inviting, or did your attention drift? Either response helps us shape the next version.',disclosure:scope,cases,playLinkHref:'../../living-ensemble.html',playLinkLabel:'Return to the live ensemble ↗',listeningDb:0,listeningKey:'imagimusic-ensemble-journey-db',listeningHelp:'The file uses fixed preview gain 24. This control adds the same playback level throughout; begin quietly.'});
 html=html.replace('<small>','<details><summary>Keep or inspect the chapters</summary><p>Each chapter can be reopened separately in the live ensemble’s saved-performance player.</p>'+chapters.map(c=>`<p><a href="${c.file}" download>${c.name} · saved instruments ↓</a> · begins at ${c.startSeconds} seconds</p>`).join('')+'</details><small>');
+const picture='<details id="journey-picture" open><summary>Watch the instruments</summary><canvas id="journey-canvas" width="960" height="600" hidden role="img" aria-label="Three instruments following the journey" style="width:100%;aspect-ratio:16/10;border-radius:12px"></canvas><label><input id="journey-motion" type="checkbox" checked> Follow the music</label><label><input id="journey-cues" type="checkbox" aria-describedby="journey-cue-note"> Show approaching touch cues</label><p id="journey-cue-note">Optional artistic movements anticipate saved touches. They do not simulate collisions or force directions.</p><p id="journey-picture-status" role="status">Choose the journey to begin. The picture follows playback and seeking.</p><p>Three independently recorded chapters, with a fresh physical state at each boundary. Response bounds are magnified 1,000×.</p></details>';
+html=html.replace('<div aria-label="Choose a listening example">',picture+'<div aria-label="Choose a listening example">');
+html=html.replace('</body>','<script id="journey-chapters" type="application/json">'+JSON.stringify(admittedRecords).replace(/</g,'\\u003c')+'</script><script type="module" src="../../src/living/ensemble-journey-main.js"></script></body>');
 writeFileSync(resolve(directory,'index.html'),html);console.log(JSON.stringify({directory,seconds:plan.seconds,wavSha256,previewPeak:peak,chapters:chapters.map(({events,...c})=>({...c,eventCount:events.length}))},null,2));

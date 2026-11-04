@@ -52,3 +52,13 @@ test('optional cues anticipate a saved touch without changing sound or defeating
  f.audio.currentTime=.5;f.audio.fire('timeupdate');assert.equal(f.frames.length,held);
  f.cues.checked=false;f.cues.fire('change');assert.deepEqual(f.frames.at(-1).savedTouches,[]);assert.equal(f.tasks.size,0);assert.equal(f.audio.paused,false);f.view.dispose();
 });
+
+test('journey adapter follows chapter changes and backward seeking in one scene',async()=>{
+ const {createEnsembleJourneyView}=await import('../src/living/ensemble-journey-view.js'),{createEnsembleJourneyStudy}=await import('../src/living/ensemble-journey-study.js');
+ const f=fixture({createModels:createEnsembleJourneyView});f.prepared={identity:'blob:one',record:createEnsembleJourneyStudy().chapters.map(c=>c.record)};
+ f.cues.checked=true;f.play();await flush();assert.equal(f.frames.at(-1).chapter,0);
+ f.audio.currentTime=49.9;f.tick(0);assert.equal(f.frames.at(-1).chapter,1);assert.ok(f.frames.at(-1).savedTouches.length>0);
+ f.audio.currentTime=96;f.tick(40);assert.equal(f.frames.at(-1).chapter,2);assert.equal(f.frames.at(-1).touches,0);assert.equal(f.layouts.length,1);
+ f.audio.paused=true;f.audio.currentTime=2;f.audio.fire('seeked');assert.equal(f.frames.at(-1).chapter,0);assert.equal(f.frames.at(-1).touches,1);assert.equal(f.tasks.size,0);
+ f.audio.currentTime=144;f.audio.ended=true;f.audio.fire('ended');assert.deepEqual(f.frames.at(-1).savedTouches,[]);assert.equal(f.layouts.length,1);f.view.dispose();
+});

@@ -1129,3 +1129,5 @@ Saved-touch choreography research complete: separate staging identity, actual ac
 Optional saved-touch cues integrated: lazy bounded geometry, default-off replay option, saved-position contact and media-clock behavior. Full 1,152 tests pass under --no-maglev; served resources, IDs, syntax and diff checks pass. Claims released; native appeal/sync and independent review remain open.
 
 Longer unattended listening study complete: A way home, three related 48-second chapters, exact motif return, strict chapter admission, one explicit generated player and catalog/preparer discovery. Three focused tests, independent WAV/hash/HTTP/readiness and diff checks pass. Claims released; native listening/appeal and independent review remain open.
+
+Longer journey picture complete: renderer-admitted embedded chapters, exact media-clock boundary/seek sampling, shared scene lifecycle, reduced-motion/still choice and optional cues. Twenty focused tests pass; embedded records/WAV identity/HTTP/syntax/diff checked. Claims released; native appearance/sync and independent review remain open.
