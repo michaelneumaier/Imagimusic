@@ -1022,3 +1022,5 @@ Personal journey discovery complete: homepage invitation, roadmap and dated hist
 Personal listening continuation complete: explicit Repeat this journey option uses the retained personal score/audio after3seconds of quiet; generated continuation unchanged, crossing to generated music stops personal opt-in. Full920tests pass. Claims released; native listening/interaction verification pending.
 
 Original phrase audition complete: personal journey offers sound-only original through existing live worker, exact opening stereo/gain/PCM16, coordinated preview/Quiet/selection and retained journey downloads. Seven focused tests pass; three affected tests rerun after cancellation-status fix. Claims released; native listening/layout still pending.
+
+Shared ringing-body prototype complete: scheduled and guest touches use one continuous existing tine pass with reserved quota, deterministic ties and exact retained source ending.10focused tests pass; authored original/joined WAV pair rendered. Claims released. Worklet/live UI, native timing, visualization and long-running composition remain ahead.
