@@ -1046,3 +1046,5 @@ Continuous tine research complete: separate constant-memory streaming kernel, co
 Continuous score reservation complete: read-only conservative forecast and64note/8second committed queue protect planned notes from guest admission.8focused tests pass, including saturated reservation and60second rolling schedule. Claims released; native scheduling, recording and composition adoption remain ahead.
 
 Continuous performance capture complete: separate strict sixty-second/from-rest record, accepted provenance, bounded reader, admission reconstruction and output-only ending. Twelve focused tests and full967tests pass. Claims released; browser transport, ensemble integration, native listening and independent review remain pending.
+
+Continuous finite transport complete: explicit start/Quiet/cancel/end, bounded capture with score-slot reservation, exact saved reconstruction, scheduler cancellation/accessors. Sixteen focused tests pass. Claims released; composer/worklet/native listening and independent review remain ahead.

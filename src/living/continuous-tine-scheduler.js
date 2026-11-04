@@ -36,5 +36,7 @@ export function createContinuousTineScheduler(geometry,options){
   }
   return events;
  }
- return Object.freeze({schedule,tryGuest,process,flush,snapshot:()=>({...kernel.snapshot(),queue:queue.slice()})});
+ // Transport may withdraw future commitments when ending a performance.
+ function cancelPending(){const count=queue.length;queue=[];return count;}
+ return Object.freeze({schedule,tryGuest,process,flush,cancelPending,get frame(){return kernel.frame;},get queued(){return queue.length;},snapshot:()=>({...kernel.snapshot(),queue:queue.slice()})});
 }
