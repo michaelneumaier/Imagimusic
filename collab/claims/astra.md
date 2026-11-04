@@ -1060,3 +1060,5 @@ Cancellable continuous verification worker complete: strict request, actual back
 Continuous browser session foundation complete: cancellable context setup, acknowledged touches/Quiet, validated live events, bounded drain plus worker verification and retained previous result on failure. Forty focused tests pass; module200. Claims released; controls/native listening and independent review remain ahead.
 
 Continuous listening interface complete: local listening-first page, optional touches, score-position timeline, verified JSON keeping and journey navigation. Full999tests pass; IDs/assets/HTTP/syntax/diff checked. Claims released; native layout/playback, reopening/export and independent review remain ahead.
+
+Continuous kept-performance return complete: bounded silent JSON opening/last-record preparation, exact raw float WAV, coordinated sound-only replay using shared live listening stage, retained prior downloads on failure. Fifty-one focused tests pass; IDs/HTTP/syntax/diff checked. Claims released; native playback/appearance and independent review remain ahead.

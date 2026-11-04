@@ -1,5 +1,5 @@
 import {createContinuousReturnSession} from './continuous-return-session.js';
-export function setupContinuousReturnControls({elements,createSession=createContinuousReturnSession,makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url),onChange=()=>{}}){
+export function setupContinuousReturnControls({elements,createSession=createContinuousReturnSession,makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url),onChange=()=>{},beforePlay=()=>{}}){
  const {start,quiet,pad,strength,seed,status,count,download,result}=elements;let session,pending=false,url=null,notes=0,guests=0,version=0;
  const active=()=>['preparing','playing','ending','verifying'].includes(session.state);
  function update(){
@@ -20,7 +20,7 @@ export function setupContinuousReturnControls({elements,createSession=createCont
   update();
  }});
  start.addEventListener('click',async()=>{
-  if(active())return;const current=++version;notes=0;guests=0;pending=false;
+  if(active())return;beforePlay();const current=++version;notes=0;guests=0;pending=false;
   try{await session.start(Number(seed.value));}catch(error){if(current===version&&error.name!=='AbortError')status.textContent=error.message;}finally{if(current===version)update();}
  });
  async function strike(value){
@@ -32,5 +32,5 @@ export function setupContinuousReturnControls({elements,createSession=createCont
  async function hush(){if(session.state==='verifying'){stop();return;}try{await session.quiet();}catch(error){if(error.name!=='AbortError')status.textContent=error.message;}update();}
  quiet.addEventListener('click',hush);
  function stop(){version++;pending=false;if(active())session.park();update();}
- update();return {stop,quiet:hush,setDb:db=>session.setListeningDb(db),time:()=>session.time(),get state(){return session.state;},dispose(){stop();session.dispose();if(url)revokeURL(url);url=null;}};
+ update();return {stop,quiet:hush,setDb:db=>session.setListeningDb(db),time:()=>session.time(),get state(){return session.state;},get finished(){return session.finished;},dispose(){stop();session.dispose();if(url)revokeURL(url);url=null;}};
 }

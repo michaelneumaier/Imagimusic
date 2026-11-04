@@ -1,6 +1,9 @@
 import {setupContinuousReturnControls} from './continuous-return-controls.js';
+import {setupContinuousReturnReplay} from './continuous-return-replay.js';
 const $=id=>document.getElementById(id),names=['start','quiet','pad','strength','seed','status','count','download','result'];
-const controls=setupContinuousReturnControls({elements:Object.fromEntries(names.map(name=>[name,$(name)]))});
+let replay=null;
+const controls=setupContinuousReturnControls({elements:Object.fromEntries(names.map(name=>[name,$(name)])),beforePlay:()=>replay?.stop()});
+replay=setupContinuousReturnReplay({elements:Object.fromEntries(['file','prepare','cancel','listen','quiet','audio','status','wav','json'].map(name=>[name,$(`replay-${name}`)])),getSource:()=>controls.finished?.record,beforePlay:()=>controls.stop()});
 const phases=['Opening','Echo','Reflection','Space','Gathering','Thinning','Recollection','Return'];
 const marks=[...document.querySelectorAll('.phases li')];
 function draw(){
@@ -10,7 +13,7 @@ function draw(){
  $('elapsed').textContent=`${Math.floor(seconds)} / 48 seconds`;
 }
 let timer=setInterval(draw,200);draw();
-$('level').addEventListener('input',()=>{const db=Number($('level').value);controls.setDb(db);$('level-value').textContent=`+${db} dB`;});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)controls.stop();});
-window.addEventListener('pagehide',()=>{controls.stop();clearInterval(timer);});
+$('level').addEventListener('input',()=>{const db=Number($('level').value);controls.setDb(db);replay.setDb(db);$('level-value').textContent=`+${db} dB`;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){controls.stop();replay.stop();}});
+window.addEventListener('pagehide',()=>{controls.stop();replay.stop();clearInterval(timer);});
 window.addEventListener('pageshow',event=>{if(event.persisted){clearInterval(timer);timer=setInterval(draw,200);draw();}});

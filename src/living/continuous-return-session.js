@@ -2,12 +2,12 @@ import {createContinuousReturnStudy} from './continuous-return-study.js';
 import {createContinuousReturnVerifyJob} from './continuous-return-verify-job.js';
 import {createListeningLevel,listeningGain} from '../grove/listening-level.js';
 const aborted=()=>Object.assign(Error('Continuous listening cancelled.'),{name:'AbortError'});
-function listeningStage(context,{db}){
+export function createContinuousListeningStage(context,{db}){
  const level=createListeningLevel(context,{db}),input=context.createGain();input.gain.value=8/Math.sqrt(2);
  try{input.connect(level.input);}catch(error){input.disconnect();level.dispose();throw error;}
  return {input,output:level.output,setDb:level.setDb,dispose(){input.disconnect();level.dispose();}};
 }
-export function createContinuousReturnSession({createContext=rate=>new AudioContext({sampleRate:rate}),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-continuous-return',options),createListeningStage=listeningStage,createVerifyJob=createContinuousReturnVerifyJob,listeningDb=0,onChange=()=>{}}={}){
+export function createContinuousReturnSession({createContext=rate=>new AudioContext({sampleRate:rate}),createNode=(context,options)=>new AudioWorkletNode(context,'imagimusic-continuous-return',options),createListeningStage=createContinuousListeningStage,createVerifyJob=createContinuousReturnVerifyJob,listeningDb=0,onChange=()=>{}}={}){
  listeningGain(listeningDb);let active=null,state='idle',touches=0,lastFinished=null;
  const emit=extra=>onChange({state,touches,...extra});
  function closeAudio(s){
