@@ -728,3 +728,18 @@ Added an optional Enter listening view / Show the workshop toggle to the existin
 Switching views does not start/stop the journey or reset the camera. Entering pauses any comparison whose controls are about to be hidden. Escape exits and focuses the mode button. No persistent setting, forced fullscreen, animation or automatic scrolling. Existing scene ResizeObserver handles canvas dimensions.
 
 Verification: syntax and diff clean; four resourcesHTTP200; HTML parsed for unique IDs and retained controls outside concealed ancestors. Scene resize integration read. Native visual, responsive layout and focus/browser playback verification remains pending the known unavailable native bridge. No new full-suite run for this presentation-only change; latest regression checkpoint remains891passing at db5c1f5. No audience-preference or independent-review claim.
+
+
+### Homepage synthesis: a complete listening experience first
+
+Reconciled project.html current chapter, long-journey roadmap card and history, plus the existing Living catalog description. The home now links directly to making a longer journey and distinguishes implemented local capabilities (actual instance staging, fresh generation, WAV/report return, continuation, quieter view) from unverified browser behavior and unfinished journey films/flagship integration. The catalog remains43entries. Source proposal026's earlier adoption-gate prose is historical where superseded by these notes; Fable-owned shared docs were not edited.
+
+The priority remains one compelling complete journey requiring no performance input. A small creative seed and direct playing should eventually deepen that experience, but seamless participation in an evolving ensemble is not implemented. More controls, more parameter combinations or a longer runtime do not themselves establish progress toward musical appeal.
+
+Next development gates, in order of evidence needed:
+1. Recover native inspection and verify the existing full encounter: fresh generation, automatic continuation, Quiet during work, keyboard controls, narrow layout, scene clocks and quiet report reopening. Current pipe startup failure is a verification limitation, not evidence that these paths work.
+2. Assess whole musical arcs, keeping the same-score physical-body comparison separate from the three differently composed structures. Record specific recognition, pacing and return observations before changing the default or promoting a tuning. The current comparison changes mass/decay/loudness as well as modal frequencies.
+3. Refine composition around continuity and memory. A future richer grammar should offer meaningful relationships among motifs and bodies with its own identity, preserving old generated reports. Repeated random selection from324source forms is not endless invention.
+4. Complete journey visual keeping and versioned flagship adoption once one candidate earns its place. Existing journey reports do not preserve camera, film or an interactive encounter. Keep independent passes visually explicit rather than imply shared resonator state.
+
+Verification for this copy checkpoint:43catalog entries unchanged, unique page IDs, syntax/diff clean and four changed/reference resources200. No new browser or preference evidence; latest full suite891passing at db5c1f5, subsequent presentation/copy checks are narrower.

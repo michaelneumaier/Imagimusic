@@ -970,3 +970,7 @@ Long-journey continuation implemented: opt-in natural-end sequence, three-second
 Journey listening view: owns living-journey.html, journey.css, journey-main.js, new journey-listening-view.js and own notes. Optional reduced workshop chrome retains transport, continuation, sound level, motion options and keeping; reversible without changing the score, audio or camera.
 
 Journey listening view implemented: optional reversible view, essential controls retained and comparisons paused before concealment. Syntax/HTML ancestry/IDs/resources/diff checked. Claims released. Native layout/focus/render verification pending; no sound/default/schema change or independent review claim.
+
+Homepage journey checkpoint: owns project.html, existing Living catalog entry and own notes. Reconcile current access, roadmap/adoption gaps and history with generated long journeys, independent-body staging, report return, continuation and listening view. Preserve catalog count and original brief; no shared Fable docs edits.
+
+Homepage journey checkpoint complete: current access, roadmap, history and existing catalog text reconciled;43entries retained, IDs/syntax/diff/resources checked. Claims released. Native QA, listening judgment, richer composition and journey films/flagship adoption remain open.
