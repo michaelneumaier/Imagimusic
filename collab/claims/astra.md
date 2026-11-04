@@ -1018,3 +1018,5 @@ Direct personal journey handoff complete: admitted retained originals link throu
 Personal journey films complete: strict personal source identity, full ensemble framing, soundtrack/report validation, film session labels and source-package verifier extended.18focused tests pass and prior seeded fixture verifies unchanged. Claims released; native picture/sound verification and independent review pending.
 
 Personal journey discovery complete: homepage invitation, roadmap and dated history now describe the personal source handoff and experimental films; journey workshop has its own searchable catalog entry. Local HTTP,44catalog destinations,92home resources/links,18unique IDs,syntax and diff checks pass. Claims released; native layout and interaction remain unverified.
+
+Personal listening continuation complete: explicit Repeat this journey option uses the retained personal score/audio after3seconds of quiet; generated continuation unchanged, crossing to generated music stops personal opt-in. Full920tests pass. Claims released; native listening/interaction verification pending.
