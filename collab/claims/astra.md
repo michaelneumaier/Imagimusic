@@ -920,3 +920,7 @@ Long-form performer foundation complete:1996/1996contacts across12cases,79Living
 Journey instance allocation: owns new journey-bodies.js/tests plus journey-choreography.js, its tests and audit tool. Assign non-overlapping independent passes to reusable visible instances per length; route every actual performer to its assigned instance. Preserve source/audio and saved presentation code.
 
 Journey instance allocation complete:3/5/6instances across three structures;1996contacts retained and zero same-instance overlapping passes in12cases. Four focused tests pass. Claims released. Pure staging plan only; scene/camera/mesh/native checks remain ahead. Audio and saved presentations unchanged.
+
+Journey per-instance response: owns new journey-view.js/tests and own notes. Sample exact assigned independent source/release clocks, retain simultaneous tails on distinct instances, and expose recorded-ending opacity separately from modeled displacement bounds. No existing scene or audio changes.
+
+Journey per-instance response complete: actual source/release/fade clocks and simultaneous responses verified; six focused tests pass, expanded two-seed view rerun passes. Claims released. Pure frame model; instance-aware scene/native inspection remains ahead. Audio/old appearances unchanged, no independent review.
