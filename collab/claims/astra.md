@@ -792,3 +792,13 @@ Automatic listening polish: owns living.html/living.css/main.js for an aftermath
 Listening polish evidence: also owns append-only astra-living-instrument notes and proposal026 checkpoint. No source/score/film identity changes.
 
 Automatic listening polish complete: scene-first layout, named piece card, optional disclosures and nearby Another piece verified in native390pxSafari; natural completion focus visible, new identity generated, Quiet and pace discovery checked. Static checks pass. Claims released; musical evaluation remains the next substantive creative decision.
+
+Generated composition comparison: owns study-fixtures.js and render-living-answer-study.mjs for an optional generated-source comparison using existing round/spaced renderers. Keep default study sources intact, no new catalog destination or production score change. Report touch-span overlap as score structure, not an audio/loudness/feeling measure.
+
+Generated visual comparison: also owns living-look.html/look-main.js for choosing the same five generated fixtures in the existing workshop, selecting their matching round/spaced WAVs. Preserve default authored controls, paused transitions and camera preference. No new production score adoption.
+
+Generated audition regeneration: also owns prepare-project-home.mjs registry entry invoking the existing renderer with --generated, so the workshop's new sources can be prepared through the established local helper.
+
+Generated comparison evidence: also owns current appendices in proposal026 and astra-living-instrument notes. Preserve existing production arrangements and saved identities; this is comparison evidence, not a listening verdict.
+
+Generated composition comparison complete:10auditions, measured score-span tradeoff, matching existing visual-workshop source selection and preparation helper verified.15targeted tests;10WAV audits;8legacyWAV hashes unchanged; native generated playback and authored return checked. Evidence/plan updated; claims released. Production remains round1 pending explicit versioned choice work.

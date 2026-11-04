@@ -201,3 +201,9 @@ Next, assess whether these choices are clearly audible and whether the current a
 ## Listening comes before the controls
 
 The generated piece now introduces itself below the scene with a musical name and three clear next actions: hear it again, make another, or explore it. Pace and technical identity remain optional disclosures. The scene leads during playback, and completion brings the replay action into view. This keeps low-input listening at the center while preserving the invitation to shape or play the result.
+
+## A concrete arrangement choice to assess
+
+[Generated arrangement comparison](../../renders/living-generated-answer-study/index.html) now places five automatic sources into the current round and the existing spaced exchange. The same sources are selectable in the [visual workshop](../../living-look.html), with matching audio and choreography. Regenerate with node tools/render-living-answer-study.mjs --generated, or the established preparation helper.
+
+Across these examples, the round overlaps all three answers' first-to-last-touch spans; the spaced alternative separates those spans and adds roughly three to seven seconds. Decays can overlap in either. This is a compositional distinction, not evidence of which feels better. The next bounded decision is whether to offer the spacious exchange as an explicit saved arrangement choice, with the original round still available. Any adoption must carry its identity through live performance, keeping and film rather than leaving a workshop-only preference.

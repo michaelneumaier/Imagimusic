@@ -1,4 +1,4 @@
-import {createLivingStudyFixtures} from './study-fixtures.js';
+import {createLivingStudyFixtures,createLivingGeneratedStudyFixtures} from './study-fixtures.js';
 import {createLivingChoreography} from './choreography.js';
 import {LIVING_LOOKS} from './looks.js';
 import {createLivingArrangement} from './arrangement.js';
@@ -6,7 +6,7 @@ import {createLivingSpacedAnswer} from './answer-study.js';
 import {createLivingArrangementView} from './arrangement-view.js';
 import {createLivingScene} from './scene.js';
 const $=id=>document.getElementById(id),audio=$('audio');
-const fixtures=createLivingStudyFixtures();let fixtureId='greeting';
+const fixtures=[...createLivingStudyFixtures().map(f=>({...f,audioDirectory:'living-answer-study'})),...createLivingGeneratedStudyFixtures().map(f=>({...f,audioDirectory:'living-generated-answer-study'}))];let fixtureId='greeting';
 const source=()=>fixtures.find(f=>f.id===fixtureId).source;
 let composition='round',plan=createLivingArrangement(source()),view=createLivingArrangementView(plan);
 let choreography=createLivingChoreography(source());
@@ -31,14 +31,16 @@ for(const b of document.querySelectorAll('[data-look]'))b.addEventListener('clic
 for(const b of document.querySelectorAll('[data-chapter]'))b.addEventListener('click',()=>{contactDetail=false;seek(b.dataset.chapter==='opening'?1:b.dataset.chapter==='answer'?(plan.roundStart+plan.delayFrames)/plan.sampleRate+1:plan.returnStart/plan.sampleRate+1);});
 function chooseScore(){
  pause();contactDetail=false;plan=composition==='round'?createLivingArrangement(source()):createLivingSpacedAnswer(source());view=createLivingArrangementView(plan);choreography=createLivingChoreography(source(),composition);seconds=1;lastPaint=-Infinity;
- $('moment').max=duration();audio.src=`renders/living-answer-study/${fixtureId}-${composition}.wav`;audio.load();audio.pause();
+ $('moment').max=duration();audio.src=`renders/${fixtures.find(f=>f.id===fixtureId).audioDirectory}/${fixtureId}-${composition}.wav`;audio.load();audio.pause();
  $('audio-note').textContent=`${fixtures.find(f=>f.id===fixtureId).name} · ${names[composition]} · ${duration().toFixed(1)} seconds · dry bodies · preview gain ×8. Choose Play when ready.`;
  for(const c of document.querySelectorAll('[data-composition]'))c.setAttribute('aria-pressed',String(c.dataset.composition===composition));
+ $('generated-fixture').value=fixtures.find(f=>f.id===fixtureId).seed===undefined?'':fixtureId;
  for(const c of document.querySelectorAll('[data-fixture]'))c.setAttribute('aria-pressed',String(c.dataset.fixture===fixtureId));
  $('download').hidden=true;saveVersion++;draw();
 }
 for(const b of document.querySelectorAll('[data-composition]'))b.addEventListener('click',()=>{composition=b.dataset.composition;chooseScore();});
 for(const b of document.querySelectorAll('[data-fixture]'))b.addEventListener('click',()=>{fixtureId=b.dataset.fixture;chooseScore();});
+$('generated-fixture').addEventListener('change',()=>{fixtureId=$('generated-fixture').value||'greeting';chooseScore();});
 for(const b of document.querySelectorAll('[data-contact]'))b.addEventListener('click',()=>{$('performers').checked=true;const onset=plan.source.events[0].frame/plan.sampleRate;seek(onset+({approach:-.09,contact:0,recover:.14}[b.dataset.contact]));});
 for(const b of document.querySelectorAll('[data-framing]'))b.addEventListener('click',()=>{pause();contactDetail=b.dataset.framing==='contact';if(contactDetail)$('performers').checked=true;draw();});
 $('moment').addEventListener('input',()=>seek(Number($('moment').value)));

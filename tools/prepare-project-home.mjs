@@ -5,6 +5,7 @@ import {spawn} from 'node:child_process';
 import {verifyExpressiveComparison} from './finalize-expressive-compare.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const studies=[
+ ['How should a generated piece answer?','renders/living-generated-answer-study','tools/render-living-answer-study.mjs',['--generated']],
  ['A phrase with room to breathe','renders/living-answer-study','tools/render-living-answer-study.mjs'],
  ['An answer that leaves room','renders/living-response-study','tools/render-living-response-study.mjs'],
  ['A little air around a phrase','renders/living-space-study','tools/render-living-space-study.mjs'],
