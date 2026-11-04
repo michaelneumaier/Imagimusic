@@ -1020,3 +1020,5 @@ Personal journey films complete: strict personal source identity, full ensemble 
 Personal journey discovery complete: homepage invitation, roadmap and dated history now describe the personal source handoff and experimental films; journey workshop has its own searchable catalog entry. Local HTTP,44catalog destinations,92home resources/links,18unique IDs,syntax and diff checks pass. Claims released; native layout and interaction remain unverified.
 
 Personal listening continuation complete: explicit Repeat this journey option uses the retained personal score/audio after3seconds of quiet; generated continuation unchanged, crossing to generated music stops personal opt-in. Full920tests pass. Claims released; native listening/interaction verification pending.
+
+Original phrase audition complete: personal journey offers sound-only original through existing live worker, exact opening stereo/gain/PCM16, coordinated preview/Quiet/selection and retained journey downloads. Seven focused tests pass; three affected tests rerun after cancellation-status fix. Claims released; native listening/layout still pending.

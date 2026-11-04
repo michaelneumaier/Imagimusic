@@ -1,3 +1,4 @@
+import {setupPersonalOriginalListening} from './personal-original-listening.js';
 import {createLivingJourneyStudy} from './journey-study.js';
 import {createLivingConnectedJourneyStudy} from './connected-journey-study.js';
 import {createLivingEvolvingJourneyStudy} from './evolving-journey-study.js';
@@ -18,11 +19,11 @@ import {readLivingPersonalJourneyReport} from './personal-journey-report.js';
 import {readLivingPersonalPhrase,PERSONAL_PHRASE_INPUT_LIMIT} from './personal-journey-input.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
-let film=null;
+let film=null,original=null;
 const media=createLivingJourneyMedia();
 const generated=createLivingJourneyGeneration();
 const tuning=setupLivingTuningListening({beforePlay:()=>stop()});
-setupJourneyListeningView({beforeEnter:()=>{tuning.stop();film?.cancel();}});
+setupJourneyListeningView({beforeEnter:()=>{tuning.stop();original?.stop();film?.cancel();}});
 let generatedChoice=false,selectedRequest=null,expectedSha256=null,personalSource=null,personalChoice=false;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
@@ -34,7 +35,7 @@ const continuation=createJourneyContinuation({
  $('journey-continue').checked=continuation.enabled;
  $('journey-continue-label').textContent=personalChoice?'Repeat this journey':'Keep listening after this journey';
  $('journey-continue-note').textContent=personalChoice?(continuation.pending?'A moment of quiet. Your same journey returns in three seconds.':continuation.enabled?'The same personal journey will return after its ending. Quiet stops repetition.':'Optional. Repeat this complete composition after three seconds of quiet. Its music and downloads stay the same. Keeping a file stops repetition.'):continuation.pending?'A moment of quiet. Preparing the next journey starts in three seconds.':continuation.enabled?'Another journey will follow this ending. Quiet stops the sequence.':'Optional. New journeys follow at the selected structure; ideas can repeat. Each new journey replaces the previous downloads. Keeping a file stops the sequence.';
- $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy;
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy&&!original?.active;
 }});
 $('ensemble-motion').checked=!reducedMotion.matches;
 function drawEnsemble(){
@@ -80,12 +81,12 @@ function update(){
  drawScore(frame);
  const active=plan.sections.filter(s=>frame>=s.startFrame&&frame<s.endFrame);
  rows.forEach((row,i)=>row.classList.toggle('active',frame>=plan.sections[i].startFrame&&frame<plan.sections[i].endFrame));
- $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy;
+ $('quiet').disabled=audio.paused&&!starting&&!continuation.pending&&!film?.busy&&!original?.active;
  if(!starting)$('status').textContent=audio.error?'Audio unavailable. See the local rendering instructions below.':audio.ended?'The journey has settled.':`${audio.paused?'Paused':'Playing'} · ${clock(audio.currentTime)} · ${active.map(s=>s.name).join(' / ')||'a moment of space'}`;
 }
-function stop(){film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
+function stop({keepOriginal=false}={}){if(!keepOriginal)original?.stop();film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();player.stop();update();}
 function choose({continueSequence=false}={}){
- tuning.stop();film?.cancel();
+ original?.clear();tuning.stop();film?.cancel();
  if(!continueSequence)continuation.stop();
  expectedSha256=null;
  generation++;starting=false;player.stop();media.clear();generated.clear();audio.hidden=true;audio.removeAttribute('src');audio.load();
@@ -106,12 +107,13 @@ function choose({continueSequence=false}={}){
  $('duration').textContent=clock(plan.frames/plan.sampleRate);
  $('description').textContent=personalChoice?`Your ${personalSource.events.length}-touch phrase opens the journey. Five exchanges turn its rhythm and move its accents, then the exact original returns. All of your touches remain in each variation; the whole opening and homecoming stand alone.`:treatment.description;
  $('personal-capabilities').hidden=!personalChoice;
+ $('personal-original').hidden=!personalChoice;
  film?.refresh();
  rows=plan.sections.map(s=>{const li=document.createElement('li'),name=document.createElement('span'),time=document.createElement('small');name.textContent=s.name;time.textContent=`${clock(s.startFrame/plan.sampleRate)}–${clock(s.endFrame/plan.sampleRate)}`;li.append(name,time);return li;});
  $('chapters').replaceChildren(...rows);$('quiet').disabled=true;$('status').textContent='Ready when you are. Playback starts only when you choose Listen.';
 }
 async function listen(){
- film?.cancel();
+ original?.stop();film?.cancel();
  continuation.cancelPending();
  tuning.stop();
  const own=++generation;starting=true;player.stop();$('quiet').disabled=false;$('status').textContent=generatedChoice?'Making your journey locally… Quiet cancels preparation.':'Checking the journey audio and score…';
@@ -181,8 +183,8 @@ audio.addEventListener('pause',()=>{if(!audio.ended&&!starting)continuation.stop
 audio.addEventListener('error',()=>continuation.stop());
 $('seed').addEventListener('change',choose);
 for(const input of document.querySelectorAll('[name=shape]'))input.addEventListener('change',choose);
-$('level').addEventListener('input',()=>{player.setDb(Number($('level').value));tuning.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
-audio.addEventListener('play',()=>{film?.cancel();continuation.cancelPending();tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
+$('level').addEventListener('input',()=>{player.setDb(Number($('level').value));tuning.setDb(Number($('level').value));original?.setDb(Number($('level').value));$('level-value').textContent=`+${$('level').value} dB`;});
+audio.addEventListener('play',()=>{original?.stop();film?.cancel();continuation.cancelPending();tuning.stop();player.resume().catch(()=>{stop();$('status').textContent='Audio was interrupted. Choose Listen to try again.';});});
 audio.addEventListener('playing',startAnimation);
 for(const event of ['pause','ended','seeked'])audio.addEventListener(event,()=>{stopAnimation();drawEnsemble();if(event==='seeked')startAnimation();});
 $('ensemble-motion').addEventListener('change',()=>{drawEnsemble();startAnimation();});
@@ -190,8 +192,9 @@ $('ensemble-veils').addEventListener('change',drawEnsemble);
 $('ensemble').addEventListener('webglcontextlost',event=>{event.preventDefault();stop();stopAnimation();$('ensemble-status').textContent='Graphics were interrupted and playback paused. The ensemble will rebuild when graphics recover.';});
 $('ensemble').addEventListener('webglcontextrestored',()=>{prepareEnsemble();drawEnsemble();});
 for(const event of ['timeupdate','pause','playing','ended','seeked','error'])audio.addEventListener(event,()=>{if(plan)update();});
-function park(){film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
+function park(){original?.park();film?.cancel();continuation.stop();generation++;starting=false;media.cancel();generated.cancel();stopAnimation();player.park();if(plan)update();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)park();});window.addEventListener('pagehide',park);
+original=setupPersonalOriginalListening({getSource:()=>personalSource,beforePlay:()=>{stop({keepOriginal:true});tuning.stop();},onChange:()=>{if(plan)update();},elements:{audio:$('original-audio'),listen:$('original-listen'),quiet:$('original-quiet'),status:$('original-status')}});
 choose();
 film=setupLivingJourneyMovieControls({getSelection:()=>({request:selectedRequest,reveal:$('ensemble-veils').checked,expectedSha256}),beforePrepare:()=>{stop();tuning.stop();},onChange:update});
 function openPersonalAddress(){
