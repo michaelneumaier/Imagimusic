@@ -880,3 +880,9 @@ Listening-first transport complete: fresh narrow screenshot, native Space disclo
 Phrase-aware exploration disclosure: owns living.html/living.css/main.js and evidence notes. Hide empty body/encounter panel until an original exists; move camera choice next to scene so passive listeners retain it. Native fresh/generated/adopted/kept paths; no music or format changes.
 
 Phrase-aware exploration disclosure complete: fresh/generated listening keeps camera visible and empty body controls hidden; native Explore adopts quietly and reveals meaningful controls. Unique IDs/syntax/diff checks pass. Claims released; no sound/record changes or independent review claim.
+
+Opt-in continued listening: owns new listening-continuation.js/tests plus main.js/living.html and evidence. Schedule a fresh generated piece3s after natural completion only; same pace/arrangement. Quiet, keeping/exploring, manual playing, interruptions and leaving stop the sequence. No saved-format or source replacement changes.
+
+Continued listening discovery: also owns the existing home/catalog description and current proposal/evidence appendices for the visit-local opt-in feature.
+
+Continued listening complete:76focused tests pass; native automatic seed transition, Quiet during playback/pause and keep-during-pause verified. Home/catalog/plan/evidence updated. Claims released. Visit-local only, original/address retained; no independent or listening-preference claim.

@@ -252,3 +252,9 @@ The composition work now supplies a third arrangement: opening motif, partial fi
 Release is modeled as additional distributed modal viscous loss with continuous displacement/velocity. Sound and response veil follow the same state; this is not a simulated felt pad. It gives the automatic path a concrete articulation choice without requiring ongoing playing. An actual521-frame film and a generated recipe have been verified; implementation notes retain the cross-engine sample-precision limits and regression status.
 
 Next develop and assess the character of a whole short encounter: the quality of the opening invitation, the recognition of its motif, the relation between sound and attention, and the desire to return. The current model offers meaningful choices, but tests and deterministic keepsakes alone cannot establish that it is compelling. Preserve the three complete entrances—listen, offer a small direction, play—while refining that experience.
+
+## Staying without operating
+
+Keep listening now lets complete generated miniatures follow one another after a three-second pause, using the chosen pace and arrangement. It is optional and lasts only for the current visit. Quiet stops it; keeping or exploring a piece cancels the next one so the visitor can stay with that piece. Leaving stops playback. Existing originals and saved addresses remain separate.
+
+This removes repeated button presses from sustained listening while preserving a clear beginning and ending for each miniature. It is not yet one evolving long-form score: the next artistic step should explore relationships between successive motifs, not equate endless generation with a satisfying musical journey.
