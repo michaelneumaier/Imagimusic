@@ -20,6 +20,7 @@ test('every actual journey touch has one exact contact and a recovery before the
      assert.ok(assignment.arriveBy>=previousEnd);previousEnd=assignment.leaveAt;
      const at=t=>c.at(t).find(a=>a.id===actor.id),contact=at(assignment.noteOn);
      assert.equal(contact.bodyMm,original.body);assert.equal(contact.eventId,assignment.eventId);assert.equal(contact.down,1);
+     assert.equal(contact.body,c.allocation.assignments.find(a=>a.passId===Number(assignment.eventId.split(':')[0])).instance);
      assert.ok(at(assignment.noteOn-1e-7).down>1-1e-9);assert.ok(at(assignment.noteOn+1e-7).down>1-1e-9);
      assert.equal(at(assignment.leaveAt).down,0);
      const pose=livingStrikerPose(contact.bodyMm,contact.down,contact.lane,contact.headRadius);
@@ -28,7 +29,7 @@ test('every actual journey touch has one exact contact and a recovery before the
    }
   }
   assert.equal(seen.size,expected.size);
-  for(const body of [0,1,2]){
+  for(const body of c.allocation.instances.map(i=>i.id)){
    const actors=c.actors.filter(a=>a.body===body);
    for(let i=1;i<actors.length;i++)assert.ok(actors[i].lane-actors[i-1].lane>actors[i].headRadius+actors[i-1].headRadius);
   }

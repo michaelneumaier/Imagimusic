@@ -1,17 +1,20 @@
 import {planPerformers,actorPose} from '../perform/planner.js';
 import {createLivingJourneyScore} from './journey-score.js';
+import {allocateLivingJourneyBodies} from './journey-bodies.js';
 
 /** Workshop-only choreography for the actual long-form score. Distinct
- * rendered passes may share a visible blade; this does not merge their physics.
+ * simultaneous passes receive distinct visible blades; reuse after a completed
+ * fade does not merge their physics or establish state continuity.
  * Geometry follows existing artistic staging, never a simulated collision. */
 export function createLivingJourneyChoreography(journey){
  const score=createLivingJourneyScore(journey),lengths=[80,95,65];
  if(score.passes.some(p=>!lengths.includes(p.bodyMm)||p.touches.some(e=>e.strength<=0)))throw Error('Journey staging requires admitted bodies and positive impulses.');
- const plans=lengths.map((length,body)=>planPerformers(score.passes.filter(p=>p.bodyMm===length).flatMap(p=>p.touches.map((e,i)=>({id:`${p.id}:${i}`,slot:0,noteOn:e.frame/score.sampleRate,velocity:e.strength}))),{family:`journey-${body}`,slots:1,restSlot:0,maxActors:8}));
+ const allocation=allocateLivingJourneyBodies(score);
+ const plans=allocation.instances.map(instance=>planPerformers(instance.passIds.flatMap(id=>score.passes.find(p=>p.id===id).touches.map((e,i)=>({id:`${id}:${i}`,slot:0,noteOn:e.frame/score.sampleRate,velocity:e.strength}))),{family:`journey-instance-${instance.id}`,slots:1,restSlot:0,maxActors:8}));
  if(plans.some(p=>p.unplanned.length))throw Error('Journey staging cannot assign every touch.');
- const actors=plans.flatMap((plan,body)=>plan.actors.map((actor,i)=>Object.freeze({id:actor.id,body,bodyMm:lengths[body],lane:plan.actors.length===1?0:(i/(plan.actors.length-1)-.5)*.7,headRadius:plan.actors.length===1?.1:Math.min(.1,.28/(plan.actors.length-1))})));
+ const actors=plans.flatMap((plan,body)=>plan.actors.map((actor,i)=>Object.freeze({id:actor.id,body,bodyMm:allocation.instances[body].bodyMm,lane:plan.actors.length===1?0:(i/(plan.actors.length-1)-.5)*.7,headRadius:plan.actors.length===1?.1:Math.min(.1,.28/(plan.actors.length-1))})));
  const ease=u=>u*u*(3-2*u);
- return {score,plans,actors:Object.freeze(actors),at(seconds){
+ return {score,allocation,plans,actors:Object.freeze(actors),at(seconds){
   if(!Number.isFinite(seconds)||seconds<0||seconds>score.frames/score.sampleRate)throw Error('Journey contact time is outside the score.');
   return actors.map(actor=>{
    const pose=actorPose(plans[actor.body],actor.id,seconds);

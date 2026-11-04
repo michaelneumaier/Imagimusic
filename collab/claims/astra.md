@@ -916,3 +916,7 @@ Journey synthesis checkpoint complete: homepage/current vision/roadmap/history a
 Long-form performer foundation: owns new journey-choreography.js, tests and audit tool plus own notes. Plan actual flattened journey touches per body, retaining source IDs/times and independent-pass limits. Audit complete contacts, actor recovery/lane geometry and same-body tail overlaps before scene integration. Earlier presentation identities unchanged.
 
 Long-form performer foundation complete:1996/1996contacts across12cases,79Living tests pass. Audit identifies28same-body overlaps, each25ms after both first touches, requiring explicit scene treatment. Claims released. Core planning only; no browser/scene/physical-contact or independent-review claim.
+
+Journey instance allocation: owns new journey-bodies.js/tests plus journey-choreography.js, its tests and audit tool. Assign non-overlapping independent passes to reusable visible instances per length; route every actual performer to its assigned instance. Preserve source/audio and saved presentation code.
+
+Journey instance allocation complete:3/5/6instances across three structures;1996contacts retained and zero same-instance overlapping passes in12cases. Four focused tests pass. Claims released. Pure staging plan only; scene/camera/mesh/native checks remain ahead. Audio and saved presentations unchanged.
