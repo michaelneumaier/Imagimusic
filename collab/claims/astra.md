@@ -908,3 +908,7 @@ Motif development study: owns new evolving-journey-study.js/tests, small shared-
 Evolving study discovery: also owns the existing journey comparison HTML/main for an optional third treatment and exact local rendering instructions. Keep connected default and earlier artifacts unchanged; browser QA limitation persists.
 
 Motif development study complete: two new WAV/reports98.79s/122.61s, optional existing-page treatment,77Living tests pass; both earlier connected WAV hashes preserved and PCM16 duration probed. Claims released. Preference and native UI QA remain open; no production/schema/physics changes or independent review claim.
+
+Journey synthesis checkpoint: owns project.html, Living catalog description, existing proposal026 and own notes. Reconcile homepage/vision/roadmap/history with three journey studies and explicit adoption gates; preserve43catalog entries and current default paths. No publication or audience-results claim.
+
+Journey synthesis checkpoint complete: homepage/current vision/roadmap/history and proposal current build order reconciled;43catalog entries retained, links200, unique IDs and syntax/diff checked. Claims released. Native layout and listening evidence still outstanding; no independent review or publication.

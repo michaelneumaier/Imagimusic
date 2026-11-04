@@ -2,7 +2,7 @@
 
 *Proposal 026 · Astra for Michael · 2026-11-04 · Creative synthesis and next build plan*
 
-**You make a small sound. A world grows around the way you played. You change that world and hear your idea become something you could not have made alone.**
+**Press play and let a musical world unfold. Offer a small idea and hear it develop. Step inside when you want to play; step back without making the music depend on you.**
 
 This is the next ambition for The Living Instrument. “Learns” means that the system retains a musical gesture and develops explicit, inspectable responses to it. It does not mean that it understands a person's emotions. The potentially distinctive invention is a continuous relationship between musical authorship, the design of a sounding body, and the staging of a place. Its appeal and novelty remain hypotheses.
 
@@ -10,9 +10,9 @@ This is the next ambition for The Living Instrument. “Learns” means that the
 
 We have built three unusually useful foundations together. First, a gesture can survive: it can be replayed, compared, saved, reopened and filmed. Second, a body can matter: the tine's geometry determines its modeled sound, while the Grove and Rest demonstrate other relationships involving coupling and damping. Third, a performance can have a point of view: the same underlying event can support an intimate object, an ensemble, a close reading, and a directed film.
 
-The current flagship puts several of these foundations into one encounter. It offers live touches, exact phrase replay, three independent bodies, a composed camera journey, a quiet return, versioned appearances and local keepsakes. The pale ceramic and steel presentation is adopted. The home page now leads to this actual scene while preserving the research catalog and history. The last full implementation checkpoint passed 809 tests; subsequent home changes affect presentation and navigation only.
+The current flagship combines generated miniatures, optional automatic continuation, live touches, exact replay, three independent bodies, score-driven performers, phrase-following camera direction and local keepsakes. Three saved arrangements and four presentation identities preserve earlier work. The latest full-suite checkpoint was855tests at released-arrangement adoption; subsequent journey work has77focused Living tests, not a new full-suite result. The home page leads to the playable scene while preserving43catalog entries and the history.
 
-The current limitation is artistic and structural. A fixed round can demonstrate the mechanism, but it gives every visitor substantially the same kind of answer. Changing entrance spacing helps legibility; it does not create a developing relationship. The static body and its magnified response veil also leave much of the original ambition—watching a world perform music—unrealized. Forty-three catalog entries offer breadth, but a newcomer needs one encounter with an unmistakable reason to care.
+The current limitation is artistic and structural. Arrangement choices and visible performers demonstrate the mechanism, but do not establish a compelling developing relationship. New long-form studies retain and transform a motif across a larger arc; they remain outside the flagship's performer, film and recipe paths. A newcomer still needs one encounter with an unmistakable reason to care. [The current journey checkpoint and adoption gates](#current-journey-checkpoint-and-adoption-gates) below distinguish implementation evidence from the next creative decisions.
 
 Keep the precision, continuity and graceful stopping. Concentrate the next creative work on **recognition, consequence and anticipation**.
 
@@ -258,3 +258,32 @@ Next develop and assess the character of a whole short encounter: the quality of
 Keep listening now lets complete generated miniatures follow one another after a three-second pause, using the chosen pace and arrangement. It is optional and lasts only for the current visit. Quiet stops it; keeping or exploring a piece cancels the next one so the visitor can stay with that piece. Leaving stops playback. Existing originals and saved addresses remain separate.
 
 This removes repeated button presses from sustained listening while preserving a clear beginning and ending for each miniature. It is not yet one evolving long-form score: the next artistic step should explore relationships between successive motifs, not equate endless generation with a satisfying musical journey.
+
+## Current journey checkpoint and adoption gates
+
+This checkpoint supersedes the earlier “next slice” directions above; those entries remain as development history. The desired experience is **a musical world that can play itself and make room for a person**. Listening, giving one creative seed, and playing should be equally complete entrances. The long-term handoff between watching and playing remains unimplemented: the current capture/adoption controls do not yet let someone join a continuously evolving ensemble.
+
+The [journey listening comparison](../../living-journey.html) is a workshop attached to the existing visual workshop, not a new catalog entry. It currently offers three finite treatments of two prepared seeds:
+
+| Treatment | Musical structure | Seed42 / seed2950288811 |
+| --- | --- | --- |
+| Separate chapters | Seven complete miniatures, each with its own opening and return | 118.88s / 134.27s |
+| Connected arc | One solo opening, five exchanges, one solo return; intermediate tails overlap | 40.21s / 47.48s |
+| Developing motif | One solo opening, twelve exchanges that transform rhythm and accents, one exact solo return | 98.79s / 122.61s |
+
+The dramatic shortening of the second treatment exposed how much of the first duration came from repeated framing. The third adds explicit motif development instead of restoring that framing. Each variation derives independently from the same seed: reflect the two intervals inside a three-touch cell, rotate that cell's original accents, change bounded spacing, or soften the touches. Cell boundaries survive; the original rhythm returns before the original accents, then the final solo restores the untouched source. Equal intervals remain equal when reflected. None of these rules establishes beauty, novelty or a universal emotional response.
+
+The new listening view offers one shared player, quiet selection changes, optional shared listening gain, downloads, chapter reading and a diagram of actual instrument/touch times. It has served-resource, pure score, renderer and shared-player test evidence. **Native layout, keyboard, playback and seeking verification is still outstanding** because the computer-use bridge failed before opening Safari. No audience evaluation or independent Fable review has taken place. The latest focused Living suite has77passing tests; both pre-existing connected WAV hashes survived renderer extraction unchanged. Exact evidence and limitations are in [Astra's implementation notes](../../collab/notes/astra-living-instrument.md).
+
+### The next complete milestone
+
+Bring one candidate journey through a complete local listening and viewing experience, retaining all three studies until musical judgment supports a choice. Do not declare the newest or longest candidate the winner by default.
+
+1. **Close the listening-view verification gap.** Inspect a narrow layout and keyboard controls. Exercise initial silence, Listen, pause/resume, Quiet during preparation, rapid treatment switches, scrubbing, leaving and returning, missing-file recovery and selected downloads. Verify the diagram follows the chosen file rather than merely its separately calculated plan. Source tests alone cannot close this gate.
+2. **Assess musical recognition and pacing.** Listen through whole pieces at the same gain, vary comparison order, and record concrete observations: where the opening becomes recognizable, where an exchange adds something, where repetition or waiting becomes tiresome, and whether the return earns its place. Duration and source material differ, so this is formative composition work rather than a controlled preference claim. Listener evidence would inform revision; engineering work can continue independently while that evidence is unavailable.
+3. **Stage the actual long-form score.** Every voice must use its own source, start/end, release and accepted touches. The current diagram is a score reading, not an embodied performance. Do not reuse a baseline chapter's camera or striker clocks for a connected treatment. Preserve a held view and respect reduced-motion preferences. Resolve overlapping passes assigned to the same visible body explicitly before implying continuous physical state.
+4. **Complete regeneration and keeping before flagship adoption.** A future saved journey must identify its seed, transformation rules and score version; reconstruct the same source and timeline; prepare away from the UI thread with cancellation; and keep audio, visual replay and films consistent. Current WAV/report files are research artifacts, not new Living encounter recipes. Preserve existing encounter1/2/3 and presentation1/2/3/4 identities.
+
+The current audio remains independent four-mode steel-tine passes with ideal impulses and a velocity pickup. Distributed damping is not a felt-pad contact model. Full recorded tails are summed, but successive passes do not share physical state; there is no acoustic radiation or new coupling between these instruments. A longer score does not remove these limits.
+
+The spiritual and psychedelic direction can continue through attentive listening, familiar material returning from an unfamiliar perspective, shared time, and meaningful silence. Keep these as artistic invitations. Do not turn them into prescribed feelings, claims about consciousness, or mandatory interaction. The measure of success is whether the whole experience gives someone a reason to stay or return—not the number of parameters, studies, minutes, or passing tests.
