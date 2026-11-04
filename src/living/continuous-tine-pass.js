@@ -17,6 +17,8 @@ export function createContinuousTinePass(value,{sampleRate=48000,endFrame=60*sam
   if(!Array.isArray(events)||history.length+scheduler.queued+events.length>4096||events.some(e=>!e||e.frame>fadeStart))throw Error('Score exceeds the capture capacity or ending.');
   return scheduler.schedule(events);
  }
+ // Ensemble owners can acknowledge all due score notes before a guest on any body.
+ function flush(){return state==='playing'?remember(scheduler.flush()):[];}
  function tryGuest(strength=.1){
   if(!Number.isFinite(strength)||strength===0||Math.abs(strength)>.1)throw Error('Guest strength must be nonzero and within ±0.1.');
   if(state!=='playing'||scheduler.frame>=fadeStart)return {admitted:false,events:[],reason:'The pass is not accepting touches.'};
@@ -44,5 +46,5 @@ export function createContinuousTinePass(value,{sampleRate=48000,endFrame=60*sam
   if(state!=='ended')throw Error('Only a completed continuous pass can be kept.');
   return Object.freeze({kind:'imagimusic-continuous-tine-record',version:1,design,sampleRate,events:Object.freeze(history.map(({frame,strength,origin})=>Object.freeze({frame,strength,origin}))),fadeStart});
  }
- return Object.freeze({start,schedule,tryGuest,quiet,cancel,process,record,get state(){return state;},get frame(){return scheduler.frame;},snapshot:()=>({state,fadeStart,endFrame,events:history.slice(),body:scheduler.snapshot()})});
+ return Object.freeze({start,schedule,flush,tryGuest,quiet,cancel,process,record,get state(){return state;},get frame(){return scheduler.frame;},snapshot:()=>({state,fadeStart,endFrame,events:history.slice(),body:scheduler.snapshot()})});
 }

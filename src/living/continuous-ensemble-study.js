@@ -3,7 +3,8 @@ import {createTineDesign} from '../tine/address.js';
 import {createContinuousTinePass} from './continuous-tine-pass.js';
 
 /** One existing motif travels among independent bodies. No mechanical coupling,
- * new notes, emotional inference or listener input is involved in this study. */
+ * new score notes or emotional inference. Guests join the same ringing state;
+ * this fixed score does not yet adapt its later answers to those guests. */
 export function createContinuousEnsembleStudy(seed=42,{sampleRate=48000}={}){
  const source=createContinuousReturnStudy(seed,{sampleRate});
  const bodies=Object.freeze([80,95,65].map(lengthMm=>createTineDesign({lengthMm})));
@@ -16,7 +17,7 @@ export function createContinuousEnsembleStudy(seed=42,{sampleRate=48000}={}){
 
 export function createContinuousEnsemblePerformance(seed=42,options={}){
  const plan=createContinuousEnsembleStudy(seed,options),passes=plan.bodies.map(body=>createContinuousTinePass(body,{sampleRate:plan.sampleRate,endFrame:plan.frames}));
- const scores=passes.map((_,body)=>plan.events.filter(event=>event.body===body).map(({frame,strength})=>({frame,strength}))),next=[0,0,0],scratch=passes.map(()=>new Float32Array(16384));
+ const scores=passes.map((_,body)=>plan.events.filter(event=>event.body===body).map(({frame,strength})=>({frame,strength}))),next=[0,0,0],guests=[0,0,0],scratch=passes.map(()=>new Float32Array(16384));
  const cancel=()=>passes.forEach(pass=>pass.cancel());
  function replenish(){
   if(passes[0].state!=='playing')return;
@@ -38,6 +39,20 @@ export function createContinuousEnsemblePerformance(seed=42,options={}){
    return ordered(groups);
   }catch(error){output.fill(0);cancel();throw error;}
  }
+ function tryGuest(body,strength=.1){
+  if(!Number.isInteger(body)||body<0||body>=passes.length)throw Error('Choose one of the three ensemble bodies.');
+  if(!Number.isFinite(strength)||strength===0||Math.abs(strength)>.1)throw Error('Guest strength must be nonzero and within ±0.1.');
+  if(passes[0].state!=='playing')return {admitted:false,events:[],reason:'The ensemble is not accepting touches.'};
+  try{
+   replenish();
+   // Flush across all bodies first. A guest on an earlier-numbered body must
+   // never hide a score note due on another body at this same sample.
+   const due=ordered(passes.map(pass=>pass.flush()));
+   if(guests[body]>=4096-scores[body].length)return {admitted:false,events:due,reason:'Recording space is reserved for this body’s remaining composition.'};
+   const result=passes[body].tryGuest(strength);if(result.admitted)guests[body]++;
+   return {...result,events:[...due,...result.events.map(event=>({...event,body}))]};
+  }catch(error){cancel();throw error;}
+ }
  function quiet(){try{return ordered(passes.map(pass=>pass.quiet()));}catch(error){cancel();throw error;}}
- return Object.freeze({plan,start,process,quiet,cancel,records:()=>passes.map(pass=>pass.record()),snapshot:()=>passes.map(pass=>pass.snapshot()),get state(){return passes[0].state;},get frame(){return passes[0].frame;}});
+ return Object.freeze({plan,start,process,tryGuest,quiet,cancel,records:()=>passes.map(pass=>pass.record()),snapshot:()=>passes.map(pass=>pass.snapshot()),get state(){return passes[0].state;},get frame(){return passes[0].frame;}});
 }
