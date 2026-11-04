@@ -17,7 +17,7 @@ function freeze(value){
 /** Canonical workshop film source, not a flagship recipe or encoded movie.
  * Snapshot all identity before exporting; manual orbit/listening gain excluded.
  */
-export function createLivingJourneyMoviePlan(value,{reveal=true}={}){
+export function createLivingJourneyMovieSource(value,{reveal=true}={}){
  if(typeof reveal!=='boolean')throw Error('Choose whether the journey film reveals response veils.');
  const request=validateLivingJourneyRequest(value),journey=makers[request.treatment](request.seed);
  const view=createLivingJourneyView(journey),layout=freeze(createLivingJourneyLayout(view.allocation));
@@ -30,10 +30,34 @@ export function createLivingJourneyMoviePlan(value,{reveal=true}={}){
   kind:'imagimusic-living-journey-movie-plan',version:1,request,journey,layout,reveal,look:'dusk',
   width:1280,height:720,fps,sampleRate:journey.sampleRate,audioSamples:journey.frames,
   duration,frames:times.length,videoDuration:times.length/fps,
-  hashDigits:JOURNEY_MOVIE_HASH_DIGITS,frameHashes:times.map(t=>traceHash(sample(t),JOURNEY_MOVIE_HASH_DIGITS)),
+  hashDigits:JOURNEY_MOVIE_HASH_DIGITS,frameHashes:[],
   hashScope:'Non-cryptographic state hashes rounded to12decimal places. Every independent instance, assigned pass, response bound, recorded-ending opacity, score-driven performer, accepted-touch count and held camera at i/30 seconds. Reveal choice is applied. These hashes do not establish rendered pixels, encoded bytes, audible synchronization or collision physics.',
   camera:'Canonical held ensemble camera. Manual browser orbit and live following toggle are excluded; the film follows the complete score.',
   audioPolicy:'Use the exact journey study soundtrack at fixed preview gain8; exclude visit listening gain. Preserve its PCM16 WAV separately from lossy film audio. Final video frame extends less than1/30second beyond exact soundtrack duration.',
  });
  return Object.freeze({manifest,times,sample});
+}
+
+function complete(source,frameHashes){
+ return Object.freeze({...source,manifest:freeze({...source.manifest,frameHashes})});
+}
+
+/** Synchronous source retained for offline checks and deterministic comparisons. */
+export function createLivingJourneyMoviePlan(value,options){
+ const source=createLivingJourneyMovieSource(value,options);
+ return complete(source,source.times.map(t=>traceHash(source.sample(t),JOURNEY_MOVIE_HASH_DIGITS)));
+}
+
+/** Internal completion of a source snapshot. Yield in bounded frame batches so
+ * a browser can receive cancellation without waiting for thousands of hashes.
+ * Initial score/response setup remains synchronous; encoding is a later step.
+ */
+export async function completeLivingJourneyMoviePlan(source,{signal,onProgress=()=>{},yieldFrame=()=>new Promise(resolve=>setTimeout(resolve,0))}={}){
+ const check=()=>{if(signal?.aborted)throw new DOMException('Journey film preparation cancelled.','AbortError');};
+ const hashes=[];check();
+ for(let i=0;i<source.times.length;i++){
+  if(i%32===0){onProgress(`Preparing journey frame ${i} / ${source.times.length}`);await yieldFrame();check();}
+  hashes.push(traceHash(source.sample(source.times[i]),JOURNEY_MOVIE_HASH_DIGITS));
+ }
+ check();return complete(source,hashes);
 }

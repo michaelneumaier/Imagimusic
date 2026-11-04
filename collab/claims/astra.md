@@ -986,3 +986,7 @@ Journey film soundtrack complete: three focused tests pass; six regenerated soun
 Journey movie encoding: owns new journey-movie-render.js, journey-movie-backend.js, journey-export.js and tests/living-journey-movie-render.test.js plus own notes. Connect fixed verified frames/decoded kept WAV to local H264/AAC encoder, cancellation and resource cleanup; injected backend tests separate from pending native codec verification.
 
 Journey movie encoding connected: browser H264/AAC adapter plus frame/hash/cancellation orchestration; eight focused film tests pass and full connected-score test-double pipeline checked. Claims released. Native MP4/pixel/audio/codec performance and visitor controls remain unfinished; no encoded-film claim.
+
+Responsive journey film preparation: owns journey-movie-plan.js, journey-export.js and new async-plan tests plus own notes. Split immutable source snapshot from batched frame hashing; retain exact synchronous manifest identity, snapshot audio before yielding and check cancellation before encoder allocation.
+
+Responsive journey film preparation complete: exact manifest preserved with32frame batches/cancellation; ten focused film tests pass. Node initialsetup167ms/maxbatch24ms is scoped CPU evidence only. Claims released. Visitor controls and native encoding/interaction verification remain ahead.
