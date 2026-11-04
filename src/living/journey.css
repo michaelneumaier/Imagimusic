@@ -2,3 +2,12 @@
 #score{margin-top:24px;padding:18px 0;border-block:1px solid #344047}.score-lane{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;height:52px}.score-label{font-size:12px;color:#b8c5c1}.score-track{position:relative;height:32px;background:#15232a;border-radius:5px}.score-pass{position:absolute;top:8px;height:16px;border:1px solid #637b75;border-radius:8px;background:#243c36;opacity:.65}.score-pass.sounding{background:#c9bc92;border-color:#eee0ba;opacity:1}.score-pass i{position:absolute;top:4px;width:3px;height:6px;border-radius:2px;background:#d9dfc8;transform:translateX(-50%)}.score-pass.sounding i{background:#172c2b}.score-cursor{position:absolute;top:0;bottom:0;width:1px;background:#f4e6bd;pointer-events:none}#score-reading{min-height:2em}
 #ensemble{display:block;width:100%;height:auto;aspect-ratio:16/10;border:1px solid #344047;touch-action:none}#ensemble-status{min-height:2em}section[aria-labelledby=ensemble-title]>label{font-size:14px;margin:10px 0}
 #open-journey{display:block;max-width:100%;margin:12px 0}
+#listening-view{background:transparent;margin:0 8px 12px 0}
+.listening-view [data-workshop-only]{display:none!important}
+.listening-view main{max-width:1120px;padding-top:24px}
+.listening-view h1{font-size:clamp(32px,5vw,52px);margin:12px 0 24px}
+.listening-view h1 br{display:none}
+.listening-view .dock{margin-top:16px}
+.listening-view #ensemble-title{font-size:24px;margin:18px 0 12px}
+.listening-view #ensemble{border-color:#50635e;border-radius:12px}
+.listening-caption{font-size:13px;color:#b8c5c1;max-width:760px;margin:20px 0}

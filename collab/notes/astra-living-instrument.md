@@ -719,3 +719,12 @@ Quiet, native pause, keeping WAV/report, opening a kept report, starting the tun
 Syntax/diff checks and served page/modules pass; unique IDs checked. Existing continuation tests cover duplicate endings, epoch cancellation, owner cancellation and manual-next behavior. The full regression result follows below. Native browser automatic playback/transport timing and graphical continuity remain unverified because the native-control startup failure persists; this is implemented local behavior, not a browser acceptance claim. A browser refusing playback stops the sequence and offers the existing retry path.
 
 Regression checkpoint: `npm test` completed891/891 passing,0failures,93.69s. Full output: `/tmp/imagimusic-journey-continuation-suite.log`. This includes core scheduler, worker/generation/report, body comparison and media-stage tests; it does not simulate the new page wiring in a real browser.
+
+
+### A quieter listening view within the workshop
+
+Added an optional Enter listening view / Show the workshop toggle to the existing journey page. It suppresses marked workshop sections (seed/structure selection, score lanes, chapter listing, detailed disclosures and comparisons) while retaining new-journey, Listen/Quiet/native audio, status, continuation, volume, ensemble/motion/veil controls and current downloads. The frame widens and heading contracts. A compact model caption remains. Default remains the full workshop; no new page, audio/score/render identity or motion preference.
+
+Switching views does not start/stop the journey or reset the camera. Entering pauses any comparison whose controls are about to be hidden. Escape exits and focuses the mode button. No persistent setting, forced fullscreen, animation or automatic scrolling. Existing scene ResizeObserver handles canvas dimensions.
+
+Verification: syntax and diff clean; four resourcesHTTP200; HTML parsed for unique IDs and retained controls outside concealed ancestors. Scene resize integration read. Native visual, responsive layout and focus/browser playback verification remains pending the known unavailable native bridge. No new full-suite run for this presentation-only change; latest regression checkpoint remains891passing at db5c1f5. No audience-preference or independent-review claim.

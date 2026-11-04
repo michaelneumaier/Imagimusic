@@ -966,3 +966,7 @@ Tuning listening access complete, including tests/living-tuning-listening.test.j
 Long-journey continuation: owns living-journey.html, journey-main.js and own notes. Reuse established opt-in continuation scheduler for fresh worker-generated journeys after natural ending; cancel on Quiet/manual selection/keeping/page-away/error and retain finite-family limits.
 
 Long-journey continuation implemented: opt-in natural-end sequence, three-second pause plus local worker preparation, bounded latest-artifact retention and explicit stops. Full891tests pass; syntax/resources/IDs/diff checked. Claims released. Native automatic playback/transport/scene verification and independent review remain open.
+
+Journey listening view: owns living-journey.html, journey.css, journey-main.js, new journey-listening-view.js and own notes. Optional reduced workshop chrome retains transport, continuation, sound level, motion options and keeping; reversible without changing the score, audio or camera.
+
+Journey listening view implemented: optional reversible view, essential controls retained and comparisons paused before concealment. Syntax/HTML ancestry/IDs/resources/diff checked. Claims released. Native layout/focus/render verification pending; no sound/default/schema change or independent review claim.

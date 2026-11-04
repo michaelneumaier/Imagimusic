@@ -11,11 +11,13 @@ import {createLivingJourneyGeneration} from './journey-generation.js';
 import {readLivingJourneyReport,LIVING_JOURNEY_REPORT_LIMIT} from './journey-report.js';
 import {setupLivingTuningListening} from './tuning-listening.js';
 import {createListeningContinuation} from './listening-continuation.js';
+import {setupJourneyListeningView} from './journey-listening-view.js';
 
 const $=id=>document.getElementById(id),audio=$('audio'),player=createTineStudyPlayer({audio});
 const media=createLivingJourneyMedia();
 const generated=createLivingJourneyGeneration();
 const tuning=setupLivingTuningListening({beforePlay:()=>stop()});
+setupJourneyListeningView({beforeEnter:()=>tuning.stop()});
 let generatedChoice=false,selectedRequest=null,expectedSha256=null;
 let plan,url,rows=[],generation=0,starting=false;
 let score,marks=[],cursors=[];
