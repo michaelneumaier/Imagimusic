@@ -3,19 +3,19 @@ import assert from 'node:assert/strict';
 import {setupContinuousEnsembleControls} from '../src/living/continuous-ensemble-controls.js';
 function fixture({whole=false}={}){
  const make=()=>({disabled:false,hidden:true,value:'42',handlers:{},addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){return this.handlers[type]?.(event);}});
- const elements={...Object.fromEntries(['start','quiet','seed','status','count','result'].map(name=>[name,make()])),downloads:[make(),make(),make()]};
+ const elements={...Object.fromEntries(['start','quiet','seed','status','count','result','strength'].map(name=>[name,make()])),downloads:[make(),make(),make()],pads:[make(),make(),make()]};elements.strength.value='.05';
  if(whole)elements.whole=make();
- const calls=[],blobs=[],revoked=[];let notify,failAt=-1;
- const session={state:'idle',touches:0,async start(seed){calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
+ const calls=[],blobs=[],revoked=[];let notify,failAt=-1,gate=null;
+ const session={state:'idle',touches:0,async start(seed){calls.push(['start',seed]);this.state='playing';notify({state:this.state,touches:0});},async strike(body,strength){calls.push(['strike',body,strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state,touches:0});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state,touches:0});},dispose(){},time(){return 12;},setListeningDb(value){calls.push(['level',value]);}};
  const visual={begin:seed=>calls.push(['visual',seed]),update(){},stop:()=>calls.push(['visual-stop'])};
  const controls=setupContinuousEnsembleControls({elements,visual,createSession:options=>{notify=options.onChange;return session;},makeURL:blob=>{if(blobs.length===failAt)throw Error('URL failed');blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
- return {elements,calls,blobs,revoked,controls,emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;}};
+ return {elements,calls,blobs,revoked,controls,emit(event){session.state=event.state;notify({touches:0,...event});},failNextAt(n){failAt=n;},setGate(value){gate=value;}};
 }
 const finished={seed:42,records:[80,95,65].map(lengthMm=>({kind:'imagimusic-continuous-tine-record',sampleRate:48000,design:{lengthMm},events:[]})),snapshot:[{endFrame:1200}]};
 test('one Begin starts the picture and piece; Quiet is optional and seed stays fixed',async()=>{
  const f=fixture();assert.equal(f.calls.length,0);assert.equal(f.elements.quiet.disabled,true);
  await f.elements.start.fire('click');assert.deepEqual(f.calls,[['visual',42],['start',42]]);assert.equal(f.elements.start.disabled,true);assert.equal(f.elements.seed.disabled,true);
- await f.elements.start.fire('click');assert.equal(f.calls.length,2);f.emit({state:'playing',touches:3});assert.equal(f.elements.count.textContent,'3 accepted notes');
+ await f.elements.start.fire('click');assert.equal(f.calls.length,2);f.emit({state:'playing',touches:3});assert.equal(f.elements.count.textContent,'3 accepted notes · 0 from you');
  await f.elements.quiet.fire('click');assert.deepEqual(f.calls.at(-1),['quiet']);assert.equal(f.elements.quiet.disabled,true);
 });
 test('only verified completion creates three independent records; failed replacements retain them',async()=>{
@@ -36,4 +36,17 @@ test('whole-piece keep is atomic with the three component links',async()=>{
  const compound=JSON.parse(await f.blobs[3].text());assert.equal(compound.kind,'imagimusic-continuous-ensemble-record');assert.equal(compound.mixGain,1/3);assert.deepEqual(compound.records,finished.records);assert.equal(f.elements.whole.href,'blob:4');assert.equal(f.elements.whole.hidden,false);
  f.failNextAt(7);f.emit({state:'ended',finished});assert.deepEqual(f.revoked,['blob:5','blob:6','blob:7']);assert.equal(f.elements.whole.href,'blob:4');assert.equal(f.elements.downloads[0].href,'blob:1');
  f.controls.dispose();assert.deepEqual(f.revoked.slice(-4),['blob:1','blob:2','blob:3','blob:4']);
+});
+
+test('body buttons share a pending guard and keyboard strength applies only to the focused voice',async()=>{
+ const f=fixture();assert.ok(f.elements.pads.every(p=>p.disabled));await f.elements.start.fire('click');let release;f.setGate(new Promise(resolve=>release=resolve));
+ const pending=f.elements.pads[2].fire('click');assert.ok(f.elements.pads.every(p=>p.disabled));await f.elements.pads[0].fire('click');assert.deepEqual(f.calls.at(-1),['strike',2,.05]);assert.equal(f.calls.length,3);
+ release();await pending;f.setGate(null);assert.ok(f.elements.pads.every(p=>!p.disabled));
+ const key={key:'1',preventDefault(){}};await f.elements.pads[0].fire('keydown',{...key,repeat:true});assert.equal(f.calls.length,3);await f.elements.pads[0].fire('keydown',key);assert.deepEqual(f.calls.at(-1),['strike',0,.025]);
+ f.emit({state:'playing',touches:1,events:[{origin:'guest'}]});assert.equal(f.elements.count.textContent,'1 accepted note · 1 from you');
+ await f.elements.quiet.fire('click');assert.ok(f.elements.pads.every(p=>p.disabled));
+});
+test('stopping during a pending guest cannot re-enable controls from its late completion',async()=>{
+ const f=fixture();await f.elements.start.fire('click');let release;f.setGate(new Promise(resolve=>release=resolve));const pending=f.elements.pads[1].fire('click');f.controls.stop();release();await pending;
+ assert.ok(f.elements.pads.every(p=>p.disabled));assert.equal(f.controls.state,'interrupted');
 });

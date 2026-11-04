@@ -1097,3 +1097,5 @@ Ensemble keep/replay interface complete: atomic whole/component keeping, silent 
 Optional ensemble guest foundation complete: per-body admission, global due-score flush before guests and whole-score recording reservation.128focused tests pass under --no-maglev; unattended preview/raw/record hashes unchanged. Claims released; worklet/verifier/view/session/UI guest integration and independent/native assessment ahead.
 
 Ensemble guest audio/view evidence complete: body/strength worklet commands, exact guest reconstruction, pre-origin/Quiet handling and atomic mixed visual histories.131focused tests pass under --no-maglev. Claims released; session/UI guest integration, native assessment and independent review ahead.
+
+Optional ensemble browser participation complete: correlated guest history, one-pending command lifecycle, optional body/strength controls, view/keep/replay continuity and home/catalog/history. Full1091tests pass under --no-maglev; HTTP/IDs/syntax/diff pass. Claims released; adaptive ensemble replies, native assessment and independent review ahead.

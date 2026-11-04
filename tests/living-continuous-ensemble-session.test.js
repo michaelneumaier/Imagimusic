@@ -40,6 +40,26 @@ test('ensemble session with production worklet and injected audio host',async t=
    assert.equal(s.contexts[0].closed,1);assert.equal(s.nodes[0].port.closed,true);assert.equal(s.stages[0].disposed,true);
    result.records.length=0;assert.equal(s.session.finished.records.length,3);await assert.rejects(s.session.start(-1));assert.equal(s.session.finished.records.length,3);
   });
+  await t.test('optional body touches correlate acknowledgments and history, then keep the exact shared mix',async()=>{
+   const s=setup();await s.session.start();const first=s.session.strike(2,.05);await assert.rejects(s.session.strike(0,.025),/accepting/);await first;
+   await s.session.strike(0,.025);await s.session.strike(1,.05);assert.equal(s.session.guests,3);assert.equal(s.view.accepted.length,0);
+   const samples=await s.pump(),result=await s.finished,channels=result.records.map(r=>renderContinuousTineRecord(r).channels[0]);
+   assert.deepEqual(samples,Float32Array.from(samples,(_,i)=>(channels[0][i]+channels[1][i]+channels[2][i])/3));
+   assert.equal(s.view.accepted.filter(e=>e.origin==='guest').length,3);assert.equal(s.session.touches,28);assert.equal(result.records.reduce((n,r)=>n+r.events.filter(e=>e.origin==='guest').length,0),3);
+  });
+  await t.test('guest command/acknowledgment mismatches cannot become a verified capture',async()=>{
+   for(const mutate of [value=>value.body=1,value=>value.strength=.1]){
+    const s=setup({changeMessage:value=>{if(value.type==='applied'&&value.command==='strike')mutate(value);return value;}});await s.session.start();await assert.rejects(s.session.strike(0,.05),/guest acknowledgment/);assert.equal(s.session.state,'error');assert.equal(s.session.finished,null);
+   }
+   for(const mutate of [value=>value.body=1,value=>value.strength=.1]){
+    const s=setup({changeMessage:value=>{if(value.type==='touches'&&value.touches[0].origin==='guest')mutate(value.touches[0]);return value;}});await s.session.start();await s.session.strike(0,.05);await s.pump();assert.equal(s.session.state,'error');assert.equal(s.view.accepted.length,0);assert.equal(s.session.finished,null);
+   }
+   const frame=setup({changeMessage:value=>{if(value.type==='applied'&&value.command==='strike')value.frame++;return value;}});await frame.session.start();await frame.session.strike(0,.05);await frame.pump();assert.equal(frame.session.state,'error');assert.equal(frame.view.accepted.length,0);
+  });
+  await t.test('Quiet after an accepted pre-origin touch keeps it and rejects further commands',async()=>{
+   const s=setup();await s.session.start();await s.session.strike(1,.025);await s.session.quiet();await assert.rejects(s.session.strike(2,.05),/accepting/);await s.pump();const result=await s.finished;
+   assert.deepEqual(result.records.map(r=>r.events.length),[0,1,0]);assert.ok(result.records.every(r=>r.fadeStart===0));
+  });
   await t.test('Quiet retains a short verified result when a later attempt fails',async()=>{
    let corrupt=false;const s=setup({changeMessage:value=>{if(corrupt&&value.type==='finished')value.snapshot[1].body.modes[0].velocityMPerS+=1;return value;}});
    await s.session.start();await s.session.quiet();await s.pump();const first=await s.finished;assert.ok(first.records.every(r=>r.fadeStart===0));

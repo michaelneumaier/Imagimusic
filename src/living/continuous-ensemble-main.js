@@ -4,7 +4,7 @@ import {createContinuousEnsembleVisual} from './continuous-ensemble-visual.js';
 const $=id=>document.getElementById(id);let replay=null;
 $('body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
 const visual=createContinuousEnsembleVisual({canvas:$('body-canvas'),motion:$('body-motion'),details:$('body-view'),status:$('body-status'),getTime:()=>controls.time()});
-const controls=setupContinuousEnsembleControls({visual,beforePlay:()=>replay?.stop(),elements:{...Object.fromEntries(['start','quiet','seed','status','count','result','whole'].map(name=>[name,$(name)])),downloads:[1,2,3].map(i=>$(`voice-${i}`))}});
+const controls=setupContinuousEnsembleControls({visual,beforePlay:()=>replay?.stop(),elements:{...Object.fromEntries(['start','quiet','seed','status','count','result','whole','strength'].map(name=>[name,$(name)])),pads:[0,1,2].map(i=>$(`pad-${i}`)),downloads:[1,2,3].map(i=>$(`voice-${i}`))}});
 replay=setupContinuousEnsembleReplay({elements:Object.fromEntries(['file','prepare','cancel','listen','quiet','audio','status','wav','json'].map(name=>[name,$(`replay-${name}`)])),getSource:()=>{const finished=controls.finished;return finished?{kind:'imagimusic-continuous-ensemble-record',version:1,mixGain:1/3,records:finished.records}:null;},beforePlay:()=>controls.stop()});
 const phases=['Opening','Echo','Reflection','Space','Gathering','Thinning','Recollection','Return'],marks=[...document.querySelectorAll('.phases li')];
 function draw(){
