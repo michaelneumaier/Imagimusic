@@ -35,3 +35,17 @@ test('low-rate source remains subject to the physical mode admission guard',()=>
  const s={...createLivingGreeting(),sampleRate:8000,events:[{frame:4000,strength:.1}],fadeStart:31800};
  assert.throws(()=>createLivingSpacedAnswer(s),/sample-rate guard/);
 });
+
+test('spaced score drives independent visual clocks and returns the original response',async()=>{
+ const {createLivingArrangementView}=await import('../src/living/arrangement-view.js');
+ const p=createLivingSpacedAnswer(createLivingGreeting()),view=createLivingArrangementView(p),r=p.sampleRate;
+ for(const v of p.voices.slice(1,4)){
+  const first=v.startFrame+p.source.events[0].frame;
+  assert.equal(view.at((first-1)/r).bodies[v.body].touched,false);
+  assert.equal(view.at((first+.5)/r).bodies[v.body].touched,true);
+ }
+ assert.deepEqual(view.at(1).bodies,view.at(p.returnStart/r+1).bodies);
+ assert.equal(view.at(p.voices[3].endFrame/r).cameraOpen,1);
+ assert.equal(view.at(p.returnStart/r).cameraOpen,0);
+ assert.equal(view.at(p.frames/r).touches,15);
+});

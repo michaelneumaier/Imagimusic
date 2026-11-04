@@ -738,3 +738,5 @@
 - 2026-11-03 (Astra): Living first-screen invitation/transport/body consolidated; native390×656 and1100×656 views plus Begin/Touch/Quiet retention checked. Proposal024 defines one directed encounter as the next artistic milestone, with sparse/crowded/still-camera cases and a local film/recipe review artifact.
 
 - 2026-11-03 (Astra): composition workshop compares original round with gesture-span-based spaced answers for four sources (eight WAVs). Exact original/return preservation, six focused tests, independent WAV/hash checks and native narrow playback/tab-away verified. Production score stays v1; recognition-versus-momentum listening decision remains open.
+
+- 2026-11-04 (Astra): visual workshop now pairs original/spaced greeting scores with their matching audio, score-derived chapters and composition-named stills. Native quiet selection, active-score switching,14.5s return and capture-link identity verified; six answer/view checks pass. Main experience/film contracts unchanged.

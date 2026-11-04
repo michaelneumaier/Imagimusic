@@ -686,3 +686,7 @@ Living first-screen consolidation and flagship polish planning complete: native 
 Living answer composition: owns src/living/answer-study.js, tests/living-answer-study.test.js, tools/render-living-answer-study.mjs and ignored renders/living-answer-study. Compare v1 overlap with complete gesture entrances separated by source span plus350ms (minimum800ms); identical bodies/gains/pans/source/return. Link study through existing model details and preparation helper after verification; production arrangement remains v1.
 
 Living answer composition comparison complete: eight local WAVs/report/manual workshop, six focused tests, file and native lifecycle evidence recorded. Claims released; next: direct the musical entrances visually and evaluate the complete encounter.
+
+Living visual composition comparison: owns living-look.html, src/living/look-main.js and tests/living-answer-study.test.js. Add explicit original/spaced greeting selection with matching generated audio, plan-derived chapter moments and quiet reset; keep production scene/film defaults unchanged.
+
+Living visual composition comparison complete: matching score/audio, quiet reset, adaptive chapters and named stills checked natively; six focused answer/view tests pass. Claim released.
