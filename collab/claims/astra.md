@@ -846,3 +846,7 @@ Fragment journey comparison complete:27 WAVs rendered,13 focused tests pass, nat
 Partial-reply tail evidence: owns tools/render-living-answer-study.mjs and current evidence/plan appendices. Add source-window RMS and onset-gap context to existing comparison/report; distinguish ringing from silence without inventing an audibility threshold. Preserve score pending perceptual assessment.
 
 Partial-reply tail evidence complete:54 source-window measurements verified, regenerated existing comparisons, native18.23s return confirmed. Claims released. No score timing change or subjective listening verdict.
+
+Damped release foundation: owns new src/tine/damped-release.js and tests/tine-damped-release.test.js plus evidence appendices. Experimental post-touch added modal viscous damping with continuous displacement/velocity and matched response/audio; no finite contact or saved-schema change. Existing physics/kernel remain untouched.
+
+Damped release foundation complete:9 focused tests pass;5 experimental whole-piece WAVs rendered with unchanged other voices and explicit distributed-loss limits. Claims released. Matching workshop integration and listening assessment remain next; no independent review claimed.
