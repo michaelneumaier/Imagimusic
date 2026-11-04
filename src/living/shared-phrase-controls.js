@@ -1,3 +1,4 @@
+import {livingPersonalJourneyHref} from './personal-journey-input.js';
 import {createLivingSharedPhraseSession} from './shared-phrase-session.js';
 import {createListeningLevel} from '../grove/listening-level.js';
 import {tineLiveFragment} from '../tine/live-address.js';
@@ -13,15 +14,19 @@ export function createSharedPhraseListeningStage(context,options){
 export function setupSharedPhraseControls({getSource,beforePlay,onChange=()=>{},elements,
  createSession=createLivingSharedPhraseSession,makeURL=blob=>URL.createObjectURL(blob),revokeURL=url=>URL.revokeObjectURL(url),createItem=()=>document.createElement('li'),
 }){
- const {start,pad,strength,quiet,status,history,download,replay,result}=elements;
+ const {start,pad,strength,quiet,status,history,download,replay,develop,result}=elements;
  let session,quota=0,pending=0,version=0,currentURL=null;
  const active=()=>['preparing','playing','ringing','ending'].includes(session.state);
  function update(){start.disabled=active();pad.disabled=session.state!=='playing'||session.touches+pending>=quota;quiet.disabled=!active();onChange();}
  function keep(finished){
   const href='tine-play.html'+tineLiveFragment(finished.record);
+  let journeyHref=null,journeyNote='';
+  if(!finished.record.events.length)journeyNote=' This ending has no touches to develop into a journey.';
+  else try{journeyHref=livingPersonalJourneyHref(finished.record);}catch(error){journeyNote=` This combined phrase can be kept and replayed, but cannot seed a journey: ${error.message}`;}
   const next=makeURL(new Blob([JSON.stringify(finished.record,null,2)+'\n'],{type:'application/json'}));
   const previous=currentURL;currentURL=next;download.href=next;replay.href=href;
-  result.hidden=false;result.textContent=`Last completed shared phrase: ${finished.record.events.length} touches, including ${finished.snapshot.guestTouches} from you. The kept record contains the combined performance; your original journey stays selected.`;
+  result.hidden=false;result.textContent=`Last completed shared phrase: ${finished.record.events.length} touches, including ${finished.snapshot.guestTouches} from you. The kept record contains the combined performance; your original journey stays selected.`+journeyNote;
+  develop.hidden=!journeyHref;if(journeyHref)develop.href=journeyHref;else develop.removeAttribute('href');
   download.hidden=replay.hidden=false;if(previous)revokeURL(previous);
  }
  session=createSession({listeningDb:0,createListeningStage:createSharedPhraseListeningStage,onChange:event=>{

@@ -2,11 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {setupSharedPhraseControls,createSharedPhraseListeningStage} from '../src/living/shared-phrase-controls.js';
 import {createTineDesign} from '../src/tine/address.js';
+import {readLivingPersonalPhrase} from '../src/living/personal-journey-input.js';
+import {createLivingPersonalJourneyStudy} from '../src/living/personal-journey-study.js';
 import {readTineLiveAddress} from '../src/tine/live-address.js';
 const source={kind:'imagimusic-tine-live',version:1,design:createTineDesign(),sampleRate:48000,events:[{frame:0,strength:.025},{frame:24000,strength:.05}],fadeStart:120000};
 function fixture(){
- const make=()=>({disabled:false,hidden:true,children:[],handlers:{},value:'.05',addEventListener(t,f){this.handlers[t]=f;},fire(t,event={}){return this.handlers[t]?.(event);},append(item){this.children.push(item);},replaceChildren(){this.children=[];},focus(){this.focused=true;}});
- const elements=Object.fromEntries(['start','pad','strength','quiet','status','history','download','replay','result'].map(k=>[k,make()]));
+ const make=()=>({disabled:false,hidden:true,children:[],handlers:{},value:'.05',addEventListener(t,f){this.handlers[t]=f;},fire(t,event={}){return this.handlers[t]?.(event);},append(item){this.children.push(item);},replaceChildren(){this.children=[];},focus(){this.focused=true;},removeAttribute(key){delete this[key];}});
+ const elements=Object.fromEntries(['start','pad','strength','quiet','status','history','download','replay','develop','result'].map(k=>[k,make()]));
  const revoked=[],blobs=[],strikes=[];let notify,coordinations=0,startGate=null;
  const session={state:'idle',touches:0,async start(record,options){this.state='preparing';notify({state:this.state});if(startGate)await startGate;this.state='playing';notify({state:this.state});},async strike(value){strikes.push(value);this.touches++;notify({state:this.state,events:[{origin:'guest',frame:30000,strength:value}]});},async quiet(){this.state='ending';notify({state:this.state});},park(){this.state='interrupted';notify({state:this.state});},setListeningDb(value){this.db=value;}};
  const controls=setupSharedPhraseControls({elements,getSource:()=>source,beforePlay:()=>coordinations++,createSession:options=>{notify=options.onChange;assert.equal(options.listeningDb,0);return session;},createItem:make,makeURL:blob=>{blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
@@ -19,6 +21,10 @@ test('start invites optional focused input, accepted touches are labelled, and o
  const record={...source,events:[...source.events,{frame:30000,strength:.05}]};f.session.state='ended';f.emit({state:'ended',finished:{record,snapshot:{guestTouches:1}}});
  assert.deepEqual(JSON.parse(await f.blobs[0].text()),record);assert.deepEqual(readTineLiveAddress(f.elements.replay.href.slice('tine-play.html'.length)),record);
  assert.equal(f.elements.download.hidden,false);assert.equal(f.elements.result.hidden,false);
+ assert.equal(f.elements.develop.hidden,false);
+ const retained=readLivingPersonalPhrase(new URL(f.elements.develop.href,'http://localhost:8081/').href);
+ assert.deepEqual(retained,record);const next=createLivingPersonalJourneyStudy(retained);
+ assert.deepEqual(next.sections[0].source.events,record.events);assert.deepEqual(next.sections.at(-1).source.events,record.events);
  const href=f.elements.download.href;await f.elements.start.fire('click');f.session.state='error';f.emit({state:'error',message:'Injected failure'});assert.equal(f.elements.download.href,href);assert.deepEqual(f.revoked,[]);
  f.session.state='ended';f.emit({state:'ended',finished:{record:source,snapshot:{guestTouches:0}}});assert.deepEqual(f.revoked,['blob:1']);
 });
@@ -40,4 +46,13 @@ test('live shared listening uses fixed centered preview gain before the adjustab
  const context={currentTime:0,createGain:node,createWaveShaper:node};const stage=createSharedPhraseListeningStage(context,{db:0});
  assert.equal(stage.input.gain.value,8/Math.sqrt(2));assert.equal(stage.input.to,nodes[0]);assert.equal(nodes[0].to,stage.output);
  stage.setDb(20);assert.equal(nodes[0].gain.target,10);assert.equal(stage.input.gain.value,8/Math.sqrt(2));stage.dispose();assert.ok(nodes.every(n=>n.closed));
+});
+
+test('an empty early ending clears the old development link but still keeps the completed pass',()=>{
+ const f=fixture();f.session.state='ended';f.emit({state:'ended',finished:{record:source,snapshot:{guestTouches:0}}});
+ assert.equal(f.elements.develop.hidden,false);
+ f.emit({state:'ended',finished:{record:{...source,events:[],fadeStart:0},snapshot:{guestTouches:0}}});
+ assert.equal(f.elements.develop.hidden,true);assert.equal(f.elements.develop.href,undefined);
+ assert.equal(f.elements.download.hidden,false);assert.equal(f.elements.replay.hidden,false);assert.equal(f.blobs.length,2);
+ assert.match(f.elements.result.textContent,/no touches/);
 });
