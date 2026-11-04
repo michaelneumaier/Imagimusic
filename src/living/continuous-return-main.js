@@ -1,7 +1,7 @@
 import {setupContinuousReturnControls} from './continuous-return-controls.js';
 import {createContinuousReturnVisual} from './continuous-return-visual.js';
 import {setupContinuousReturnReplay} from './continuous-return-replay.js';
-const $=id=>document.getElementById(id),names=['start','quiet','pad','strength','seed','status','count','download','result'];
+const $=id=>document.getElementById(id),names=['start','quiet','pad','strength','seed','mode','status','count','download','result'];
 let replay=null;
 $('body-motion').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;
 const visual=createContinuousReturnVisual({canvas:$('body-canvas'),motion:$('body-motion'),details:$('body-view'),status:$('body-status'),getTime:()=>controls.time()});
@@ -11,8 +11,9 @@ const phases=['Opening','Echo','Reflection','Space','Gathering','Thinning','Reco
 const marks=[...document.querySelectorAll('.phases li')];
 function draw(){
  const showing=['playing','ending','verifying','ended'].includes(controls.state),seconds=showing?controls.time():0,index=Math.min(7,Math.floor(seconds/6));$('progress').value=seconds;
- $('phase').textContent=!showing?'A gesture, and its return':phases[index];
- marks.forEach((mark,i)=>{mark.classList.toggle('current',i===index&&showing);if(i===index&&showing)mark.setAttribute('aria-current','step');else mark.removeAttribute('aria-current');});
+ const names=phases.map((name,i)=>controls.mode==='memory'&&controls.memoryTouches>0&&seconds>=6?(i===3?'Your gesture, answered':i===6?'Your gesture, recalled':name):name);
+ $('phase').textContent=!showing?'A gesture, and its return':names[index];
+ marks.forEach((mark,i)=>{mark.textContent=names[i];mark.classList.toggle('current',i===index&&showing);if(i===index&&showing)mark.setAttribute('aria-current','step');else mark.removeAttribute('aria-current');});
  $('elapsed').textContent=`${Math.floor(seconds)} / 48 seconds`;
 }
 let timer=setInterval(draw,200);draw();

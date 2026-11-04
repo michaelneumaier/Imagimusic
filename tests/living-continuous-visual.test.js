@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {createMemoryReturnPerformance} from '../src/living/memory-return-study.js';
 import assert from 'node:assert/strict';
 import {createContinuousReturnVisual} from '../src/living/continuous-return-visual.js';
 import {createContinuousReturnStudy} from '../src/living/continuous-return-study.js';
@@ -42,4 +43,12 @@ test('context loss releases the picture and restoration rebuilds the current acc
  const f=fixture();f.view.begin(42);await flush();f.view.update({state:'playing',events:[{...source.events[0],index:0,origin:'score'}]});
  let prevented=false;f.canvas.fire('webglcontextlost',{preventDefault:()=>prevented=true});assert.equal(prevented,true);assert.equal(f.disposed,1);assert.equal(f.tasks.size,0);
  f.time=.6;f.canvas.fire('webglcontextrestored');await flush();assert.equal(f.created,2);assert.equal(f.frames.at(-1).touches,1);f.view.dispose();
+});
+
+test('explicit remembered mode displays both answers through completion',async()=>{
+ const f=fixture(),p=createMemoryReturnPerformance();f.view.begin(42,{mode:'memory'});await flush();p.start();
+ f.view.update({state:'playing',events:p.tryGuest(.05).events});
+ while(p.state!=='ended')f.view.update({state:'playing',events:p.process(new Float32Array(4096))});
+ f.view.update({state:'ended',finished:{record:p.record()}});
+ assert.equal(f.disposed,0);assert.equal(f.frames.at(-1).touches,p.snapshot().events.length);assert.equal(f.frames.at(-1).instances[0].endingOpacity,0);assert.equal(f.tasks.size,0);f.view.dispose();
 });

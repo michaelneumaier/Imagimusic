@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import {setupContinuousReturnControls} from '../src/living/continuous-return-controls.js';
 function fixture(){
  const make=()=>({disabled:false,hidden:true,value:'.05',handlers:{},addEventListener(type,fn){this.handlers[type]=fn;},fire(type,event={}){return this.handlers[type]?.(event);}});
- const elements=Object.fromEntries(['start','quiet','pad','strength','seed','status','count','download','result'].map(name=>[name,make()]));elements.seed.value='42';
+ const elements=Object.fromEntries(['start','quiet','pad','strength','seed','mode','status','count','download','result'].map(name=>[name,make()]));elements.seed.value='42';elements.mode.value='fixed';
  let notify,gate=null;const calls=[],blobs=[],revoked=[];
- const session={state:'idle',async start(seed){calls.push(['start',seed]);this.state='playing';notify({state:this.state});},async strike(strength){calls.push(['strike',strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state});},dispose(){},setListeningDb(value){calls.push(['level',value]);},time(){return 12;}};
+ const session={state:'idle',async start(seed,options){this.options=options;calls.push(['start',seed]);this.state='playing';notify({state:this.state});},async strike(strength){calls.push(['strike',strength]);if(gate)await gate;},async quiet(){calls.push(['quiet']);this.state='ending';notify({state:this.state});},park(){calls.push(['park']);this.state='interrupted';notify({state:this.state});},dispose(){},setListeningDb(value){calls.push(['level',value]);},time(){return 12;}};
  const controls=setupContinuousReturnControls({elements,createSession:options=>{notify=options.onChange;return session;},makeURL:blob=>{blobs.push(blob);return `blob:${blobs.length}`;},revokeURL:url=>revoked.push(url)});
  return {elements,session,calls,blobs,revoked,controls,emit(event){session.state=event.state;notify(event);},setGate(value){gate=value;}};
 }
@@ -33,4 +33,13 @@ test('pending touch and modified/repeated keys cannot enqueue extra inputs',asyn
 test('verification cancellation parks the session, while level and time stay delegated',async()=>{
  const f=fixture();f.emit({state:'verifying'});await f.elements.quiet.fire('click');assert.deepEqual(f.calls,[['park']]);assert.equal(f.blobs.length,0);
  f.controls.setDb(6);assert.deepEqual(f.calls.at(-1),['level',6]);assert.equal(f.controls.time(),12);
+});
+
+test('remembered mode is fixed per run and does not require a contribution',async()=>{
+ const f=fixture();f.elements.mode.value='memory';await f.elements.start.fire('click');
+ assert.deepEqual(f.session.options,{mode:'memory'});assert.equal(f.controls.mode,'memory');assert.equal(f.controls.memoryTouches,0);assert.equal(f.elements.mode.disabled,true);
+ f.elements.mode.value='fixed';assert.equal(f.controls.mode,'memory');
+ f.emit({state:'playing',events:[{origin:'guest',frame:0},{origin:'guest',frame:288000},{origin:'guest',frame:1},{origin:'guest',frame:2},{origin:'guest',frame:3}]});
+ assert.equal(f.controls.memoryTouches,3);f.controls.stop();assert.equal(f.elements.mode.disabled,false);
+ await f.elements.start.fire('click');assert.deepEqual(f.session.options,{mode:'fixed'});assert.equal(f.controls.memoryTouches,0);
 });

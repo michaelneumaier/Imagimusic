@@ -1,4 +1,5 @@
 import {createContinuousReturnStudy} from './continuous-return-study.js';
+import {createMemoryReturnStudy} from './memory-return-study.js';
 import {requestForTineDesign} from '../tine/address.js';
 import {createTineImpulse} from '../tine/impulse.js';
 
@@ -7,8 +8,10 @@ import {createTineImpulse} from '../tine/impulse.js';
  * Signed states combine before magnitudes, preserving interference. The veil
  * is a displacement bound, not instantaneous screen-rate vibration or pressure.
  */
-export function createContinuousReturnView(seed=42,{sampleRate=48000}={}){
- const plan=createContinuousReturnStudy(seed,{sampleRate}),model=createTineImpulse(requestForTineDesign(plan.design).geometry);
+export function createContinuousReturnView(seed=42,{sampleRate=48000,mode='fixed'}={}){
+ if(!['fixed','memory'].includes(mode))throw Error('Choose a supported visual composition mode.');
+ let plan=(mode==='memory'?createMemoryReturnStudy:createContinuousReturnStudy)(seed,{sampleRate}),memory=[],sealed=false;
+ const model=createTineImpulse(requestForTineDesign(plan.design).geometry);
  const unit=model.strike({activation:plan.design.activation,impulseNs:1e-6}),positions=Array.from({length:81},(_,i)=>i/80),shapes=positions.map(u=>model.modes.map(m=>Math.abs(m.shape(u))));
  const checkpoints=[];let scores=0,guests=0,fadeStart=plan.frames-Math.round(.025*sampleRate);
  //1000x spatial magnification (100 drawing units per metre) keeps the full
@@ -24,18 +27,24 @@ export function createContinuousReturnView(seed=42,{sampleRate=48000}={}){
  }
  function accept(batch){
   if(!Array.isArray(batch)||batch.length+checkpoints.length>4096)throw Error('Invalid continuous visual history.');
-  let scoreCount=scores,guestCount=guests,previous=checkpoints.at(-1);const next=[];
+  let scoreCount=scores,guestCount=guests,previous=checkpoints.at(-1),candidatePlan=plan,candidateSealed=sealed;const next=[],candidateMemory=memory.slice();
   for(const [offset,input] of batch.entries()){
    if(!input||input.index!==checkpoints.length+offset||!Number.isInteger(input.frame)||input.frame<(previous?.event.frame??0)||input.frame>fadeStart||!Number.isFinite(input.strength)||input.strength===0||Math.abs(input.strength)>.1||!['score','guest'].includes(input.origin))throw Error('Invalid continuous visual touch.');
+   if(mode==='memory'&&!candidateSealed&&input.frame>=6*sampleRate){candidatePlan=createMemoryReturnStudy(seed,{sampleRate,contributions:candidateMemory});candidateSealed=true;}
    if(input.origin==='score'){
-    const planned=plan.events[scoreCount++];if(!planned||planned.frame!==input.frame||planned.strength!==input.strength)throw Error('The visible score differs from its source.');
-   }else{if(plan.events[scoreCount]?.frame<=input.frame)throw Error('A guest cannot precede a due score note.');guestCount++;}
+    const planned=candidatePlan.events[scoreCount++];if(!planned||planned.frame!==input.frame||planned.strength!==input.strength)throw Error('The visible score differs from its source.');
+   }else{
+    if(candidatePlan.events[scoreCount]?.frame<=input.frame)throw Error('A guest cannot precede a due score note.');guestCount++;
+    if(mode==='memory'&&input.frame<6*sampleRate&&candidateMemory.length<3)candidateMemory.push({frame:input.frame,strength:input.strength,index:input.index,origin:'guest'});
+   }
    const state=propagate(previous,input.frame);for(let i=0;i<state.v.length;i++)state.v[i]+=input.strength*unit.initialVelocity[i];
    previous={...state,event:Object.freeze({frame:input.frame,strength:input.strength,index:input.index,origin:input.origin}),scores:scoreCount,guests:guestCount};next.push(previous);
   }
-  checkpoints.push(...next);scores=scoreCount;guests=guestCount;
+  checkpoints.push(...next);scores=scoreCount;guests=guestCount;plan=candidatePlan;memory=candidateMemory;sealed=candidateSealed;
  }
- function end(frame){if(!Number.isInteger(frame)||frame<0||frame>fadeStart||frame<(checkpoints.at(-1)?.event.frame??0))throw Error('Invalid continuous visual ending.');fadeStart=frame;}
+ function end(frame){if(!Number.isInteger(frame)||frame<0||frame>fadeStart||frame<(checkpoints.at(-1)?.event.frame??0))throw Error('Invalid continuous visual ending.');
+  if(mode==='memory'&&!sealed&&frame>=6*sampleRate){plan=createMemoryReturnStudy(seed,{sampleRate,contributions:memory});sealed=true;}
+  fadeStart=frame;}
  function at(seconds){
   if(!Number.isFinite(seconds)||seconds<0||seconds>48)throw Error('Invalid continuous visual time.');
   const raw=seconds*sampleRate,nearest=Math.round(raw),frame=Math.abs(raw-nearest)<1e-7?nearest:raw;
@@ -47,5 +56,5 @@ export function createContinuousReturnView(seed=42,{sampleRate=48000}={}){
   return {seconds,frame,touches:lo,scoreTouches:previous?.scores??0,guestTouches:previous?.guests??0,amplitudesM,
    instances:[{...layout.instances[0],points:previous?points:null,touched:!!previous,touchMarker,endingOpacity,passId:previous?0:null,localSeconds:frame/sampleRate}],performers:[]};
  }
- return Object.freeze({plan,layout,magnification,accept,end,at,get accepted(){return checkpoints.map(c=>c.event);}});
+ return Object.freeze({get plan(){return plan;},layout,magnification,accept,end,at,get accepted(){return checkpoints.map(c=>c.event);}});
 }

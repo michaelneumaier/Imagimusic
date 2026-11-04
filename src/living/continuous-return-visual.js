@@ -17,9 +17,9 @@ export function createContinuousReturnVisual({canvas,motion,details,status,getTi
   try{const createScene=await loadScene();if(own!==epoch||!isVisible())return;scene=createScene(canvas,{ensemble:model.layout,responseMagnification:model.magnification});scene.setLook('dusk');status.textContent='One continuous body · response bound magnified 1,000× · gold markers acknowledge accepted touches.';refresh();}
   catch(error){if(own===epoch)fail(error);}finally{if(own===epoch)loading=false;}
  }
- function begin(seed=42){
+ function begin(seed=42,options={}){
   epoch++;loading=false;stopFrames();active=false;last=-Infinity;heldTime=0;endLimit=48;
-  try{model=createContinuousReturnView(seed);if(scene)scene.instanceFrame(model.at(0),true);ensureScene();}
+  try{model=createContinuousReturnView(seed,options);if(scene)scene.instanceFrame(model.at(0),true);ensureScene();}
   catch(error){model=null;fail(error);}
  }
  function update(event){

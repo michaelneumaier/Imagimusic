@@ -1075,3 +1075,5 @@ Whole-score capture-capacity fix complete in continuous-return-study.js and memo
 Responsive completion contract complete: explicit variant identity, exact remembered contributions/derived answers and physical-history reconstruction, with fixed verifier rejecting variant messages. Sixty-nine focused tests pass under --no-maglev; syntax/diff checked. Claims released; responsive worker/worklet/session/view integration and independent review remain ahead.
 
 Responsive live routing complete: memory worklet/verification worker and session dispatch implemented;78focused and full regression pass under --no-maglev. Claims released; visual/UI integration, native assessment and independent review remain ahead. Explicit immutable per-run variant selection and matching verification pipeline.
+
+Responsive view and listening choice complete: atomic remembered-score validation, mode-aware scene/control routing and optional pre-start selection.84focused tests pass under --no-maglev; HTTP/IDs/syntax/diff checked. Claims released. Native assessment and independent review remain pending.
